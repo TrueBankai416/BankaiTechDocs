@@ -48,7 +48,7 @@ I ran `cat /root/.ssh/id_ed25519.pub`
 :::
 
 ### Adding SSH key to GitHub
-<p>Go back over to GitHub and Paste the SSH key you just copied</p
+<p>Go back over to GitHub and Paste the SSH key you just copied</p>
 
 ![key](/img/Docusaurus/Styling/key.jpg)
 
