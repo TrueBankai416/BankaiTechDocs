@@ -1,0 +1,184 @@
+## Adding Last Updated Feature
+<h3>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</h3>
+![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
+### Creating a GitHub Repository
+<p>First we need to create a [GitHub Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/quickstart-for-repositories).
+<p>When you are done creating your new repository we will have to add `SSH Keys` to your account</p>
+<p>In the upper-right corner of any page, click your profile photo, then click Settings.</p>
+
+![GitHub Settings](/img/Docusaurus/Styling/githubSettings.png)
+
+<p>In the "Access" section of the sidebar, click SSH and GPG keys.</p>
+
+![SSH and GPG keys](/img/Docusaurus/Styling/sshKeys.jpg)
+
+<p>Click `New SSH key`</p>
+
+![New SSH key](/img/Docusaurus/Styling/NewSSHkey.png)
+
+<p>You should now see this screen</p>
+
+![Paste key](/img/Docusaurus/Styling/addKey.jpg)
+:::note
+I used my repo name `BankaiTechDocs` for the Key name\
+Key type is `Authentication key`
+:::
+
+### Creating local SSH key
+<p>Go to your temninal and run this command</p>
+```
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+<p>Press `ENTER` and follow the prompts</p>
+
+![Generate Keys](/img/Docusaurus/Styling/generateKey.jpg)
+
+:::tip[Recommended]
+You do not need to enter a `passphrase` but it is recommended for security
+:::warning
+If you do use a Passphrase, please keep it safe as you will need it every time you run `Git pull` or `Git push`
+:::
+
+<p>Run the following command and copy the contents of the result</p>
+```
+cat <location of new ssh key>
+```
+:::info
+I ran `cat /root/.ssh/id_ed25519.pub`
+:::
+
+### Adding SSH key to GitHub
+<p>Go back over to GitHub and Paste the SSH key you just copied</p
+
+![key](/img/Docusaurus/Styling/key.jpg)
+
+<p>Press `Add SSH key`</p>
+
+## Creating a local .git repo
+<p>Go to the root directory of your website</p>
+:::note
+This directory will contain your `docusaurus.config.js` or `docusaurus.config.ts` file
+:::
+<p>In your terminal, run the following commands</p>
+```
+git init
+git config --global user.name "<USER_NAME>"
+git config --global user.email "<USER_EMAIL>"
+```
+## Connecting to the remote Repo
+<p>We are going to need the SSH url for your repo, we can find that here</p>
+
+![Repo URL](/img/Docusaurus/Styling/sshUrl.jpg)
+
+<p>Run this command to add your remote repo</p>
+```
+git remote add origin <SSh Repo URL>
+```
+:::note[Example]
+`git@github.com:TrueBankai416/BankaiTechDocs.git`
+:::
+
+<p>Now run the following commands</p>
+```
+git add -A
+git commit -m 'main'
+git push  origin master
+git pull origin main
+```
+<p>You should now be able to make changes on GitHub and then run `git pull origin main` to download the changes locally, or you can make changes locally and run `git push origin main` to send the changes to GitHub</p>
+:::note
+When you run `git pull origin main` you will have to run `npm run build` afterwards to apply the changes
+:::
+
+## Enabling the last updated footer
+### Editing the docusaurus config file
+<p>We will need to first make some changes in your `docusaurus.config.ts` file</p>
+```
+nano docusaurus.config.ts
+```
+<p>Find the following Snippet of code</p>
+```
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          routeBasePath: '/', // Serve the docs at the site's root
+          sidebarPath: './sidebars.ts',
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: false, //{
+      //    showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+       // },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+```
+<p>Add the following lines in the `docs` section</p>
+```
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+```
+<p>The snippet of code should now look like this</p>
+```
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+          routeBasePath: '/', // Serve the docs at the site's root
+          sidebarPath: './sidebars.ts',
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: false, //{
+      //    showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+       // },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+```
+
+### Adding the last updated to Font Matter
+<p>Open up one of your `.md` files in `/docs`</p>
+<p>Add the following lines to the top of the file</p>
+```
+---
+last_update:
+  date: 2024/04/17
+  author: custom author name
+---
+```
+:::note
+You will have to add this too all of your `.md` files
+:::
+<p>Now everytime you run `git pull origin main` and `npm run build` it will update the `last_updated` line from `git history`</p>
+
+## References
+[Font Matter Options](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#markdown-front-matter)
+[Introduction to GIT](https://learn.microsoft.com/en-us/training/modules/intro-to-git/2-exercise-configure-git)
+[How to Push Existing Project to GitHub](https://www.digitalocean.com/community/tutorials/how-to-push-an-existing-project-to-github)
+[GitHub Remote Repositories](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)
+[Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+[Generating SSH key to local System](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
