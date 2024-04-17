@@ -1,0 +1,8 @@
+{
+  "label": "Tutorial - Docker",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Tutorials showing you how to run Self-Hosted systems using Docker."
+  }
+}
