@@ -2,7 +2,7 @@
 <h3>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</h3>
 ![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
 ### Creating a GitHub Repository
-<p>First we need to create a [GitHub Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/quickstart-for-repositories).
+<p>First we need to create a [GitHub Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/quickstart-for-repositories).</p>
 <p>When you are done creating your new repository we will have to add `SSH Keys` to your account</p>
 <p>In the upper-right corner of any page, click your profile photo, then click Settings.</p>
 
