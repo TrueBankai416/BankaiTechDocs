@@ -34,6 +34,7 @@ const config: Config = {
       'classic',
       {
         docs: {
+          showLastUpdateAuthor: true,
           showLastUpdateTime: true,
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.ts',
