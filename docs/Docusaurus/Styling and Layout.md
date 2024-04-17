@@ -176,9 +176,9 @@ You will have to add this too all of your `.md` files
 <p>Now everytime you run `git pull origin main` and `npm run build` it will update the `last_updated` line from `git history`</p>
 
 ## References
-[Font Matter Options](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#markdown-front-matter)
-[Introduction to GIT](https://learn.microsoft.com/en-us/training/modules/intro-to-git/2-exercise-configure-git)
-[How to Push Existing Project to GitHub](https://www.digitalocean.com/community/tutorials/how-to-push-an-existing-project-to-github)
-[GitHub Remote Repositories](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)
-[Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+[Font Matter Options](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#markdown-front-matter)\
+[Introduction to GIT](https://learn.microsoft.com/en-us/training/modules/intro-to-git/2-exercise-configure-git)\
+[How to Push Existing Project to GitHub](https://www.digitalocean.com/community/tutorials/how-to-push-an-existing-project-to-github)\
+[GitHub Remote Repositories](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)\
+[Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)\
 [Generating SSH key to local System](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
