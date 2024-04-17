@@ -1,0 +1,200 @@
+## Nextcloud Installation using Docker Compose
+***This method includes Redis and MariaDB***
+
+First lets update your system.
+```
+sudo apt-get update && apt-get upgrade -y
+```
+
+### Setting up the directories
+Now lets setup the Directories
+:::note
+
+You can change the directories to your liking.
+
+:::
+
+```
+sudo mkdir /var/docker && sudo mkdir /var/docker/nextcloud
+```
+Lets take ownership of the directory
+```
+sudo chown -R 1000:1000 /var/docker
+```
+### Creating .env files
+Now lets make two [Docker Secrets](https://docs.docker.com/compose/use-secrets/) files in the new directory.
+```
+cd /var/docker/nextcloud
+nano .mariadb.env
+```
+Paste this using `CTRL+SHIFT+V`
+```
+MYSQL_ROOT_PASSWORD=CHANGEME
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+```
+:::tip[Info]
+
+Please Change `CHANGEME` to a password of your choosing.
+
+:::
+Save the new file by pressing `CTRL+X`
+
+Now lets make the second file.
+```
+nano .nextcloud.env
+```
+Paste the Following
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
+TRUSTED_PROXIES=<IP address of your Reverse Proxy>
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://cloud.<YourDomain>.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-100M
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+```
+:::tip[Info]
+
+<p>Please Change the `Domain` and `Reverse Proxy IP`.</p>
+
+:::warning[warning]
+
+<p>Please make sure that the Password is the same as the one you previously set in the last file</p>
+<p>Remove all instances of `<>`</p>
+:::
+
+### Creating the Compose file
+Now lets create the compose file.
+```
+nano docker-compose.yaml
+```
+Paste this into the file
+```
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - mariadb
+      - redis
+    volumes:
+      - ./nextcloud:/var/www/html
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+```
+## Starting Nextcloud
+Now lets start it up.
+```
+sudo docker compose up -d
+```
+:::info
+
+the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
+:::
+<p>After its done pulling the docker images you can open up a web browser.</p>
+<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+<p>You should see this screen.</p>
+
+![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
+
+### Account Creation
+<p>Now create an admin account and click `Install`</p>
+<p>Click `Install Recommended Apps`</p>
+
+![Nextcloud Install Recommended Apps](/img/nextcloud/FirstStart_RecommendedApps.jpg)
+
+<p>When its done installing you should see your Dashboard</p>
+
+![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
+
+### Checking for errors and warnings
+<p>On the top right click the `User Icon` and go to `Administration Settings`</p>
+
+![Nextcloud Administration Settings](/img/nextcloud/Administration_Settings.jpg)
+
+<p>Here you should see `Security & Setup Warnings`</p>
+
+![Nextcloud Warnings](/img/nextcloud/Warnings.jpg)
+
+<p>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</p>
+
+### Modifying the config.php file
+Run the following command to open the `config.php` file with nano.
+```
+nano nextcloud/config/config.php
+```
+:::tip[Hint]
+
+<p>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</p>
+Run `cd /var/docker/nextcloud` then try again.
+:::
+
+Now add the following to the bottom of the file.
+```
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+```
+
+
+![Nextcloud config.php](/img/nextcloud/config.jpg)
+
+<p>Now if you go back to your `Administration Settings` Page.</p>
+It should look something like this.
+
+![Nextcloud No Warnings](/img/nextcloud/NoErrors.jpg)
+
+:::tip[HINT]
+
+In some cases, you may have to delete your browser cache and restart the browser for the Warnings to update.
+:::
+
+### Creating production use user
+<p>Now you can go create a user for yourself.</p>
+<p>Go to the user icon on the top right and select `Users`.</p>
+
+![Nextcloud Users](/img/nextcloud/users.jpg)
+
+<p>Click on `Add User` on the left hand side.</p>
+
+![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
+
+
+<p>Now create your User.</p>
+:::warning[Caution]
+
+Make sure to set `Groups` to `admin`
+:::
+
+![Nextcloud Add Users1](/img/nextcloud/Adduser1.jpg)
+
+## Congragulations!! you have installed Nextcloud!

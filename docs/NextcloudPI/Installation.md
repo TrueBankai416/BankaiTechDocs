@@ -1,0 +1,237 @@
+---
+title: Installation
+---
+## NextcloudPI Installation
+
+<h3> How to install [Nextcloud](https://github.com/nextcloud) on RaspberryPI using the [NextcloudPI Image](https://github.com/nextcloud/nextcloudpi)</h3>
+
+<p>First, lets Format the RaspberryPI MicroSD card</p>
+
+<p>Now lets download the latest version of NextcloudPI for RaspberryPi. [Link](https://github.com/nextcloud/nextcloudpi/releases/)</p>
+
+![Install NextcloudPI](/img/NextcloudPI/NextcloudImage.png)
+
+<p>Next, lets install Etcher. [Link](https://etcher.balena.io/)</p>
+
+![Etcher](/img/NextcloudPI/Etcher1.png)
+
+<p>After installed, select `flash from file`.</p>
+
+![Install Etcher](/img/NextcloudPI/etcher.jpg)
+
+<p>Select the zip file with the nextcloudPi OS we just downloaded</p>
+
+![Select File](/img/NextcloudPI/SelectFile.png)
+
+<p>Press `Select Target` and Select the MicroSD card.</p>
+
+![Select Target](/img/NextcloudPI/SelectTarget.png)
+![Target](/img/NextcloudPI/SelectTarget1.png)
+
+<p>Now press `Flash`.</p>
+
+![Flash](/img/NextcloudPI/Flash.png)
+
+:::note
+
+Some programs such as [Acronis Cyber Protect](https://www.acronis.com/en-us/products/cyber-protect/) may flag the files during the Flash.\
+If so, you will have to Re-format and Re-Flash.
+:::
+
+<p>If successful, Put the MicroSD Card back into to RaspberryPI</p>
+
+![Flash Successful](/img/NextcloudPI/FlashSuccess.png)
+
+### First Boot
+#### Keyboard Layout
+<p>Select your keyboard layout</p>
+
+![Keyboard Layout](/img/NextcloudPI/nextcloud-keyboard.jpg)
+
+<p>Leave the `Pi` user Unchanged</p>
+<p>Press `ENTER`</p>
+
+![Pi User](/img/NextcloudPI/nextcloud-ask-rename.jpg)
+#### Create your user
+<p>Now you can create your user</p>
+
+<p>After your user is created, Login.</p>
+#### Network Configuration
+<p>Now run</p>
+
+```
+sudo raspi-config
+```
+
+<p>Go to `System Options` > `Wireless LAN`</p>
+<p>Select your Country</p>
+
+:::tip[Hint]
+
+`US United States` is towards the bottom
+:::
+
+<p>Press `OK`</p>
+
+<p>Enter your [SSID](https://nordvpn.com/blog/what-is-ssid/)</p>
+
+<p>Enter your Network Password</p>
+
+<p>Press `Finish`</p>
+
+<p>Now lets make sure the RaspberryPI is updated.</p>
+
+```
+sudo apt update
+sudo apt upgrade
+sudo reboot
+```
+
+### Configuring Nextcloud
+
+<p>Run the NextCloudPi configuration tool</p>
+
+```
+sudo ncp-config
+```
+
+<p>Click `CONFIG`</p>
+
+<p>Scroll down to `nc-webui` and press `ENTER`</p>
+
+<p>Type `yes` in the feild</p>
+
+<p>Exit the Configuration Tool</p>
+
+:::info
+
+This may take awhile
+:::
+
+### Activating Nextcloud
+
+<p>Lets start by finding you IP Address.</p>
+
+```
+ifconfig
+```
+
+:::info
+
+You may need to install [Net-Tools](https://net-tools.sourceforge.io/)\
+`sudo apt-get install net-tools`
+:::
+
+<p>Now go to your Web Browser and type in `https://<IP from ifconfig>:4443`\
+Ex. `https://192.168.4.135:4443`</p>
+
+<p>You should get and error similiar to `Warning: Potential Security Risk Ahead`\
+Press `Advanced` > `Accept Risk and Continue`</p>
+
+![Security Warning](/img/NextcloudPI/security-warning.png)
+![Activation Creds](/img/NextcloudPI/activation-creds.png)
+
+<p>The Default Login is\
+`User=ncp`\
+`Pass=ownyourbits`</p>
+
+<p>You should now see the Activation Page</p>
+
+![Activation Page](/img/NextcloudPI/Activation-page.png)
+
+:::warning[Note]
+
+Store the `Users` and `Passwords` in a safe Location.
+:::
+
+<p>Press `Activate`</p>
+
+<p>Activation will take some time</p>
+
+<p>You may receive a popup warning, select options and allow popups</p>
+
+![Popup](/img/NextcloudPI/Popup.png)
+
+<p>It should open up another tab\
+Input the credentials for nextcloudpi interface\
+Mine are User ncp Password dNtTg70ZynVzh5TB65zjowADB8BTj0FdjQXB08bkbvk</p>
+
+:::tip[hint]
+
+I had to do this twice
+:::
+
+<p>You should now see this screen</p>
+
+![First Run](/img/NextcloudPI/FirstRun.png)
+
+<p>Click `Skip`</p>
+
+## Nextcloud First Run
+
+<p>Now lets go to the login screen</p>
+
+```
+https://192.168.4.135
+```
+
+![Nextcloud First Run](/img/NextcloudPI/NextcloudFirstRun.png)
+
+<p>Sign in with the Credentials listed earlier\
+Mine are\
+`User=ncp`\
+`Pass=IROr8xd36qFAdRzo0eeP3txP7Q+VNU6KwguOMf+Z1cA`</p>
+
+<p>Nextcloud is now Running</p>
+
+![Dashboard](/img/NextcloudPI/Dashboard.png)
+
+### Checking for Errors and Warnings
+
+<p>For the remainder of this tutorial, I will be using SSH</p>
+
+<p>Go to the `User` Icon at the top right and click `Administration Settings`</p>
+
+![Administration Settings](/img/NextcloudPI/Administration.jpg)
+
+<p>Here you can check for Warnings</p>
+
+![Warnings](/img/NextcloudPI/Warnings.jpg)
+
+<p>First we will start by fixing these warnings</p>
+```
+    Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
+
+    Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
+```
+## Enabling SSH
+<p>On the RaspberryPI Terminal, type</p>
+```
+sudo raspi-config
+```
+<p>Select `Interfacing Options`</p>
+
+<p>Navigate to and select `SSH`</p>
+
+<p>Choose `Yes` and Select `OK`</p>
+
+<p>Click `Finish`</p>
+
+### Connecting to Raspberry Pi Via SSH
+<p>Open up a [Terminal](https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal) on your Computer</p>
+
+<p>Type in</p>
+```
+ssh user@ip-address
+```
+:::note
+
+Replace `user` with the user you created earlier\
+Replace `ip-address` with the IP of the Raspberry Pi
+:::
+
+![Connecting with SSH](/img/NextcloudPI/ConnectSSH.jpg)
+
+<p>Your terminal should now look like this</p>
+
+![SSH Sucessful](/img/NextcloudPI/ConnectSSHsuccessful.jpg)
