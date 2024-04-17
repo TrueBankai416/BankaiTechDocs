@@ -1,3 +1,8 @@
+---
+last_update:
+  date: 2024/04/17
+  author: BankaiTech
+---
 ## Installing Algolia Search for Docusaurus
 <h3>*This method will use the Local version of  [Algolia Search Bar](https://docsearch.algolia.com/docs/legacy/run-your-own/)*</h3>
 *Click [here](https://docusaurus.io/docs/search) for official Docs.*
