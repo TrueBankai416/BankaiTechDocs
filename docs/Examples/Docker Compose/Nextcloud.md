@@ -2,8 +2,8 @@
 last_update:
   author: BankaiTech
 ---
-<h2>Nextcloud with Redis and MariaDb</h2>
-## docker-compose.yaml
+## Nextcloud with Redis and MariaDb
+### docker-compose.yaml
 ```
   mariadb:
     image: mariadb:10.6
@@ -37,8 +37,8 @@ last_update:
     command: redis-server --save 60 1 --loglevel warning
     restart: always
 ```
-### .env files
-#### .nextcloud.env
+#### .env files
+##### .nextcloud.env
 ```
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.bankai-tech.com
 TRUSTED_PROXIES=192.168.4.204
@@ -53,14 +53,14 @@ MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
 ```
-#### .mariadb.env
+##### .mariadb.env
 ```
 MYSQL_ROOT_PASSWORD=CHANGE
 MYSQL_PASSWORD=CHANGEME
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 ```
-### config.php
+#### config.php
 ```
 <?php
 $CONFIG = array (
