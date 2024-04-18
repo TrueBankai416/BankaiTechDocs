@@ -1,6 +1,5 @@
 ---
 last_update:
-  date: 2024/04/17
   author: BankaiTech
 ---
 <h2>Nextcloud with Redis and MariaDb</h2>
