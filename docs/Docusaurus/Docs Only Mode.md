@@ -1,6 +1,5 @@
 ---
 last_update:
-  date: 2024/04/17
   author: BankaiTech
 ---
 ## How to remove the /docs path
