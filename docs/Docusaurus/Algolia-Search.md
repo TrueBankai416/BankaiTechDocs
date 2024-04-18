@@ -1,8 +1,8 @@
 ---
 last_update:
   author: BankaiTech
-draft: true
-comments: true # for Disqus
+draft: false
+comments: true
 ---
 ## Installing Algolia Search for Docusaurus
 <h3>*This method will use the Local version of  [Algolia Search Bar](https://docsearch.algolia.com/docs/legacy/run-your-own/)*</h3>
