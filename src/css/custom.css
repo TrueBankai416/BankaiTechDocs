@@ -33,3 +33,6 @@
 .hero {
     background-image: url("/static/img/banner.jpg");
 }
+.heroBanner {
+    --ifm-color: white;
+} 
