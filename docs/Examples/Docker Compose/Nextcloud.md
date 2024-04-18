@@ -2,23 +2,8 @@
 last_update:
   author: BankaiTech
 ---
-## Nextcloud with Redis and MariaDb
-<details>
-  <summary>Toggle me!</summary>
-  <div>
-    <div>This is the detailed content</div>
-    <br/>
-    <details>
-      <summary>
-        hello
-      </summary>
-      <div>😲😲😲😲😲</div>
-    </details>
-  </div>
-</details>
 
 ### docker-compose.yaml
-
 ```
   mariadb:
     image: mariadb:10.6
