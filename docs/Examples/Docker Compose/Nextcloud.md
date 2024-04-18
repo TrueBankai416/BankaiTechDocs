@@ -1,9 +1,9 @@
 ---
 last_update:
-  date: 2024/04/17
   author: BankaiTech
 ---
-## docker-compose.yaml
+## Nextcloud with Redis and MariaDb
+### docker-compose.yaml
 ```
   mariadb:
     image: mariadb:10.6
@@ -37,7 +37,30 @@ last_update:
     command: redis-server --save 60 1 --loglevel warning
     restart: always
 ```
-## config.php
+#### .env files
+##### .nextcloud.env
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.bankai-tech.com
+TRUSTED_PROXIES=192.168.4.204
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://cloud.bankai-tech.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-100M
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+```
+##### .mariadb.env
+```
+MYSQL_ROOT_PASSWORD=CHANGE
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+```
+#### config.php
 ```
 <?php
 $CONFIG = array (

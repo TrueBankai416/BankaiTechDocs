@@ -1,6 +1,5 @@
 ---
 last_update:
-  date: 2024/04/17
   author: BankaiTech
 ---
 Official Documentation can be found here. [Official Docs](https://docs.docker.com/engine/install/ubuntu/)

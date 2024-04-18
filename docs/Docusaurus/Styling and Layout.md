@@ -1,3 +1,7 @@
+---
+last_update:
+  author: BankaiTech
+---
 ## Adding Last Updated Feature
 <h3>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</h3>
 ![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
@@ -166,7 +170,6 @@ nano docusaurus.config.ts
 ```
 ---
 last_update:
-  date: 2024/04/17
   author: custom author name
 ---
 ```
