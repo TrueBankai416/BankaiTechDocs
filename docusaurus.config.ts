@@ -1,6 +1,8 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
  
 const config: Config = {
   title: 'My HomeLab Documentation',
