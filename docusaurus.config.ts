@@ -58,6 +58,9 @@ const config: Config = {
   ],
 
   themeConfig: {
+    sidebar: {
+      autoCollapseCategories: true
+    }
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,
