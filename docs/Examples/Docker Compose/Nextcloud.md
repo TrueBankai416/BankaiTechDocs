@@ -4,6 +4,14 @@ last_update:
 ---
 
 ### docker-compose.yaml
+<Tabs groupId="operating-systems">
+  <TabItem value="minimal" label="Minimal Install">
+    ```
+    hello
+    ```
+  </TabItem>
+  <TabItem value="memories" label="Install with Memories">Use Command + C to copy.</TabItem>
+</Tabs>
 ```
   mariadb:
     image: mariadb:10.6
