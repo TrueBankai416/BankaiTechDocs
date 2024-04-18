@@ -13,7 +13,7 @@ export default function BlogPostItemWrapper(props) {
       <BlogPostItem {...props} />
       {comments && (
         <DiscussionEmbed
-          shortname='https://bankai-tech.disqus.com/embed.js'
+          shortname='bankai-tech'
           config={{
             url: slug,
             identifier: slug,
