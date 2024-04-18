@@ -2,6 +2,9 @@
 last_update:
   author: BankaiTech
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Adding Last Updated Feature
 <h3>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</h3>
 ![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
@@ -96,7 +99,78 @@ When you run `git pull origin main` you will have to run `npm run build` afterwa
 
 ## Enabling the last updated footer
 ### Editing the docusaurus config file
-<p>We will need to first make some changes in your `docusaurus.config.ts` file</p>
+<Tabs groupId="Java-Type">
+  <TabItem value="js" label="Javascript">
+    <p>We will need to first make some changes in your `docusaurus.config.js` file</p>
+```
+nano docusaurus.config.js
+```
+<p>Find the following Snippet of code</p>
+```
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          routeBasePath: '/', // Serve the docs at the site's root
+          sidebarPath: './sidebars.js',
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: false, //{
+      //    showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+       // },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+```
+<p>Add the following lines in the `docs` section</p>
+```
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+```
+<p>The snippet of code should now look like this</p>
+```
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+          routeBasePath: '/', // Serve the docs at the site's root
+          sidebarPath: './sidebars.js',
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+        },
+        blog: false, //{
+      //    showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        //  editUrl:
+        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+       // },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+```
+  </TabItem>
+  <TabItem value="ts" label="Typescript">
+    <p>We will need to first make some changes in your `docusaurus.config.ts` file</p>
 ```
 nano docusaurus.config.ts
 ```
@@ -163,6 +237,8 @@ nano docusaurus.config.ts
     ],
   ],
 ```
+  </TabItem>
+</Tabs>
 
 ### Adding the last updated to Font Matter
 <p>Open up one of your `.md` files in `/docs`</p>
