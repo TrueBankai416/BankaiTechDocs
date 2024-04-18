@@ -16,7 +16,9 @@ last_update:
     </details>
   </div>
 </details>
+
 ### docker-compose.yaml
+
 ```
   mariadb:
     image: mariadb:10.6
