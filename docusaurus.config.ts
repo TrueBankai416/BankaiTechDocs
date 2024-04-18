@@ -58,6 +58,7 @@ const config: Config = {
   ],
 
   themeConfig: {
+   // Adds bar to top of the Page
     announcementBar: {
       id: 'Pick your Operating System',
       content:
@@ -66,6 +67,10 @@ const config: Config = {
       textColor: '#091E42',
       isCloseable: true,
     },
+   // Declare some <meta> tags
+    metadata: [
+      {name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation'},
+    ],
     sidebar: {
       autoCollapseCategories: true
     },
