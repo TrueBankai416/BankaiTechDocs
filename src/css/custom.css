@@ -34,5 +34,5 @@
     background-image: url("/static/img/banner.jpg");
 }
 .heroBanner {
-    --ifm-color: white;
+    --ifm-color: #2e8555;
 } 
