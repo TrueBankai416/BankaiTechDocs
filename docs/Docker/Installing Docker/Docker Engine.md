@@ -1,5 +1,5 @@
 ---
-title: Installing Docker Engine
+title: Docker Engine
 tags:
    - Docker
    - Docker Engine
