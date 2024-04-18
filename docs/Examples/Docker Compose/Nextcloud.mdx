@@ -2,9 +2,13 @@
 last_update:
   author: BankaiTech
 ---
-## Nextcloud with Redis and MariaDb
-### docker-compose.yaml
-```
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs groupId="NC-Install-Type">
+  <TabItem value="nc-minimal-install" label="Minimal Install">
+    ### docker-compose.yaml
+    ```
   mariadb:
     image: mariadb:10.6
     container_name: mariadb
@@ -37,6 +41,7 @@ last_update:
     command: redis-server --save 60 1 --loglevel warning
     restart: always
 ```
+
 #### .env files
 ##### .nextcloud.env
 ```
@@ -118,3 +123,14 @@ $CONFIG = array (
   'default_phone_region' => 'US',
 );
 ```
+  </TabItem>
+  <TabItem value="nc-collabora" label="Install with Collabora Code">
+    PlaceHolder
+  </TabItem>
+  <TabItem value="nc-memories" label="Install with Memories">
+    Coming Soon
+  </TabItem>
+  <TabItem value="nc-memories-office" label="Install with Memories & Office">
+    Coming Soon
+  </TabItem>
+</Tabs>

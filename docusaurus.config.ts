@@ -1,6 +1,8 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
  
 const config: Config = {
   title: 'My HomeLab Documentation',
@@ -40,8 +42,8 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-        //  editUrl:
-        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl:
+            'https://github.com/TrueBankai416/BankaiTechDocs/tree/main/',
         },
         blog: false, //{
       //    showReadingTime: true,
@@ -58,6 +60,7 @@ const config: Config = {
   ],
 
   themeConfig: {
+   // Adds bar to top of the Page
     announcementBar: {
       id: 'Pick your Operating System',
       content:
@@ -66,6 +69,10 @@ const config: Config = {
       textColor: '#091E42',
       isCloseable: true,
     },
+   // Declare some <meta> tags
+    metadata: [
+      {name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation'},
+    ],
     sidebar: {
       autoCollapseCategories: true
     },

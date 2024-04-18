@@ -1,4 +1,10 @@
 ---
+title: Docker Compose
+tags:
+   - Docker
+   - Docker Compose
+   - Tutorial
+keywords: [Docker, Docker Compose, Tutorial]
 last_update:
   author: BankaiTech
 ---
