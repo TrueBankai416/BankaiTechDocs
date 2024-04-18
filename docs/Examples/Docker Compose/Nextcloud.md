@@ -39,53 +39,59 @@ last_update:
 ```
 ## config.php
 ```
-        "htaccess.RewriteBase": "\/",
-        "memcache.local": "\\OC\\Memcache\\APCu",
-        "apps_paths": [
-            {
-                "path": "\/var\/www\/html\/apps",
-                "url": "\/apps",
-                "writable": false
-            },
-            {
-                "path": "\/var\/www\/html\/custom_apps",
-                "url": "\/custom_apps",
-                "writable": true
-            }
-        ],
-        "memcache.distributed": "\\OC\\Memcache\\Redis",
-        "memcache.locking": "\\OC\\Memcache\\Redis",
-        "redis": {
-            "host": "***REMOVED SENSITIVE VALUE***",
-            "password": "***REMOVED SENSITIVE VALUE***",
-            "port": 6379
-        },
-        "trusted_proxies": "***REMOVED SENSITIVE VALUE***",
-        "upgrade.disable-web": true,
-        "instanceid": "***REMOVED SENSITIVE VALUE***",
-        "passwordsalt": "***REMOVED SENSITIVE VALUE***",
-        "secret": "***REMOVED SENSITIVE VALUE***",
-        "trusted_domains": [
-            "cloud.bankai-tech.com"
-        ],
-        "datadirectory": "***REMOVED SENSITIVE VALUE***",
-        "dbtype": "mysql",
-        "version": "28.0.4.1",
-        "overwrite.cli.url": "https:\/\/cloud.bankai-tech.com",
-        "overwriteprotocol": "https",
-        "dbname": "***REMOVED SENSITIVE VALUE***",
-        "dbhost": "***REMOVED SENSITIVE VALUE***",
-        "dbport": "",
-        "dbtableprefix": "oc_",
-        "mysql.utf8mb4": true,
-        "dbuser": "***REMOVED SENSITIVE VALUE***",
-        "dbpassword": "***REMOVED SENSITIVE VALUE***",
-        "installed": true,
-        "maintenance_window_start": 1,
-        "default_phone_region": "US"
-    }
-}
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' => 
+  array (
+    0 => 
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 => 
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' => 
+  array (
+    'host' => 'redis',
+    'password' => '',
+    'port' => 6379,
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '192.168.4.204',
+  ),
+  'upgrade.disable-web' => true,
+  'instanceid' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'passwordsalt' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'secret' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '28.0.4.1',
+  'overwrite.cli.url' => 'https://cloud.bankai-tech.com',
+  'overwriteprotocol' => 'https',
+  'dbname' => 'nextcloud',
+  'dbhost' => 'mariadb',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'nextcloud',
+  'dbpassword' => 'CHANGEME',
+  'installed' => true,
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+);
 ```
-:::note
-The `config.php` file is not indented correctly so only use this file as a reference, Do not attempt to copy/paste.
-:::
