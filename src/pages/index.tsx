@@ -15,7 +15,7 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <p><h2 style="color:white;">For Ubuntu Systems</h2></p>
+        <p><h2>For Ubuntu Systems</h2></p>
         <p><h3>For Windows, Please visit <a href="https://docs.demonwarriortech.com">DemonWarriorTech</a></h3></p>
       </div>
     </header>
