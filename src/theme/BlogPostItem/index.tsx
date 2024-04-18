@@ -1,14 +1,27 @@
-import React from 'react';
-import BlogPostItem from '@theme-original/BlogPostItem';
-import type BlogPostItemType from '@theme/BlogPostItem';
-import type {WrapperProps} from '@docusaurus/types';
+import React from 'react'
+import { DiscussionEmbed } from 'disqus-react'
+import { useBlogPost } from '@docusaurus/theme-common/internal'
+import BlogPostItem from '@theme-original/BlogPostItem'
 
-type Props = WrapperProps<typeof BlogPostItemType>;
+export default function BlogPostItemWrapper(props) {
+  const { metadata } = useBlogPost()
+  const { frontMatter, slug, title } = metadata
+  const { comments = true } = frontMatter
 
-export default function BlogPostItemWrapper(props: Props): JSX.Element {
   return (
     <>
       <BlogPostItem {...props} />
+      {comments && (
+        <DiscussionEmbed
+          shortname='https://bankai-tech.disqus.com/embed.js'
+          config={{
+            url: slug,
+            identifier: slug,
+            title,
+            language: 'en_US',
+          }}
+        />
+      )}
     </>
-  );
+  )
 }
