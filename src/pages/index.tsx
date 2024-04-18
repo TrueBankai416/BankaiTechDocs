@@ -16,7 +16,6 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <p><h2>For Ubuntu Systems</h2></p>
-        <p><h3>For Windows, Please visit <a href="https://docs.demonwarriortech.com">DemonWarriorTech</a></h3></p>
       </div>
     </header>
   );
@@ -29,8 +28,6 @@ export default function Home(): JSX.Element {
       title={`Hello from ${siteConfig.title}`}
       description="Home to My HomeLab Documentation <head />">
       <HomepageHeader />
-      <main>
-      </main>
     </Layout>
   );
 }
