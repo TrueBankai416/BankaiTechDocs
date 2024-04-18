@@ -58,6 +58,14 @@ const config: Config = {
   ],
 
   themeConfig: {
+    announcementBar: {
+      id: 'Pick your Operating System',
+      content:
+        'This site is mainly for Ubuntu Systems. For windows, visit <a target="_blank" rel="noopener noreferrer" href="https://docs.demonwarriortech.com">DemonWarriorTech</a>',
+      backgroundColor: '#fafbfc',
+      textColor: '#091E42',
+      isCloseable: true,
+    },
     sidebar: {
       autoCollapseCategories: true
     },
