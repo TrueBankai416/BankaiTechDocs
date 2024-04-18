@@ -1,4 +1,7 @@
 ---
+title: Installing Docker Engine
+tags: Docker, Docker Engine, Tutorial
+keywords: [Docker, Docker Engine, Tutorial]
 last_update:
   author: BankaiTech
 ---
