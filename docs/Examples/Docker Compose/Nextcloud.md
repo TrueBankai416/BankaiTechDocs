@@ -10,7 +10,7 @@ last_update:
     <br/>
     <details>
       <summary>
-        ```
+  ```      
   mariadb:
     image: mariadb:10.6
     container_name: mariadb
@@ -42,7 +42,8 @@ last_update:
       - 6379
     command: redis-server --save 60 1 --loglevel warning
     restart: always
-```
+    ```
+
       </summary>
       <div>😲😲😲😲😲</div>
     </details>
