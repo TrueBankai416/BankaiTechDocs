@@ -34,6 +34,10 @@ RUN git clone https://github.com/goodspb/pdlib.git /usr/src/php/ext/pdlib
 # Install the pdlib PHP extension
 RUN docker-php-ext-install pdlib
 
+# Install inotify extension
+RUN pecl install inotify \
+    && docker-php-ext-enable inotify
+
 # Install the bz2 PHP extension
 RUN docker-php-ext-install bz2
 
