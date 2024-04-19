@@ -9,6 +9,8 @@ import TabItem from '@theme/TabItem';
   <TabItem value="nc-minimal-install" label="Minimal Install">
     ### docker-compose.yaml
     ```
+version: '3.8'
+
   mariadb:
     image: mariadb:10.6
     container_name: mariadb
@@ -178,6 +180,94 @@ services:
       - .collabora.env
     restart: always
    ```
+  #### .env Files
+  ##### .nextcloud.env
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.bankai-tech.com
+TRUSTED_PROXIES=192.168.4.204
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://cloud.bankai-tech.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-100M
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+```
+##### .mariadb.env
+```
+MYSQL_ROOT_PASSWORD=CHANGE
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+```
+##### config.php
+```
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' => 
+  array (
+    0 => 
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 => 
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' => 
+  array (
+    'host' => 'redis',
+    'password' => '',
+    'port' => 6379,
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '192.168.4.204',
+  ),
+  'upgrade.disable-web' => true,
+  'instanceid' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'passwordsalt' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'secret' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '28.0.4.1',
+  'overwrite.cli.url' => 'https://cloud.bankai-tech.com',
+  'overwriteprotocol' => 'https',
+  'dbname' => 'nextcloud',
+  'dbhost' => 'mariadb',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'nextcloud',
+  'dbpassword' => 'CHANGEME',
+  'installed' => true,
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+);
+```
+##### .collabora.env
+```
+username=admin
+password=2hRZ8zRBn7Kyo7
+domain=cloud\\.domain\\.com
+```
+  
   </TabItem>
   <TabItem value="nc-memories" label="Install with Memories">
     Coming Soon
