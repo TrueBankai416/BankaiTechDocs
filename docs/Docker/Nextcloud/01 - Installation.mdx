@@ -355,8 +355,6 @@ services:
     cap_add:
       - MKNOD
     image: collabora/code:latest
-    volumes:
-      - ./collabora/config/coolwsd.xml:/etc/coolwsd/coolwsd.xml
     env_file:
       - .collabora.env
     restart: always
