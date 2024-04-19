@@ -483,7 +483,209 @@ Press `ENTER`
 ## Congragulations!! you have installed Nextcloud With Collabora Code!
   </TabItem>
   <TabItem value="nc-memories" label="Install with Memories">
-    Coming Soon
+        ## Nextcloud Installation using Docker Build and Docker Compose
+***This method includes Redis, MariaDB, and Nextcloud Memories***
+:::info
+Nextcloud 28.0.4 was the latest version when making this tutorial.
+:::warning[Recognize App]
+At the time of this tuturial, the APT keys for the Recognize App library was depreciated meaning you cannot use Recognize. \
+The lines for installation in the Dockerfile are commented out. I will update the Dockerfile when this issue is fixed.
+:::
+
+First lets update your system.
+```
+sudo apt-get update && apt-get upgrade -y
+```
+
+### Setting up the directories
+Now lets setup the Directories
+:::note
+
+You can change the directories to your liking.
+
+:::
+
+```
+sudo mkdir /var/docker && sudo mkdir /var/docker/nextcloud
+```
+Lets take ownership of the directory
+```
+sudo chown -R 1000:1000 /var/docker
+```
+### Creating .env files
+Now lets download and modify [Docker Secrets](https://docs.docker.com/compose/use-secrets/) files in the new directory.
+```
+cd /var/docker/nextcloud
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/.nextcloud.env
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/.mariadb.env
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/.collabora.env
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/.go_vod.env
+nano .mariadb.env
+```
+Update the following
+```
+MYSQL_ROOT_PASSWORD=CHANGEME
+MYSQL_PASSWORD=CHANGEME
+```
+:::tip[Info]
+
+Please Change `CHANGEME` to a password of your choosing.
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
+Save the new file by pressing `CTRL+X`
+
+Now lets edit the second file.
+```
+nano .nextcloud.env
+```
+Update the Following
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
+TRUSTED_PROXIES=<IP address of your Reverse Proxy>
+OVERWRITECLIURL=https://cloud.<YourDomain>.com
+MYSQL_PASSWORD=CHANGEME
+```
+:::tip[Info]
+
+<p>Please Change the `Domain` and `Reverse Proxy IP`.</p>
+
+:::warning[warning]
+
+<p>Please make sure that the Password is the same as the one you previously set in the last file</p>
+<p>Remove all instances of `<>`</p>
+:::
+```
+nano .collabora.env
+```
+Update the Following
+```
+username=admin
+password=2hRZ8zRBn7Kyo7
+domain=cloud\\.bankai-tech\\.com
+```
+<p>Now lets update the go-vod.env file</p>
+```
+nano .go_vod.env
+```
+Update the following
+```
+NEXTCLOUD_HOST=https://cloud.bankai-tech.com
+```
+### Creating the Custom Image
+```
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/Dockerfile \
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/supervisord.conf \
+docker build . -t nextcloud:28.0.4-custom
+```
+:::tip
+Go grab a beer, this will take awhile.... maybe take a nap.
+:::note[Recomendation]
+Change the `nextcloud:28.0.4-custom to the latest version of nextcloud \
+Ex. `nextcloud:29.0.8-custom`
+:::
+
+### Modifying the Compose file
+Now lets edit the compose file.
+```
+wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories/docker-compose.yaml
+nano docker-compose.yaml
+```
+Update this line if you named the image differently during the `build command`.
+```
+image: nextcloud:28.0.4-custom
+```
+:::info[NVIDIA HWA]
+If you want to use GPU for transcoding then uncomment this line \
+#    runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers. Test nvidia by running `sudo nvidia-smi`
+:::
+## Starting Nextcloud
+Now lets start it up.
+```
+sudo docker compose up -d
+```
+:::info
+
+the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
+:::
+<p>After its done pulling the docker images you can open up a web browser.</p>
+<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+<p>You should see this screen.</p>
+
+![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
+
+### Account Creation
+<p>Now create an admin account and click `Install`</p>
+<p>Click `Install Recommended Apps`</p>
+
+![Nextcloud Install Recommended Apps](/img/nextcloud/FirstStart_RecommendedApps.jpg)
+
+<p>When its done installing you should see your Dashboard</p>
+
+![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
+
+### Checking for errors and warnings
+<p>On the top right click the `User Icon` and go to `Administration Settings`</p>
+
+![Nextcloud Administration Settings](/img/nextcloud/Administration_Settings.jpg)
+
+<p>Here you should see `Security & Setup Warnings`</p>
+
+![Nextcloud Warnings](/img/nextcloud/Warnings.jpg)
+
+<p>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</p>
+
+### Modifying the config.php file
+Run the following command to open the `config.php` file with nano.
+```
+nano nextcloud/config/config.php
+```
+:::tip[Hint]
+
+<p>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</p>
+Run `cd /var/docker/nextcloud` then try again.
+:::
+
+Now add the following to the bottom of the file.
+```
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+```
+
+
+![Nextcloud config.php](/img/nextcloud/config.jpg)
+
+<p>Now if you go back to your `Administration Settings` Page.</p>
+It should look something like this.
+
+![Nextcloud No Warnings](/img/nextcloud/NoErrors.jpg)
+
+:::tip[HINT]
+
+In some cases, you may have to delete your browser cache and restart the browser for the Warnings to update.
+:::
+
+### Creating production use user
+<p>Now you can go create a user for yourself.</p>
+<p>Go to the user icon on the top right and select `Users`.</p>
+
+![Nextcloud Users](/img/nextcloud/users.jpg)
+
+<p>Click on `Add User` on the left hand side.</p>
+
+![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
+
+
+<p>Now create your User.</p>
+:::warning[Caution]
+
+Make sure to set `Groups` to `admin`
+:::
+
+![Nextcloud Add Users1](/img/nextcloud/Adduser1.jpg)
+
+## Congragulations!! you have installed Nextcloud!
   </TabItem>
   <TabItem value="nc-memories-office" label="Install with Memories & Office">
     Coming Soon
