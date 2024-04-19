@@ -50,10 +50,10 @@ export default function DocItemLayout({children}: Props): JSX.Element {
       <br></br>
       <Giscus
         id="comments"
-        repo="farlowdw/software-development-handbook"
-        repoId="R_kgDOHmzzBQ"
+        repo="TrueBankai416/BankaiTechDocs"
+        repoId="R_kgDOLsjlxA"
         category="Announcements"
-        categoryId="DIC_kwDOHmzzBc4CSLOr"
+        categoryId="DIC_kwDOLsjlxM4CeyWH"
         mapping="pathname"
         reactionsEnabled="1"
         emitMetadata="0"
