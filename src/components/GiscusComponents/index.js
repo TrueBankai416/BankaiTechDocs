@@ -19,7 +19,7 @@ export default function GiscusComponent() {
         data-theme="preferred_color_scheme"
         data-lang="en"
         crossorigin="anonymous"
-        async>
+        async
     />
   );
 }
