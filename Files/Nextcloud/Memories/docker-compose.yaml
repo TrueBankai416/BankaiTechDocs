@@ -72,4 +72,4 @@ services:
       - .go_vod.env
     volumes:
       - ./nextcloud:/var/www/html:ro
-    runtime: nvidia # (NVENC)
+#    runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers. Test nvidia by running `sudo nvidia-smi`
