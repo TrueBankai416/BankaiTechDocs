@@ -61,6 +61,12 @@ MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
 ```
+:::info
+Instead of using the hostname `redis`, you can use the IP address of the redis host.
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
 ##### .mariadb.env
 ```
 MYSQL_ROOT_PASSWORD=CHANGE
@@ -68,6 +74,10 @@ MYSQL_PASSWORD=CHANGEME
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 ```
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
 #### config.php
 ```
 <?php
@@ -126,6 +136,9 @@ $CONFIG = array (
   'default_phone_region' => 'US',
 );
 ```
+:::info
+Instead of using the hostname `redis`, you can also use the IP address of the redis host.
+:::
   </TabItem>
   <TabItem value="nc-collabora" label="Install with Collabora Code">
     ## Nextcloud With Collabora Code
@@ -197,6 +210,12 @@ MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
 ```
+:::info
+Instead of the hostname `redis`, you can also use the IP address for the redis host.
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
 ##### .mariadb.env
 ```
 MYSQL_ROOT_PASSWORD=CHANGE
