@@ -1,6 +1,6 @@
 {
-  "label": "Installation",
-  "position": 1,
+  "label": "Tutorial - Nextcloud",
+  "position": 2,
   "link": {
     "type": "generated-index",
     "description": "Tutorials showing you how to Install Nextcloud using Docker."
