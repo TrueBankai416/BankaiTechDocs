@@ -14,8 +14,6 @@ import Unlisted from '@theme/Unlisted';
 import type {Props} from '@theme/DocItem/Layout';
 import Giscus from '@giscus/react';
 import { useColorMode } from '@docusaurus/theme-common';
-import { useLocation } from '@docusaurus/router';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 import styles from './styles.module.css';
 
@@ -46,9 +44,6 @@ function useDocTOC() {
 export default function DocItemLayout({children}: Props): JSX.Element {
   const docTOC = useDocTOC();
   const { colorMode } = useColorMode();
-  const location = useLocation();
-  const {siteConfig} = useDocusaurusContext();
-  const {forbiddenGiscusDocPaths} = siteConfig.customFields;
   const giscus = (
     <React.Fragment>
       <hr />
@@ -86,7 +81,7 @@ export default function DocItemLayout({children}: Props): JSX.Element {
             <DocItemFooter />
           </article>
           <DocItemPaginator />
-          {!forbiddenGiscusDocPaths.includes(location.pathname) && giscus}
+          {giscus}
         </div>
       </div>
       {docTOC.desktop && <div className="col col--3">{docTOC.desktop}</div>}
