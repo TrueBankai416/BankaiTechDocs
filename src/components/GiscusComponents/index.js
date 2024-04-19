@@ -6,10 +6,11 @@ export default function GiscusComponent() {
   const { colorMode } = useColorMode();
 
   return (
-    <Giscus    
+    <Giscus
+        id="comments"
         data-repo="TrueBankai416/BankaiTechDocs"
         data-repo-id="R_kgDOLsjlxA"
-        data-category="General"
+        data-category="Announcements"
         data-category-id="DIC_kwDOLsjlxM4CeyWI"
         data-mapping="pathname"
         data-strict="0"
@@ -19,7 +20,7 @@ export default function GiscusComponent() {
         data-theme="preferred_color_scheme"
         data-lang="en"
         crossorigin="anonymous"
-        async
+        loading="lazy"
     />
   );
 }
