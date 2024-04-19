@@ -24,6 +24,7 @@ services:
       - redis
       - collabora
       - imaginary
+      - go-vod
     volumes:
       - ./nextcloud:/var/www/html
     env_file:
@@ -67,8 +68,6 @@ services:
     image: radialapps/go-vod
     restart: always
     container_name: go-vod
-    depends_on:
-      - nextcloud
     env_file:
       - .go_vod.env
     volumes:
