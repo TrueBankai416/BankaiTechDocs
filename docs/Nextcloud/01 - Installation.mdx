@@ -597,8 +597,9 @@ Update this line if you named the image differently during the `build command`.
 image: nextcloud:28.0.4-custom
 ```
 :::info[NVIDIA HWA]
-If you want to use GPU for transcoding then uncomment this line \
-#    runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers. Test nvidia by running `sudo nvidia-smi`
+If you want to use GPU for transcoding then uncomment this line\
+runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers.\
+Test nvidia by running `sudo nvidia-smi`
 :::
 ## Starting Nextcloud
 Now lets start it up.
@@ -684,7 +685,34 @@ Make sure to set `Groups` to `admin`
 :::
 
 ![Nextcloud Add Users1](/img/nextcloud/Adduser1.jpg)
-
+## Installing Nextcloud Memories
+Go to `Apps`
+![Nextcloud Apps](/img/nextcloud/Apps.jpg)
+<p>Now click `Download and enable`</p>
+![Enable Memories](/img/nextcloud/InstallMemories.jpg)
+<p>Now search and install `Preview Generator`.</p>
+### Configuring Nextcloud Memories
+<p>Go to your `Administration Settings` and find `Memories`</p>
+![Memories](/img/nextcloud/Memories.jpg)
+<p>My Settings are as Follows</p>
+[Memories Setting1](/img/nextcloud/MemoriesSetting1.jpg)
+[Memories Setting2](/img/nextcloud/MemoriesSetting2.jpg)
+[Memories Setting3](/img/nextcloud/MemoriesSetting3.jpg)
+[Memories Setting4](/img/nextcloud/MemoriesSetting4.jpg)
+[Memories Setting5](/img/nextcloud/MemoriesSetting5.jpg)
+[Memories Setting6](/img/nextcloud/MemoriesSetting6.jpg)
+<p>Im sure you noticed that there are a few warnings we need to take care of.</p>
+```
+ Geometry table has not been created.
+Reverse geocoding has not been configured (-1). 
+```
+<p>We can generate the Geometry table using this command.</p>
+```
+sudo docker exec -it -u 33 nextcloud php occ memories:places-setup
+```
+:::tip
+I prefer generating the Geometry table this way so I can view the progress
+:::
 ## Congragulations!! you have installed Nextcloud!
   </TabItem>
   <TabItem value="nc-memories-office" label="Install with Memories & Office">
