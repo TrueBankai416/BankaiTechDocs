@@ -125,7 +125,59 @@ $CONFIG = array (
 ```
   </TabItem>
   <TabItem value="nc-collabora" label="Install with Collabora Code">
-    PlaceHolder
+    ## Nextcloud With Collabora Code
+    ### docker-compose.yaml
+    ```
+    version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - mariadb
+      - redis
+      - collabora
+    volumes:
+      - ./nextcloud:/var/www/html
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+
+  collabora:
+    container_name: collabora
+    hostname: collabora
+    privileged: true
+    tty: true
+    ports:
+      - 9980:9980
+    cap_add:
+      - MKNOD
+    image: collabora/code:latest
+    env_file:
+      - .collabora.env
+    restart: always
+   ```
   </TabItem>
   <TabItem value="nc-memories" label="Install with Memories">
     Coming Soon
