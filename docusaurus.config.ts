@@ -73,12 +73,12 @@ const config: Config = {
     metadata: [
       {name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation'},
     ],
-    forbiddenGiscusDocPaths: [
-    ''
-    ],
-    forbiddenGiscusBlogPaths: [
-    ''
-    ],
+ //   forbiddenGiscusDocPaths: [
+ //   ''
+ //   ],
+ //   forbiddenGiscusBlogPaths: [
+ //   ''
+ //   ],
     sidebar: {
       autoCollapseCategories: true
     },
