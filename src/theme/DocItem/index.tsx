@@ -4,7 +4,7 @@ import type DocItemType from '@theme/DocItem';
 import type {WrapperProps} from '@docusaurus/types';
 
 type Props = WrapperProps<typeof DocItemType>;
-import GiscusComponent from '@site/src/components/GiscusComponent';
+import GiscusComponent from '@site/src/components/GiscusComponents';
 function DocItemContent({ sidebar, children }) {
     const { metadata, toc } = useDocItem();
     const { nextItem, prevItem, frontMatter, unlisted } = metadata;
