@@ -12,6 +12,8 @@ import DocItemContent from '@theme/DocItem/Content';
 import DocBreadcrumbs from '@theme/DocBreadcrumbs';
 import Unlisted from '@theme/Unlisted';
 import type {Props} from '@theme/DocItem/Layout';
+import Giscus from '@giscus/react';
+import { useColorMode } from '@docusaurus/theme-common';
 
 import styles from './styles.module.css';
 
@@ -41,6 +43,27 @@ function useDocTOC() {
 
 export default function DocItemLayout({children}: Props): JSX.Element {
   const docTOC = useDocTOC();
+  const { colorMode } = useColorMode();
+  const giscus = (
+    <React.Fragment>
+      <hr />
+      <br></br>
+      <Giscus
+        id="comments"
+        repo="farlowdw/software-development-handbook"
+        repoId="R_kgDOHmzzBQ"
+        category="Announcements"
+        categoryId="DIC_kwDOHmzzBc4CSLOr"
+        mapping="pathname"
+        reactionsEnabled="1"
+        emitMetadata="0"
+        inputPosition="top"
+        theme={colorMode}
+        lang="en"
+        loading="lazy"
+      />
+    </React.Fragment>
+  )
   const {
     metadata: {unlisted},
   } = useDoc();
@@ -58,6 +81,7 @@ export default function DocItemLayout({children}: Props): JSX.Element {
             <DocItemFooter />
           </article>
           <DocItemPaginator />
+          {giscus}
         </div>
       </div>
       {docTOC.desktop && <div className="col col--3">{docTOC.desktop}</div>}
