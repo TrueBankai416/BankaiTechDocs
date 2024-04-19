@@ -30,14 +30,6 @@ function DocItemContent({ sidebar, children }) {
     );
 }
 
-export default function DocItemWrapper(props: Props): JSX.Element {
-  return (
-    <>
-      <DocItem {...props} />
-    </>
-  );
-}
-
 export default function DocItemWrapper(props) {
     const DocItemContent = props.content;
     return (
