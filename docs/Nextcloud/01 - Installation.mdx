@@ -485,6 +485,9 @@ Press `ENTER`
   <TabItem value="nc-memories" label="Install with Memories">
         ## Nextcloud Installation using Docker Build and Docker Compose
 ***This method includes Redis, MariaDB, and Nextcloud Memories***
+:::note:
+inotify libraries have been added to the Dockerfile for the iNotify App
+:::
 :::info
 Nextcloud 28.0.4 was the latest version when making this tutorial.
 :::warning[Recognize App]
@@ -658,7 +661,7 @@ Now add the following to the bottom of the file.
 ![Nextcloud config.php](/img/nextcloud/config.jpg)
 
 <p>Now if you go back to your `Administration Settings` Page.</p>
-It should look something like this.
+<p>It should look something like this.</p>
 
 ![Nextcloud No Warnings](/img/nextcloud/NoErrors.jpg)
 
@@ -686,7 +689,7 @@ Make sure to set `Groups` to `admin`
 
 ![Nextcloud Add Users1](/img/nextcloud/Adduser1.jpg)
 ## Installing Nextcloud Memories
-Go to `Apps`
+<p>Go to `Apps`</p>
 ![Nextcloud Apps](/img/nextcloud/Apps.jpg)
 <p>Now click `Download and enable`</p>
 ![Enable Memories](/img/nextcloud/InstallMemories.jpg)
@@ -695,12 +698,12 @@ Go to `Apps`
 <p>Go to your `Administration Settings` and find `Memories`</p>
 ![Memories](/img/nextcloud/Memories.jpg)
 <p>My Settings are as Follows</p>
-[Memories Setting1](/img/nextcloud/MemoriesSetting1.jpg)
-[Memories Setting2](/img/nextcloud/MemoriesSetting2.jpg)
-[Memories Setting3](/img/nextcloud/MemoriesSetting3.jpg)
-[Memories Setting4](/img/nextcloud/MemoriesSetting4.jpg)
-[Memories Setting5](/img/nextcloud/MemoriesSetting5.jpg)
-[Memories Setting6](/img/nextcloud/MemoriesSetting6.jpg)
+![Memories Setting1](/img/nextcloud/MemoriesSetting1.jpg)
+![Memories Setting2](/img/nextcloud/MemoriesSetting2.jpg)
+![Memories Setting3](/img/nextcloud/MemoriesSetting3.jpg)
+![Memories Setting4](/img/nextcloud/MemoriesSetting4.jpg)
+![Memories Setting5](/img/nextcloud/MemoriesSetting5.jpg)
+![Memories Setting6](/img/nextcloud/MemoriesSetting6.jpg)
 <p>Im sure you noticed that there are a few warnings we need to take care of.</p>
 ```
  Geometry table has not been created.

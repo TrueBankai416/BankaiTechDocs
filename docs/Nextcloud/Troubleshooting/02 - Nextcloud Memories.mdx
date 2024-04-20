@@ -11,14 +11,14 @@ last_update:
 ---
 ## Troubleshooting for Nextcloud Memories
 ### Geometry table has not been created
-![Geometry Table](/image/nextcloud/Troubleshooting/GeoTable.jpg)
+![Geometry Table](/img/nextcloud/Troubleshooting/GeoTable.jpg)
 <p>Run the following command.</p>
 ```
 sudo docker exec -it -u 33 nextcloud php occ memories:places-setup
 ```
 
 ### Database triggers are not set up correctly.
-<p>You need to add `--log_bin_trust_function_creators=true` to `command:` for `mariadb` in you `docker-compose.yaml file.</p>
+<p>You need to add `--log_bin_trust_function_creators=true` to `command:` for `mariadb` in you `docker-compose.yaml` file.</p>
 :::info[Example]
 command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
 :::
