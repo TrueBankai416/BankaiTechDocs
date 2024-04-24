@@ -64,4 +64,10 @@ Save the file by pressing `CTRL+X`
 If the error doesnt go away, you may need to clear your browser cache and restart the browser
 :::
 
+### The database is missing some indexes.
+![Missing Indexes](/img/nextcloud/Troubleshooting/missingIndexes.jpg)
+<p>This seems to be caused by nextcloud skipping large indexes. To fix in a Docker environment, run the following.</p>
+```
+sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
+```
 ## Resources
