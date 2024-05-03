@@ -29,5 +29,5 @@ sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
 ```
 
 ## Resources
-[Reset Nextcloud Password](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/reset_admin_password.html)
+[Reset Nextcloud Password](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/reset_admin_password.html) \
 [Show Nextcloud AIO Admin Panel Password](https://github.com/nextcloud/all-in-one/discussions/803#discussioncomment-2905075)
