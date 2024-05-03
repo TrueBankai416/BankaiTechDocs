@@ -19,6 +19,10 @@ sudo docker exec -it -u 33 nextcloud php occ maintenance:repair
 ```
 sudo docker exec -it -u 33 nextcloud php occ memories:places-setup
 ```
+### Adding Missing DB Indices
+```
+sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
+```
 
 ## Resources
-[Reset Nextcloud Password](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/reset_admin_password.html)\
+[Reset Nextcloud Password](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/reset_admin_password.html)
