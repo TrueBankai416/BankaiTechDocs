@@ -40,7 +40,10 @@ sudo docker compose down
 :::note
 You have to be in the directory containing your `docker-compose.yaml` file
 :::
-
+<p>Lets Delete the old Image</p>
+```
+sudo docker image rm bankaitech/nextcloud:latest
+```
 <p>Now lets pull the new image</p>
 ```
 sudo docker pull bankaitech/nextcloud:latest
