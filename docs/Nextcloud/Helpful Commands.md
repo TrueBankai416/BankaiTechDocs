@@ -11,12 +11,10 @@ docker exec -it -u www-data nextcloud php occ config:list system
 ```
 sudo docker exec -it -u 33 nextcloud php occ user:resetpassword admin
 ```
-:::tip
-For Nextcloud AIO, use.
+#### Show mastercontainer password for Nextcloud AIO
 ```
 sudo cat /var/lib/docker/volumes/nextcloud_aio_mastercontainer/_data/data/configuration.json | grep password
 ```
-:::
 ### Repair Nextcloud
 ```
 sudo docker exec -it -u 33 nextcloud php occ maintenance:repair
