@@ -225,7 +225,7 @@ Make sure to set `Groups` to `admin`
   </TabItem>
 
 
-  <TabItem value="nc-collabora" label="Install with Collabora Code">
+   <TabItem value="nc-collabora" label="Install with Collabora Code">
     ## Nextcloud Installation With Collabora Code
 ***This method includes Redis, MariaDB, and Collabora Code***
 
@@ -570,15 +570,13 @@ Update the following
 ```
 NEXTCLOUD_HOST=https://cloud.bankai-tech.com
 ```
-   <TabItem value="Prebuilt Image" label="Pre-built Image">
+      <TabItem value="Prebuilt Image" label="Pre-built Image">
    ### Downloading the Compose file
-   Now lets edit the compose file.
    ```
    wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
-   nano docker-compose.yaml
    ```
-   </TabItem>
-   <TabItem value="Docker Build" label="Building Custom Image">
+      </TabItem>
+      <TabItem value="Docker Build" label="Building Custom Image">
    ### Creating the Custom Image
    ```
    wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/Dockerfile \
@@ -601,7 +599,7 @@ NEXTCLOUD_HOST=https://cloud.bankai-tech.com
    ```
    image: nextcloud:28.0.4-custom
    ```
-   </TabItem>
+      </TabItem>
 
 :::info[NVIDIA HWA]
 If you want to use GPU for transcoding then uncomment this line\
