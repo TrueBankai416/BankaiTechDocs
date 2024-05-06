@@ -14,7 +14,7 @@ services:
       - .mariadb.env
 
   nextcloud:
-    image: nextcloud:28.0.4-custom
+    image: bankaitech/nextcloud:latest
     container_name: nextcloud
     restart: always
     ports:
