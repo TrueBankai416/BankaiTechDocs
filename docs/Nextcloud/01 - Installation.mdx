@@ -146,7 +146,10 @@ sudo docker compose up -d
 the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
 :::
 <p>After its done pulling the docker images you can open up a web browser.</p>
-<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+:::note
+Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](https://docs.bankai-tech.com/Reverse%20Proxy/Nginx).
+:::
+<p>Connect to nextcloud by typing in your configured `domain`</p>
 <p>You should see this screen.</p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
@@ -225,7 +228,7 @@ Make sure to set `Groups` to `admin`
   </TabItem>
 
 
-  <TabItem value="nc-collabora" label="Install with Collabora Code">
+   <TabItem value="nc-collabora" label="Install with Collabora Code">
     ## Nextcloud Installation With Collabora Code
 ***This method includes Redis, MariaDB, and Collabora Code***
 
@@ -385,7 +388,10 @@ the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/ru
  ✔ Container nextcloud  Started 
  ```
 <p>After its done pulling the docker images you can open up a web browser.</p>
-<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+:::note
+Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](https://docs.bankai-tech.com/Reverse%20Proxy/Nginx).
+:::
+<p>Connect to nextcloud by typing in your configured `domain`</p>
 <p>You should see this screen.</p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
@@ -570,29 +576,39 @@ Update the following
 ```
 NEXTCLOUD_HOST=https://cloud.bankai-tech.com
 ```
-### Creating the Custom Image
-```
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/Dockerfile \
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/supervisord.conf \
-docker build . -t nextcloud:28.0.4-custom
-```
-:::tip
-Go grab a beer, this will take awhile.... maybe take a nap.
-:::note[Recomendation]
-Change the `nextcloud:28.0.4-custom to the latest version of nextcloud\
-Ex. `nextcloud:29.0.8-custom`
-:::
+   <Tabs>
+      <TabItem value="Prebuilt Image" label="Pre-built Image">
+   ### Downloading the Compose file
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
+   ```
+      </TabItem>
+      <TabItem value="Docker Build" label="Building Custom Image">
+   ### Creating the Custom Image
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/Dockerfile \
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/supervisord.conf \
+   docker build . -t nextcloud:28.0.4-custom
+   ```
+   :::tip
+   Go grab a beer, this will take awhile.... maybe take a nap.
+   :::note[Recomendation]
+   Change the `nextcloud:28.0.4-custom to the latest version of nextcloud\
+   Ex. `nextcloud:29.0.8-custom`
+   :::
+   ### Modifying the Compose file
+   Now lets edit the compose file.
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
+   nano docker-compose.yaml
+   ```
+   Update this line if you named the image differently during the `build command`.
+   ```
+   image: nextcloud:28.0.4-custom
+   ```
+      </TabItem>
+   </Tabs>
 
-### Modifying the Compose file
-Now lets edit the compose file.
-```
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
-nano docker-compose.yaml
-```
-Update this line if you named the image differently during the `build command`.
-```
-image: nextcloud:28.0.4-custom
-```
 :::info[NVIDIA HWA]
 If you want to use GPU for transcoding then uncomment this line\
 runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers.\
@@ -608,7 +624,10 @@ sudo docker compose up -d
 the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
 :::
 <p>After its done pulling the docker images you can open up a web browser.</p>
-<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+:::note
+Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](https://docs.bankai-tech.com/Reverse%20Proxy/Nginx).
+:::
+<p>Connect to nextcloud by typing in your configured `domain`</p>
 <p>You should see this screen.</p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
@@ -808,29 +827,38 @@ Update the following
 ```
 NEXTCLOUD_HOST=https://cloud.bankai-tech.com
 ```
-### Creating the Custom Image
-```
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/Dockerfile \
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/supervisord.conf \
-docker build . -t nextcloud:28.0.4-custom
-```
-:::tip
-Go grab a beer, this will take awhile.... maybe take a nap.
-:::note[Recomendation]
-Change the `nextcloud:28.0.4-custom to the latest version of nextcloud\
-Ex. `nextcloud:29.0.8-custom`
-:::
-
-### Modifying the Compose file
-Now lets edit the compose file.
-```
-wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
-nano docker-compose.yaml
-```
-Update this line if you named the image differently during the `build command`.
-```
-image: nextcloud:28.0.4-custom
-```
+   <Tabs>
+      <TabItem value="Prebuilt Image" label="Pre-built Image">
+   ### Downloading the Compose file
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
+   ```
+      </TabItem>
+      <TabItem value="Docker Build" label="Building Custom Image">
+   ### Creating the Custom Image
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/Dockerfile \
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/supervisord.conf \
+   docker build . -t nextcloud:28.0.4-custom
+   ```
+   :::tip
+   Go grab a beer, this will take awhile.... maybe take a nap.
+   :::note[Recomendation]
+   Change the `nextcloud:28.0.4-custom to the latest version of nextcloud\
+   Ex. `nextcloud:29.0.8-custom`
+   :::
+   ### Modifying the Compose file
+   Now lets edit the compose file.
+   ```
+   wget https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/docker-compose.yaml
+   nano docker-compose.yaml
+   ```
+   Update this line if you named the image differently during the `build command`.
+   ```
+   image: nextcloud:28.0.4-custom
+   ```
+      </TabItem>
+   </Tabs>
 :::info[NVIDIA HWA]
 If you want to use GPU for transcoding then uncomment this line\
 runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers.\
@@ -846,7 +874,10 @@ sudo docker compose up -d
 the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
 :::
 <p>After its done pulling the docker images you can open up a web browser.</p>
-<p>Connect to nextcloud by typing in `<ip:8080>` or by tying in your configured `domain`</p>
+:::note
+Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](https://docs.bankai-tech.com/Reverse%20Proxy/Nginx).
+:::
+<p>Connect to nextcloud by typing in your configured `domain`</p>
 <p>You should see this screen.</p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
