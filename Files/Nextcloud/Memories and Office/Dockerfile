@@ -50,11 +50,12 @@ RUN apt update \
   && apt install -y wget gnupg2 unzip
 
 # Enable the repository for pdlib and install dlib
-#RUN mkdir -m 0755 -p /etc/apt/keyrings/ \
-#  && wget -O- https://repo.delellis.com.ar/repo.gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/php-pdlib.gpg > /dev/null \
-#  && echo "deb [signed-by=/etc/apt/keyrings/php-pdlib.gpg arch=amd64] https://repo.delellis.com.ar bullseye bullseye" | sudo tee /etc/apt/sources.list.d/php-pdlib.list \
-#RUN apt update \
-#  && apt install -y libdlib-dev
+RUN mkdir -m 0755 -p /etc/apt/keyrings/ \
+  && wget -qO - https://repo.delellis.com.ar/repo.gpg.key | sudo apt-key add - \
+  && wget -O- https://repo.delellis.com.ar/repo.gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/php-pdlib.gpg > /dev/null \
+  && echo "deb [signed-by=/etc/apt/keyrings/php-pdlib.gpg arch=amd64] https://repo.delellis.com.ar bullseye bullseye" | sudo tee /etc/apt/sources.list.d/php-pdlib.list \
+RUN apt update \
+  && apt install -y libdlib-dev
 
 # Install pdlib extension from a downloaded archive
 RUN wget https://github.com/goodspb/pdlib/archive/master.zip \
