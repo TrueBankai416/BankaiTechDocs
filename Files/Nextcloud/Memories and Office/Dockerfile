@@ -138,6 +138,6 @@ ENV NEXTCLOUD_UPDATE=1
 # Health check to ensure Nextcloud is running and accessible
 # The health check pings the Nextcloud status.php page and expects an HTTP 200 response
 # Adjust the interval, timeout, start period, and retries as necessary for your environment
-#HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
-#  CMD curl -f http://localhost/status.php || exit 1
-#CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost/status.php || exit 1
+CMD ["/usr/bin/supervisord", "-c", "./supervisord.conf"]
