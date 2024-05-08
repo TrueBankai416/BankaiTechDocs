@@ -34,27 +34,25 @@ RUN git clone https://github.com/goodspb/pdlib.git /usr/src/php/ext/pdlib
 # Install the pdlib PHP extension
 RUN docker-php-ext-install pdlib
 
-# Install inotify extension
-RUN pecl install inotify \
-    && docker-php-ext-enable inotify
-
 # Install the bz2 PHP extension
 RUN docker-php-ext-install bz2
 
 # Add cron jobs for Nextcloud's background tasks
 RUN echo '12 * * * * php /var/www/html/occ face:background_job' >> /var/spool/cron/crontabs/www-data
 RUN echo '37 * * * * php /var/www/html/occ preview:pre-generate' >> /var/spool/cron/crontabs/www-data
+RUN echo '*/5 * * * * php -f /var/www/html/cron.php' > /var/spool/cron/crontabs/www-data
 
 # Install additional utilities
 RUN apt update \
   && apt install -y wget gnupg2 unzip
 
 # Enable the repository for pdlib and install dlib
-#RUN mkdir -m 0755 -p /etc/apt/keyrings/ \
-#  && wget -O- https://repo.delellis.com.ar/repo.gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/php-pdlib.gpg > /dev/null \
-#  && echo "deb [signed-by=/etc/apt/keyrings/php-pdlib.gpg arch=amd64] https://repo.delellis.com.ar bullseye bullseye" | sudo tee /etc/apt/sources.list.d/php-pdlib.list \
-#RUN apt update \
-#  && apt install -y libdlib-dev
+RUN mkdir -m 0755 -p /etc/apt/keyrings/ \
+  && wget -qO - https://repo.delellis.com.ar/repo.gpg.key | sudo apt-key add - \
+  && wget -O- https://repo.delellis.com.ar/repo.gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/php-pdlib.gpg > /dev/null \
+  && echo "deb [signed-by=/etc/apt/keyrings/php-pdlib.gpg arch=amd64] https://repo.delellis.com.ar bullseye bullseye" | sudo tee /etc/apt/sources.list.d/php-pdlib.list \
+RUN apt update \
+  && apt install -y libdlib-dev
 
 # Install pdlib extension from a downloaded archive
 RUN wget https://github.com/goodspb/pdlib/archive/master.zip \
@@ -65,6 +63,8 @@ RUN docker-php-ext-install pdlib-master
 
 # Increase PHP memory limit for Nextcloud
 RUN echo memory_limit=1024M > /usr/local/etc/php/conf.d/memory-limit.ini
+
+RUN echo 'apc.enable_cli=1' >> "${PHP_INI_DIR}/conf.d/docker-php-ext-apcu.ini"
 
 # Download and test the pdlib extension
 RUN wget https://github.com/matiasdelellis/pdlib-min-test-suite/archive/master.zip \
@@ -125,10 +125,18 @@ RUN set -ex; \
 RUN mkdir -p \
     /var/log/supervisord \
     /var/run/supervisord \
+    /docker-entrypoint-hooks.d/pre-installation \
+    /docker-entrypoint-hooks.d/post-installation \
+    /docker-entrypoint-hooks.d/pre-upgrade \
+    /docker-entrypoint-hooks.d/post-upgrade \
+    /docker-entrypoint-hooks.d/before-starting \
 ;
 
 # Copy the supervisord configuration file
 COPY supervisord.conf /
+
+# Copy the healthcheck file
+COPY healthcheck.sh /
 
 # Set an environment variable to indicate that Nextcloud should be updated
 ENV NEXTCLOUD_UPDATE=1
@@ -137,6 +145,6 @@ ENV NEXTCLOUD_UPDATE=1
 # Health check to ensure Nextcloud is running and accessible
 # The health check pings the Nextcloud status.php page and expects an HTTP 200 response
 # Adjust the interval, timeout, start period, and retries as necessary for your environment
-#HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
-#  CMD curl -f http://localhost/status.php || exit 1
-#CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost/status.php || exit 1
+CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
