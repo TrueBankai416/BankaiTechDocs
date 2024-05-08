@@ -34,16 +34,13 @@ RUN git clone https://github.com/goodspb/pdlib.git /usr/src/php/ext/pdlib
 # Install the pdlib PHP extension
 RUN docker-php-ext-install pdlib
 
-# Install inotify extension
-RUN pecl install inotify \
-    && docker-php-ext-enable inotify
-
 # Install the bz2 PHP extension
 RUN docker-php-ext-install bz2
 
 # Add cron jobs for Nextcloud's background tasks
 RUN echo '12 * * * * php /var/www/html/occ face:background_job' >> /var/spool/cron/crontabs/www-data
 RUN echo '37 * * * * php /var/www/html/occ preview:pre-generate' >> /var/spool/cron/crontabs/www-data
+RUN echo '*/5 * * * * php -f /var/www/html/cron.php' > /var/spool/cron/crontabs/www-data
 
 # Install additional utilities
 RUN apt update \
@@ -66,6 +63,8 @@ RUN docker-php-ext-install pdlib-master
 
 # Increase PHP memory limit for Nextcloud
 RUN echo memory_limit=1024M > /usr/local/etc/php/conf.d/memory-limit.ini
+
+RUN echo 'apc.enable_cli=1' >> "${PHP_INI_DIR}/conf.d/docker-php-ext-apcu.ini"
 
 # Download and test the pdlib extension
 RUN wget https://github.com/matiasdelellis/pdlib-min-test-suite/archive/master.zip \
@@ -126,10 +125,18 @@ RUN set -ex; \
 RUN mkdir -p \
     /var/log/supervisord \
     /var/run/supervisord \
+    /docker-entrypoint-hooks.d/pre-installation \
+    /docker-entrypoint-hooks.d/post-installation \
+    /docker-entrypoint-hooks.d/pre-upgrade \
+    /docker-entrypoint-hooks.d/post-upgrade \
+    /docker-entrypoint-hooks.d/before-starting \
 ;
 
 # Copy the supervisord configuration file
 COPY supervisord.conf /
+
+# Copy the healthcheck file
+COPY healthcheck.sh /
 
 # Set an environment variable to indicate that Nextcloud should be updated
 ENV NEXTCLOUD_UPDATE=1
