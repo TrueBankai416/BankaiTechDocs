@@ -140,4 +140,4 @@ ENV NEXTCLOUD_UPDATE=1
 # Adjust the interval, timeout, start period, and retries as necessary for your environment
 HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost/status.php || exit 1
-CMD ["/usr/bin/supervisord", "-c", "./supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
