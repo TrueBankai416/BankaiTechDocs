@@ -38,9 +38,9 @@ RUN docker-php-ext-install pdlib
 RUN docker-php-ext-install bz2
 
 # Add cron jobs for Nextcloud's background tasks
+#RUN echo '*/5 * * * * php -f /var/www/html/cron.php' >> /var/spool/cron/crontabs/www-data #Duplicate will be created
 RUN echo '12 * * * * php /var/www/html/occ face:background_job' >> /var/spool/cron/crontabs/www-data
 RUN echo '37 * * * * php /var/www/html/occ preview:pre-generate' >> /var/spool/cron/crontabs/www-data
-RUN echo '*/5 * * * * php -f /var/www/html/cron.php' > /var/spool/cron/crontabs/www-data
 
 # Install additional utilities
 RUN apt update \
@@ -135,8 +135,7 @@ RUN mkdir -p \
 # Copy the supervisord configuration file
 COPY supervisord.conf /
 
-# Copy the healthcheck file
-COPY healthcheck.sh /
+COPY *.sh upgrade.exclude /
 
 # Set an environment variable to indicate that Nextcloud should be updated
 ENV NEXTCLOUD_UPDATE=1
