@@ -1,5 +1,6 @@
 FROM php:8.2-apache-bookworm
 
+USER root
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
     \
@@ -216,10 +217,10 @@ COPY supervisord.conf /
 RUN apt-get update && apt-get install -y \
     supervisor \
   && rm -rf /var/lib/apt/lists/* \
-  && mkdir /var/log/supervisord /var/run/supervisord && \
-     touch /var/log/supervisord/supervisord.log && \
-     chmod -R 777 /var/log/supervisord /var/run/supervisord && \
-     chown -R www-data:www-data /var/log/supervisord /var/run/supervisord
+  && mkdir /var/log/supervisord /var/run/supervisord
+#     && touch /var/log/supervisord/supervisord.log && \
+#     chmod -R 777 /var/log/supervisord /var/run/supervisord && \
+#     chown -R www-data:www-data /var/log/supervisord /var/run/supervisord
 
 CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
