@@ -23,7 +23,6 @@ services:
       - mariadb
       - redis
       - collabora
-      - imaginary
       - go-vod
     volumes:
       - ./nextcloud:/var/www/html
@@ -53,16 +52,6 @@ services:
     env_file:
       - .collabora.env
     restart: always
-
-  imaginary:
-    image: nextcloud/aio-imaginary:latest
-    container_name: imaginary
-    restart: always
-    environment:
-      - PORT=9000
-    ports:
-      - 9000:9000
-    command: -concurrency 50 -enable-url-source -log-level debug
 
   go-vod:
     image: radialapps/go-vod
