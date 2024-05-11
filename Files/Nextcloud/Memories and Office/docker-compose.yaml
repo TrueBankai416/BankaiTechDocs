@@ -62,3 +62,9 @@ services:
     volumes:
       - ./nextcloud:/var/www/html:ro
 #    runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers. Test nvidia by running `sudo nvidia-smi`
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
