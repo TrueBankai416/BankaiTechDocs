@@ -101,7 +101,7 @@ nano docker-compose.yaml
 ```
 Paste this into the file
 ```
-version: '3.8'
+name: nextcloud
 
 services:
   mariadb:
@@ -115,7 +115,7 @@ services:
       - .mariadb.env
 
   nextcloud:
-    image: nextcloud
+    image: nextcloud:production
     container_name: nextcloud
     restart: always
     ports:
@@ -135,6 +135,12 @@ services:
       - 6379
     command: redis-server --save 60 1 --loglevel warning
     restart: always
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 ```
 ## Starting Nextcloud
 Now lets start it up.
@@ -334,7 +340,7 @@ services:
       - .mariadb.env
 
   nextcloud:
-    image: nextcloud
+    image: nextcloud:production
     container_name: nextcloud
     restart: always
     ports:
@@ -369,6 +375,12 @@ services:
     env_file:
       - .collabora.env
     restart: always
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 ```
 ## Starting Nextcloud
 Now lets start it up.
