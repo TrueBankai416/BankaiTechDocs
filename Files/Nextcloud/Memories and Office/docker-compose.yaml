@@ -29,6 +29,17 @@ services:
     env_file:
       - .nextcloud.env
 
+  cron:
+    image: bankaitech/nextcloud:latest
+    container_name: cron
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html:z
+    depends_on:
+      - mariadb
+      - redis
+    entrypoint: /cron.sh
+
   redis:
     container_name: redis
     image: redis:latest
