@@ -1,3 +1,4 @@
+# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/Files/Nextcloud/Memories%20and%20Office/oneclickinstall)" 
 #!/bin/bash
 
 set -e
