@@ -309,15 +309,8 @@ EOF
         ;;
 esac
 
-echo "docker-compose.yml file created successfully."
+echo "docker-compose.yaml file created successfully."
 
-# Start Nextcloud using Docker Compose
-echo "Starting Nextcloud..."
-sudo docker-compose up -d
-
-echo "Nextcloud has been started successfully."
-
-echo "Nextcloud has been started successfully."
 # Start Nextcloud using Docker Compose
 echo "Starting Nextcloud..."
 sudo docker-compose up -d
