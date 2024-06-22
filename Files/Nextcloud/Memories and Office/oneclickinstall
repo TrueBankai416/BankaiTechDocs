@@ -49,6 +49,10 @@ read -p "Enter your domain: " DOMAIN_NAME
 echo "Enter the private ip address for your reverse proxy "
 read -p "Enter here: " PROXY_IP
 
+# Prompt user to select nextclouds listening port
+echo "What port would you like nextcloud to listen on? (Default: 8080) "
+read -p "Enter port: " PORT
+
 # Create directory for Docker Nextcloud
 NEXTCLOUD_DIR="/etc/docker/nextcloud"
 if [ ! -d "$NEXTCLOUD_DIR" ]; then
@@ -184,7 +188,7 @@ services:
     container_name: nextcloud
     restart: unless-stopped
     ports:
-      - 8080:80
+      - $PORT:80
     links:
       - mariadb
       - redis
@@ -222,7 +226,7 @@ services:
     image: nextcloud:production
     container_name: nextcloud
     ports:
-      - "8080:80"
+      - "$PORT:80"
     links:
       - mariadb
       - redis
@@ -277,7 +281,7 @@ services:
     image: bankaitech/nextcloud:latest
     container_name: nextcloud
     ports:
-      - "8080:80"
+      - "$PORT:80"
     links:
       - mariadb
       - redis
