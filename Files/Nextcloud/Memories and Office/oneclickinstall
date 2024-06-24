@@ -37,7 +37,7 @@ else
     echo "This script only works for Linux systems."
     read -p "Press ENTER to exit."
     exit 1
-fi  # This 'fi' closes the if block started at line 11
+  # This 'fi' closes the if block started at line 11
     echo "This script only works for Linux systems."
     read -p "Press ENTER to exit."
     exit 1
