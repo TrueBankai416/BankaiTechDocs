@@ -78,6 +78,7 @@ echo "Select the Nextcloud installation option:"
 echo "1) Just Nextcloud"
 echo "2) Nextcloud with Office"
 echo "3) Nextcloud with Memories support"
+echo "4) Exit."
 read -p "Enter your choice (1/2/3): " INSTALL_OPTION
 
 # Prompt user for Domain
@@ -346,6 +347,10 @@ services:
     ports:
       - "9980:9980"
 EOF
+        ;;
+    4)
+        echo "Exiting ...."
+        exit 1
         ;;
     *)
         echo "Invalid option selected. Exiting."
