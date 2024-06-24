@@ -357,6 +357,9 @@ sudo docker compose up -d
 echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
 
+# Installing Nextcloud
+sudo docker exec -u www-data nextcloud php occ  maintenance:install
+
 # Wait for Nextcloud to fully start
 echo "Waiting for Nextcloud to fully start..."
 sleep 30
