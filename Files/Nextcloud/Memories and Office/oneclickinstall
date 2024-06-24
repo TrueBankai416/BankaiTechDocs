@@ -381,3 +381,5 @@ fi
 echo "Nextcloud has been started successfully."
 echo ""
 echo "Files are stored Here. $NEXTCLOUD_DIR"
+echo ""
+echo "Visit my documentation site here: https://docs.bankai-tech.com"
