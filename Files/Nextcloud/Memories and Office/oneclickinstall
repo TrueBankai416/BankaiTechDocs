@@ -79,7 +79,7 @@ echo "1) Just Nextcloud"
 echo "2) Nextcloud with Office"
 echo "3) Nextcloud with Memories support"
 echo "4) Exit."
-read -p "Enter your choice (1/2/3): " INSTALL_OPTION
+read -p "Enter your choice (1/2/3/4): " INSTALL_OPTION
 
 # Prompt user for Domain
 echo "What is the your nextcloud domain? "
