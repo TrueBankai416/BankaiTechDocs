@@ -105,7 +105,7 @@ echo ""
 echo "What is your office domain"
 echo ""
 echo "Example: office.bankai-tech.com"
-read -p "Enter you domain: " COLLABORA_DOMAIN
+read -p "Enter your domain: " COLLABORA_DOMAIN
         ;;
     3)
 echo ""
