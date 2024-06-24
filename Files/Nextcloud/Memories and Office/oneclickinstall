@@ -387,7 +387,7 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
     echo "Checking Nextcloud status (Attempt: $attempt/$MAX_ATTEMPTS)..."
 
     # Use curl to fetch the Nextcloud status page
-    status=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN_NAME/status.php")
+    status=$(curl -s -o /dev/null -w "%{http_code}" "https://$DOMAIN_NAME/status.php")
 
     # Check if the HTTP status code is 200 (OK)
     if [ "$status" -eq 200 ]; then
