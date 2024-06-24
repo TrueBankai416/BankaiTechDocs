@@ -131,6 +131,10 @@ echo "Detected private IP: $PRIVATE_IP"
 PUBLIC_IP=$(curl -s https://api.ipify.org)
 echo "Detected public IP: $PUBLIC_IP"
 
+echo "Lets create a user"
+read -p "Enter username: " NC_USERNAME
+read -p "Enter your password: " NC_PASSWORD
+
 # Create .env file with common environment variables based on selection
 case $INSTALL_OPTION in
     1)
@@ -142,6 +146,8 @@ MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 EOF
         cat << EOF > .nextcloud.env
+NEXTCLOUD_ADMIN_USER=$NC_USERNAME
+NEXTCLOUD_ADMIN_PASSWORD=$NC_PASSWORD
 NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
 TRUSTED_PROXIES=$PROXY_IP
 OVERWRITEPROTOCOL=https
@@ -167,6 +173,8 @@ MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 EOF
         cat << EOF > .nextcloud.env
+NEXTCLOUD_ADMIN_USER=$NC_USERNAME
+NEXTCLOUD_ADMIN_PASSWORD=$NC_PASSWORD
 NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
 TRUSTED_PROXIES=$PROXY_IP
 OVERWRITEPROTOCOL=https
@@ -359,11 +367,6 @@ echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
 
 # Installing Nextcloud
-echo "Lets create a user"
-read -p "Enter username: " NC_USERNAME
-read -p "Enter your password: " NC_PASSWORD
-sudo docker exec -u www-data nextcloud bash -c \
-  'php occ maintenance:install --admin-user="'$NC_USERNAME'" --admin-pass="'$NC_PASSWORD'"'
 
 # Wait for Nextcloud to fully start
 echo "Waiting for Nextcloud to fully start..."
