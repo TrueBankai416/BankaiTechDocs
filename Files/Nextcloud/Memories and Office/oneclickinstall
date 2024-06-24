@@ -301,7 +301,7 @@ services:
     image: mariadb:10.6
     container_name: mariadb
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
     volumes:
       - ./mariadb:/var/lib/mysql
     env_file:
@@ -371,6 +371,9 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
     sudo docker exec -u www-data nextcloud php occ app:install recognize
     sudo docker exec -u www-data nextcloud php occ app:enable recognize
     echo "Collabora Online, Memories, and Recognize apps have been installed and enabled successfully."
+    echo ""
+    echo "Creating Geometry Table ...."
+    sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
 else
     echo "Skipping additional app installations."
 fi
