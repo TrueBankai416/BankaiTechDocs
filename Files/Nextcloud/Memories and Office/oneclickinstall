@@ -177,6 +177,7 @@ MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
+EOF
         cat << EOF > .collabora.env
 username=admin
 password=$COLLABORA_PASSWORD
