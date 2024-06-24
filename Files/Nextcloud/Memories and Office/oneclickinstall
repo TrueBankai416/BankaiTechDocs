@@ -88,7 +88,6 @@ if [ ! -d "$NEXTCLOUD_DIR" ]; then
     echo "Creating directory $NEXTCLOUD_DIR..."
     sudo mkdir -p "$NEXTCLOUD_DIR"
 fi
-
 # Check if Nextcloud is already installed
 NEXTCLOUD_DATA_DIR="$NEXTCLOUD_DIR/nextcloud"
 if [ -d "$NEXTCLOUD_DATA_DIR" ] && [ -f "$NEXTCLOUD_DATA_DIR/version.php" ]; then
@@ -179,38 +178,6 @@ MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
-EOF
-        cat << EOF > .collabora.env
-username=admin
-password=$COLLABORA_PASSWORD
-domain=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
-EOF
-        ;;
-    3)
-        cat << EOF > .mariadb.env
-# Common Environment variables for Nextcloud docker-compose setup
-MYSQL_DATABASE=nextcloud
-MYSQL_USER=nextcloud
-MYSQL_PASSWORD=$MYSQL_PASSWORD
-MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-EOF
-        cat << EOF > .nextcloud.env
-NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
-TRUSTED_PROXIES=$PROXY_IP
-OVERWRITEPROTOCOL=https
-OVERWRITECLIURL=https://$DOMAIN_NAME
-OFFICE_ENABLED=1
-MEMORIES_ENABLED=1
-MAINTENANCE_WINDOW_START=1
-REDIS_HOST=redis
-REDIS_PORT=6379
-PHP_MEMORY_LIMIT=512M
-PHP_UPLOAD_LIMIT-512M
-MYSQL_PASSWORD=$MYSQL_PASSWORD
-MYSQL_DATABASE=nextcloud
-MYSQL_USER=nextcloud
-MYSQL_HOST=mariadb
-EOF
         cat << EOF > .collabora.env
 username=admin
 password=$COLLABORA_PASSWORD
@@ -273,7 +240,7 @@ services:
     image: mariadb:10.6
     container_name: mariadb
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
     volumes:
       - ./mariadb:/var/lib/mysql
     env_file:
@@ -381,6 +348,28 @@ echo "docker-compose.yaml file created successfully."
 echo "Starting Nextcloud..."
 echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
+# Automatically determine the private IP address
+PRIVATE_IP=$(hostname -I | awk '{print $1}')
+echo "Detected private IP: $PRIVATE_IP"
+
+# Automatically determine the public IP address
+PUBLIC_IP=$(curl -s https://api.ipify.org)
+echo "Detected public IP: $PUBLIC_IP"
+
+# Wait for Nextcloud to fully start
+echo "Waiting for Nextcloud to fully start..."
+sleep 30
+
+# Configure Nextcloud to trust the private IP and public IP
+NEXTCLOUD_CONTAINER_ID=$(docker ps -qf "name=^/${NEXTCLOUD_CONTAINER_NAME}$")
+docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:system:set trusted_domains 2 --value=$PRIVATE_IP"
+docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:system:set trusted_domains 3 --value=$PUBLIC_IP"
+
+# Configure Collabora domain
+COLLABORA_DOMAIN=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
+docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN"
+
+echo "WOPI configuration for Collabora has been completed."
 
 if [ "$INSTALL_OPTION" = "2" ]; then
     echo "Installing and enabling Collabora Online app within Nextcloud..."
@@ -406,5 +395,3 @@ fi
 echo "Nextcloud has been started successfully."
 echo ""
 echo "Files are stored Here. $NEXTCLOUD_DIR"
-echo ""
-echo "Visit my documentation site here: https://docs.bankai-tech.com"
