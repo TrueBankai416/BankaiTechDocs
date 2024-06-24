@@ -115,11 +115,6 @@ fi
 # Navigate to the Nextcloud directory
 cd "$NEXTCLOUD_DIR"
 
-# Create .env file
-cat << EOF > .env
-# Environment variables for Nextcloud docker-compose setup
-EOF
-
 # Generate random passwords for MySQL
 MYSQL_PASSWORD=$(openssl rand -base64 12)
 MYSQL_ROOT_PASSWORD=$(openssl rand -base64 12)
