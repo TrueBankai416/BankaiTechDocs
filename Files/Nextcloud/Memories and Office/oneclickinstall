@@ -28,6 +28,10 @@ if [ "$OS" = "Linux" ]; then
             echo "Exiting script."
             exit 1
         fi
+elif [ "$OS" = "Darwin" ] || [ "$OS" = "MINGW" ] || [ "$OS" = "MSYS" ] || [ "$OS" = "CYGWIN" ]; then
+    echo "This script only works for Linux systems."
+    read -p "Press ENTER to exit."
+    exit 1
 else
     echo "Unsupported operating system: $OS"
     echo "This script only works for Linux systems."
@@ -37,12 +41,7 @@ fi  # This 'fi' closes the if block started at line 11
     echo "This script only works for Linux systems."
     read -p "Press ENTER to exit."
     exit 1
-else
-    echo "Unsupported operating system: $OS"
-    echo "This script only works for Linux systems."
-    read -p "Press ENTER to exit."
-    exit 1
-fi
+
 if ! command -v docker &> /dev/null
 then
     echo "Docker could not be found."
