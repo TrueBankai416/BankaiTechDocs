@@ -28,6 +28,7 @@ if [ "$OS" = "Linux" ]; then
             echo "Exiting script."
             exit 1
         fi
+    fi
 fi
 
 if ! command -v docker &> /dev/null
@@ -387,4 +388,3 @@ fi
 echo "Nextcloud has been started successfully."
 echo ""
 echo "Files are stored Here. $NEXTCLOUD_DIR"
-EOF
