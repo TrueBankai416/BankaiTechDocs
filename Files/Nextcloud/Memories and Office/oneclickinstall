@@ -122,6 +122,14 @@ MYSQL_ROOT_PASSWORD=$(openssl rand -base64 12)
 # Generate random passwords for Collabora
 COLLABORA_PASSWORD=$(openssl rand -base64 12)
 
+# Automatically determine the private IP address
+PRIVATE_IP=$(hostname -I | awk '{print $1}')
+echo "Detected private IP: $PRIVATE_IP"
+
+# Automatically determine the public IP address
+PUBLIC_IP=$(curl -s https://api.ipify.org)
+echo "Detected public IP: $PUBLIC_IP"
+
 # Create .env file with common environment variables based on selection
 case $INSTALL_OPTION in
     1)
@@ -348,22 +356,10 @@ echo "Starting Nextcloud..."
 sudo docker compose up -d
 echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
-# Automatically determine the private IP address
-PRIVATE_IP=$(hostname -I | awk '{print $1}')
-echo "Detected private IP: $PRIVATE_IP"
-
-# Automatically determine the public IP address
-PUBLIC_IP=$(curl -s https://api.ipify.org)
-echo "Detected public IP: $PUBLIC_IP"
 
 # Wait for Nextcloud to fully start
 echo "Waiting for Nextcloud to fully start..."
 sleep 30
-
-# Configure Nextcloud to trust the private IP and public IP
-NEXTCLOUD_CONTAINER_ID=$(docker ps -qf "name=^/${NEXTCLOUD_CONTAINER_NAME}$")
-sudo docker exec -u www-data nextcloud php occ config:system:set trusted_domains 2 --value=$PRIVATE_IP
-sudo docker exec -u www-data nextcloud php occ config:system:set trusted_domains 3 --value=$PUBLIC_IP
 
 # Configure Collabora domain
 COLLABORA_DOMAIN=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
