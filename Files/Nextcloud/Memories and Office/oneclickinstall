@@ -36,26 +36,6 @@ else
     exit 1
 fi
 
-if ! command -v docker &> /dev/null
-then
-    echo "Docker could not be found."
-    read -p "Do you want to install Docker? (y/N): " install_docker
-    if [[ "$install_docker" =~ ^[Yy]$ ]]
-    then
-        echo "Installing Docker..."
-        sudo apt-get update
-        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        sudo apt-get update
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-        echo "Docker installed successfully."
-    else
-        echo "Docker installation aborted. Exiting script."
-        exit 1
-    fi
-fi
-
 # Check if Nextcloud is already installed
 NEXTCLOUD_DATA_DIR="$NEXTCLOUD_DIR/nextcloud"
 if [ -d "$NEXTCLOUD_DATA_DIR" ] && [ -f "$NEXTCLOUD_DATA_DIR/version.php" ]; then
@@ -77,6 +57,26 @@ if [ $(docker ps -q -f name=^/${NEXTCLOUD_CONTAINER_NAME}$) ]; then
         docker stop $NEXTCLOUD_CONTAINER_NAME
     else
         echo "Installation aborted by user. Exiting."
+        exit 1
+    fi
+fi
+
+if ! command -v docker &> /dev/null
+then
+    echo "Docker could not be found."
+    read -p "Do you want to install Docker? (y/N): " install_docker
+    if [[ "$install_docker" =~ ^[Yy]$ ]]
+    then
+        echo "Installing Docker..."
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        echo "Docker installed successfully."
+    else
+        echo "Docker installation aborted. Exiting script."
         exit 1
     fi
 fi
