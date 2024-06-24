@@ -362,9 +362,11 @@ sleep 30 # Wait for Nextcloud to finish setting up
 echo "Lets create a user"
 read -p "Enter username: " NC_USERNAME
 read -p "Enter your password: " NC_PASSWORD
-sudo docker exec -u www-data nextcloud php occ  maintenance:install \\
---admin-user="$NC_USERNAME" \\
---admin-pass="$NC_PASSWORD"
+sudo docker exec -u www-data nextcloud bash -c \\
+  'php occ maintenance:install \\
+    --admin-user="'$NC_USERNAME'" \\
+    --admin-pass="'$NC_PASSWORD'"'
+exit
 
 # Wait for Nextcloud to fully start
 echo "Waiting for Nextcloud to fully start..."
