@@ -94,18 +94,21 @@ echo "4) Exit."
 read -p "Enter your choice (1/2/3/4): " INSTALL_OPTION
 
 # Prompt user for Domain
+echo ""
 echo "What is your nextcloud domain? "
 echo "Example: cloud.bankai-tech.com"
 read -p "Enter your domain: " DOMAIN_NAME
 
 case $INSTALL_OPTION in
     2)
+echo ""
 echo "What is your office domain"
 echo ""
 echo "Example: office.bankai-tech.com"
 read -p "Enter you domain: " COLLABORA_DOMAIN
         ;;
     3)
+echo ""
 echo "What is your office domain"
 echo ""
 echo "Example: office.bankai-tech.com"
@@ -114,10 +117,12 @@ read -p "Enter you domain: " COLLABORA_DOMAIN
 esac
 
 # Prompt user for Reverse-Proxy IP address
+echo ""
 echo "Enter the private ip address for your reverse proxy "
 read -p "Enter here: " PROXY_IP
 
 # Prompt user to select nextclouds listening port
+echo ""
 echo "What port would you like nextcloud to listen on? (Default: 8080) "
 read -p "Enter port: " PORT
 
@@ -146,6 +151,7 @@ echo "Detected private IP: $PRIVATE_IP"
 PUBLIC_IP=$(curl -s https://api.ipify.org)
 echo "Detected public IP: $PUBLIC_IP"
 
+echo ""
 echo "Lets create a user"
 read -p "Enter username: " NC_USERNAME
 read -p "Enter your password: " NC_PASSWORD
