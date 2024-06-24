@@ -56,6 +56,31 @@ then
     fi
 fi
 
+# Check if Nextcloud is already installed
+NEXTCLOUD_DATA_DIR="$NEXTCLOUD_DIR/nextcloud"
+if [ -d "$NEXTCLOUD_DATA_DIR" ] && [ -f "$NEXTCLOUD_DATA_DIR/version.php" ]; then
+    echo "A Nextcloud installation has been detected in $NEXTCLOUD_DATA_DIR."
+    read -p "Do you want to continue with the installation? This may upgrade or reinstall Nextcloud. (y/N): " continue_install
+    if [[ ! "$continue_install" =~ ^[Yy]$ ]]; then
+        echo "Installation aborted by user. Exiting."
+        exit 1
+    fi
+fi
+
+# Check if Nextcloud is running in Docker
+NEXTCLOUD_CONTAINER_NAME="nextcloud"
+if [ $(docker ps -q -f name=^/${NEXTCLOUD_CONTAINER_NAME}$) ]; then
+    echo "A Docker container named '$NEXTCLOUD_CONTAINER_NAME' is already running."
+    read -p "Do you want to stop the container and proceed with the installation? (y/N): " stop_and_proceed
+    if [[ "$stop_and_proceed" =~ ^[Yy]$ ]]; then
+        echo "Stopping the Nextcloud container..."
+        docker stop $NEXTCLOUD_CONTAINER_NAME
+    else
+        echo "Installation aborted by user. Exiting."
+        exit 1
+    fi
+fi
+
 # Update Docker
 echo "Updating Docker..."
 sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io -y
@@ -86,30 +111,6 @@ NEXTCLOUD_DIR="/etc/docker/nextcloud"
 if [ ! -d "$NEXTCLOUD_DIR" ]; then
     echo "Creating directory $NEXTCLOUD_DIR..."
     sudo mkdir -p "$NEXTCLOUD_DIR"
-fi
-# Check if Nextcloud is already installed
-NEXTCLOUD_DATA_DIR="$NEXTCLOUD_DIR/nextcloud"
-if [ -d "$NEXTCLOUD_DATA_DIR" ] && [ -f "$NEXTCLOUD_DATA_DIR/version.php" ]; then
-    echo "A Nextcloud installation has been detected in $NEXTCLOUD_DATA_DIR."
-    read -p "Do you want to continue with the installation? This may upgrade or reinstall Nextcloud. (y/N): " continue_install
-    if [[ ! "$continue_install" =~ ^[Yy]$ ]]; then
-        echo "Installation aborted by user. Exiting."
-        exit 1
-    fi
-fi
-
-# Check if Nextcloud is running in Docker
-NEXTCLOUD_CONTAINER_NAME="nextcloud"
-if [ $(docker ps -q -f name=^/${NEXTCLOUD_CONTAINER_NAME}$) ]; then
-    echo "A Docker container named '$NEXTCLOUD_CONTAINER_NAME' is already running."
-    read -p "Do you want to stop the container and proceed with the installation? (y/N): " stop_and_proceed
-    if [[ "$stop_and_proceed" =~ ^[Yy]$ ]]; then
-        echo "Stopping the Nextcloud container..."
-        docker stop $NEXTCLOUD_CONTAINER_NAME
-    else
-        echo "Installation aborted by user. Exiting."
-        exit 1
-    fi
 fi
 
 # Navigate to the Nextcloud directory
