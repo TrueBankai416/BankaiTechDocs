@@ -395,7 +395,6 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
 else
     echo "Skipping additional app installations."
 fi
-fi
 
 echo "Nextcloud has been started successfully."
 echo ""
