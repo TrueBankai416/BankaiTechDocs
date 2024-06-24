@@ -366,11 +366,49 @@ sudo docker compose up -d
 echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
 
-# Installing Nextcloud
-
 # Wait for Nextcloud to fully start
 echo "Waiting for Nextcloud to fully start..."
 sleep 30
+
+
+# Maximum number of attempts to check if Nextcloud is up
+MAX_ATTEMPTS=5
+
+# Time (in seconds) to wait between attempts
+WAIT_TIME=6
+
+# Attempt counter
+attempt=1
+
+echo "Waiting for Nextcloud to become accessible..."
+
+# Loop until the maximum number of attempts is reached
+while [ $attempt -le $MAX_ATTEMPTS ]; do
+    echo "Checking Nextcloud status (Attempt: $attempt/$MAX_ATTEMPTS)..."
+
+    # Use curl to fetch the Nextcloud status page
+    status=$(curl -s -o /dev/null -w "%{http_code}" "$DOMAIN_NAME/status.php")
+
+    # Check if the HTTP status code is 200 (OK)
+    if [ "$status" -eq 200 ]; then
+        echo "Nextcloud is up and running."
+        break
+    else
+        echo "Nextcloud is not accessible yet. Status code: $status"
+    fi
+
+    # Increment the attempt counter
+    ((attempt++))
+
+    # Check if the maximum number of attempts has been reached
+    if [ $attempt -gt $MAX_ATTEMPTS ]; then
+        echo "Failed to access Nextcloud after $MAX_ATTEMPTS attempts."
+        exit 1
+    fi
+
+    # Wait before the next attempt
+    sleep $WAIT_TIME
+done
 
 # Configure Collabora domain
 COLLABORA_DOMAIN=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
