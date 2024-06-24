@@ -254,10 +254,8 @@ services:
     restart: always
     privileged: true
     tty: true
-    environment:
-      - domain=nextcloud\.localhost
-      - username=admin
-      - password=admin
+    env_file:
+      - .collabora.env
     cap_add:
       - MKNOD
     ports:
@@ -309,10 +307,8 @@ services:
     restart: always
     privileged: true
     tty: true
-    environment:
-      - domain=nextcloud\.localhost
-      - username=admin
-      - password=admin
+    env_file:
+      - .collabora.env
     cap_add:
       - MKNOD
     ports:
