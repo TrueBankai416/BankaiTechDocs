@@ -502,7 +502,7 @@ sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_win
 
 # Setting Default Phone Region
 echo ""
-echo "Setting Default Phone Region
+echo "Setting Default Phone Region"
 sudo docker exec -u www-data nextcloud php occ config:system:set default_phone_region --value="$REGION_CODE"
 
 # Configure Collabora domain
