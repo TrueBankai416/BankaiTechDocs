@@ -28,13 +28,14 @@ if [ "$OS" = "Linux" ]; then
             echo "Exiting script."
             exit 1
         fi
-    fi
-elif [ "$OS" = "Darwin" ]; then
+elif [ "$OS" = "Darwin" ] || [ "$OS" = "MINGW" ] || [ "$OS" = "MSYS" ] || [ "$OS" = "CYGWIN" ]; then
     echo "This script only works for Linux systems."
+    read -p "Press ENTER to exit."
     exit 1
 else
     echo "Unsupported operating system: $OS"
     echo "This script only works for Linux systems."
+    read -p "Press ENTER to exit."
     exit 1
 fi
 if ! command -v docker &> /dev/null
@@ -353,7 +354,26 @@ echo "docker-compose.yaml file created successfully."
 
 # Start Nextcloud using Docker Compose
 echo "Starting Nextcloud..."
-sudo docker compose up -d
+echo "Waiting for Nextcloud to initialize..."
+sleep 30 # Wait for Nextcloud to finish setting up
+
+if [ "$INSTALL_OPTION" = "2" ]; then
+    echo "Installing and enabling Collabora Online app within Nextcloud..."
+    sudo docker exec -u www-data nextcloud php occ app:install richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:enable richdocuments
+    echo "Collabora Online app has been installed and enabled successfully."
+elif [ "$INSTALL_OPTION" = "3" ]; then
+    echo "Installing and enabling Collabora Online, Memories, and Recognize apps within Nextcloud..."
+    sudo docker exec -u www-data nextcloud php occ app:install richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:enable richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:install memories
+    sudo docker exec -u www-data nextcloud php occ app:enable memories
+    sudo docker exec -u www-data nextcloud php occ app:install recognize
+    sudo docker exec -u www-data nextcloud php occ app:enable recognize
+    echo "Collabora Online, Memories, and Recognize apps have been installed and enabled successfully."
+else
+    echo "Skipping additional app installations."
+fi
 
 echo "Nextcloud has been started successfully."
 echo ""
