@@ -367,7 +367,7 @@ echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
 
 # Wait for Nextcloud to fully start
-echo "Waiting for Nextcloud to fully start..."
+echo "Waiting 60s for Nextcloud to fully start..."
 sleep 60
 
 
