@@ -365,12 +365,12 @@ sleep 30
 
 # Configure Nextcloud to trust the private IP and public IP
 NEXTCLOUD_CONTAINER_ID=$(docker ps -qf "name=^/${NEXTCLOUD_CONTAINER_NAME}$")
-docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:system:set trusted_domains 2 --value=$PRIVATE_IP"
-docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:system:set trusted_domains 3 --value=$PUBLIC_IP"
+sudo docker exec -u www-data nextcloud php occ config:system:set trusted_domains 2 --value=$PRIVATE_IP
+sudo docker exec -u www-data nextcloud php occ config:system:set trusted_domains 3 --value=$PUBLIC_IP
 
 # Configure Collabora domain
 COLLABORA_DOMAIN=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
-docker exec $NEXTCLOUD_CONTAINER_ID /bin/bash -c "php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN"
+sudo docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN
 
 echo "WOPI configuration for Collabora has been completed."
 
