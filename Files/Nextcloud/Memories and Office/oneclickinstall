@@ -349,6 +349,7 @@ echo "docker-compose.yaml file created successfully."
 
 # Start Nextcloud using Docker Compose
 echo "Starting Nextcloud..."
+sudo docker compose up -d
 echo "Waiting for Nextcloud to initialize..."
 sleep 30 # Wait for Nextcloud to finish setting up
 # Automatically determine the private IP address
