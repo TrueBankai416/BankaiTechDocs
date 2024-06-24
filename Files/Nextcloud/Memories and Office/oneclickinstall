@@ -126,6 +126,13 @@ echo ""
 echo "What port would you like nextcloud to listen on? (Default: 8080) "
 read -p "Enter port: " PORT
 
+# Prompt user to specify Phone Region
+echo ""
+echo "What is your Phone Region?"
+echo "Example: US for United States or AU for Australia"
+ehco "Here is a list: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+read -p "Enter Code: " REGION_CODE
+
 # Create directory for Docker Nextcloud
 NEXTCLOUD_DIR="/etc/docker/nextcloud"
 if [ ! -d "$NEXTCLOUD_DIR" ]; then
@@ -434,6 +441,11 @@ done
 # Setting Maintenance Window
 echo "Setting up Maintenance Window to 1"
 sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_window_start --value="1" --type=integer
+
+# Setting Default Phone Region
+echo ""
+echo "Setting Default Phone Region
+sudo docker exec -u www-data nextcloud php occ config:system:set default_phone_region --value="$REGION_CODE"
 
 # Configure Collabora domain
 sudo docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN
