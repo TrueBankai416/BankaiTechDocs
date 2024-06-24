@@ -432,7 +432,7 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
 done
 
 # Setting Maintenance Window
-echo "Setting up Maintenance Window to "1""
+echo "Setting up Maintenance Window to 1"
 sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_window_start --value="1" --type=integer
 
 # Configure Collabora domain
