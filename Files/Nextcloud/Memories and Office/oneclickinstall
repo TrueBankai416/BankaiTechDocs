@@ -189,7 +189,7 @@ EOF
         cat << EOF > .collabora.env
 username=admin
 password=$COLLABORA_PASSWORD
-domain=cloud\\.domain\\.com
+domain=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
 EOF
         ;;
     *)
