@@ -94,9 +94,24 @@ echo "4) Exit."
 read -p "Enter your choice (1/2/3/4): " INSTALL_OPTION
 
 # Prompt user for Domain
-echo "What is the your nextcloud domain? "
+echo "What is your nextcloud domain? "
 echo "Example: cloud.bankai-tech.com"
 read -p "Enter your domain: " DOMAIN_NAME
+
+case $INSTALL_OPTION in
+    2)
+echo "What is your office domain"
+echo ""
+echo "Example: office.bankai-tech.com"
+read -p "Enter you domain: " COLLABORA_DOMAIN
+        ;;
+    3)
+echo "What is your office domain"
+echo ""
+echo "Example: office.bankai-tech.com"
+read -p "Enter you domain: " COLLABORA_DOMAIN
+        ;;
+esac
 
 # Prompt user for Reverse-Proxy IP address
 echo "Enter the private ip address for your reverse proxy "
@@ -410,8 +425,11 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
     sleep $WAIT_TIME
 done
 
+# Setting Maintenance Window
+echo "Setting up Maintenance Window to "1""
+sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_window_start --value="1" --type=integer`
+
 # Configure Collabora domain
-COLLABORA_DOMAIN=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
 sudo docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN
 
 echo "WOPI configuration for Collabora has been completed."
