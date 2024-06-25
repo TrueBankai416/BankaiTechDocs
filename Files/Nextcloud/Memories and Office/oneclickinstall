@@ -466,6 +466,7 @@ WAIT_TIME=10
 # Attempt counter
 attempt=1
 
+echo ""
 echo "Waiting for Nextcloud to become accessible..."
 
 # Loop until the maximum number of attempts is reached
