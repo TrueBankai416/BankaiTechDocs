@@ -518,6 +518,7 @@ if [ "$INSTALL_OPTION" = "2" ]; then
     echo "Collabora Online app has been installed and enabled successfully."
 elif [ "$INSTALL_OPTION" = "3" ]; then
     echo "Installing and enabling Collabora Online, Memories, and Recognize apps within Nextcloud..."
+    echo "This may take some time."
     sudo docker exec -u www-data nextcloud php occ app:install richdocuments
     sudo docker exec -u www-data nextcloud php occ app:enable richdocuments
     sudo docker exec -u www-data nextcloud php occ app:install memories
@@ -527,6 +528,7 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
     echo "Collabora Online, Memories, and Recognize apps have been installed and enabled successfully."
     echo ""
     echo "Creating Geometry Table ...."
+    echo "This may take some time."
     sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
 else
     echo "Skipping additional app installations."
