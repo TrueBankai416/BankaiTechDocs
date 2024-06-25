@@ -454,7 +454,7 @@ echo "Additional Packages and Options."
     # Add Elasticsearch link to Nextcloud service if it exists
     if grep -q "nextcloud:" docker-compose.yaml; then
         # Using awk to add Elasticsearch link under Nextcloud service
-        awk '/nextcloud:/{print;print "    links:\n      - elasticsearch:elasticsearch";next}1' docker-compose.yaml > temp.yaml && mv temp.yaml docker-compose.yaml
+        awk '/nextcloud:/{print "    links:\\n      - elasticsearch"; f=0}1' docker-compose.yaml > temp.yaml && mv temp.yaml docker-compose.yaml
     else
         echo "Nextcloud service not found. Please ensure Nextcloud service is defined before running this script."
     fi
@@ -463,6 +463,7 @@ echo "Additional Packages and Options."
 # Generate random passwords for Elasticsearch
 ELASTIC_PASS=$(openssl rand -base64 12)
         cat <<EOF >>docker-compose.yaml
+
   elasticsearch:
     # DOCKER_TAG will be provided by the .env-file
     image: r0wi/elasticsearch-nextcloud-docker:8.8.2
@@ -591,6 +592,17 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
     echo "Creating Geometry Table ...."
     echo "This may take some time."
     sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
+elif [[ "$install_elasticsearch" =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "Configuring Elasticsearch"
+    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch
+    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch_elasticsearch
+    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch_files
+    sudo docker exec -it -u www-data nextcloud php occ config:app:set fulltextsearch_elasticsearch elastic_host --value="http://$PRIVATE_IP:9200"
+    sudo docker exec -it -u www-data nextcloud php occ config:app:set fulltextsearch_elasticsearch elastic_index --value="nextcloud"
+    echo ""
+    echo "Indexing Files. This may take some time."
+    sudo docker exec -it -u www-data nextcloud php occ fulltextsearch:index
 else
     echo "Skipping additional app installations."
 fi
