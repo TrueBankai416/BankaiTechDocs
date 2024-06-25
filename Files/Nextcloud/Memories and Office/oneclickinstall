@@ -515,14 +515,11 @@ EOF
     echo "Elasticsearch service has been added to docker-compose.yaml."
 else
     echo "Skipping Elasticsearch installation."
-
+fi
         echo "Elasticsearch installed successfully."
-    else
-        echo ""
-        echo "Continuing the script..."
-    fi
 
 # Start Nextcloud using Docker Compose
+echo ""
 echo "Starting Nextcloud..."
 sudo docker compose up -d
 echo "Waiting for Nextcloud to initialize..."
