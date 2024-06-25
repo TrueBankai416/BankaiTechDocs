@@ -515,7 +515,7 @@ EOF
     echo "Elasticsearch service has been added to docker-compose.yaml."
 else
     echo "Skipping Elasticsearch installation."
-fi
+
         echo "Elasticsearch installed successfully."
     else
         echo ""
