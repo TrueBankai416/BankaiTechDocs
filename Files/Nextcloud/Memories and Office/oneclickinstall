@@ -446,6 +446,63 @@ esac
 
 echo "docker-compose.yaml file created successfully."
 
+echo "Additional Packages and Options."
+    read -p "Do you want to install Elasticsearch? (y/N): " install_elasticsearch
+    if [[ "$install_elasticsearch" =~ ^[Yy]$ ]]
+    then
+        echo "Installing Elasticsearch..."
+    # Add Elasticsearch link to Nextcloud service if it exists
+    if grep -q "nextcloud:" docker-compose.yaml; then
+        # Using awk to add Elasticsearch link under Nextcloud service
+        awk '/nextcloud:/{print;print "    links:\n      - elasticsearch:elasticsearch";next}1' docker-compose.yaml > temp.yaml && mv temp.yaml docker-compose.yaml
+    else
+        echo "Nextcloud service not found. Please ensure Nextcloud service is defined before running this script."
+    fi
+
+    if [ -f "docker-compose.yaml" ]; then
+# Generate random passwords for Elasticsearch
+ELASTIC_PASS=$(openssl rand -base64 12)
+        cat <<EOF >>docker-compose.yaml
+  elasticsearch:
+    # DOCKER_TAG will be provided by the .env-file
+    image: r0wi/elasticsearch-nextcloud-docker:8.8.2
+    container_name: elasticsearch_nc
+    mem_limit: 2g  ##limit the container to 2gb of ram
+    restart: always
+    env_file:
+       - .elasticsearch.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      # Use named volume because of permission problems
+       - ./elasticsearch:/usr/share/elasticsearch/data 
+    ports:
+       - 9200:9200
+EOF
+        cat <<EOF >>.elasticsearch.env
+cluster.name=docker-cluster
+bootstrap.memory_lock=true
+"ES_JAVA_OPTS=-Xms1g -Xmx1g"
+discovery.type=single-node
+# Disable authentication and ssl completely
+# - xpack.security.enabled=false
+# Use this to enable Basic Authentication:
+xpack.security.enabled=true
+xpack.security.http.ssl.enabled=false
+ELASTIC_PASSWORD=$ELASTIC_PASS
+EOF
+    echo "Elasticsearch service has been added to docker-compose.yaml."
+else
+    echo "Skipping Elasticsearch installation."
+fi
+        echo "Elasticsearch installed successfully."
+    else
+        echo ""
+        echo "Continuing the script..."
+    fi
+
 # Start Nextcloud using Docker Compose
 echo "Starting Nextcloud..."
 sudo docker compose up -d
