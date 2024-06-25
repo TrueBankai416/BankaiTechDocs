@@ -295,7 +295,6 @@ services:
     links:
       - mariadb
       - redis
-      - collabora
     volumes:
       - ./nextcloud:/var/www/html
     env_file:
