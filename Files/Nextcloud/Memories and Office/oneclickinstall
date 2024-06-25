@@ -527,6 +527,10 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
     sudo docker exec -u www-data nextcloud php occ app:enable recognize
     echo "Collabora Online, Memories, and Recognize apps have been installed and enabled successfully."
     echo ""
+    echo "Downloading Machine Learning Models for Memories."
+    echo "This may take some time."
+    sudo docker exec -it -u www-data nextcloud php occ recognize:download-models
+    echo ""
     echo "Creating Geometry Table ...."
     echo "This may take some time."
     sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
