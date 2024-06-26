@@ -463,10 +463,11 @@ echo "Would you like the containers to Auto Update?"
       - /var/run/docker.sock:/var/run/docker.sock
 EOF
     echo "Watchtower service has been added to docker-compose.yaml."
+    echo ""
+    echo "Watchtower installed successfully."
 else
     echo "Skipping Watchtower installation."
 fi
-    echo "Watchtower installed successfully."
 
 # Start Nextcloud using Docker Compose
 echo ""
