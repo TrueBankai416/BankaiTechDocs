@@ -446,7 +446,7 @@ esac
 echo "docker-compose.yaml file created successfully."
 
 echo ""
-echo "WARNING.. elasticsearch may not work, recomend that you install manually"
+echo "WARNING.. elasticsearch may not work, recommend that you install manually"
 echo "Additional Packages and Options."
     read -p "Do you want to install Elasticsearch? (y/N): " install_elasticsearch
     if [[ "$install_elasticsearch" =~ ^[Yy]$ ]]
