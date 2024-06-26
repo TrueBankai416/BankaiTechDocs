@@ -460,6 +460,7 @@ DOCKER_COMPOSE_FILE="docker-compose.yaml"
 TEMP_FILE=$(mktemp)
 
 # Use awk to process the docker-compose file
+    if
 awk '
 BEGIN {print_service = 0; links_found = 0; in_nextcloud = 0}
 # Check for the nextcloud service block
