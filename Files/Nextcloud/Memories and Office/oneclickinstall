@@ -131,6 +131,7 @@ echo ""
 echo "What is your Phone Region?"
 echo "Example: US for United States or AU for Australia"
 echo "Here is a list: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+echo ""
 read -p "Enter Code: " REGION_CODE
 
 # Create directory for Docker Nextcloud
