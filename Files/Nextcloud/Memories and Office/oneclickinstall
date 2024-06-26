@@ -477,7 +477,6 @@ BEGIN {print_service = 0; links_found = 0; in_nextcloud = 0}
 mv $TEMP_FILE $DOCKER_COMPOSE_FILE
     else
         echo "Nextcloud service not found. Please ensure Nextcloud service is defined before running this script."
-    fi
 
     if [ -f "docker-compose.yaml" ]; then
 # Generate random passwords for Elasticsearch
