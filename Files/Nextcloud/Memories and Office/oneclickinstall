@@ -447,79 +447,7 @@ esac
 echo "docker-compose.yaml file created successfully."
 
 echo ""
-echo "WARNING.. elasticsearch may not work, recommend that you install manually"
 echo "Additional Packages and Options."
-    read -p "Do you want to install Elasticsearch? (y/N): " install_elasticsearch
-    if [[ "$install_elasticsearch" =~ ^[Yy]$ ]]
-    then
-        echo "Installing Elasticsearch..."
-    # Add Elasticsearch link to Nextcloud service if it exists
-# Define the docker-compose file path
-DOCKER_COMPOSE_FILE="docker-compose.yaml"
-
-# Define a temporary file for intermediate processing
-TEMP_FILE=$(mktemp)
-
-# Use awk to process the docker-compose file
-awk '
-BEGIN {print_service = 0; links_found = 0; in_nextcloud = 0}
-# Check for the nextcloud service block
-/^[ ]*nextcloud:/ {in_nextcloud = 1}
-# Check for the links section under nextcloud
-/^[ ]*links:/ && in_nextcloud == 1 {links_found = 1; print; print "      - elasticsearch"; next}
-# Reset on a new service block to avoid adding to other services
-/^[a-zA-Z0-9]/ {if (in_nextcloud == 1 && links_found == 0) {print "    links:\n      - elasticsearch"; links_found = 1} in_nextcloud = 0}
-# Print all lines by default
-{print}
-' $DOCKER_COMPOSE_FILE > $TEMP_FILE
-
-# Replace the original docker-compose file with the modified one
-mv $TEMP_FILE $DOCKER_COMPOSE_FILE
-    else
-        echo "Nextcloud service not found. Please ensure Nextcloud service is defined before running this script."
-
-    if [ -f "docker-compose.yaml" ]; then
-# Generate random passwords for Elasticsearch
-ELASTIC_PASS=$(openssl rand -base64 12)
-        cat <<EOF >>docker-compose.yaml
-
-  elasticsearch:
-    # DOCKER_TAG will be provided by the .env-file
-    image: r0wi/elasticsearch-nextcloud-docker:8.8.2
-    container_name: elasticsearch_nc
-    mem_limit: 2g  ##limit the container to 2gb of ram
-    restart: always
-    env_file:
-       - .elasticsearch.env
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      # Use named volume because of permission problems
-       - ./elasticsearch:/usr/share/elasticsearch/data 
-    ports:
-       - 9200:9200
-EOF
-        cat <<EOF >>.elasticsearch.env
-cluster.name=docker-cluster
-bootstrap.memory_lock=true
-ES_JAVA_OPTS="-Xms1g -Xmx1g"
-discovery.type=single-node
-# Disable authentication and ssl completely
-# - xpack.security.enabled=false
-# Use this to enable Basic Authentication:
-xpack.security.enabled=true
-xpack.security.http.ssl.enabled=false
-ELASTIC_PASSWORD=$ELASTIC_PASS
-EOF
-fi
-    echo "Elasticsearch service has been added to docker-compose.yaml."
-else
-    echo "Skipping Elasticsearch installation."
-fi
-        echo "Elasticsearch installed successfully."
-
 echo ""
 echo "Would you like the containers to Auto Update?"
     read -p "Do you want to install Watchtower? (y/N): " install_watchtower
