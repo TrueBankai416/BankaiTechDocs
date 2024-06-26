@@ -522,6 +522,7 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
 done
 
 # Setting Maintenance Window
+echo ""
 echo "Setting up Maintenance Window to 1"
 sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_window_start --value="1" --type=integer
 
@@ -530,10 +531,13 @@ echo ""
 echo "Setting Default Phone Region"
 sudo docker exec -u www-data nextcloud php occ config:system:set default_phone_region --value="$REGION_CODE"
 
+if [ "$INSTALL_OPTION" != "1" ]; then
 # Configure Collabora domain
+echo ""
 sudo docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN
 
 echo "WOPI configuration for Collabora has been completed."
+fi
 
 if [ "$INSTALL_OPTION" = "2" ]; then
     echo "Installing and enabling Collabora Online app within Nextcloud..."
