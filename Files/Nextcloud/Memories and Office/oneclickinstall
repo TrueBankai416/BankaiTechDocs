@@ -557,19 +557,6 @@ elif [ "$INSTALL_OPTION" = "3" ]; then
     echo "Creating Geometry Table ...."
     echo "This may take some time."
     sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
-elif [[ "$install_elasticsearch" =~ ^[Yy]$ ]]; then
-    echo ""
-    echo "Configuring Elasticsearch"
-    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch
-    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch_elasticsearch
-    sudo docker exec -it -u www-data nextcloud php occ app:install fulltextsearch_files
-    sudo docker exec -it -u www-data nextcloud php occ config:app:set fulltextsearch_elasticsearch elastic_host --value="http://$PRIVATE_IP:9200"
-    sudo docker exec -it -u www-data nextcloud php occ config:app:set fulltextsearch_elasticsearch elastic_index --value="nextcloud"
-    echo ""
-    echo "Indexing Files. This may take some time."
-    sudo docker exec -it -u www-data nextcloud php occ fulltextsearch:index
-else
-    echo "Skipping additional app installations."
 fi
 
 echo "Nextcloud has been started successfully."
