@@ -1,0 +1,569 @@
+#!/bin/bash
+
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+# Automatically restart without asking.
+# this gets around needrestart command halting for user input
+export RESTART_MODE=l
+
+# Check the host's operating system
+OS=$(uname -s)
+if [ "$OS" = "Linux" ]; then
+    # Check if the distribution is Ubuntu
+    if [ -f /etc/lsb-release ]; then
+        . /etc/lsb-release
+        if [ "$DISTRIB_ID" != "Ubuntu" ]; then
+            echo "Warning: This script has only been tested on Ubuntu."
+            read -p "Do you want to continue? (y/N): " confirm
+            if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+                echo "Exiting script."
+                exit 1
+            fi
+        fi
+    else
+        echo "Warning: Unable to determine Linux distribution. This script has only been tested on Ubuntu."
+        read -p "Do you want to continue? (y/N): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "Exiting script."
+            exit 1
+        fi
+    fi
+else
+    echo "Unsupported operating system: $OS"
+    echo "This script only works for Linux systems."
+    read -p "Press ENTER to exit."
+    exit 1
+fi
+
+# Check if Nextcloud is already installed
+NEXTCLOUD_DATA_DIR="$NEXTCLOUD_DIR/nextcloud"
+if [ -d "$NEXTCLOUD_DATA_DIR" ] && [ -f "$NEXTCLOUD_DATA_DIR/version.php" ]; then
+    echo "A Nextcloud installation has been detected in $NEXTCLOUD_DATA_DIR."
+    read -p "Do you want to continue with the installation? This may upgrade or reinstall Nextcloud. (y/N): " continue_install
+    if [[ ! "$continue_install" =~ ^[Yy]$ ]]; then
+        echo "Installation aborted by user. Exiting."
+        exit 1
+    fi
+fi
+
+# Check if Nextcloud is running in Docker
+NEXTCLOUD_CONTAINER_NAME="nextcloud"
+if [ $(docker ps -q -f name=^/${NEXTCLOUD_CONTAINER_NAME}$) ]; then
+    echo "A Docker container named '$NEXTCLOUD_CONTAINER_NAME' is already running."
+    read -p "Do you want to stop the container and proceed with the installation? (y/N): " stop_and_proceed
+    if [[ "$stop_and_proceed" =~ ^[Yy]$ ]]; then
+        echo "Stopping the Nextcloud container..."
+        docker stop $NEXTCLOUD_CONTAINER_NAME
+    else
+        echo "Installation aborted by user. Exiting."
+        exit 1
+    fi
+fi
+
+if ! command -v docker &> /dev/null
+then
+    echo "Docker could not be found."
+    read -p "Do you want to install Docker? (y/N): " install_docker
+    if [[ "$install_docker" =~ ^[Yy]$ ]]
+    then
+        echo "Installing Docker..."
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        echo "Docker installed successfully."
+    else
+        echo "Docker installation aborted. Exiting script."
+        exit 1
+    fi
+fi
+
+# Update Docker
+echo "Updating Docker..."
+sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+
+# Prompt user for Nextcloud installation option
+echo "Select the Nextcloud installation option:"
+echo "1) Just Nextcloud"
+echo "2) Nextcloud with Office"
+echo "3) Nextcloud with Memories support"
+echo "4) Exit."
+read -p "Enter your choice (1/2/3/4): " INSTALL_OPTION
+
+# Prompt user for Domain
+echo ""
+echo "What is your nextcloud domain? "
+echo "Example: cloud.bankai-tech.com"
+read -p "Enter your domain: " DOMAIN_NAME
+
+case $INSTALL_OPTION in
+    2)
+echo ""
+echo "What is your office domain"
+echo ""
+echo "Example: office.bankai-tech.com"
+read -p "Enter your domain: " COLLABORA_DOMAIN
+        ;;
+    3)
+echo ""
+echo "What is your office domain"
+echo ""
+echo "Example: office.bankai-tech.com"
+read -p "Enter you domain: " COLLABORA_DOMAIN
+        ;;
+esac
+
+# Prompt user for Reverse-Proxy IP address
+echo ""
+echo "Enter the private ip address for your reverse proxy "
+read -p "Enter here: " PROXY_IP
+
+# Prompt user to select nextclouds listening port
+echo ""
+echo "What port would you like nextcloud to listen on? (Default: 8080) "
+read -p "Enter port: " PORT
+
+# Prompt user to specify Phone Region
+echo ""
+echo "What is your Phone Region?"
+echo "Example: US for United States or AU for Australia"
+echo "Here is a list: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"
+echo ""
+read -p "Enter Code: " REGION_CODE
+
+# Create directory for Docker Nextcloud
+NEXTCLOUD_DIR="/etc/docker/nextcloud"
+if [ ! -d "$NEXTCLOUD_DIR" ]; then
+    echo "Creating directory $NEXTCLOUD_DIR..."
+    sudo mkdir -p "$NEXTCLOUD_DIR"
+fi
+
+# Navigate to the Nextcloud directory
+cd "$NEXTCLOUD_DIR"
+
+# Generate random passwords for MySQL
+MYSQL_PASSWORD=$(openssl rand -base64 12)
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 12)
+
+# Generate random passwords for Collabora
+COLLABORA_PASSWORD=$(openssl rand -base64 12)
+
+# Automatically determine the private IP address
+PRIVATE_IP=$(hostname -I | awk '{print $1}')
+echo "Detected private IP: $PRIVATE_IP"
+
+# Automatically determine the public IP address
+PUBLIC_IP=$(curl -s https://api.ipify.org)
+echo "Detected public IP: $PUBLIC_IP"
+
+echo ""
+echo "Lets create a user"
+read -p "Enter username: " NC_USERNAME
+read -p "Enter your password: " NC_PASSWORD
+
+# Create .env file with common environment variables based on selection
+case $INSTALL_OPTION in
+    1)
+        cat << EOF > .mariadb.env
+# Common Environment variables for Nextcloud docker-compose setup
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+EOF
+        cat << EOF > .nextcloud.env
+NEXTCLOUD_ADMIN_USER=$NC_USERNAME
+NEXTCLOUD_ADMIN_PASSWORD=$NC_PASSWORD
+NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
+TRUSTED_PROXIES=$PROXY_IP
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://$DOMAIN_NAME
+OFFICE_ENABLED=1
+MAINTENANCE_WINDOW_START=1
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-512M
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+EOF
+        ;;
+    2)
+        cat << EOF > .mariadb.env
+# Common Environment variables for Nextcloud docker-compose setup
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+EOF
+        cat << EOF > .nextcloud.env
+NEXTCLOUD_ADMIN_USER=$NC_USERNAME
+NEXTCLOUD_ADMIN_PASSWORD=$NC_PASSWORD
+NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
+TRUSTED_PROXIES=$PROXY_IP
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://$DOMAIN_NAME
+OFFICE_ENABLED=1
+MAINTENANCE_WINDOW_START=1
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-512M
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+EOF
+        cat << EOF > .collabora.env
+username=admin
+password=$COLLABORA_PASSWORD
+domain=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
+EOF
+        ;;
+    3)
+        cat << EOF > .mariadb.env
+# Common Environment variables for Nextcloud docker-compose setup
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+EOF
+        cat << EOF > .nextcloud.env
+NEXTCLOUD_ADMIN_USER=$NC_USERNAME
+NEXTCLOUD_ADMIN_PASSWORD=$NC_PASSWORD
+NEXTCLOUD_TRUSTED_DOMAINS=$DOMAIN_NAME
+TRUSTED_PROXIES=$PROXY_IP
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://$DOMAIN_NAME
+OFFICE_ENABLED=1
+MAINTENANCE_WINDOW_START=1
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-512M
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+EOF
+        cat << EOF > .collabora.env
+username=admin
+password=$COLLABORA_PASSWORD
+domain=$(echo $DOMAIN_NAME | sed 's/\./\\./g')
+EOF
+        cat << EOF > .govod.env
+NEXTCLOUD_HOST=https://$DOMAIN_NAME
+NEXTCLOUD_ALLOW_INSECURE=1 # (self-signed certs or no HTTPS)
+NVIDIA_VISIBLE_DEVICES=all
+#devices:
+#  - /dev/dri:/dev/dri # VA-API (omit for NVENC)
+EOF
+        ;;
+    *)
+        echo "Invalid option selected. Exiting."
+        exit 1
+        ;;
+esac
+
+echo "Creating docker-compose.yaml file..."
+case $INSTALL_OPTION in
+    1)
+        cat << EOF > docker-compose.yaml
+name: nextcloud
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud:production
+    container_name: nextcloud
+    restart: unless-stopped
+    ports:
+      - $PORT:80
+    links:
+      - mariadb
+      - redis
+    volumes:
+      - ./nextcloud:/var/www/html
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+EOF
+        ;;
+    2)
+        cat << EOF > docker-compose.yaml
+name: nextcloud
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud:production
+    container_name: nextcloud
+    ports:
+      - "$PORT:80"
+    links:
+      - mariadb
+      - redis
+      - collabora
+    volumes:
+      - ./nextcloud:/var/www/html
+    restart: unless-stopped
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    restart: always
+    privileged: true
+    tty: true
+    env_file:
+      - .collabora.env
+    cap_add:
+      - MKNOD
+    ports:
+      - "9980:9980"
+
+EOF
+        ;;
+    3)
+        cat << EOF > docker-compose.yaml
+name: nextcloud
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: bankaitech/nextcloud:latest
+    container_name: nextcloud
+    ports:
+      - "$PORT:80"
+    links:
+      - mariadb
+      - redis
+      - collabora
+    volumes:
+      - ./nextcloud:/var/www/html
+    restart: unless-stopped
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    restart: always
+    privileged: true
+    tty: true
+    env_file:
+      - .collabora.env
+    cap_add:
+      - MKNOD
+    ports:
+      - "9980:9980"
+  go-vod:
+    image: radialapps/go-vod
+    restart: always
+    container_name: go-vod
+    env_file:
+      - .govod.env
+    volumes:
+      - ./nextcloud:/var/www/html:ro
+#    runtime: nvidia # (NVENC)
+  cron:
+    image: bankaitech/nextcloud:latest
+    container_name: cron
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html:z
+    depends_on:
+      - mariadb
+      - redis
+    entrypoint: /cron.sh
+EOF
+        ;;
+    4)
+        echo "Exiting ...."
+        exit 1
+        ;;
+    *)
+        echo "Invalid option selected. Exiting."
+        exit 1
+        ;;
+esac
+
+echo "docker-compose.yaml file created successfully."
+
+echo ""
+echo "Additional Packages and Options."
+echo ""
+echo "Would you like the containers to Auto Update?"
+    read -p "Do you want to install Watchtower? (y/N): " install_watchtower
+    if [[ "$install_watchtower" =~ ^[Yy]$ ]]
+    then
+        echo "Installing Watchtower..."
+        cat <<EOF >>docker-compose.yaml
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+EOF
+    echo "Watchtower service has been added to docker-compose.yaml."
+    echo ""
+    echo "Watchtower installed successfully."
+else
+    echo "Skipping Watchtower installation."
+fi
+
+# Start Nextcloud using Docker Compose
+echo ""
+echo "Starting Nextcloud..."
+sudo docker compose up -d
+echo "Waiting for Nextcloud to initialize..."
+sleep 30 # Wait for Nextcloud to finish setting up
+
+# Wait for Nextcloud to fully start
+echo "Waiting 120s for Nextcloud to fully start..."
+sleep 120
+
+
+# Maximum number of attempts to check if Nextcloud is up
+MAX_ATTEMPTS=10
+
+# Time (in seconds) to wait between attempts
+WAIT_TIME=10
+
+# Attempt counter
+attempt=1
+
+echo ""
+echo "Waiting for Nextcloud to become accessible..."
+
+# Loop until the maximum number of attempts is reached
+while [ $attempt -le $MAX_ATTEMPTS ]; do
+    echo "Checking Nextcloud status (Attempt: $attempt/$MAX_ATTEMPTS)..."
+
+    # Use curl to fetch the Nextcloud status page
+    status=$(curl -s -o /dev/null -w "%{http_code}" "https://$DOMAIN_NAME/status.php")
+
+    # Check if the HTTP status code is 200 (OK)
+    if [ "$status" -eq 200 ]; then
+        echo "Nextcloud is up and running."
+        break
+    else
+        echo "Nextcloud is not accessible yet. Status code: $status"
+    fi
+
+    # Increment the attempt counter
+    ((attempt++))
+
+    # Check if the maximum number of attempts has been reached
+    if [ $attempt -gt $MAX_ATTEMPTS ]; then
+        echo "Failed to access Nextcloud after $MAX_ATTEMPTS attempts."
+        exit 1
+    fi
+
+    # Wait before the next attempt
+    sleep $WAIT_TIME
+done
+
+# Setting Maintenance Window
+echo ""
+echo "Setting up Maintenance Window to 1"
+sudo docker exec -u www-data nextcloud php occ config:system:set maintenance_window_start --value="1" --type=integer
+
+# Setting Default Phone Region
+echo ""
+echo "Setting Default Phone Region"
+sudo docker exec -u www-data nextcloud php occ config:system:set default_phone_region --value="$REGION_CODE"
+
+if [ "$INSTALL_OPTION" != "1" ]; then
+# Configure Collabora domain
+echo ""
+sudo docker exec -u www-data nextcloud php occ config:app:set richdocuments wopi_url --value=https://$COLLABORA_DOMAIN
+
+echo "WOPI configuration for Collabora has been completed."
+fi
+
+if [ "$INSTALL_OPTION" = "2" ]; then
+    echo "Installing and enabling Collabora Online app within Nextcloud..."
+    sudo docker exec -u www-data nextcloud php occ app:install richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:enable richdocuments
+    echo "Collabora Online app has been installed and enabled successfully."
+elif [ "$INSTALL_OPTION" = "3" ]; then
+    echo "Installing and enabling Collabora Online, Memories, and Recognize apps within Nextcloud..."
+    echo "This may take some time."
+    sudo docker exec -u www-data nextcloud php occ app:install richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:enable richdocuments
+    sudo docker exec -u www-data nextcloud php occ app:install memories
+    sudo docker exec -u www-data nextcloud php occ app:enable memories
+    sudo docker exec -u www-data nextcloud php occ app:install recognize
+    sudo docker exec -u www-data nextcloud php occ app:enable recognize
+    echo "Collabora Online, Memories, and Recognize apps have been installed and enabled successfully."
+    echo ""
+    echo "Downloading Machine Learning Models for Memories."
+    echo "This may take some time."
+    sudo docker exec -it -u www-data nextcloud php occ recognize:download-models
+    echo ""
+    echo "Creating Geometry Table ...."
+    echo "This may take some time."
+    sudo docker exec -it -u www-data nextcloud php occ memories:places-setup
+fi
+
+echo "Nextcloud has been started successfully."
+echo ""
+echo "Files are stored Here. $NEXTCLOUD_DIR"
