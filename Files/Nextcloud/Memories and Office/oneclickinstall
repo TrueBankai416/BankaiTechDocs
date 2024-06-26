@@ -445,6 +445,8 @@ esac
 
 echo "docker-compose.yaml file created successfully."
 
+echo ""
+echo "WARNING.. elasticsearch may not work, recomend that you install manually"
 echo "Additional Packages and Options."
     read -p "Do you want to install Elasticsearch? (y/N): " install_elasticsearch
     if [[ "$install_elasticsearch" =~ ^[Yy]$ ]]
@@ -516,6 +518,27 @@ else
     echo "Skipping Elasticsearch installation."
 fi
         echo "Elasticsearch installed successfully."
+
+echo ""
+echo "Would you like the containers to Auto Update?
+    read -p "Do you want to install Watchtower? (y/N): " install_watchtower
+    if [[ "$install_watchtower" =~ ^[Yy]$ ]]
+    then
+        echo "Installing Watchtower..."
+    if [ -f "docker-compose.yaml" ]; then
+        cat <<EOF >>docker-compose.yaml
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+EOF
+    echo "Watchtower service has been added to docker-compose.yaml."
+else
+    echo "Skipping Watchtower installation."
+fi
+        echo "Watchtower installed successfully."
 
 # Start Nextcloud using Docker Compose
 echo ""
