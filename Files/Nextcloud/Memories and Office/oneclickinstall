@@ -513,6 +513,7 @@ xpack.security.enabled=true
 xpack.security.http.ssl.enabled=false
 ELASTIC_PASSWORD=$ELASTIC_PASS
 EOF
+fi
     echo "Elasticsearch service has been added to docker-compose.yaml."
 else
     echo "Skipping Elasticsearch installation."
