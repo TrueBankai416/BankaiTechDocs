@@ -521,7 +521,7 @@ fi
         echo "Elasticsearch installed successfully."
 
 echo ""
-echo "Would you like the containers to Auto Update?
+echo "Would you like the containers to Auto Update?"
     read -p "Do you want to install Watchtower? (y/N): " install_watchtower
     if [[ "$install_watchtower" =~ ^[Yy]$ ]]
     then
