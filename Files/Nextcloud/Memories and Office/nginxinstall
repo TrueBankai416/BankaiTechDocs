@@ -1,0 +1,63 @@
+#!/bin/bash
+
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+# Automatically restart without asking.
+# this gets around needrestart command halting for user input
+export RESTART_MODE=l
+
+# Check the host's operating system
+OS=$(uname -s)
+if [ "$OS" = "Linux" ]; then
+    # Check if the distribution is Ubuntu
+    if [ -f /etc/lsb-release ]; then
+        . /etc/lsb-release
+        if [ "$DISTRIB_ID" != "Ubuntu" ]; then
+            echo "Warning: This script has only been tested on Ubuntu."
+            read -p "Do you want to continue? (y/N): " confirm
+            if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+                echo "Exiting script."
+                exit 1
+            fi
+        fi
+    else
+        echo "Warning: Unable to determine Linux distribution. This script has only been tested on Ubuntu."
+        read -p "Do you want to continue? (y/N): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "Exiting script."
+            exit 1
+        fi
+    fi
+else
+    echo "Unsupported operating system: $OS"
+    echo "This script only works for Linux systems."
+    read -p "Press ENTER to exit."
+    exit 1
+fi
+
+# Prompt user for Nginx installation option
+echo "Select the Nginx installation option:"
+echo "1) Create nextcloud.conf file"
+echo "2) Install Nginx and Configure for Nextcloud"
+read -p "Enter your choice (1/2): " INSTALL_OPTION
+
+# Prompt user for Domain
+echo ""
+echo "What is your nextcloud domain? "
+echo "Example: cloud.bankai-tech.com"
+read -p "Enter your domain: " DOMAIN_NAME
+
+# Prompt user for Collabora Domain
+echo ""
+echo "Create other .conf files??"
+    read -p "Will you be using Collabora (NC Office)? (y/N): " install_collabora
+    if [[ "$install_collabora" =~ ^[Yy]$ ]]
+    then
+echo ""
+echo "What is your collabora domain? "
+echo "Example: office.bankai-tech.com"
+read -p "Enter your domain: " COLLABORA_DOMAIN
+else
+    echo "Skipping Collabora Configuration."
+fi
