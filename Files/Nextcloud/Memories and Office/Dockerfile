@@ -1,96 +1,109 @@
-FROM php:8.2-apache-bookworm
+# Use the Nextcloud production image as the base
+FROM nextcloud:production
 
-USER root
-# entrypoint.sh and cron.sh dependencies
-RUN set -ex; \
-    \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        busybox-static \
-        bzip2 \
-        libldap-common \
-        libmagickcore-6.q16-6-extra \
-        rsync \
-        nano \
-        cmake \
-        ffmpeg \
-        ghostscript \
-        git \
-        inotify-tools \
-        libbz2-dev \
-        liblapack-dev \
-        libopenblas-dev \
-        libx11-dev \
-        wget \
-        unzip \
-        gnupg2 \
-    ; \
-    rm -rf /var/lib/apt/lists/*; \
-    \
-    mkdir -p /var/spool/cron/crontabs;
+# Install gosu (Debian/Ubuntu)
+RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
 
-# install the PHP extensions we need
-# see https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html
-ENV PHP_MEMORY_LIMIT 512M
-ENV PHP_UPLOAD_LIMIT 512M
+# Update the package lists and install various dependencies
+# These dependencies include tools and libraries required for Nextcloud and its features
+RUN apt-get update \
+ && apt-get install -y \
+    cmake \
+    ffmpeg \
+    ghostscript \
+    ghostwriter \
+    git \
+    imagemagick \
+    inotify-tools \
+    libbz2-dev \
+    liblapack-dev \
+    libopenblas-dev \
+    libx11-dev \
+    sudo \
+    nano \
+    libmagickcore-6.q16-6-extra \
+ && apt-get clean
+
+RUN pecl install inotify && \
+    echo "extension=inotify.so" | tee /usr/local/etc/php/conf.d/docker-php-ext-inotify.ini
+
+# Clone and build dlib, a toolkit for making real world machine learning and data analysis applications
+RUN git clone https://github.com/davisking/dlib.git \
+ && cd dlib/dlib \
+ && mkdir build \
+ && cd build \
+ && cmake -DBUILD_SHARED_LIBS=ON .. \
+ && make \
+ && make install
+
+# Clone and install pdlib, a PHP extension for dlib
+RUN git clone https://github.com/goodspb/pdlib.git /usr/src/php/ext/pdlib
+
+# Install the pdlib PHP extension
+RUN docker-php-ext-install pdlib
+
+# Install the bz2 PHP extension
+RUN docker-php-ext-install bz2
+
+# Add cron jobs for Nextcloud's background tasks
+RUN echo '12 * * * * php /var/www/html/occ face:background_job' >> /var/spool/cron/crontabs/www-data
+RUN echo '37 * * * * php /var/www/html/occ preview:pre-generate' >> /var/spool/cron/crontabs/www-data
+
+# Install additional utilities
+RUN apt update \
+  && apt install -y wget gnupg2 unzip
+
+# Enable the repository for pdlib and install dlib
+RUN mkdir -m 0755 -p /etc/apt/keyrings/ \
+  && wget -qO - https://repo.delellis.com.ar/repo.gpg.key | sudo apt-key add - \
+  && wget -O- https://repo.delellis.com.ar/repo.gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/php-pdlib.gpg > /dev/null \
+  && echo "deb [signed-by=/etc/apt/keyrings/php-pdlib.gpg arch=amd64] https://repo.delellis.com.ar bullseye bullseye" | sudo tee /etc/apt/sources.list.d/php-pdlib.list \
+RUN apt update \
+  && apt install -y libdlib-dev
+
+# Install pdlib extension from a downloaded archive
+RUN wget https://github.com/goodspb/pdlib/archive/master.zip \
+  && mkdir -p /usr/src/php/ext/ \
+  && unzip -d /usr/src/php/ext/ master.zip \
+  && rm master.zip
+RUN docker-php-ext-install pdlib-master
+
+# Increase PHP memory limit for Nextcloud
+RUN echo memory_limit=1024M > /usr/local/etc/php/conf.d/memory-limit.ini
+
+RUN echo 'apc.enable_cli=1' >> "${PHP_INI_DIR}/conf.d/docker-php-ext-apcu.ini"
+
+# Increase opcache memory
+RUN sed -i 's/opcache.memory_consumption=128/opcache.memory_consumption=512/g' /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+# Download and test the pdlib extension
+RUN wget https://github.com/matiasdelellis/pdlib-min-test-suite/archive/master.zip \
+  && unzip -d /tmp/ master.zip \
+  && rm master.zip
+RUN cd /tmp/pdlib-min-test-suite-master \
+    && make
+
+# Install PHP extensions and configure them
 RUN set -ex; \
     \
     savedAptMark="$(apt-mark showmanual)"; \
     \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-        libcurl4-openssl-dev \
-        libevent-dev \
-        libfreetype6-dev \
-        libgmp-dev \
-        libicu-dev \
-        libjpeg-dev \
-        libldap2-dev \
-        libmagickwand-dev \
-        libmcrypt-dev \
-        libmemcached-dev \
-        libpng-dev \
-        libpq-dev \
-        libwebp-dev \
-        libxml2-dev \
-        libzip-dev \
+        libbz2-dev \
+        libc-client-dev \
+        libkrb5-dev \
+        libsmbclient-dev \
     ; \
     \
-    debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-    docker-php-ext-configure ftp --with-openssl-dir=/usr; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
-    docker-php-ext-configure ldap --with-libdir="lib/$debMultiarch"; \
-    docker-php-ext-install -j "$(nproc)" \
-        bcmath \
-        exif \
-        ftp \
-        gd \
-        gmp \
-        intl \
-        ldap \
-        opcache \
-        pcntl \
-        pdo_mysql \
-        pdo_pgsql \
-        sysvsem \
-        zip \
+    docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
+    docker-php-ext-install \
+        bz2 \
+        imap \
     ; \
+    pecl install smbclient; \
+    docker-php-ext-enable smbclient; \
     \
-# pecl will claim success even if one install fails, so we need to perform each install separately
-    pecl install APCu-5.1.23; \
-    pecl install imagick-3.7.0; \
-    pecl install memcached-3.2.0; \
-    pecl install redis-6.0.2; \
-    \
-    docker-php-ext-enable \
-        apcu \
-        imagick \
-        memcached \
-        redis \
-    ; \
-    rm -r /tmp/pear; \
-    \
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
     apt-mark auto '.*' > /dev/null; \
     apt-mark manual $savedAptMark; \
     ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
@@ -104,128 +117,12 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
-# Clone, build, and install Dlib as a shared library
-RUN git clone https://github.com/davisking/dlib.git \
-    && mkdir dlib/dlib/build \
-    && cd dlib/dlib/build \
-    && cmake -DBUILD_SHARED_LIBS=ON .. \
-    && make \
-    && make install
+# Copy and adjust permissions for cron
+COPY cron.sh /
+RUN chmod +x /cron.sh
 
-# Clone, build, and install pdlib
-RUN git clone https://github.com/goodspb/pdlib.git \
-    && cd pdlib \
-    && phpize \
-    && ./configure --enable-debug \
-    # If the above command doesn't find dlib, uncomment the line below:
-    # && PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure --enable-debug \
-    && make \
-    && make install
-
-# Append the necessary extension configuration to php.ini (for Docker that means add file to php/conf.d/)
-RUN echo "[pdlib]" >> /usr/local/etc/php/conf.d/docker-php-ext-pblib.ini \
-    && echo "extension=\"pdlib.so\"" >> /usr/local/etc/php/conf.d/docker-php-ext-pblib.ini
-
-# Install the bz2 PHP extension
-RUN docker-php-ext-install bz2
-
-# set recommended PHP.ini settings
-# see https://docs.nextcloud.com/server/latest/admin_manual/installation/server_tuning.html#enable-php-opcache
-RUN { \
-        echo 'opcache.enable=1'; \
-        echo 'opcache.interned_strings_buffer=32'; \
-        echo 'opcache.max_accelerated_files=10000'; \
-        echo 'opcache.memory_consumption=128'; \
-        echo 'opcache.save_comments=1'; \
-        echo 'opcache.revalidate_freq=60'; \
-        echo 'opcache.jit=1255'; \
-        echo 'opcache.jit_buffer_size=128M'; \
-    } > "${PHP_INI_DIR}/conf.d/opcache-recommended.ini"; \
-    \
-    echo 'apc.enable_cli=1' >> "${PHP_INI_DIR}/conf.d/docker-php-ext-apcu.ini"; \
-    \
-    { \
-        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
-        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
-        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
-    } > "${PHP_INI_DIR}/conf.d/nextcloud.ini"; \
-    \
-    mkdir /var/www/data; \
-    mkdir -p /docker-entrypoint-hooks.d/pre-installation \
-             /docker-entrypoint-hooks.d/post-installation \
-             /docker-entrypoint-hooks.d/pre-upgrade \
-             /docker-entrypoint-hooks.d/post-upgrade \
-             /docker-entrypoint-hooks.d/before-starting; \
-    chown -R www-data:root /var/www; \
-    chmod -R g=u /var/www
-
-VOLUME /var/www/html
-
-RUN a2enmod headers rewrite remoteip ; \
-    { \
-     echo 'RemoteIPHeader X-Real-IP'; \
-     echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
-     echo 'RemoteIPInternalProxy 172.16.0.0/12'; \
-     echo 'RemoteIPInternalProxy 192.168.0.0/16'; \
-    } > /etc/apache2/conf-available/remoteip.conf; \
-    a2enconf remoteip
-
-# set apache config LimitRequestBody
-ENV APACHE_BODY_LIMIT 1073741824
-RUN { \
-     echo 'LimitRequestBody ${APACHE_BODY_LIMIT}'; \
-    } > /etc/apache2/conf-available/apache-limits.conf; \
-    a2enconf apache-limits
-
-ENV NEXTCLOUD_VERSION 28.0.5
-
-RUN set -ex; \
-    fetchDeps=" \
-        gnupg \
-        dirmngr \
-    "; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends $fetchDeps; \
-    \
-    curl -fsSL -o nextcloud.tar.bz2 "https://download.nextcloud.com/server/releases/nextcloud-28.0.5.tar.bz2"; \
-    curl -fsSL -o nextcloud.tar.bz2.asc "https://download.nextcloud.com/server/releases/nextcloud-28.0.5.tar.bz2.asc"; \
-    export GNUPGHOME="$(mktemp -d)"; \
-# gpg key from https://nextcloud.com/nextcloud.asc
-    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 28806A878AE423A28372792ED75899B9A724937A; \
-    gpg --batch --verify nextcloud.tar.bz2.asc nextcloud.tar.bz2; \
-    tar -xjf nextcloud.tar.bz2 -C /usr/src/; \
-    gpgconf --kill all; \
-    rm nextcloud.tar.bz2.asc nextcloud.tar.bz2; \
-    rm -rf "$GNUPGHOME" /usr/src/nextcloud/updater; \
-    mkdir -p /usr/src/nextcloud/data; \
-    mkdir -p /usr/src/nextcloud/custom_apps; \
-    chmod +x /usr/src/nextcloud/occ; \
-    \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps; \
-    rm -rf /var/lib/apt/lists/*
-
-# Add cron jobs for Nextcloud's background tasks
-RUN echo '*/5 * * * * php -f /var/www/html/cron.php' >> /var/spool/cron/crontabs/www-data
-RUN echo '12 * * * * php /var/www/html/occ face:background_job' >> /var/spool/cron/crontabs/www-data
-RUN echo '37 * * * * php /var/www/html/occ preview:pre-generate' >> /var/spool/cron/crontabs/www-data
-
-COPY *.sh upgrade.exclude /
-COPY config/* /usr/src/nextcloud/config/
-COPY post_install.sh /docker-entrypoint-hooks.d/post-installation
-COPY supervisord.conf /
-
-RUN apt-get update && apt-get install -y \
-    supervisor \
-  && rm -rf /var/lib/apt/lists/* \
-  && mkdir /var/log/supervisord /var/run/supervisord
-#     && touch /var/log/supervisord/supervisord.log && \
-#     chmod -R 777 /var/log/supervisord /var/run/supervisord && \
-#     chown -R www-data:www-data /var/log/supervisord /var/run/supervisord
-
-CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
-
-RUN chmod +x /entrypoint.sh /docker-entrypoint-hooks.d/post-installation/post_install.sh /cron.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Set an environment variable to indicate that Nextcloud should be updated
+ENV NEXTCLOUD_UPDATE=1
 
 # Set the command to run supervisord on container start
 # Health check to ensure Nextcloud is running and accessible
