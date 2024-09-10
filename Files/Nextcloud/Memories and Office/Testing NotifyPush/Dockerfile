@@ -147,6 +147,7 @@ RUN mkdir src && \
 COPY build.rs ./
 COPY appinfo/info.xml ./appinfo/
 COPY src/ ./src/
+COPY notify_push.service /etc/systemd/system/notify_push.service
 RUN touch src/main.rs
 
 RUN cargo build --release
