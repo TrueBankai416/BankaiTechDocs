@@ -105,7 +105,7 @@ name: nextcloud
 
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:10.11
     container_name: mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
@@ -326,11 +326,11 @@ nano docker-compose.yaml
 ```
 Paste this into the file
 ```
-version: '3.8'
+name: nextcloud
 
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:10.11
     container_name: mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
