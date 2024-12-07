@@ -174,4 +174,18 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
 };
 
+// PostHog Analytics
+module.exports = {
+  plugins: [
+    [
+      "posthog-docusaurus",
+      {
+        apiKey: "phc_3hulh2QlrRhXB5lTRAIJ5sUPSmuNGGTiU3iST27rT9X",
+        appUrl: "https://us.i.posthog.com", // optional, defaults to "https://us.i.posthog.com"
+        enableInDevelopment: false, // optional
+      },
+    ],
+  ],
+};
+
 export default config;
