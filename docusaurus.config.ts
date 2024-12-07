@@ -182,6 +182,7 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
 
-} as Config;
+    },
+  };
 
 export default config;
