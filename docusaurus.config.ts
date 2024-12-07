@@ -58,6 +58,17 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+    plugins: [
+      [
+        'posthog-docusaurus',
+        {
+          apiKey: 'phc_3hulh2QlrRhXB5lTRAIJ5sUPSmuNGGTiU3iST27rT9X',
+          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+          enableInDevelopment: false, // optional
+        },
+      ],
+      // Add other plugins here
+    ],
 
   themeConfig: {
    // Adds bar to top of the Page
