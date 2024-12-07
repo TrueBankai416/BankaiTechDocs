@@ -6,13 +6,11 @@ import TabItem from '@theme/TabItem';
 
 // Environment Variable Config
 require('dotenv').config({path: './.env', debug: true})
-const { siteConfig } = useDocusaurusContext() {
+const serverId = siteConfig.customFields.EMAILJS_SERVER_ID as string
+const templateId = siteConfig.customFields.EMAILJS_TEMPLATE_ID as string
+const publicKey = siteConfig.customFields.EMAILJS_PUBLIC_KEY as string
 
-    const serverId = siteConfig.customFields.EMAILJS_SERVER_ID as string
-    const templateId = siteConfig.customFields.EMAILJS_TEMPLATE_ID as string
-    const publicKey = siteConfig.customFields.EMAILJS_PUBLIC_KEY as string
-};
- 
+// Main Config 
 const config: Config = {
   title: 'My HomeLab Documentation',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
