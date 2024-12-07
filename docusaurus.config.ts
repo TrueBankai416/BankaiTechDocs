@@ -4,6 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
  
+import type {Config} from '@docusaurus/types';
 const config: Config = {
   title: 'My HomeLab Documentation',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
@@ -62,8 +63,8 @@ const config: Config = {
       [
         'posthog-docusaurus',
         {
-          apiKey: 'phc_3hulh2QlrRhXB5lTRAIJ5sUPSmuNGGTiU3iST27rT9X',
-          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+          apiKey: '<ph_project_api_key>',
+          appUrl: '<ph_client_api_host>', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
       ],
@@ -181,8 +182,7 @@ const config: Config = {
     prism: {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
-    },
-  } satisfies Preset.ThemeConfig,
-);
+  ],
+} as Config;
 
 export default config;
