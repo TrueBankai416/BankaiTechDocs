@@ -66,8 +66,6 @@ const config: Config = {
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
-      ],
-      [,
         'docusaurus-plugin-dotenv',
         {
           path: "./.env", // The path to your environment variables.
@@ -78,7 +76,7 @@ const config: Config = {
           defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
           ignoreStub: true
         },
-       ],
+      ],
     ],
 
   themeConfig: {
