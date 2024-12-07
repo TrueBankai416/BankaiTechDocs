@@ -172,7 +172,7 @@ const config: Config = {
       theme: prismThemes.github,
     },
   } satisfies Preset.ThemeConfig,
-};
+}
 
 // PostHog Analytics
 interface DocusaurusConfig {
