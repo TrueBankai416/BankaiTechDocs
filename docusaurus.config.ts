@@ -62,8 +62,8 @@ const config: Config = {
       [
         'posthog-docusaurus',
         {
-          apiKey: '<ph_project_api_key>',
-          appUrl: '<ph_client_api_host>', // optional, defaults to "https://us.i.posthog.com"
+          apiKey: 'phc_3hulh2QlrRhXB5lTRAIJ5sUPSmuNGGTiU3iST27rT9X',
+          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
       ],
