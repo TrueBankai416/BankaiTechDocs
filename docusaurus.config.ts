@@ -67,6 +67,7 @@ const config: Config = {
           enableInDevelopment: false, // optional
         },
       ],
+      [,
         'docusaurus-plugin-dotenv',
         {
           path: "./.env", // The path to your environment variables.
@@ -77,6 +78,7 @@ const config: Config = {
           defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
           ignoreStub: true
         },
+       ],
     ],
 
   themeConfig: {
