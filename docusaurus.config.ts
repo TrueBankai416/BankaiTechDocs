@@ -172,15 +172,8 @@ const config: Config = {
       theme: prismThemes.github,
     },
   } satisfies Preset.ThemeConfig,
-}
 
-// PostHog Analytics
-interface DocusaurusConfig {
-  plugins: Array<Array<string | { apiKey: string; appUrl?: string; enableInDevelopment?: boolean }>>;
-}
-
-const docusaurusConfig: DocusaurusConfig = {
-  plugins: [
+   plugins: [
     [
       "posthog-docusaurus",
       {
@@ -190,7 +183,6 @@ const docusaurusConfig: DocusaurusConfig = {
       },
     ],
   ],
-};
+},
 
 export default config;
-export default docusaurusConfig;
