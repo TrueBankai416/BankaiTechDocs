@@ -77,7 +77,7 @@ const config: Config = {
         'posthog-docusaurus',
         {
           id: 'posthog',
-          apiKey: 'process.env.POSTHOG_API_KEY',
+          apiKey: 'POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
