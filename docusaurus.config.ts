@@ -63,7 +63,7 @@ const config: Config = {
         'posthog-docusaurus',
         {
           id: 'posthog',
-          apiKey: 'POSTHOG_API_KEY',
+          apiKey: 'process.env.POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
@@ -112,8 +112,8 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/social-card.jpg',
     algolia: {
-      appId: 'ALGOLIA_APP_ID',
-      apiKey: 'ALGOLIA_API_KEY',
+      appId: 'process.env.ALGOLIA_APP_ID',
+      apiKey: 'process.env.ALGOLIA_API_KEY',
       indexName: 'bankai-tech',
       // Optional: see doc section below
       contextualSearch: true,
