@@ -130,3 +130,31 @@ ENV NEXTCLOUD_UPDATE=1
 # Adjust the interval, timeout, start period, and retries as necessary for your environment
 HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost/status.php || exit 1
+
+# Notify_push
+
+FROM clux/muslrust:stable AS build
+
+COPY Cargo.toml Cargo.lock ./
+
+# Build with a dummy main to pre-build dependencies
+RUN mkdir src && \
+ sed -i '/test_client/d' Cargo.toml && \
+ echo "fn main(){}" > src/main.rs && \
+ cargo build --release && \
+ rm -r src
+
+COPY build.rs ./
+COPY appinfo/info.xml ./appinfo/
+COPY src/ ./src/
+COPY notify_push.service /etc/systemd/system/notify_push.service
+RUN touch src/main.rs
+
+RUN cargo build --release
+
+FROM scratch
+
+COPY --from=build /volume/target/x86_64-unknown-linux-musl/release/notify_push /
+EXPOSE 7867
+
+CMD ["/notify_push"]
