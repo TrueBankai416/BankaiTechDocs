@@ -194,3 +194,6 @@ Just incase I wanted to revert these changes in the future
 ```
 npm run build
 ```
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/BankaiTech)
