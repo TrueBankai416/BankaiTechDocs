@@ -1,0 +1,91 @@
+---
+title: Updating
+tags:
+   - Docker
+   - Docker Compose
+   - Tutorial
+   - Nextcloud
+   - Collabora Code
+   - Nextcloud Office
+keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Updating Nextcloud Image with Docker
+### Listing Current Images
+<p>run the following command to list all your docker images</p>
+```
+sudo docker images
+```
+<p>The output should look similiar to this.</p>
+```
+REPOSITORY                TAG             IMAGE ID       CREATED          SIZE
+bankaitech/nextcloud      28.0.5-custom   1715832d34f5   31 minutes ago   2.41GB
+bankaitech/nextcloud      latest          1715832d34f5   31 minutes ago   2.41GB
+redis                     latest          7fc37b47acde   3 weeks ago      116MB
+nextcloud/aio-imaginary   latest          ed2f702ee7bb   5 weeks ago      162MB
+collabora/code            latest          9e4e65343730   5 weeks ago      1.35GB
+mariadb                   10.6            89d7493508f3   2 months ago     396MB
+radialapps/go-vod         latest          7562fd28454d   5 months ago     789MB
+```
+### Removing Old Image
+<p>For this tutorial I will be removing the `bankaitech/nextcloud:latest` image.</p>
+<p>First lets stop nextcloud</p>
+```
+sudo docker compose down
+```
+:::note
+You have to be in the directory containing your `docker-compose.yaml` file
+:::
+<p>Lets Delete the old Image</p>
+```
+sudo docker image rm bankaitech/nextcloud:latest
+```
+<p>Now lets pull the new image</p>
+```
+sudo docker pull bankaitech/nextcloud:latest
+```
+<p>Wait for it to finish downloading</p>
+### Starting nextcloud
+<p>Start nextcloud</p>
+```
+sudo docker compose up -d
+```
+<p>Wait about 15-30 seconds and then check the nextcloud logs</p>
+```
+sudo docker logs nextcloud
+```
+<p>You should see this</p>
+```
+root@testing:/var/docker/nextcloud# docker logs nextcloud
+Configuring Redis as session handler
+Initializing nextcloud 28.0.5.1 ...
+Upgrading nextcloud from 28.0.4.1 ...
+=> Searching for scripts (*.sh) to run, located in the folder: /docker-entrypoint-hooks.d/pre-upgrade
+Nextcloud or one of the apps require upgrade - only a limited number of commands are available
+You may use your browser or the occ upgrade command to do the upgrade
+Setting log level to debug
+Turned on maintenance mode
+Updating database schema
+Updated database
+Update app memories from App Store
+Starting code integrity check...
+root@testing:/var/docker/nextcloud# 
+```
+:::note
+You may have to check the logs several times if you are not seeing anything after `Upgrading nextcloud`
+:::
+<p>Now lets run the upgrade command</p>
+```
+sudo docker exec -it -u 33 nextcloud php occ upgrade
+```
+<p>You should see something like this</p>
+```
+root@testing:/var/docker/nextcloud# sudo docker exec -it -u 33 nextcloud php occ upgrade                          
+Nextcloud is already latest version
+root@testing:/var/docker/nextcloud# 
+```
+## Now Nextcloud should Be Upgraded
