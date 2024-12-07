@@ -6,6 +6,7 @@ import TabItem from '@theme/TabItem';
 import 'dotenv/config'
 require('dotenv').config()
 Dotenv.config({ path: ".env" });
+const dotenv = require('dotenv')
  
 const config: Config = {
   title: 'My HomeLab Documentation',
