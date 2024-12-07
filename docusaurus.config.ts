@@ -6,6 +6,7 @@ import TabItem from '@theme/TabItem';
 
 // Environment Variable Config
 require('dotenv').config({path: './.env', debug: true})
+const { siteConfig } = useDocusaurusContext()
 const serverId = siteConfig.customFields.EMAILJS_SERVER_ID as string
 const templateId = siteConfig.customFields.EMAILJS_TEMPLATE_ID as string
 const publicKey = siteConfig.customFields.EMAILJS_PUBLIC_KEY as string
