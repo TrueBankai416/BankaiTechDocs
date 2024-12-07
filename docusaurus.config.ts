@@ -5,6 +5,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 // Environment Variable Config
+import dotenv from 'dotenv';
 require('dotenv').config({path: './.env', debug: true})
 
 // Main Config 
@@ -80,7 +81,7 @@ const config: Config = {
         'posthog-docusaurus',
         {
           id: 'posthog',
-          apiKey: 'POSTHOG_API_KEY',
+          apiKey: 'process.env.POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
