@@ -146,12 +146,12 @@ const config: Config = {
        //     },
             {
               label: 'Discord',
-              href: 'https://discord.gg/8ER7t3bGQN',
+              href: 'https://discord.gg/6THYdvayjg',
             },
-      //      {
-      //        label: 'Twitter',
-      //        href: 'https://twitter.com/docusaurus',
-      //      },
+            {
+              label: 'Buy me a Coffee',
+              href: 'https://buymeacoffee.com/BankaiTech',
+            },
           ],
         },
         {
