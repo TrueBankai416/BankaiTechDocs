@@ -3,6 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import Dotenv from "dotenv";
+Dotenv.config({ path: ".env.local" });
  
 const config: Config = {
   title: 'My HomeLab Documentation',
@@ -62,7 +64,7 @@ const config: Config = {
       [
         'posthog-docusaurus',
         {
-          apiKey: '{{ secrets.POSTHOG_API_KEY }}',
+          apiKey: 'POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
