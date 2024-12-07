@@ -112,8 +112,8 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/social-card.jpg',
     algolia: {
-      appId: '84A31YI3XB',
-      apiKey: 'dcaac6d468682fd5cbcafe408d4bdd45',
+      appId: 'ALGOLIA_APP_ID',
+      apiKey: 'ALGOLIA_API_KEY',
       indexName: 'bankai-tech',
       // Optional: see doc section below
       contextualSearch: true,
