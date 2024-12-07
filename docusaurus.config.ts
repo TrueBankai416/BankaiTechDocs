@@ -58,6 +58,17 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+    plugins: [
+      [
+        'posthog-docusaurus',
+        {
+          apiKey: '{{ secrets.POSTHOG_API_KEY }}',
+          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+          enableInDevelopment: false, // optional
+        },
+      ],
+      // Add other plugins here
+    ],
 
   themeConfig: {
    // Adds bar to top of the Page
@@ -117,6 +128,7 @@ const config: Config = {
           position: 'left',
           label: 'Tutorials',
         },
+          {to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Coffee', position: 'left'},
     //    {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/facebook/docusaurus',
@@ -140,18 +152,14 @@ const config: Config = {
         {
           title: 'Community',
           items: [
-       //     {
-       //       label: 'Stack Overflow',
-       //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-       //     },
             {
               label: 'Discord',
-              href: 'https://discord.gg/8ER7t3bGQN',
+              href: 'https://discord.gg/6THYdvayjg',
             },
-      //      {
-      //        label: 'Twitter',
-      //        href: 'https://twitter.com/docusaurus',
-      //      },
+            {
+              label: 'Buy me a Coffee',
+              href: 'https://buymeacoffee.com/BankaiTech',
+            },
           ],
         },
         {
