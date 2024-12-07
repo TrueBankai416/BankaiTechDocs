@@ -3,14 +3,9 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 
 // Environment Variable Config
 require('dotenv').config({path: './.env', debug: true})
-const { siteConfig } = useDocusaurusContext()
-const serverId = siteConfig.customFields.EMAILJS_SERVER_ID as string
-const templateId = siteConfig.customFields.EMAILJS_TEMPLATE_ID as string
-const publicKey = siteConfig.customFields.EMAILJS_PUBLIC_KEY as string
 
 // Main Config 
 const config: Config = {
