@@ -3,7 +3,12 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
- 
+
+// Environment Variable Config
+import dotenv from 'dotenv';
+require('dotenv').config({path: './.env', debug: true})
+
+// Main Config 
 const config: Config = {
   title: 'My HomeLab Documentation',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
@@ -59,28 +64,29 @@ const config: Config = {
     ],
   ],
     plugins: [
+//      [
+//        'docusaurus-plugin-dotenv',
+//        {
+//          id: 'dotenv',
+//          path: "./.env", // The path to your environment variables.
+//          safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
+//          systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
+//          silent: false, //  If true, all warnings will be suppressed
+//          expand: false, // Allows your variables to be "expanded" for reusability within your .env file
+//          defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
+//         ignoreStub: true
+ //       },
+ //     ],
       [
         'posthog-docusaurus',
         {
           id: 'posthog',
-          apiKey: 'process.env.POSTHOG_API_KEY',
+          apiKey: process.env.POSTHOG_API_KEY,
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
       ],
-      [
-        'docusaurus-plugin-dotenv',
-        {
-          id: 'dotenv',
-          path: "./.env", // The path to your environment variables.
-          safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
-          systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
-          silent: false, //  If true, all warnings will be suppressed
-          expand: false, // Allows your variables to be "expanded" for reusability within your .env file
-          defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
-         ignoreStub: true
-        },
-      ],
+     
     ],
 
   themeConfig: {
@@ -112,8 +118,8 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/social-card.jpg',
     algolia: {
-      appId: 'process.env.ALGOLIA_APP_ID',
-      apiKey: 'process.env.ALGOLIA_API_KEY',
+      appId: process.env.ALGOLIA_APP_ID,
+      apiKey: process.env.ALGOLIA_API_KEY,
       indexName: 'bankai-tech',
       // Optional: see doc section below
       contextualSearch: true,
