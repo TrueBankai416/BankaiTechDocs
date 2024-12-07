@@ -3,6 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 
 // Environment Variable Config
 require('dotenv').config({path: './.env', debug: true})
