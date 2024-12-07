@@ -4,7 +4,6 @@ import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
  
-import type {Config} from '@docusaurus/types';
 const config: Config = {
   title: 'My HomeLab Documentation',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
@@ -183,6 +182,6 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
   ],
-}
+} as Config;
 
 export default config;
