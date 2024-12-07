@@ -117,6 +117,7 @@ const config: Config = {
           position: 'left',
           label: 'Tutorials',
         },
+          {to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Coffee', position: 'left'},
     //    {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/facebook/docusaurus',
@@ -140,10 +141,6 @@ const config: Config = {
         {
           title: 'Community',
           items: [
-       //     {
-       //       label: 'Stack Overflow',
-       //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-       //     },
             {
               label: 'Discord',
               href: 'https://discord.gg/6THYdvayjg',
