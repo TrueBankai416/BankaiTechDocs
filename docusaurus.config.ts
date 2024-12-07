@@ -175,7 +175,11 @@ const config: Config = {
 };
 
 // PostHog Analytics
-module.exports = {
+interface DocusaurusConfig {
+  plugins: Array<Array<string | { apiKey: string; appUrl?: string; enableInDevelopment?: boolean }>>;
+}
+
+const docusaurusConfig: DocusaurusConfig = {
   plugins: [
     [
       "posthog-docusaurus",
@@ -189,3 +193,4 @@ module.exports = {
 };
 
 export default config;
+export default docusaurusConfig;
