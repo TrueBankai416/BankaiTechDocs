@@ -62,7 +62,7 @@ const config: Config = {
       [
         'posthog-docusaurus',
         {
-          id: 'posthog'
+          id: 'posthog',
           apiKey: 'POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
@@ -71,7 +71,7 @@ const config: Config = {
       [
         'docusaurus-plugin-dotenv',
         {
-          id: 'dotenv'
+          id: 'dotenv',
           path: "./.env", // The path to your environment variables.
           safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
           systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
