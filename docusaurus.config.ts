@@ -76,7 +76,7 @@ const config: Config = {
           expand: false, // Allows your variables to be "expanded" for reusability within your .env file
           defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
           ignoreStub: true
-            },
+        },
     ],
 
   themeConfig: {
