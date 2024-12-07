@@ -3,8 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-require('dotenv').config()
-require('dotenv').config({path: './.env'})
+require('dotenv').config({path: './.env', debug: true})
  
 const config: Config = {
   title: 'My HomeLab Documentation',
