@@ -140,10 +140,7 @@ const config: Config = {
         {
           title: 'Community',
           items: [
-       //     {
-       //       label: 'Stack Overflow',
-       //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-       //     },
+            <a href="https://www.buymeacoffee.com/BankaiTech"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=BankaiTech&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" /></a>
             {
               label: 'Discord',
               href: 'https://discord.gg/6THYdvayjg',
