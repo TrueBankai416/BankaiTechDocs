@@ -182,7 +182,7 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
     },
-     } satisfies Preset.ThemeConfig,
+  } satisfies Preset.ThemeConfig,
 };
 
 export default config;
