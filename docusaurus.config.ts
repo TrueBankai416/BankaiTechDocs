@@ -88,9 +88,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/social-card.jpg',
     algolia: {
-      appId: 'I9USLRX50E',
-      apiKey: '11cd211e50738625f1423428ad36ae4e',
-      indexName: 'bankai-tech.com',
+      appId: '84A31YI3XB',
+      apiKey: 'dcaac6d468682fd5cbcafe408d4bdd45',
+      indexName: 'bankai-tech',
       // Optional: see doc section below
       contextualSearch: true,
       // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs

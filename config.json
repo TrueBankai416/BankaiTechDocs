@@ -1,50 +1,103 @@
-{
-  "index_name": "bankai-tech.com",
-  "start_urls": [
-    "https://docs.bankai-tech.com/"
-  ],
-  "sitemap_urls": [
-    "https://docs.bankai-tech.com/sitemap.xml"
-  ],
-  "sitemap_alternate_links": true,
-  "stop_urls": [
-    "/tests"
-  ],
-  "selectors": {
-    "lvl0": {
-      "selector": "(//ul[contains(@class,'menu__list')]//a[contains(@class, 'menu__link menu__link--sublist menu__link--active')]/text() | //nav[contains(@class, 'navbar')]//a[contains(@class, 'navbar__link--active')]/text())[last()]",
-      "type": "xpath",
-      "global": true,
-      "default_value": "Documentation"
+new Crawler({
+  appId: "ODIDP273UV",
+  apiKey: "f540ae91d38d3d1cfa7f52a2fdaaf455",
+  indexPrefix: "crawler_",
+  rateLimit: 8,
+  maxDepth: 10,
+  maxUrls: 100,
+  startUrls: ["https://docs.bankai-tech.com"],
+  renderJavaScript: false,
+  sitemaps: ["https://docs.bankai-tech.com/sitemap.xml"],
+  ignoreCanonicalTo: true,
+  discoveryPatterns: ["https://docs.bankai-tech.com/**"],
+  actions: [
+    {
+      indexName: "HomeLab Docs",
+      pathsToMatch: ["https://docs.bankai-tech.com/**"],
+      recordExtractor: ({ $, helpers }) => {
+        const lvl0 =
+          $(
+            ".menu__link.menu__link--sublist.menu__link--active, .navbar__item.navbar__link--active",
+          )
+            .last()
+            .text() || "Documentation";
+        return helpers.docsearch({
+          recordProps: {
+            lvl0: {
+              selectors: "",
+              defaultValue: lvl0,
+            },
+            lvl1: ["header h1", "article h1"],
+            lvl2: "article h2",
+            lvl3: "article h3",
+            lvl4: "article h4",
+            lvl5: "article h5, article td:first-child",
+            lvl6: "article h6",
+            content: "article p, article li, article td:last-child",
+          },
+          aggregateContent: true,
+          recordVersion: "v3",
+        });
+      },
     },
-    "lvl1": "header h1",
-    "lvl2": "article h2",
-    "lvl3": "article h3",
-    "lvl4": "article h4",
-    "lvl5": "article h5, article td:first-child",
-    "lvl6": "article h6",
-    "text": "article p, article li, article td:last-child"
-  },
-  "strip_chars": " .,;:#",
-  "custom_settings": {
-    "separatorsToIndex": "_",
-    "attributesForFaceting": [
-      "language",
-      "version",
-      "type",
-      "docusaurus_tag"
-    ],
-    "attributesToRetrieve": [
-      "hierarchy",
-      "content",
-      "anchor",
-      "url",
-      "url_without_anchor",
-      "type"
-    ]
-  },
-  "conversation_id": [
-    "833762294"
   ],
-  "nb_hits": 46250
-}
+  safetyChecks: { beforeIndexPublishing: { maxLostRecordsPercentage: 30 } },
+  initialIndexSettings: {
+    "HomeLab Docs": {
+      attributesForFaceting: [
+        "type",
+        "lang",
+        "language",
+        "version",
+        "docusaurus_tag",
+      ],
+      attributesToRetrieve: [
+        "hierarchy",
+        "content",
+        "anchor",
+        "url",
+        "url_without_anchor",
+        "type",
+      ],
+      attributesToHighlight: ["hierarchy", "content"],
+      attributesToSnippet: ["content:10"],
+      camelCaseAttributes: ["hierarchy", "content"],
+      searchableAttributes: [
+        "unordered(hierarchy.lvl0)",
+        "unordered(hierarchy.lvl1)",
+        "unordered(hierarchy.lvl2)",
+        "unordered(hierarchy.lvl3)",
+        "unordered(hierarchy.lvl4)",
+        "unordered(hierarchy.lvl5)",
+        "unordered(hierarchy.lvl6)",
+        "content",
+      ],
+      distinct: true,
+      attributeForDistinct: "url",
+      customRanking: [
+        "desc(weight.pageRank)",
+        "desc(weight.level)",
+        "asc(weight.position)",
+      ],
+      ranking: [
+        "words",
+        "filters",
+        "typo",
+        "attribute",
+        "proximity",
+        "exact",
+        "custom",
+      ],
+      highlightPreTag: '<span class="algolia-docsearch-suggestion--highlight">',
+      highlightPostTag: "</span>",
+      minWordSizefor1Typo: 3,
+      minWordSizefor2Typos: 7,
+      allowTyposOnNumericTokens: false,
+      minProximity: 1,
+      ignorePlurals: true,
+      advancedSyntax: true,
+      attributeCriteriaComputedByMinProximity: true,
+      removeWordsIfNoResults: "allOptional",
+    },
+  },
+});

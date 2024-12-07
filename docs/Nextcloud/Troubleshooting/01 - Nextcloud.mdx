@@ -1,0 +1,73 @@
+---
+title: Nextcloud
+tags:
+   - Docker
+   - Nextcloud
+   - Tutorial
+   - Troubleshooting
+keywords: [Docker, Docker Engine, Tutorial, Nextcloud, Troubleshootiing]
+last_update:
+  author: BankaiTech
+---
+## Troubleshooting for Nextcloud
+### Access through untrusted Domain
+<p>This happens when you attempt to access nextcloud from a source not listed inside the `config.php` file.</p>
+![NC Untrusted Domain](/img/nextcloud/Troubleshooting/untrustedDomain.jpg)
+#### Changing directories
+<p>First we need to change our directory to where nextcloud is installed</p>
+In this example, nextclouds webroot is located at `/var/docker/nextcloud/nextcloud/`
+```
+cd /var/docker/nextcloud/nextcloud
+```
+:::info
+`cd` stands for `Change Directory`
+:::
+
+<p>If you are in the right spot then you will see</p>
+```
+3rdparty  apps           config       cron.php     dist        lib                       ocs                package.json  resources   themes
+AUTHORS   composer.json  console.php  custom_apps  index.html  nextcloud-init-sync.lock  ocs-provider       public.php    robots.txt  version.php
+COPYING   composer.lock  core         data         index.php   occ                       package-lock.json  remote.php    status.php
+```
+#### Editing the config.php file
+<p>Now lets edit the `config.php` file using nano</p>
+```
+nano config/config.php
+```
+<p>Scroll down until you see</p>
+```
+'trusted_domains' =>
+array (
+    0 => '',
+  ),
+```
+#### Adding your domain to config.php
+<p>Now add your domain to the array</p>
+```
+'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+  ),
+```
+<p>If you need to add multiple domains you can do so like this</p>
+```
+'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+    1 => '192.168.4.130',
+  ),
+```
+<p>Now save the file and you should be able to access nextcloud now</p>
+:::tip
+Save the file by pressing `CTRL+X`
+:::note
+If the error doesnt go away, you may need to clear your browser cache and restart the browser
+:::
+
+### The database is missing some indexes.
+![Missing Indexes](/img/nextcloud/Troubleshooting/missingIndexes.jpg)
+<p>This seems to be caused by nextcloud skipping large indexes. To fix in a Docker environment, run the following.</p>
+```
+sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
+```
+## Resources
