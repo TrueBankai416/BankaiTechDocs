@@ -5,6 +5,8 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import 'dotenv/config'
 const dotenv = require('dotenv')
+const buf = Buffer.from('BASIC=basic')
+const config = dotenv.parse(buf)
 require('dotenv').config()
 Dotenv.config({ path: ".env" });
  
