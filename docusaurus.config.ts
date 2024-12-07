@@ -174,4 +174,21 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
 };
 
+import type { DocusaurusConfig } from '@docusaurus/types';
+
+const config: DocusaurusConfig = {
+  plugins: [
+    [
+      'docusaurus-plugin-posthog',
+      {
+        apiKey: '',
+        apiUrl: '',
+        enableInDevelopment: false,
+      },
+    ],
+    // Other plugins...
+  ],
+  // Other configuration...
+},
+
 export default config;
