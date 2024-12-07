@@ -62,12 +62,25 @@ const config: Config = {
       [
         'posthog-docusaurus',
         {
-          apiKey: '{{ secrets.POSTHOG_API_KEY }}',
+          id: 'posthog',
+          apiKey: 'process.env.POSTHOG_API_KEY',
           appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
           enableInDevelopment: false, // optional
         },
       ],
-      // Add other plugins here
+      [
+        'docusaurus-plugin-dotenv',
+        {
+          id: 'dotenv',
+          path: "./.env", // The path to your environment variables.
+          safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
+          systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
+          silent: false, //  If true, all warnings will be suppressed
+          expand: false, // Allows your variables to be "expanded" for reusability within your .env file
+          defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
+         ignoreStub: true
+        },
+      ],
     ],
 
   themeConfig: {
@@ -99,8 +112,8 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/social-card.jpg',
     algolia: {
-      appId: '84A31YI3XB',
-      apiKey: 'dcaac6d468682fd5cbcafe408d4bdd45',
+      appId: 'process.env.ALGOLIA_APP_ID',
+      apiKey: 'process.env.ALGOLIA_API_KEY',
       indexName: 'bankai-tech',
       // Optional: see doc section below
       contextualSearch: true,
