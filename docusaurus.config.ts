@@ -172,23 +172,19 @@ const config: Config = {
       theme: prismThemes.github,
     },
   } satisfies Preset.ThemeConfig,
+    plugins: [
+     [
+       'docusaurus-plugin-posthog',
+       {
+         apiKey: '',
+         apiUrl: '',
+         enableInDevelopment: false,
+       },
+     ],
+     // Other plugins...
+   ],
+   // Other configuration...
+ },
 };
-
-import type { DocusaurusConfig } from '@docusaurus/types';
-
-const config: DocusaurusConfig = {
-  plugins: [
-    [
-      'docusaurus-plugin-posthog',
-      {
-        apiKey: '',
-        apiUrl: '',
-        enableInDevelopment: false,
-      },
-    ],
-    // Other plugins...
-  ],
-  // Other configuration...
-},
 
 export default config;
