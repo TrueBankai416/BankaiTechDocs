@@ -60,15 +60,6 @@ const config: Config = {
   ],
     plugins: [
       [
-        'posthog-docusaurus',
-        {
-          id: 'posthog',
-          apiKey: 'process.env.POSTHOG_API_KEY',
-          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
-          enableInDevelopment: false, // optional
-        },
-      ],
-      [
         'docusaurus-plugin-dotenv',
         {
           id: 'dotenv',
@@ -81,6 +72,16 @@ const config: Config = {
          ignoreStub: true
         },
       ],
+      [
+        'posthog-docusaurus',
+        {
+          id: 'posthog',
+          apiKey: 'process.env.POSTHOG_API_KEY',
+          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+          enableInDevelopment: false, // optional
+        },
+      ],
+     
     ],
 
   themeConfig: {
