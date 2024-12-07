@@ -237,3 +237,6 @@ Replace `ip-address` with the IP of the Raspberry Pi
 <p>Your terminal should now look like this</p>
 
 ![SSH Sucessful](/img/NextcloudPI/ConnectSSHsuccessful.jpg)
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/BankaiTech)
