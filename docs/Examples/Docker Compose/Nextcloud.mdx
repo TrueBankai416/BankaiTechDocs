@@ -1,0 +1,298 @@
+---
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs groupId="NC-Install-Type">
+  <TabItem value="nc-minimal-install" label="Minimal Install">
+    ### docker-compose.yaml
+    ```
+version: '3.8'
+
+  services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - mariadb
+      - redis
+    volumes:
+      - ./nextcloud:/var/www/html
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+```
+
+#### .env files
+##### .nextcloud.env
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.bankai-tech.com
+TRUSTED_PROXIES=192.168.4.204
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://cloud.bankai-tech.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-100M
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+```
+:::info
+Instead of using the hostname `redis`, you can use the IP address of the redis host.
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
+##### .mariadb.env
+```
+MYSQL_ROOT_PASSWORD=CHANGE
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+```
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
+#### config.php
+```
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' => 
+  array (
+    0 => 
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 => 
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' => 
+  array (
+    'host' => 'redis',
+    'password' => '',
+    'port' => 6379,
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '192.168.4.204',
+  ),
+  'upgrade.disable-web' => true,
+  'instanceid' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'passwordsalt' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'secret' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '28.0.4.1',
+  'overwrite.cli.url' => 'https://cloud.bankai-tech.com',
+  'overwriteprotocol' => 'https',
+  'dbname' => 'nextcloud',
+  'dbhost' => 'mariadb',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'nextcloud',
+  'dbpassword' => 'CHANGEME',
+  'installed' => true,
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+);
+```
+:::info
+Instead of using the hostname `redis`, you can also use the IP address of the redis host.
+:::
+  </TabItem>
+  <TabItem value="nc-collabora" label="Install with Collabora Code">
+    ## Nextcloud With Collabora Code
+    ### docker-compose.yaml
+    ```
+    version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    env_file:
+      - .mariadb.env
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - mariadb
+      - redis
+      - collabora
+    volumes:
+      - ./nextcloud:/var/www/html
+    env_file:
+      - .nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    expose:
+      - 6379
+    command: redis-server --save 60 1 --loglevel warning
+    restart: always
+
+  collabora:
+    container_name: collabora
+    hostname: collabora
+    privileged: true
+    tty: true
+    ports:
+      - 9980:9980
+    cap_add:
+      - MKNOD
+    image: collabora/code:latest
+    env_file:
+      - .collabora.env
+    restart: always
+   ```
+  #### .env Files
+  ##### .nextcloud.env
+```
+NEXTCLOUD_TRUSTED_DOMAINS=cloud.bankai-tech.com
+TRUSTED_PROXIES=192.168.4.204
+OVERWRITEPROTOCOL=https
+OVERWRITECLIURL=https://cloud.bankai-tech.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+PHP_MEMORY_LIMIT=512M
+PHP_UPLOAD_LIMIT-100M
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+MYSQL_HOST=mariadb
+```
+:::info
+Instead of the hostname `redis`, you can also use the IP address for the redis host.
+:::danger
+Refrain from using Special characters for you MySQL Passwords. \
+Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
+:::
+##### .mariadb.env
+```
+MYSQL_ROOT_PASSWORD=CHANGE
+MYSQL_PASSWORD=CHANGEME
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
+```
+##### .collabora.env
+```
+username=admin
+password=2hRZ8zRBn7Kyo7
+domain=cloud\\.domain\\.com
+```
+#### config.php
+```
+<?php
+$CONFIG = array (
+  'htaccess.RewriteBase' => '/',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'apps_paths' => 
+  array (
+    0 => 
+    array (
+      'path' => '/var/www/html/apps',
+      'url' => '/apps',
+      'writable' => false,
+    ),
+    1 => 
+    array (
+      'path' => '/var/www/html/custom_apps',
+      'url' => '/custom_apps',
+      'writable' => true,
+    ),
+  ),
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'redis' => 
+  array (
+    'host' => 'redis',
+    'password' => '',
+    'port' => 6379,
+  ),
+  'trusted_proxies' => 
+  array (
+    0 => '192.168.4.204',
+  ),
+  'upgrade.disable-web' => true,
+  'instanceid' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'passwordsalt' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'secret' => '*****REMOVED_SENSITIVE_VALUE*****',
+  'trusted_domains' => 
+  array (
+    0 => 'cloud.bankai-tech.com',
+  ),
+  'datadirectory' => '/var/www/html/data',
+  'dbtype' => 'mysql',
+  'version' => '28.0.4.1',
+  'overwrite.cli.url' => 'https://cloud.bankai-tech.com',
+  'overwriteprotocol' => 'https',
+  'dbname' => 'nextcloud',
+  'dbhost' => 'mariadb',
+  'dbport' => '',
+  'dbtableprefix' => 'oc_',
+  'mysql.utf8mb4' => true,
+  'dbuser' => 'nextcloud',
+  'dbpassword' => 'CHANGEME',
+  'installed' => true,
+  'maintenance_window_start' => 1,
+  'default_phone_region' => 'US',
+);
+```
+  
+  </TabItem>
+  <TabItem value="nc-memories" label="Install with Memories">
+    Coming Soon
+  </TabItem>
+  <TabItem value="nc-memories-office" label="Install with Memories & Office">
+    Coming Soon
+  </TabItem>
+</Tabs>
