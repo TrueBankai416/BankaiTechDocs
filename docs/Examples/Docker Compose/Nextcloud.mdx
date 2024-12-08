@@ -9,11 +9,11 @@ import TabItem from '@theme/TabItem';
   <TabItem value="nc-minimal-install" label="Minimal Install">
     ### docker-compose.yaml
     ```
-version: '3.8'
+name: nextcloud
 
   services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:10.11
     container_name: mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
@@ -144,11 +144,11 @@ Instead of using the hostname `redis`, you can also use the IP address of the re
     ## Nextcloud With Collabora Code
     ### docker-compose.yaml
     ```
-    version: '3.8'
+name: nextcloud
 
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:10.11
     container_name: mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
@@ -226,7 +226,7 @@ MYSQL_USER=nextcloud
 ##### .collabora.env
 ```
 username=admin
-password=2hRZ8zRBn7Kyo7
+password=CHANGEME
 domain=cloud\\.domain\\.com
 ```
 #### config.php
