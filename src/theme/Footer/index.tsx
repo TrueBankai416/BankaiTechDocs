@@ -10,7 +10,10 @@ export default function FooterWrapper(props) {
 
   return (
     <>
-      <MendableFloatingButton anon_key={customFields.mendableAnonKey} />
+      {/* Using the correct prop format expected by the MendableFloatingButton component */}
+      <MendableFloatingButton 
+        anon_key={customFields.mendableAnonKey as string} 
+      />
       <Footer {...props} />
     </>
   )

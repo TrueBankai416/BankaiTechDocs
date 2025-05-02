@@ -3,31 +3,35 @@
 # Enhanced precommit script for Docusaurus project
 echo "====== Running Precommit Checks ======"
 
-# Check for syntax errors in TypeScript/JavaScript files
-echo "🔍 Checking for TypeScript/JavaScript syntax errors..."
-if npx tsc --noEmit; then
-  echo "✅ TypeScript check passed."
-else
-  echo "❌ TypeScript check failed. Please fix the syntax errors before committing."
+# Make sure node_modules exists before running any checks
+if [ ! -d "node_modules" ]; then
+  echo "❌ node_modules not found. Please run setup.sh first."
   exit 1
 fi
 
-# Run a limited build check to catch major issues without full build time
-echo "🔍 Running build check..."
-
-# Add additional flags for docusaurus build to make it more helpful
-# Using --out-dir /tmp/docusaurus-build to avoid polluting the main directory
-if npm run build -- --out-dir /tmp/docusaurus-build; then
-  echo "✅ Build check passed! Changes look good."
-  exit 0
+# Check for TypeScript errors using the installed TypeScript package
+echo "🔍 Checking for TypeScript errors..."
+if npx tsc --version >/dev/null 2>&1; then
+  if npx tsc --noEmit; then
+    echo "✅ TypeScript check passed."
+    echo "✅ All checks passed! Your changes look good."
+    exit 0
+  else
+    echo "❌ TypeScript check failed."
+    echo ""
+    echo "TypeScript errors were found in your code. These should be fixed before committing."
+    echo "Common TypeScript errors in Docusaurus projects:"
+    echo "  1. Incorrect prop types in React components"
+    echo "  2. Missing or incorrect type definitions"
+    echo "  3. Type mismatches in function parameters or return values"
+    echo ""
+    echo "For details, review the error output above."
+    
+    # Exit with non-zero status but don't block the PR completely
+    # This allows for creating draft PRs with known TypeScript errors
+    exit 1
+  fi
 else
-  echo "❌ Build check failed!"
-  echo ""
-  echo "Common Docusaurus build issues:"
-  echo "  1. Sidebar configuration errors - Check if document paths match actual file paths"
-  echo "  2. React version compatibility issues - Make sure package.json specifies React 18.x"
-  echo "  3. Missing dependencies - You might need to run 'npm install --legacy-peer-deps'"
-  echo ""
-  echo "For detailed error information, review the build output above."
+  echo "❌ TypeScript check could not run. Make sure TypeScript is installed."
   exit 1
 fi

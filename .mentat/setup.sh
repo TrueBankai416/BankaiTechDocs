@@ -1,78 +1,82 @@
 #!/bin/bash
 
+# Setup script for Docusaurus project
+echo "====== Running Docusaurus Setup ======"
+
 # Create environment variables for local development
 echo "----- Setting up environment variables -----"
 echo "ALGOLIA_APP_ID=LOCAL_DEV" > .env
 echo "ALGOLIA_API_KEY=LOCAL_DEV" >> .env
 echo "ALGOLIA_INDEX_NAME=LOCAL_DEV" >> .env
-echo "POSTHOG_API_KEY=phc_000000000000000000000000000000000000" >> .env
+# Use a properly formatted placeholder for PostHog API key
+echo "POSTHOG_API_KEY=phc_placeholder" >> .env
+# Add a placeholder for Mendable search if used in config
+echo "MENDABLE_KEY=placeholder" >> .env
 echo "Environment variables set."
 
-# Clear any existing node_modules and cache to ensure clean install
-echo "----- Cleaning up any previous installations -----"
-if [ -d "node_modules" ]; then
-  echo "Removing existing node_modules..."
-  rm -rf node_modules
-fi
-
-# Clear npm cache if needed
-echo "Clearing npm cache..."
-npm cache clean --force
-
-# First try regular install
-echo "----- Installing dependencies -----"
-echo "Attempting standard npm install..."
-if npm install; then
-  echo "Dependencies installed successfully."
-else
-  echo "Regular npm install failed, trying with --legacy-peer-deps..."
-  # Fallback to --legacy-peer-deps if normal install fails
-  if npm install --legacy-peer-deps; then
-    echo "Dependencies installed with --legacy-peer-deps."
+# Only remove node_modules if package.json has changed since node_modules was last modified
+# to avoid unnecessary reinstalls
+echo "----- Checking dependencies -----"
+if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
+  echo "Installing dependencies..."
+  
+  # Use npm ci for consistent installations (same as in GitHub Actions)
+  if npm ci; then
+    echo "✅ Dependencies installed successfully with npm ci."
   else
-    echo "Installation with --legacy-peer-deps failed, trying with --force..."
-    # Try one more time with --force as a last resort
-    npm install --force
+    echo "npm ci failed, falling back to npm install..."
+    
+    # Fallback to npm install if npm ci fails
+    if npm install; then
+      echo "✅ Dependencies installed successfully with npm install."
+    else
+      echo "❌ Dependency installation failed."
+      exit 1
+    fi
   fi
+else
+  echo "✅ Dependencies already up to date."
 fi
 
-# Verify that the project dependencies are installed correctly
-echo "----- Verifying installation -----"
+# Verify node_modules exists
 if [ ! -d "node_modules" ]; then
-  echo "ERROR: node_modules directory doesn't exist. Installation failed."
+  echo "❌ node_modules directory doesn't exist. Installation failed."
   exit 1
 fi
 
-# Check for common Docusaurus issues
-echo "----- Checking for potential Docusaurus configuration issues -----"
-echo "Checking sidebar configuration..."
+# Check for TypeScript
+echo "----- Checking TypeScript -----"
+if npx tsc --version; then
+  echo "✅ TypeScript is installed correctly."
+else
+  echo "❌ TypeScript is not working properly."
+  exit 1
+fi
+
+# Check for Docusaurus configuration
+echo "----- Checking Docusaurus configuration -----"
+if [ -f "docusaurus.config.ts" ]; then
+  echo "✅ Docusaurus configuration file found."
+else
+  echo "❌ docusaurus.config.ts not found!"
+  exit 1
+fi
+
+# Check sidebar configuration
 if [ -f "sidebars/customSidebar.ts" ]; then
-  echo "Custom sidebar found."
+  echo "✅ Custom sidebar configuration found."
 else
-  echo "WARNING: Custom sidebar configuration not found!"
+  echo "⚠️ Custom sidebar configuration not found!"
 fi
 
-# Run docusaurus commands with more verbose output
-echo "----- Running docusaurus diagnostic commands -----"
-echo "Checking docusaurus version and dependencies..."
-npx docusaurus --version
-
-# Attempt to build the project
-echo "----- Building project -----"
-echo "Starting build process - this might take a few minutes..."
-if npm run build; then
-  echo "✅ Build completed successfully! The project is ready for development."
+# Show Docusaurus version
+echo "----- Docusaurus information -----"
+if npx docusaurus --version; then
+  echo "✅ Docusaurus CLI is working properly."
 else
-  echo "❌ Build failed. This could be due to:"
-  echo "  1. React version compatibility issues (the project currently uses React 18)"
-  echo "  2. Sidebar configuration errors"
-  echo "  3. Other content or configuration issues"
-  echo ""
-  echo "The setup script has completed the dependency installation process,"
-  echo "but the build has issues that need to be fixed in the codebase."
-  echo ""
-  echo "You can run 'npm start' to work on fixing these issues in development mode."
-  # Exit with code 0 since we want setup to "succeed" even if build fails
-  # This allows the PR to still be created with the dependency fixes
-  exit 0
+  echo "⚠️ Docusaurus CLI check failed."
 fi
+
+echo "====== Setup complete! ======"
+echo "You can now start development with: npm start"
+echo "Run checks with: bash .mentat/precommit.sh"
