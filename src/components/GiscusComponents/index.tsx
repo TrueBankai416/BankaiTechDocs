@@ -19,8 +19,6 @@ export default function GiscusComponent() {
       theme={colorMode}
       lang="en"
       loading="lazy"
-      // Removed unsupported attributes (crossorigin and async)
-      // These HTML attributes aren't part of the React component's props interface
     />
   );
 }

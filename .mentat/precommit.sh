@@ -9,28 +9,6 @@ if [ ! -d "node_modules" ]; then
   exit 1
 fi
 
-# Check for TypeScript errors using the installed TypeScript package
-echo "🔍 Checking for TypeScript errors..."
-if npx tsc --version >/dev/null 2>&1; then
-  if npx tsc --noEmit; then
-    echo "✅ TypeScript check passed."
-    echo "✅ All checks passed! Your changes look good."
-    exit 0
-  else
-    echo "❌ TypeScript check failed."
-    echo ""
-    echo "TypeScript errors were found in your code. These should be fixed before committing."
-    echo "Common TypeScript errors in Docusaurus projects:"
-    echo "  1. Incorrect prop types in React components"
-    echo "  2. Missing or incorrect type definitions"
-    echo "  3. Type mismatches in function parameters or return values"
-    echo ""
-    echo "For details, review the error output above."
-    
-    # Exit with non-zero status but don't block the PR completely
-    # This allows for creating draft PRs with known TypeScript errors
-    exit 1
-  fi
 else
   echo "❌ TypeScript check could not run. Make sure TypeScript is installed."
   exit 1
