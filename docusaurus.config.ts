@@ -26,7 +26,7 @@ const config: Config = {
 
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
+  // Set the /<baseUrl>/ pathname under which your site is servedd
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
