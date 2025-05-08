@@ -26,7 +26,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="Home to My HomeLab Documentation <head />">
+      description="Home to My HomeLab Documentation">
       <HomepageHeader />
     </Layout>
   );
