@@ -1,23 +1,16 @@
 #!/bin/bash
 
-# Create environment variables for local development
-echo "----- Setting up environment variables -----"
-# Create .env file with development placeholders
-cat > .env << EOL
-# Development environment variables
-ALGOLIA_APP_ID=LOCAL_DEV
-ALGOLIA_API_KEY=LOCAL_DEV
-ALGOLIA_INDEX_NAME=LOCAL_DEV
-POSTHOG_API_KEY=phc_000000000000000000000000000000000000
-MENDABLE_KEY=dev_key
-EOL
-echo "Environment variables set for local development."
+# Setup script for Docusaurus project
+echo "----- Setting up development environment -----"
+
+# Note: Create your own .env file manually if needed
+# See documentation for required environment variables
 
 echo "----- Installing dependencies -----"
 # Check if node_modules exists and if package-lock.json has changed
 if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
   echo "Installing dependencies with --legacy-peer-deps..."
-  npm install --legacy-peer-deps
+  npm install --legacy-peer-deps --no-fund
   
   # Verify that the installation succeeded
   if [ ! -d "node_modules" ]; then
@@ -40,11 +33,15 @@ else
   echo "Custom sidebar configuration found."
 fi
 
-# Display Docusaurus version for debugging
-echo "----- Checking Docusaurus version -----"
-npx docusaurus --version
+# Check if Docusaurus is installed
+echo "----- Checking dependencies -----"
+if [ -d "node_modules/@docusaurus" ]; then
+  echo "Docusaurus modules found in node_modules"
+else
+  echo "WARNING: Docusaurus modules not found, please check your installation"
+fi
 
-# Skip the build step in the setup script as it's already run in precommit
+# Skip the build step in the setup script
 echo "----- Setup complete -----"
 echo "✅ Project is ready for development."
 echo "Run 'npm start' to start the development server."
