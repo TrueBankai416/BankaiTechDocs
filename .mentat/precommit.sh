@@ -3,6 +3,27 @@
 # Enhanced precommit script for Docusaurus project
 echo "====== Running Precommit Checks ======"
 
+# Check for potential sensitive data or secrets - helps prevent gitleaks failures
+echo "🔍 Checking for potential sensitive data..."
+
+# Check for API keys and tokens in staged files
+if git diff --cached --name-only | xargs grep -l -E "(api_key|apikey|secret|token|password|credential).*[=:][^A-Z_]" 2>/dev/null; then
+  echo "❌ Potential sensitive data found in staged files above."
+  echo "Please remove or replace with placeholders before committing."
+  echo "Use 'PLACEHOLDER_NOT_REAL' for any example API keys or tokens."
+  exit 1
+fi
+
+# Ensure no .env files are committed
+if git diff --cached --name-only | grep -q "\.env"; then
+  echo "❌ .env files should not be committed!"
+  echo "These files may contain sensitive information."
+  echo "Please add them to .gitignore if they're not already there."
+  exit 1
+fi
+
+echo "✅ No obvious sensitive data found in staged files."
+
 # Skip manual JavaScript/TypeScript syntax checking as it's inconsistent in this environment
 # The Docusaurus build will catch syntax errors
 
