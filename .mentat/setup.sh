@@ -17,7 +17,8 @@ echo "----- Installing dependencies -----"
 # Check if node_modules exists and if package-lock.json has changed
 if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
   echo "Installing dependencies with --legacy-peer-deps..."
-  npm install --legacy-peer-deps
+  # Add --no-fund to avoid funding messages and prevent potential hanging
+  npm install --legacy-peer-deps --no-fund --no-audit
   
   # Verify that the installation succeeded
   if [ ! -d "node_modules" ]; then
@@ -40,9 +41,14 @@ else
   echo "Custom sidebar configuration found."
 fi
 
-# Display Docusaurus version for debugging
-echo "----- Checking Docusaurus version -----"
-npx docusaurus --version
+# Check Docusaurus dependency by checking package.json instead of running CLI
+echo "----- Checking Docusaurus installation -----"
+if grep -q "@docusaurus/core" package.json; then
+  DOCUSAURUS_VERSION=$(grep -o '"@docusaurus/core": "\^[0-9.]*"' package.json | cut -d'"' -f4)
+  echo "Docusaurus core version ${DOCUSAURUS_VERSION} found in package.json"
+else
+  echo "WARNING: Docusaurus core dependency not found in package.json"
+fi
 
 # Skip the build step in the setup script as it's already run in precommit
 echo "----- Setup complete -----"
