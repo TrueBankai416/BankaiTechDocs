@@ -8,6 +8,8 @@ keywords: [Ubiquiti, Unifi Controller, Access Points]
 last_update:
   author: BankaiTech
 ---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
 
 # **Introduction to Ubiquiti Access Points**
 
@@ -48,4 +50,4 @@ Ubiquiti Access Points offer an extensive range of solutions tailored to various
 
 In the modern connected world, Ubiquiti’s Access Points and the UniFi Controller software stand out by offering powerful features, scalability, and intuitive management at a competitive price point.
 
-<a href="https://www.buymeacoffee.com/BankaiTech"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=BankaiTech&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+<BuyMeACoffeeButton />
