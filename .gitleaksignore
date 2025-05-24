@@ -1,2 +1,4 @@
 # Ignore buymeacoffee SVG button with embedded font data
 static/img/buymeacoffee-button.svg
+# Ignore BankaiTech account ID in Buy Me a Coffee widget
+src/components/BuyMeACoffeeFloatingWidget/index.tsx
