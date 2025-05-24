@@ -7,7 +7,7 @@ tags:
    - Content Security Policy
    - Troubleshooting
 
-keywords: [Docusaurus, CSP, Content Security Policy, Nginx, PostHog, External Services, Buy Me A Coffee]
+keywords: [Docusaurus, CSP, Content Security Policy, Nginx, External Services]
 last_update:
   author: BankaiTech
 ---
@@ -23,26 +23,28 @@ If you're using nginx to serve your Docusaurus site and encountering Content Sec
 You might see errors like these in your browser console:
 
 ```
-Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://us-assets.i.posthog[.]com/static/array.js
-Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://cdnjs.buymeacoffee[.]com/1.0.0/widget.prod.min.js
-Content-Security-Policy: The page's settings blocked the loading of a resource (img-src) at data:image/svg+xml
-Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src) at https://api.external-service[.]example/v1/initialize
+Content-Security-Policy: The page's settings blocked a script (script-src-elem)
+Content-Security-Policy: The page's settings blocked the loading of a resource (img-src) 
+Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src)
 ```
 
-## ***External Services Used***
+## ***Understanding CSP***
 
-This Docusaurus site uses several external services that require CSP permissions:
+Content Security Policy is a security feature that helps prevent XSS attacks by controlling which resources can be loaded. However, it can also block legitimate external services used by your Docusaurus site.
 
-- **PostHog Analytics**: `us-assets.i.posthog[.]com` and `us.i.posthog[.]com`
-- **Buy Me A Coffee Widget**: `cdnjs.buymeacoffee[.]com`
-- **AI Search Service**: `api.search-service[.]example`
-- **SVG Data URIs**: Used for icons and graphics
+### **Common External Services**
+
+Modern Docusaurus sites often use:
+- **Analytics services** for tracking
+- **Widget services** for donations/support
+- **Search services** for AI-powered search
+- **SVG Data URIs** for icons and graphics
 
 ## ***Nginx CSP Configuration***
 
-Add these CSP headers to your nginx configuration to allow the required external resources:
+Add these CSP headers to your nginx configuration to allow required external resources:
 
-```nginx title="Complete CSP Configuration for nginx" showLineNumbers
+```nginx title="CSP Configuration for nginx" showLineNumbers
 server {
     listen 443 ssl;
     http2 on;
@@ -54,19 +56,14 @@ server {
     add_header Content-Security-Policy "
         default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-            https://ssl.google-analytics[.]com 
-            https://assets.zendesk[.]com 
-            https://connect.facebook[.]net
-            https://us-assets.i.posthog[.]com
-            https://cdnjs.buymeacoffee[.]com;
+            https://external-analytics-service.com 
+            https://widget-service.com;
         img-src 'self' 
-            https://ssl.google-analytics[.]com 
-            https://s-static.ak.facebook[.]com 
-            https://assets.zendesk[.]com
+            https://external-analytics-service.com 
             data:;
         connect-src 'self'
-            https://api.search-service[.]example
-            https://us.i.posthog[.]com;
+            https://search-service.com
+            https://analytics-service.com;
         style-src 'self' 'unsafe-inline';
         font-src 'self' data:;
         frame-src 'self';
@@ -84,19 +81,18 @@ server {
 
 ## ***Minimal CSP Configuration***
 
-If you prefer a more minimal approach, you can add just the required domains:
+For a basic setup, use this minimal configuration:
 
 ```nginx title="Minimal CSP Configuration" showLineNumbers
 # Add to your nginx server block
 add_header Content-Security-Policy "
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-        https://us-assets.i.posthog[.]com 
-        https://cdnjs.buymeacoffee[.]com;
+        https://your-analytics-domain.com 
+        https://your-widget-domain.com;
     img-src 'self' data:;
     connect-src 'self' 
-        https://api.search-service[.]example 
-        https://us.i.posthog[.]com;
+        https://your-api-domain.com;
     style-src 'self' 'unsafe-inline';
 " always;
 ```
@@ -108,7 +104,7 @@ Controls which scripts can be executed:
 - `'self'`: Scripts from your own domain
 - `'unsafe-inline'`: Inline scripts (required by Docusaurus)
 - `'unsafe-eval'`: Dynamic code evaluation (required by some components)
-- External domains for PostHog and Buy Me A Coffee
+- External domains for analytics and widgets
 
 ### **img-src**
 Controls which images can be loaded:
@@ -118,26 +114,18 @@ Controls which images can be loaded:
 ### **connect-src**
 Controls which URLs can be loaded using AJAX, WebSockets, etc.:
 - `'self'`: Your own domain
-- External APIs like search services and PostHog
+- External services and analytics
 
-## ***Testing Your Configuration***
+## ***Implementation Steps***
 
-After updating your nginx configuration:
-
-1. **Reload nginx**:
+1. **Identify your external services** by checking browser console errors
+2. **Update your nginx configuration** with the appropriate domains
+3. **Test the configuration**:
    ```bash
    sudo nginx -t
    sudo systemctl reload nginx
    ```
-
-2. **Clear browser cache** and reload your site
-
-3. **Check browser console** for any remaining CSP errors
-
-4. **Test functionality**:
-   - Search should work (AI services)
-   - Analytics should track (PostHog)
-   - Buy Me A Coffee widget should display
+4. **Verify functionality** works as expected
 
 ## ***Troubleshooting Tips***
 
@@ -181,5 +169,15 @@ When adding new external services to your Docusaurus site:
 - **Avoid 'unsafe-eval'** if your site doesn't require it
 - **Regularly review** your CSP policy as you add new features
 - **Test in multiple browsers** to ensure compatibility
+- **Monitor for new CSP violations** in production
+
+## ***Common Domain Patterns***
+
+Replace the example domains in the configuration with your actual service domains:
+
+- **Analytics**: Usually have domains ending in analytics-related TLDs
+- **CDN Services**: Often use CDN-specific domain patterns
+- **Widget Services**: Typically have widget or button-related domains
+- **Search Services**: Usually have search or AI-related domain names
 
 <BuyMeACoffeeButton />
