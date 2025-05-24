@@ -7,7 +7,7 @@ tags:
    - Content Security Policy
    - Troubleshooting
 
-keywords: [Docusaurus, CSP, Content Security Policy, Nginx, PostHog, Mendable, Buy Me A Coffee]
+keywords: [Docusaurus, CSP, Content Security Policy, Nginx, PostHog, External Services, Buy Me A Coffee]
 last_update:
   author: BankaiTech
 ---
@@ -26,7 +26,7 @@ You might see errors like these in your browser console:
 Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://us-assets.i.posthog[.]com/static/array.js
 Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://cdnjs.buymeacoffee[.]com/1.0.0/widget.prod.min.js
 Content-Security-Policy: The page's settings blocked the loading of a resource (img-src) at data:image/svg+xml
-Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src) at https://api.mendable[.]ai/v1/initializeMendable
+Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src) at https://api.external-service[.]example/v1/initialize
 ```
 
 ## ***External Services Used***
@@ -35,7 +35,7 @@ This Docusaurus site uses several external services that require CSP permissions
 
 - **PostHog Analytics**: `us-assets.i.posthog[.]com` and `us.i.posthog[.]com`
 - **Buy Me A Coffee Widget**: `cdnjs.buymeacoffee[.]com`
-- **Mendable AI Search**: `api.mendable[.]ai`
+- **AI Search Service**: `api.search-service[.]example`
 - **SVG Data URIs**: Used for icons and graphics
 
 ## ***Nginx CSP Configuration***
@@ -65,7 +65,7 @@ server {
             https://assets.zendesk[.]com
             data:;
         connect-src 'self'
-            https://api.mendable[.]ai
+            https://api.search-service[.]example
             https://us.i.posthog[.]com;
         style-src 'self' 'unsafe-inline';
         font-src 'self' data:;
@@ -95,7 +95,7 @@ add_header Content-Security-Policy "
         https://cdnjs.buymeacoffee[.]com;
     img-src 'self' data:;
     connect-src 'self' 
-        https://api.mendable[.]ai 
+        https://api.search-service[.]example 
         https://us.i.posthog[.]com;
     style-src 'self' 'unsafe-inline';
 " always;
@@ -118,7 +118,7 @@ Controls which images can be loaded:
 ### **connect-src**
 Controls which URLs can be loaded using AJAX, WebSockets, etc.:
 - `'self'`: Your own domain
-- External APIs like Mendable AI and PostHog
+- External APIs like search services and PostHog
 
 ## ***Testing Your Configuration***
 
@@ -135,7 +135,7 @@ After updating your nginx configuration:
 3. **Check browser console** for any remaining CSP errors
 
 4. **Test functionality**:
-   - Search should work (Mendable AI)
+   - Search should work (AI services)
    - Analytics should track (PostHog)
    - Buy Me A Coffee widget should display
 
