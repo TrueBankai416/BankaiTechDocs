@@ -1,0 +1,185 @@
+---
+title: Content Security Policy (CSP) Issues
+tags:
+   - Docusaurus
+   - Nginx
+   - CSP
+   - Content Security Policy
+   - Troubleshooting
+
+keywords: [Docusaurus, CSP, Content Security Policy, Nginx, PostHog, Mendable, Buy Me A Coffee]
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Content Security Policy (CSP) Issues**
+
+If you're using nginx to serve your Docusaurus site and encountering Content Security Policy (CSP) errors, this guide will help you fix them.
+
+## ***Common CSP Errors***
+
+You might see errors like these in your browser console:
+
+```
+Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://us-assets.i.posthog.com/static/array.js
+Content-Security-Policy: The page's settings blocked a script (script-src-elem) at https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js
+Content-Security-Policy: The page's settings blocked the loading of a resource (img-src) at data:image/svg+xml
+Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src) at https://api.mendable.ai/v1/initializeMendable
+```
+
+## ***External Services Used***
+
+This Docusaurus site uses several external services that require CSP permissions:
+
+- **PostHog Analytics**: `us-assets.i.posthog.com` and `us.i.posthog.com`
+- **Buy Me A Coffee Widget**: `cdnjs.buymeacoffee.com`
+- **Mendable AI Search**: `api.mendable.ai`
+- **SVG Data URIs**: Used for icons and graphics
+
+## ***Nginx CSP Configuration***
+
+Add these CSP headers to your nginx configuration to allow the required external resources:
+
+```nginx title="Complete CSP Configuration for nginx" showLineNumbers
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name your-domain.com;
+    
+    # Your existing SSL and other configurations...
+    
+    # Content Security Policy Headers
+    add_header Content-Security-Policy "
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+            https://ssl.google-analytics.com 
+            https://assets.zendesk.com 
+            https://connect.facebook.net
+            https://us-assets.i.posthog.com
+            https://cdnjs.buymeacoffee.com;
+        img-src 'self' 
+            https://ssl.google-analytics.com 
+            https://s-static.ak.facebook.com 
+            https://assets.zendesk.com
+            data:;
+        connect-src 'self'
+            https://api.mendable.ai
+            https://us.i.posthog.com;
+        style-src 'self' 'unsafe-inline';
+        font-src 'self' data:;
+        frame-src 'self';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+    " always;
+    
+    # Your existing location blocks...
+    location / {
+        # Your proxy configuration
+    }
+}
+```
+
+## ***Minimal CSP Configuration***
+
+If you prefer a more minimal approach, you can add just the required domains:
+
+```nginx title="Minimal CSP Configuration" showLineNumbers
+# Add to your nginx server block
+add_header Content-Security-Policy "
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+        https://us-assets.i.posthog.com 
+        https://cdnjs.buymeacoffee.com;
+    img-src 'self' data:;
+    connect-src 'self' 
+        https://api.mendable.ai 
+        https://us.i.posthog.com;
+    style-src 'self' 'unsafe-inline';
+" always;
+```
+
+## ***Directive Explanations***
+
+### **script-src**
+Controls which scripts can be executed:
+- `'self'`: Scripts from your own domain
+- `'unsafe-inline'`: Inline scripts (required by Docusaurus)
+- `'unsafe-eval'`: Dynamic code evaluation (required by some components)
+- External domains for PostHog and Buy Me A Coffee
+
+### **img-src**
+Controls which images can be loaded:
+- `'self'`: Images from your own domain
+- `data:`: Data URIs for SVG icons and graphics
+
+### **connect-src**
+Controls which URLs can be loaded using AJAX, WebSockets, etc.:
+- `'self'`: Your own domain
+- External APIs like Mendable AI and PostHog
+
+## ***Testing Your Configuration***
+
+After updating your nginx configuration:
+
+1. **Reload nginx**:
+   ```bash
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+
+2. **Clear browser cache** and reload your site
+
+3. **Check browser console** for any remaining CSP errors
+
+4. **Test functionality**:
+   - Search should work (Mendable AI)
+   - Analytics should track (PostHog)
+   - Buy Me A Coffee widget should display
+
+## ***Troubleshooting Tips***
+
+### **Configuration Not Working?**
+
+1. **Check nginx syntax**:
+   ```bash
+   sudo nginx -t
+   ```
+
+2. **Verify headers are being sent**:
+   ```bash
+   curl -I https://your-domain.com
+   ```
+
+3. **Check nginx error logs**:
+   ```bash
+   sudo tail -f /var/log/nginx/error.log
+   ```
+
+### **Still Getting Errors?**
+
+If you're still seeing CSP errors after applying the configuration:
+
+1. **Check for multiple CSP headers** - only one should be present
+2. **Ensure no conflicting CSP in your application**
+3. **Verify the domain names match exactly** (check browser console for exact URLs)
+
+### **Adding New External Services**
+
+When adding new external services to your Docusaurus site:
+
+1. **Check browser console** for CSP errors
+2. **Identify the blocked domain** from the error message
+3. **Add the domain** to the appropriate CSP directive
+4. **Test thoroughly** after making changes
+
+## ***Security Considerations***
+
+- **Use specific domains** instead of wildcards when possible
+- **Avoid 'unsafe-eval'** if your site doesn't require it
+- **Regularly review** your CSP policy as you add new features
+- **Test in multiple browsers** to ensure compatibility
+
+<BuyMeACoffeeButton />
