@@ -8,6 +8,8 @@ keywords: [Reverse Proxy, Nginx]
 last_update:
   author: BankaiTech
 ---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
 
 # **Introduction to Nginx**
 
@@ -52,4 +54,4 @@ Nginx has proven itself as a key player in the world of web servers and beyond, 
 
 Given its capacities to improve site reliability and performance, Nginx is a strategic choice for developers, system administrators, and businesses looking to scale and optimize their web applications.
 
-<a href="https://www.buymeacoffee.com/BankaiTech"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=BankaiTech&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+<BuyMeACoffeeButton />
