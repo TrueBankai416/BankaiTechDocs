@@ -2,16 +2,22 @@ import React, { useEffect } from 'react';
 
 const BuyMeACoffeeFloatingWidget: React.FC = () => {
   useEffect(() => {
-    // Check if the script is already loaded to avoid duplicates
-    if (document.querySelector('script[data-name="BMC-Widget"]')) {
-      return;
+    // Remove any existing widget elements and scripts
+    const existingWidget = document.querySelector('#bmc-wbtn');
+    if (existingWidget) {
+      existingWidget.remove();
+    }
+    
+    const existingScript = document.querySelector('script[data-name="BMC-Widget"]');
+    if (existingScript) {
+      existingScript.remove();
     }
 
     // Create and configure the script element
     const script = document.createElement('script');
     script.setAttribute('data-name', 'BMC-Widget');
     script.setAttribute('data-cfasync', 'false');
-    script.src = 'https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js';
+    script.src = `https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js?v=${Date.now()}`;
     script.setAttribute('data-id', 'BankaiTech');
     script.setAttribute('data-description', 'Support me on Buy me a coffee!');
     script.setAttribute('data-message', '');
