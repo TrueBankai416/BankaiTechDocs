@@ -1,2 +1,8 @@
 # Ignore buymeacoffee SVG button with embedded font data
 static/img/buymeacoffee-button.svg
+
+# Ignore CSP documentation with external service URLs - use glob pattern
+**/CSP.mdx
+
+# Ignore files containing external service URLs for documentation
+docs/Docusaurus/Docs/Troubleshooting/CSP.mdx
