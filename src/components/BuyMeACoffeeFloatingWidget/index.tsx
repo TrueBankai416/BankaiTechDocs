@@ -16,9 +16,9 @@ const BuyMeACoffeeFloatingWidget: React.FC = () => {
     script.setAttribute('data-description', 'Support me on Buy me a coffee!');
     script.setAttribute('data-message', '');
     script.setAttribute('data-color', '#5F7FFF');
-    script.setAttribute('data-position', 'Left');
+    script.setAttribute('data-position', 'Right');
     script.setAttribute('data-x_margin', '18');
-    script.setAttribute('data-y_margin', '18');
+    script.setAttribute('data-y_margin', '80');
 
     // Append the script to the document head
     document.head.appendChild(script);
