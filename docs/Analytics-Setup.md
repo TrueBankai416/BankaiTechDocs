@@ -1,84 +1,56 @@
 # Analytics Setup
 
-This documentation site supports optional PostHog analytics integration to track page views and user interactions.
+This documentation site supports optional third-party analytics integration to track page views and user interactions.
 
-## PostHog CORS Error Fix ✅
+## CORS Error Resolution ✅
 
-The PostHog CORS error has been **completely resolved**. PostHog configuration has been removed from the default setup to eliminate security scan issues and CORS errors.
+The previous CORS error has been **completely resolved**. Analytics configuration has been removed from the default setup to eliminate any issues.
 
-Analytics are now completely optional and can be added by users who want them.
+Analytics are now completely optional and can be added by users who need them.
 
-## Setting Up PostHog Analytics (Optional)
+## Adding Analytics (Optional)
 
-If you want to enable analytics for your documentation site, follow these steps:
+This site can be configured with various analytics solutions. The most popular options include:
 
-### 1. Get a PostHog API Key
+- Google Analytics
+- Analytics providers like Mixpanel, Amplitude
+- Open-source solutions
+- Self-hosted analytics
 
-1. Sign up for a free account at [PostHog](https://posthog.com)
-2. Create a new project
-3. Copy your project API key from the project settings
+### General Setup Process
 
-### 2. Add Environment Variable
+1. **Choose your analytics provider** and create an account
+2. **Get your tracking credentials** from the provider's dashboard
+3. **Add environment variables** to your `.env` file
+4. **Configure the analytics plugin** in `docusaurus.config.ts`
+5. **Install required packages** via npm
+6. **Test and verify** the integration works
 
-1. Open the `.env` file in the root directory
-2. Add your PostHog API key:
-   ```env
-   # Add this line with your actual API key:
-   POSTHOG_API_KEY=your_posthog_project_key
-   ```
+### Configuration Guidelines
 
-### 3. Add PostHog Configuration
+When adding analytics:
 
-1. Open `docusaurus.config.ts`
-2. Find the `plugins: [` array around line 88
-3. Add the PostHog plugin configuration:
-   ```typescript
-   plugins: [
-     // ... existing plugins ...
-     
-     // Add PostHog analytics
-     [
-       'posthog-docusaurus',
-       {
-         id: 'posthog',
-         apiKey: process.env.POSTHOG_API_KEY,
-         appUrl: 'https://us.i.posthog.com', // optional
-         enableInDevelopment: false, // optional
-       },
-     ],
-     
-   ],
-   ```
+- Use environment variables for sensitive configuration
+- Only enable in production environments  
+- Respect user privacy preferences
+- Follow GDPR and privacy regulations
+- Test thoroughly before deployment
 
-### 4. Install PostHog Package
+### Documentation Resources
 
-Add the PostHog Docusaurus plugin:
-```bash
-npm install posthog-docusaurus
-```
+For specific analytics integrations, consult:
 
-### 5. Verify Setup
-
-After configuration:
-
-1. Build and serve your site: `npm run build && npm run serve`
-2. Check the browser developer tools for any errors
-3. Verify analytics are being recorded in your PostHog dashboard
-
-## Configuration Options
-
-Available PostHog configuration options:
-
-- **apiKey**: Your PostHog project API key (required)
-- **appUrl**: PostHog instance URL (defaults to `https://us.i.posthog.com`)
-- **enableInDevelopment**: Set to `false` to disable analytics in development mode
+- [Docusaurus Analytics Documentation](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-google-analytics)
+- Your chosen analytics provider's documentation
+- Community guides and examples
 
 ## Privacy Considerations
 
-- PostHog respects user privacy preferences
-- Consider adding a privacy policy if collecting analytics
-- Users can opt out using browser settings or privacy extensions
+- Always inform users about data collection
+- Provide opt-out mechanisms where required
+- Consider cookie consent banners
+- Review privacy policies regularly
 
 ## No Analytics Needed?
 
-The site works perfectly without any analytics configuration. Simply skip this setup if you don't need usage tracking.
+The site works perfectly without any analytics configuration. This is completely optional based on your needs.
