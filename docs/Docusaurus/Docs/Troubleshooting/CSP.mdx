@@ -44,7 +44,11 @@ Modern Docusaurus sites often use:
 
 Add these CSP headers to your nginx configuration to allow required external resources:
 
-```nginx title="CSP Configuration for nginx" showLineNumbers
+## ***⚠️ Important: Use Single-Line Format***
+
+**Multi-line CSP headers can cause 502 Bad Gateway errors.** Always use single-line format:
+
+```nginx title="Single-Line CSP Configuration (Recommended)" showLineNumbers
 server {
     listen 443 ssl;
     http2 on;
@@ -52,25 +56,8 @@ server {
     
     # Your existing SSL and other configurations...
     
-    # Content Security Policy Headers
-    add_header Content-Security-Policy "
-        default-src 'self';
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-            https://external-analytics-service.com 
-            https://widget-service.com;
-        img-src 'self' 
-            https://external-analytics-service.com 
-            data:;
-        connect-src 'self'
-            https://search-service.com
-            https://analytics-service.com;
-        style-src 'self' 'unsafe-inline';
-        font-src 'self' data:;
-        frame-src 'self';
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-    " always;
+    # Content Security Policy - SINGLE LINE FORMAT
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://external-analytics-assets.com https://widget-service.com; img-src 'self' https://external-analytics.com data:; connect-src 'self' https://search-service.com https://analytics-api.com https://analytics-app.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" always;
     
     # Your existing location blocks...
     location / {
@@ -79,9 +66,17 @@ server {
 }
 ```
 
+## ***Real-World Example***
+
+For common services like PostHog analytics, you'll need multiple domains:
+
+```nginx title="PostHog Analytics Example" showLineNumbers
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://cdnjs.buymeacoffee.com; img-src 'self' data:; connect-src 'self' https://api.mendable.ai https://us.i.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline';" always;
+```
+
 ## ***Minimal CSP Configuration***
 
-For a basic setup, use this minimal configuration:
+For basic testing, use this minimal configuration:
 
 ```nginx title="Minimal CSP Configuration" showLineNumbers
 # Add to your nginx server block
@@ -153,6 +148,47 @@ If you're still seeing CSP errors after applying the configuration:
 1. **Check for multiple CSP headers** - only one should be present
 2. **Ensure no conflicting CSP in your application**
 3. **Verify the domain names match exactly** (check browser console for exact URLs)
+
+### **502 Bad Gateway / Cloudflare Errors**
+
+If you get a white page with "Bad Gateway" or Cloudflare errors after adding CSP:
+
+1. **Check nginx syntax**:
+   ```bash
+   sudo nginx -t
+   ```
+
+2. **Use single-line CSP format** (multi-line can cause HTTP protocol errors):
+   ```nginx
+   # ❌ DON'T - Multi-line format
+   add_header Content-Security-Policy "
+       default-src 'self';
+       script-src 'self';
+   " always;
+   
+   # ✅ DO - Single-line format  
+   add_header Content-Security-Policy "default-src 'self'; script-src 'self';" always;
+   ```
+
+3. **Temporarily remove CSP** to confirm nginx works:
+   ```bash
+   # Comment out CSP line and test
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+
+4. **Start with minimal CSP** and add domains gradually:
+   ```nginx
+   add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' data: https:;" always;
+   ```
+
+### **Multiple Domains for Same Service**
+
+Some services (like PostHog) use multiple domains:
+- **Assets domain**: `us-assets.i.posthog.com` (for scripts)
+- **API domain**: `us.i.posthog.com` (for data collection)  
+- **App domain**: `app.posthog.com` (for events/tracking)
+
+Add all required domains to avoid partial functionality.
 
 ### **Adding New External Services**
 
