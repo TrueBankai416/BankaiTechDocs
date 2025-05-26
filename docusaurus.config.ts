@@ -89,7 +89,7 @@ const config: Config = {
  //       },
  //     ],
      // Only load PostHog when a valid API key is provided (not a placeholder)
-     ...(process.env.POSTHOG_API_KEY && process.env.POSTHOG_API_KEY.startsWith('phc_') && process.env.POSTHOG_API_KEY.length > 10 && !process.env.POSTHOG_API_KEY.match(/^phc_0+$/) ? [
+     ...(process.env.POSTHOG_API_KEY && process.env.POSTHOG_API_KEY.startsWith('phc_') && process.env.POSTHOG_API_KEY !== 'phc_PLACEHOLDER_API_KEY' && process.env.POSTHOG_API_KEY.length > 20 ? [
       [
         'posthog-docusaurus',
         {

@@ -27,7 +27,7 @@ If you want to enable analytics for your documentation site:
 2. Replace the placeholder PostHog API key:
    ```env
    # Replace this placeholder:
-   POSTHOG_API_KEY=phc_000000000000000000000000000000000000
+   POSTHOG_API_KEY=phc_PLACEHOLDER_API_KEY
    
    # With your real API key:
    POSTHOG_API_KEY=phc_your_actual_api_key_here
