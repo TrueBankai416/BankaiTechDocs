@@ -88,15 +88,7 @@ const config: Config = {
 //         ignoreStub: true
  //       },
  //     ],
-      [
-        'posthog-docusaurus',
-        {
-          id: 'posthog',
-          apiKey: process.env.POSTHOG_API_KEY,
-          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
-          enableInDevelopment: false, // optional
-        },
-      ],
+      // PostHog analytics is optional - see docs/Analytics-Setup.md for configuration instructions
      
     ],
 
