@@ -16,7 +16,7 @@ If you want to enable analytics for your documentation site, follow these steps:
 
 1. Sign up for a free account at [PostHog](https://posthog.com)
 2. Create a new project
-3. Copy your project API key (starts with `phc_`)
+3. Copy your project API key from the project settings
 
 ### 2. Add Environment Variable
 
@@ -24,7 +24,7 @@ If you want to enable analytics for your documentation site, follow these steps:
 2. Add your PostHog API key:
    ```env
    # Add this line with your actual API key:
-   POSTHOG_API_KEY=phc_your_actual_api_key_here
+   POSTHOG_API_KEY=your_posthog_project_key
    ```
 
 ### 3. Add PostHog Configuration
