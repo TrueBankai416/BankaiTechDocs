@@ -1,5 +1,6 @@
 # Ignore buymeacoffee SVG button with embedded font data
 static/img/buymeacoffee-button.svg
 
-# Ignore placeholder PostHog API key used in configuration and documentation
-phc_000000000000000000000000000000000000
+# Ignore files containing placeholder PostHog API key
+.env
+docs/Analytics-Setup.md
