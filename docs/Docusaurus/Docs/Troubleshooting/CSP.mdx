@@ -66,13 +66,23 @@ server {
 }
 ```
 
-## ***Real-World Example***
+## ***Real-World Examples***
 
-For common services like PostHog analytics, you'll need multiple domains:
-
+### **PostHog Analytics Only**
 ```nginx title="PostHog Analytics Example" showLineNumbers
 add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://cdnjs.buymeacoffee.com; img-src 'self' data:; connect-src 'self' https://api.mendable.ai https://us.i.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline';" always;
 ```
+
+### **With Google Fonts**
+If your site uses Google Fonts, add these domains:
+
+```nginx title="PostHog + Google Fonts Example" showLineNumbers
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://cdnjs.buymeacoffee.com; img-src 'self' data:; connect-src 'self' https://api.mendable.ai https://us.i.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;" always;
+```
+
+**Google Fonts requires two domains:**
+- `fonts.googleapis.com` → CSS stylesheets (add to `style-src`)
+- `fonts.gstatic.com` → Font files (add to `font-src`)
 
 ## ***Minimal CSP Configuration***
 
