@@ -88,16 +88,7 @@ For basic testing, use this minimal configuration:
 
 ```nginx title="Minimal CSP Configuration" showLineNumbers
 # Add to your nginx server block
-add_header Content-Security-Policy "
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-        https://your-analytics-domain.com 
-        https://your-widget-domain.com;
-    img-src 'self' data:;
-    connect-src 'self' 
-        https://your-api-domain.com;
-    style-src 'self' 'unsafe-inline';
-" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://your-analytics-domain.com https://your-widget-domain.com; img-src 'self' data:; connect-src 'self' https://your-api-domain.com; style-src 'self' 'unsafe-inline';" always;
 ```
 
 ## ***Directive Explanations***
