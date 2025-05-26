@@ -88,18 +88,7 @@ const config: Config = {
 //         ignoreStub: true
  //       },
  //     ],
-     // Only load PostHog when a valid API key is provided (not a placeholder)
-     ...(process.env.POSTHOG_API_KEY && process.env.POSTHOG_API_KEY.startsWith('phc_') && process.env.POSTHOG_API_KEY !== 'phc_PLACEHOLDER_API_KEY' && process.env.POSTHOG_API_KEY.length > 20 ? [
-      [
-        'posthog-docusaurus',
-        {
-          id: 'posthog',
-          apiKey: process.env.POSTHOG_API_KEY,
-          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
-          enableInDevelopment: false, // optional
-        },
-      ],
-     ] : []),
+     // PostHog analytics is optional - see docs/Analytics-Setup.md for configuration instructions
      
     ],
 

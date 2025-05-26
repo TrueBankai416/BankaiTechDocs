@@ -1,19 +1,16 @@
 # Analytics Setup
 
-This documentation site includes optional PostHog analytics integration to track page views and user interactions.
+This documentation site supports optional PostHog analytics integration to track page views and user interactions.
 
-## PostHog CORS Error Fix
+## PostHog CORS Error Fix ✅
 
-If you were seeing CORS errors like:
-```
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://app.posthog.com/e/?ip=1&_=1748274014949&ver=1.46.2. (Reason: CORS request did not succeed). Status code: (null).
-```
+The PostHog CORS error has been **completely resolved**. PostHog configuration has been removed from the default setup to eliminate security scan issues and CORS errors.
 
-This was caused by PostHog trying to initialize with a placeholder API key. **This issue has been fixed** - PostHog will now only load when a valid API key is provided.
+Analytics are now completely optional and can be added by users who want them.
 
 ## Setting Up PostHog Analytics (Optional)
 
-If you want to enable analytics for your documentation site:
+If you want to enable analytics for your documentation site, follow these steps:
 
 ### 1. Get a PostHog API Key
 
@@ -21,33 +18,60 @@ If you want to enable analytics for your documentation site:
 2. Create a new project
 3. Copy your project API key (starts with `phc_`)
 
-### 2. Update Environment Variables
+### 2. Add Environment Variable
 
 1. Open the `.env` file in the root directory
-2. Replace the placeholder PostHog API key:
+2. Add your PostHog API key:
    ```env
-   # Replace this placeholder:
-   POSTHOG_API_KEY=phc_PLACEHOLDER_API_KEY
-   
-   # With your real API key:
+   # Add this line with your actual API key:
    POSTHOG_API_KEY=phc_your_actual_api_key_here
    ```
 
-### 3. Configuration Options
+### 3. Add PostHog Configuration
 
-The PostHog configuration in `docusaurus.config.ts` includes these options:
+1. Open `docusaurus.config.ts`
+2. Find the `plugins: [` array around line 88
+3. Add the PostHog plugin configuration:
+   ```typescript
+   plugins: [
+     // ... existing plugins ...
+     
+     // Add PostHog analytics
+     [
+       'posthog-docusaurus',
+       {
+         id: 'posthog',
+         apiKey: process.env.POSTHOG_API_KEY,
+         appUrl: 'https://us.i.posthog.com', // optional
+         enableInDevelopment: false, // optional
+       },
+     ],
+     
+   ],
+   ```
 
-- **apiKey**: Your PostHog project API key
-- **appUrl**: PostHog instance URL (defaults to `https://us.i.posthog.com`)
-- **enableInDevelopment**: Set to `false` to disable analytics in development mode
+### 4. Install PostHog Package
 
-### 4. Verify Setup
+If not already installed, add the PostHog Docusaurus plugin:
+```bash
+npm install posthog-docusaurus
+```
 
-After updating your API key:
+### 5. Verify Setup
 
-1. Build and serve your site
+After configuration:
+
+1. Build and serve your site: `npm run build && npm run serve`
 2. Check the browser developer tools for any errors
 3. Verify analytics are being recorded in your PostHog dashboard
+
+## Configuration Options
+
+Available PostHog configuration options:
+
+- **apiKey**: Your PostHog project API key (required)
+- **appUrl**: PostHog instance URL (defaults to `https://us.i.posthog.com`)
+- **enableInDevelopment**: Set to `false` to disable analytics in development mode
 
 ## Privacy Considerations
 
@@ -55,11 +79,6 @@ After updating your API key:
 - Consider adding a privacy policy if collecting analytics
 - Users can opt out using browser settings or privacy extensions
 
-## Disabling Analytics
+## No Analytics Needed?
 
-To completely disable analytics:
-
-1. Set `POSTHOG_API_KEY=` (empty) in your `.env` file, or
-2. Remove the PostHog configuration from `docusaurus.config.ts`
-
-The site will work perfectly without analytics enabled.
+The site works perfectly without any analytics configuration. Simply skip this setup if you don't need usage tracking.
