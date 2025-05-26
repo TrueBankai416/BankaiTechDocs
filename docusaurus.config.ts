@@ -88,6 +88,8 @@ const config: Config = {
 //         ignoreStub: true
  //       },
  //     ],
+     // Only load PostHog when a valid API key is provided (not the placeholder)
+     ...(process.env.POSTHOG_API_KEY && process.env.POSTHOG_API_KEY !== 'phc_000000000000000000000000000000000000' ? [
       [
         'posthog-docusaurus',
         {
@@ -97,6 +99,7 @@ const config: Config = {
           enableInDevelopment: false, // optional
         },
       ],
+     ] : []),
      
     ],
 
