@@ -6,3 +6,6 @@ static/img/buymeacoffee-button.svg
 
 # Ignore files containing external service URLs for documentation
 docs/Docusaurus/Docs/Troubleshooting/CSP.mdx
+
+# Ignore BankaiTech account ID in Buy Me a Coffee widget
+src/components/BuyMeACoffeeFloatingWidget/
