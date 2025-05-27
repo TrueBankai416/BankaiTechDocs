@@ -14,9 +14,10 @@ const config: Config = {
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
   favicon: 'img/favcon.ico',
 
-  // Adopt Docusaurus Faster
+  // Adopt Docusaurus Faster and v4
   future: {
     experimental_faster: true,
+    v4: true,
   },
   customFields:{
     // Mendable API key for AI-powered search functionality
