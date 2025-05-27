@@ -10,8 +10,8 @@ const BuyMeACoffeeFloatingWidget: React.FC = () => {
       onClick={handleClick}
       style={{
         position: 'fixed',
-        bottom: '150px',
-        right: '18px',
+        bottom: '50px',
+        right: '5px',
         zIndex: 9999,
         cursor: 'pointer',
         backgroundColor: '#5F7FFF',
