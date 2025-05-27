@@ -14,6 +14,17 @@ const config: Config = {
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
   favicon: 'img/favcon.ico',
 
+  // Content Security Policy configuration to allow Giscus comments
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        'http-equiv': 'Content-Security-Policy',
+        content: "default-src 'self'; frame-src 'self' https://giscus.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://giscus.app https://cdnjs.buymeacoffee.com https://widget.buymeacoffee.com; style-src 'self' 'unsafe-inline' https://giscus.app; img-src 'self' data: https:; connect-src 'self' https://giscus.app https://api.github.com; font-src 'self' data:;",
+      },
+    },
+  ],
+
   // Adopt Docusaurus Faster and v4
   future: {
     experimental_faster: true,

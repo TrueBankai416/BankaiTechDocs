@@ -37,7 +37,62 @@ Modern Docusaurus sites often use:
 - **Analytics services** for tracking
 - **Widget services** for donations/support
 - **Search services** for AI-powered search
+- **Comment systems** like Giscus for GitHub-based comments
 - **SVG Data URIs** for icons and graphics
+
+## ***Docusaurus CSP Configuration (GitHub Pages)***
+
+If you're deploying to GitHub Pages, you may encounter CSP issues because GitHub Pages sets strict CSP headers by default. You can configure CSP directly in your `docusaurus.config.ts` file:
+
+### **Basic Giscus Comments Configuration**
+
+```typescript title="docusaurus.config.ts" showLineNumbers
+const config: Config = {
+  title: 'Your Site Title',
+  // ... other config
+  
+  // Content Security Policy configuration to allow Giscus comments
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        'http-equiv': 'Content-Security-Policy',
+        content: "default-src 'self'; frame-src 'self' https://giscus.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://giscus.app; style-src 'self' 'unsafe-inline' https://giscus.app; img-src 'self' data: https:; connect-src 'self' https://giscus.app https://api.github.com; font-src 'self' data:;",
+      },
+    },
+  ],
+  
+  // ... rest of your config
+};
+```
+
+### **With Additional Services**
+
+```typescript title="docusaurus.config.ts - Multiple Services" showLineNumbers
+headTags: [
+  {
+    tagName: 'meta',
+    attributes: {
+      'http-equiv': 'Content-Security-Policy',
+      content: "default-src 'self'; frame-src 'self' https://giscus.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://giscus.app https://cdnjs.buymeacoffee.com https://widget.buymeacoffee.com https://us-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://giscus.app; img-src 'self' data: https:; connect-src 'self' https://giscus.app https://api.github.com https://api.mendable.ai https://us.i.posthog.com; font-src 'self' data:;",
+    },
+  },
+],
+```
+
+### **Common Giscus CSP Errors**
+
+If you see these errors for Giscus comments:
+
+```
+Content-Security-Policy: The page's settings blocked the loading of a resource (frame-src) at https://giscus.app/
+```
+
+Add these domains to your CSP:
+- **frame-src**: `https://giscus.app` (for the comment iframe)
+- **script-src**: `https://giscus.app` (for Giscus JavaScript)
+- **style-src**: `https://giscus.app` (for Giscus CSS)
+- **connect-src**: `https://giscus.app https://api.github.com` (for API calls)
 
 ## ***Nginx CSP Configuration***
 
