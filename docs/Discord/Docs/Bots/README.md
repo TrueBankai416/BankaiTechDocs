@@ -7,6 +7,8 @@ keywords: [Discord, Bot]
 last_update:
   author: BankaiTech
 ---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
 
 Discord bots are automated programs designed to perform a wide array of tasks within Discord servers (guilds), ranging from administrative functions to enhancing user engagement and interaction. These bots act as specialized members within a server, executing commands, moderating conversations, or providing entertainment and information without the need for human intervention. The versatility and expandability of Discord bots make them an invaluable tool for server administrators and community leaders, allowing for a tailored experience that can adapt to the specific needs and culture of each server.
 
@@ -41,4 +43,4 @@ Server administrators can add bots to their servers by following an invite link 
 
 Discord bots are a powerful and flexible tool for enhancing and managing Discord servers. They automate routine tasks, enrich the server culture with interactive and entertainment options, and bridge the gap between Discord and external applications. With careful selection and management, bots can significantly contribute to creating a vibrant, engaging, and well-organized Discord community.
 
-<a href="https://www.buymeacoffee.com/BankaiTech"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=BankaiTech&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+<BuyMeACoffeeButton />

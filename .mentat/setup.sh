@@ -40,9 +40,9 @@ else
   echo "Custom sidebar configuration found."
 fi
 
-# Display Docusaurus version for debugging
+# Skip Docusaurus version check (previously hanging)
 echo "----- Checking Docusaurus version -----"
-npx docusaurus --version
+echo "Skipping Docusaurus version check to avoid hanging"
 
 # Skip the build step in the setup script as it's already run in precommit
 echo "----- Setup complete -----"
