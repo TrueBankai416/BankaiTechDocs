@@ -812,6 +812,177 @@ sudo systemctl start redsocks
 sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8 -g 192.168.55.1
 ```
 
+### **Redsocks with Proxy Authentication**
+
+**Can lnxrouter work with authenticated proxies?** Yes! You can configure redsocks to authenticate with proxy servers that require username/password authentication, making it possible to route all hotspot traffic through authenticated corporate proxies, authenticated SOCKS proxies, or other authenticated proxy services.
+
+#### **Supported Authentication Methods**
+
+Redsocks supports several authentication methods:
+
+1. **HTTP Basic Authentication** - Username/password for HTTP proxies
+2. **SOCKS5 Authentication** - Username/password for SOCKS5 proxies  
+3. **NTLM Authentication** - Windows domain authentication (limited support)
+4. **No Authentication** - For proxies that don't require auth
+
+#### **HTTP Proxy with Basic Authentication**
+
+**Most common scenario for corporate environments:**
+
+```bash
+# Install redsocks
+sudo apt install redsocks
+
+# Configure redsocks with HTTP proxy authentication
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.100.1;      # Must match your -g setting
+    local_port = 9040;
+    ip = proxy.company.com;        # Your proxy server
+    port = 8080;                   # Your proxy port
+    type = http-connect;
+    login = "your_username";       # Replace with your username
+    password = "your_password";    # Replace with your password
+}
+EOF
+
+# Set proper permissions (config contains credentials)
+sudo chmod 600 /etc/redsocks.conf
+sudo chown root:root /etc/redsocks.conf
+
+# Start redsocks
+sudo systemctl start redsocks
+sudo systemctl enable redsocks  # Auto-start at boot
+
+# Create lnxrouter hotspot with authenticated proxy
+sudo lnxrouter --ap wlan0 "CorpWiFi" -p "wifi_password123" \
+    --tp 9040 \
+    --dns 8.8.8.8 \
+    -g 192.168.100.1 \
+    --ban-priv
+```
+
+#### **SOCKS5 Proxy with Authentication**
+
+**For SOCKS5 proxies that require authentication:**
+
+```bash
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.100.1;
+    local_port = 9040;
+    ip = socks.example.com;        # SOCKS5 proxy server
+    port = 1080;                   # SOCKS5 proxy port
+    type = socks5;
+    login = "socks_username";
+    password = "socks_password";
+}
+EOF
+
+# Start services
+sudo systemctl restart redsocks
+sudo lnxrouter --ap wlan0 "SOCKS5WiFi" -p "wifi_pass" \
+    --tp 9040 --dns 8.8.8.8 -g 192.168.100.1
+```
+
+#### **Complete Setup Example**
+
+**Scenario**: Share corporate internet through authenticated proxy
+
+```bash
+# 1. Install redsocks
+sudo apt update
+sudo apt install redsocks
+
+# 2. Configure authenticated proxy
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.200.1;
+    local_port = 9040;
+    ip = proxy.mycompany.com;
+    port = 8080;
+    type = http-connect;
+    login = "myusername";
+    password = "mypassword";
+}
+EOF
+
+# 3. Secure the config file
+sudo chmod 600 /etc/redsocks.conf
+sudo chown root:root /etc/redsocks.conf
+
+# 4. Start redsocks
+sudo systemctl start redsocks
+sudo systemctl enable redsocks
+
+# 5. Create authenticated proxy WiFi hotspot
+sudo lnxrouter --ap wlan0 "ProxyWiFi" -p "ProxyPass2024" \
+    --tp 9040 \
+    --dns 8.8.8.8,1.1.1.1 \
+    -g 192.168.200.1 \
+    --ban-priv \
+    --isolate-clients
+
+# 6. Verify everything is working
+sudo lnxrouter --list-running
+sudo systemctl status redsocks
+tail -f /var/log/redsocks.log
+```
+
+#### **Troubleshooting Proxy Authentication**
+
+**Common Issues and Solutions:**
+
+1. **Authentication Failures**
+```bash
+# Check redsocks logs
+sudo tail -f /var/log/redsocks.log
+
+# Test proxy manually
+curl --proxy http://username:password@proxy.company.com:8080 http://httpbin.org/ip
+```
+
+2. **Domain Authentication**
+```bash
+# Try different domain formats
+login = "DOMAIN\\username";     # Windows format
+login = "username@domain.com";  # UPN format  
+login = "domain/username";      # Alternative format
+```
+
+3. **Special Characters in Passwords**
+```bash
+# Escape special characters in redsocks.conf
+password = "pass\\word";        # Backslash
+password = "pass\"word";        # Quote
+```
+
+This comprehensive proxy authentication support makes lnxrouter extremely flexible for corporate environments, authenticated VPNs, and complex networking scenarios where proxy authentication is required.
+
 ### **Transparent Proxy Options**
 
 | Option | Description | Example |
