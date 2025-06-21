@@ -493,6 +493,302 @@ sudo lnxrouter -i eth0 -o wlan0 --dhcp-dns 8.8.8.8
 - Log traffic if required by local regulations
 - Use `--ban-priv` to protect your private network
 
+## **Transparent Proxy Configuration**
+
+lnxrouter supports transparent proxy functionality, which allows you to route all client traffic through a proxy server (such as Tor, custom HTTP proxies, or monitoring tools) without requiring client-side configuration.
+
+### **What is Transparent Proxy?**
+
+A transparent proxy intercepts network traffic automatically without requiring clients to configure proxy settings. All HTTP/HTTPS and DNS traffic from connected clients is redirected to specified proxy ports, making it appear "transparent" to the end users.
+
+### **Common Use Cases**
+
+1. **Privacy and Anonymity**
+   - Route traffic through Tor for enhanced privacy
+   - Use VPN-like functionality at the network level
+
+2. **Content Filtering**
+   - Block malicious websites and content
+   - Implement parental controls
+
+3. **Traffic Monitoring**
+   - Log and analyze network traffic
+   - Monitor bandwidth usage per client
+
+4. **Development and Testing**
+   - Intercept API calls for debugging
+   - Test applications with modified network conditions
+
+### **Basic Transparent Proxy Setup**
+
+```bash
+# Route all traffic through Tor
+sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1
+
+# With IPv6 support
+sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1 -6 --p6 fd00:5:6:7::
+```
+
+### **Tor Integration Example**
+
+**1. Install and configure Tor:**
+```bash
+# Install Tor
+sudo apt install tor  # Ubuntu/Debian
+sudo dnf install tor  # Fedora
+
+# Configure Tor for transparent proxy
+sudo tee -a /etc/tor/torrc << EOF
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+TransPort [fd00:5:6:7::1]:9040
+DNSPort [fd00:5:6:7::1]:9053
+EOF
+
+# Restart Tor
+sudo systemctl restart tor
+```
+
+**2. Start lnxrouter with Tor integration:**
+```bash
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
+    --tp 9040 --dns 9053 \
+    -g 192.168.55.1 \
+    -6 --p6 fd00:5:6:7::
+```
+
+### **Custom Proxy Integration**
+
+**For HTTP/HTTPS proxy (using redsocks):**
+
+```bash
+# Install redsocks
+sudo apt install redsocks
+
+# Configure redsocks
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.55.1;
+    local_port = 9040;
+    ip = YOUR_PROXY_IP;
+    port = YOUR_PROXY_PORT;
+    type = http-connect;
+}
+EOF
+
+# Start redsocks
+sudo systemctl start redsocks
+
+# Start lnxrouter with transparent proxy
+sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8
+```
+
+### **Transparent Proxy Options**
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--tp <port>` | Redirect TCP traffic to port | `--tp 9040` |
+| `--dns <ip:port>` | DNS proxy destination | `--dns 192.168.55.1:9053` |
+| `--catch-dns` | Intercept all DNS queries | `--catch-dns` |
+| `--log-dns` | Log DNS queries | `--log-dns` |
+
+### **Transparent Proxy Limitations**
+
+⚠️ **Important Considerations:**
+
+1. **Not True Anonymity**: Using Tor this way does NOT provide the same anonymity as using the Tor Browser
+2. **DNS Leaks**: Ensure DNS traffic is properly routed through the proxy
+3. **HTTPS Limitations**: Transparent proxies cannot decrypt HTTPS traffic without certificates
+4. **Performance Impact**: Additional latency due to proxy routing
+
+## **Sandbox Network Configuration**
+
+Sandbox networks provide isolated, controlled environments where clients can access the Internet but are restricted from accessing your private network resources or communicating with each other.
+
+### **What is a Sandbox Network?**
+
+A sandbox network creates a secure, isolated environment where:
+- Clients can access the Internet normally
+- Clients cannot access your local private network (192.168.x.x, 10.x.x.x, etc.)
+- Clients cannot communicate with each other
+- Your personal information and local services remain protected
+
+### **Sandbox Use Cases**
+
+1. **Guest Networks**
+   - Provide Internet to visitors without exposing your private network
+   - Protect smart home devices and local services
+
+2. **Public WiFi Scenarios**
+   - Share Internet safely in public spaces
+   - Protect against malicious clients
+
+3. **Testing and Development**
+   - Isolate test devices and applications
+   - Create controlled network environments
+
+4. **IoT Device Management**
+   - Isolate smart devices that don't need local network access
+   - Prevent IoT devices from accessing sensitive resources
+
+### **Basic Sandbox Setup**
+
+```bash
+# Create isolated guest network
+sudo lnxrouter --ap wlan0 "GuestNetwork" -p "guestpass123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac
+```
+
+### **Advanced Sandbox Configuration**
+
+```bash
+# Complete sandbox with monitoring and privacy protection
+sudo lnxrouter -i eth1 \
+    --tp 9040 --dns 9053 \
+    --random-mac \
+    --ban-priv \
+    --isolate-clients \
+    --catch-dns --log-dns \
+    --hidden
+```
+
+### **Sandbox Options Explained**
+
+| Option | Purpose | Security Benefit |
+|--------|---------|------------------|
+| `--ban-priv` | Block access to private IP ranges | Protects local network resources |
+| `--isolate-clients` | Prevent client-to-client communication | Stops lateral movement between devices |
+| `--random-mac` | Use random MAC address for the AP | Prevents MAC address tracking |
+| `--catch-dns` | Intercept DNS queries | Prevents DNS bypassing |
+| `--log-dns` | Log DNS requests | Enables monitoring and analysis |
+| `--hidden` | Hide SSID from broadcast | Reduces discoverability |
+
+### **Private Network Ranges Blocked by `--ban-priv`**
+
+When using `--ban-priv`, clients cannot access:
+- `192.168.0.0/16` - Most home networks
+- `10.0.0.0/8` - Enterprise networks
+- `172.16.0.0/12` - Private networks
+- `127.0.0.0/8` - Localhost
+- `169.254.0.0/16` - Link-local addresses
+
+### **Monitoring Sandbox Networks**
+
+```bash
+# Monitor connected clients
+sudo lnxrouter --list-clients wlan0
+
+# Check DNS queries (if --log-dns enabled)
+sudo tail -f /var/log/syslog | grep dnsmasq
+
+# Monitor traffic patterns
+sudo netstat -i  # Interface statistics
+sudo ss -tuln     # Active connections
+```
+
+### **Sandbox Network Examples**
+
+#### **Guest WiFi for Home**
+```bash
+# Secure guest network with complete isolation
+sudo lnxrouter --ap wlan1 "GuestWiFi" -p "Welcome2024!" \
+    --ban-priv \
+    --isolate-clients \
+    --hidden \
+    --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+#### **Public Sharing Point**
+```bash
+# Share Internet publicly while protecting yourself
+sudo lnxrouter --ap wlan0 "PublicInternet" -p "public123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    --catch-dns --log-dns
+```
+
+#### **Development Testing Network**
+```bash
+# Isolated network for testing applications
+sudo lnxrouter -n --ap wlan0 "TestNet" -p "testpass" \
+    --isolate-clients \
+    --dhcp-dns 192.168.50.1 \
+    -g 192.168.50.1
+```
+
+### **Sandbox Security Best Practices**
+
+1. **Always Use `--ban-priv`** when sharing with untrusted devices
+2. **Enable `--isolate-clients`** to prevent device-to-device attacks
+3. **Use `--random-mac`** to prevent tracking of your access point
+4. **Monitor DNS logs** to detect suspicious activity
+5. **Use strong passwords** even for guest networks
+6. **Regularly check connected clients** with `--list-clients`
+
+### **Advanced Sandbox with Transparent Proxy**
+
+Combine sandbox features with transparent proxy for maximum security:
+
+```bash
+# Ultra-secure sandbox with Tor routing
+sudo lnxrouter --ap wlan0 "SecureGuest" -p "SecurePass2024!" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    --tp 9040 --dns 9053 \
+    --catch-dns --log-dns \
+    --hidden \
+    -g 192.168.99.1
+```
+
+This configuration provides:
+- Complete network isolation from your private network
+- All traffic routed through Tor for enhanced privacy
+- Client isolation preventing lateral movement
+- DNS monitoring and logging
+- Hidden network reducing discoverability
+- Random MAC address preventing AP tracking
+
+### **Troubleshooting Sandbox Networks**
+
+#### **Clients Can't Access Internet**
+```bash
+# Check if private network blocking is too restrictive
+sudo lnxrouter --list-clients wlan0
+
+# Temporarily disable --ban-priv to test
+sudo lnxrouter --ap wlan0 "TestNet" -p "test" --isolate-clients
+```
+
+#### **DNS Resolution Issues**
+```bash
+# Use public DNS servers
+sudo lnxrouter --ap wlan0 "TestNet" -p "test" \
+    --ban-priv --isolate-clients \
+    --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+#### **Transparent Proxy Not Working**
+```bash
+# Check if proxy service is running
+sudo systemctl status tor      # For Tor
+sudo systemctl status redsocks # For redsocks
+
+# Test proxy connectivity
+curl --proxy socks5://127.0.0.1:9050 http://check.torproject.org
+```
+
 ## **System Cleanup**
 
 lnxrouter automatically cleans up when stopped, but some changes persist:
