@@ -1,0 +1,745 @@
+---
+title: Proxies - Complete Guide to Proxy Servers and Transparent Proxying
+tags:
+   - Networking
+   - Proxies
+   - SOCKS
+   - HTTP Proxy
+   - Redsocks
+   - Squid
+   - Security
+   - Anonymity
+keywords: [proxy, redsocks, squid, dante, socks proxy, http proxy, transparent proxy, iptables, networking, anonymity]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxies: Complete Guide to Proxy Servers and Transparent Proxying**
+
+Proxies are intermediary servers that sit between clients and destination servers, forwarding requests and responses while providing various functionalities like anonymity, content filtering, caching, and traffic routing. This comprehensive guide covers different types of proxies, popular proxy software, and transparent proxying solutions like redsocks.
+
+## **What are Proxies?**
+
+A proxy server acts as a gateway between users and the internet, receiving requests from clients, forwarding them to destination servers, and returning the responses back to clients. Proxies can modify requests, cache responses, filter content, and provide anonymity by hiding the client's real IP address.
+
+## **Types of Proxies**
+
+### **HTTP/HTTPS Proxies**
+- **Purpose**: Handle web traffic (HTTP/HTTPS protocols)
+- **Features**: Web caching, content filtering, SSL termination
+- **Common Ports**: 8080, 3128, 8888
+- **Use Cases**: Corporate web filtering, caching, bypassing geo-restrictions
+
+### **SOCKS Proxies**
+- **Purpose**: Handle any type of traffic (protocol-agnostic)
+- **Versions**: SOCKS4, SOCKS4a, SOCKS5
+- **Features**: UDP support (SOCKS5), authentication, DNS resolution
+- **Common Ports**: 1080, 1081, 9050
+- **Use Cases**: Tunneling applications, gaming, P2P, Tor networks
+
+### **Transparent Proxies**
+- **Purpose**: Intercept traffic without client configuration
+- **Features**: Automatic redirection via iptables/firewall rules
+- **Use Cases**: Network-wide proxy enforcement, content filtering
+- **Tools**: redsocks, iptables REDIRECT target
+
+### **Reverse Proxies**
+- **Purpose**: Forward requests to backend servers on behalf of servers
+- **Features**: Load balancing, SSL termination, caching
+- **Use Cases**: Web servers, API gateways, CDNs
+- **Tools**: Nginx, Apache, HAProxy
+
+## **Redsocks - Transparent SOCKS/HTTP Proxy Redirector**
+
+Redsocks is a daemon that transparently redirects network connections to SOCKS or HTTP proxies using iptables rules. It enables transparent proxying without requiring application-level proxy configuration.
+
+### **Key Features**
+- **Transparent operation**: No application configuration needed
+- **Multiple proxy support**: SOCKS4, SOCKS5, HTTP CONNECT
+- **Chain proxying**: Route traffic through multiple proxy layers
+- **DNS resolution**: Handle DNS queries through proxy
+- **IPv4/IPv6 support**: Dual-stack networking support
+
+### **Installation**
+
+#### **Ubuntu/Debian**
+```bash
+# Install from repositories
+sudo apt update
+sudo apt install redsocks
+
+# Install dependencies for building from source
+sudo apt install build-essential git libevent-dev
+```
+
+#### **Red Hat/CentOS/Fedora**
+```bash
+# RHEL/CentOS (enable EPEL first)
+sudo yum install epel-release
+sudo yum install redsocks
+
+# Fedora
+sudo dnf install redsocks
+
+# Build dependencies
+sudo dnf install gcc git libevent-devel make
+```
+
+#### **Arch Linux**
+```bash
+# Install from AUR
+yay -S redsocks
+# or
+sudo pacman -S redsocks
+```
+
+#### **Building from Source**
+```bash
+# Clone and build
+git clone https://github.com/darkk/redsocks.git
+cd redsocks
+make
+
+# Install binary
+sudo cp redsocks /usr/local/bin/
+sudo chmod +x /usr/local/bin/redsocks
+```
+
+### **Configuration**
+
+Create redsocks configuration file:
+
+```bash
+sudo nano /etc/redsocks.conf
+```
+
+#### **Basic SOCKS5 Configuration**
+```conf
+base {
+    log_debug = off;
+    log_info = on;
+    log = stderr;
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 127.0.0.1;
+    local_port = 12345;
+    ip = 127.0.0.1;        # SOCKS proxy IP
+    port = 1080;           # SOCKS proxy port
+    type = socks5;
+    login = "username";    # Optional authentication
+    password = "password"; # Optional authentication
+}
+```
+
+#### **HTTP Proxy Configuration**
+```conf
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 0.0.0.0;
+    local_port = 8080;
+    ip = proxy.example.com;  # HTTP proxy server
+    port = 8080;             # HTTP proxy port
+    type = http-connect;
+}
+```
+
+#### **Multiple Proxy Configuration**
+```conf
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+# SOCKS5 proxy for general traffic
+redsocks {
+    local_ip = 127.0.0.1;
+    local_port = 12345;
+    ip = 192.168.1.100;
+    port = 1080;
+    type = socks5;
+}
+
+# HTTP proxy for web traffic
+redsocks {
+    local_ip = 127.0.0.1;
+    local_port = 12346;
+    ip = 192.168.1.101;
+    port = 8080;
+    type = http-connect;
+}
+```
+
+### **Running Redsocks**
+
+#### **Manual Execution**
+```bash
+# Test configuration
+sudo redsocks -c /etc/redsocks.conf -t
+
+# Run in foreground (for testing)
+sudo redsocks -c /etc/redsocks.conf
+
+# Run as daemon
+sudo redsocks -c /etc/redsocks.conf -d
+```
+
+#### **Systemd Service**
+```bash
+# Create systemd service file
+sudo nano /etc/systemd/system/redsocks.service
+```
+
+```ini
+[Unit]
+Description=Redsocks transparent SOCKS proxy redirector
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/redsocks.pid
+ExecStart=/usr/bin/redsocks -c /etc/redsocks.conf -p /var/run/redsocks.pid
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable redsocks
+sudo systemctl start redsocks
+
+# Check status
+sudo systemctl status redsocks
+```
+
+### **IPTables Rules for Transparent Proxying**
+
+#### **Basic Transparent Proxy Setup**
+```bash
+# Create new chain for redsocks
+sudo iptables -t nat -N REDSOCKS
+
+# Ignore local and reserved addresses
+sudo iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 10.0.0.0/8 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 172.16.0.0/12 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 224.0.0.0/4 -j RETURN
+sudo iptables -t nat -A REDSOCKS -d 240.0.0.0/4 -j RETURN
+
+# Redirect all TCP traffic to redsocks
+sudo iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
+
+# Apply redsocks chain to OUTPUT traffic
+sudo iptables -t nat -A OUTPUT -p tcp --dport 1:65535 -j REDSOCKS
+```
+
+#### **Selective Proxy Rules**
+```bash
+# Only proxy specific destinations
+sudo iptables -t nat -A OUTPUT -p tcp -d 203.0.113.0/24 --dport 80,443 -j REDIRECT --to-ports 12345
+
+# Proxy traffic from specific users
+sudo iptables -t nat -A OUTPUT -m owner --uid-owner 1000 -p tcp -j REDIRECT --to-ports 12345
+
+# Proxy traffic to specific ports
+sudo iptables -t nat -A OUTPUT -p tcp --dport 80,443 -j REDIRECT --to-ports 12345
+```
+
+#### **Save IPTables Rules**
+```bash
+# Ubuntu/Debian
+sudo iptables-save | sudo tee /etc/iptables/rules.v4
+
+# Red Hat/CentOS
+sudo service iptables save
+
+# Using iptables-persistent
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+```
+
+## **Squid Proxy Server**
+
+Squid is a powerful HTTP/HTTPS proxy server with extensive caching and filtering capabilities.
+
+### **Installation**
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install squid
+
+# Red Hat/CentOS/Fedora
+sudo dnf install squid
+
+# Start and enable
+sudo systemctl start squid
+sudo systemctl enable squid
+```
+
+### **Basic Configuration**
+```bash
+# Edit main config file
+sudo nano /etc/squid/squid.conf
+```
+
+#### **Basic Forward Proxy Setup**
+```conf
+# Basic configuration
+http_port 3128
+
+# Access control
+acl localnet src 192.168.0.0/16
+acl localnet src 10.0.0.0/8
+acl localnet src 172.16.0.0/12
+
+# Allow local networks
+http_access allow localnet
+http_access allow localhost
+
+# Deny all other access
+http_access deny all
+
+# Cache settings
+cache_dir ufs /var/spool/squid 1000 16 256
+maximum_object_size 50 MB
+cache_mem 256 MB
+
+# Logging
+access_log /var/log/squid/access.log squid
+cache_log /var/log/squid/cache.log
+```
+
+#### **Authentication Setup**
+```bash
+# Install auth helpers
+sudo apt install squid-common
+
+# Create password file
+sudo htpasswd -c /etc/squid/passwords username1
+sudo htpasswd /etc/squid/passwords username2
+sudo chown proxy:proxy /etc/squid/passwords
+sudo chmod 640 /etc/squid/passwords
+```
+
+Add to squid.conf:
+```conf
+# Authentication
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
+auth_param basic realm Squid Proxy Server
+acl authenticated proxy_auth REQUIRED
+
+# Allow authenticated users
+http_access allow authenticated
+```
+
+### **Advanced Features**
+
+#### **Content Filtering**
+```conf
+# Block specific domains
+acl blocked_sites dstdomain .facebook.com .twitter.com
+http_access deny blocked_sites
+
+# Block file types
+acl blocked_files urlpath_regex \.(exe|zip|mp3|avi)$
+http_access deny blocked_files
+
+# Time-based access
+acl business_hours time MTWHF 09:00-17:00
+http_access allow localnet business_hours
+```
+
+#### **SSL Bump (HTTPS Inspection)**
+```conf
+# SSL bump configuration
+ssl_bump server-first all
+sslproxy_cert_error allow all
+sslproxy_flags DONT_VERIFY_PEER
+
+# Certificate for SSL bump
+http_port 3128 ssl-bump cert=/etc/squid/certs/squid.pem
+
+# Generate certificate
+sudo openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 \
+    -keyout /etc/squid/certs/squid.pem -out /etc/squid/certs/squid.pem
+```
+
+## **Dante SOCKS Server**
+
+Dante is a robust SOCKS4/SOCKS5 server implementation.
+
+### **Installation**
+```bash
+# Ubuntu/Debian
+sudo apt install dante-server
+
+# Red Hat/CentOS/Fedora
+sudo dnf install dante-server
+```
+
+### **Configuration**
+```bash
+sudo nano /etc/danted.conf
+```
+
+#### **Basic SOCKS5 Server**
+```conf
+# Basic configuration
+logoutput: /var/log/danted.log
+internal: eth0 port = 1080
+external: eth0
+
+# Authentication method
+socksmethod: username
+
+# Client rules
+client pass {
+    from: 192.168.0.0/16 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+
+# SOCKS rules
+socks pass {
+    from: 192.168.0.0/16 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+```
+
+#### **With Authentication**
+```conf
+# Authentication configuration
+socksmethod: username
+user.privileged: root
+user.unprivileged: nobody
+
+# Add system users for SOCKS auth
+# sudo useradd -r -s /bin/false socksuser
+# sudo passwd socksuser
+
+client pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+
+socks pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    socksmethod: username
+    log: connect disconnect error
+}
+```
+
+### **Running Dante**
+```bash
+# Start service
+sudo systemctl start danted
+sudo systemctl enable danted
+
+# Check status
+sudo systemctl status danted
+
+# Test SOCKS proxy
+curl --socks5 localhost:1080 http://httpbin.org/ip
+```
+
+## **3proxy - Lightweight Proxy Server**
+
+3proxy is a small but feature-rich proxy server supporting multiple protocols.
+
+### **Installation**
+```bash
+# Build from source
+git clone https://github.com/3proxy/3proxy.git
+cd 3proxy
+make -f Makefile.Linux
+
+# Install
+sudo cp bin/3proxy /usr/local/bin/
+sudo cp bin/proxy /usr/local/bin/
+sudo cp bin/socks /usr/local/bin/
+```
+
+### **Configuration**
+```bash
+sudo nano /etc/3proxy.cfg
+```
+
+#### **Multi-Protocol Configuration**
+```conf
+# Logging
+log /var/log/3proxy.log
+
+# Authentication
+users user1:CL:password1
+
+# HTTP proxy on port 8080
+proxy -p8080
+
+# SOCKS proxy on port 1080
+socks -p1080
+
+# Allow access from local network
+allow 192.168.0.0/16
+```
+
+### **Running 3proxy**
+```bash
+# Run with config file
+sudo 3proxy /etc/3proxy.cfg
+
+# Create systemd service
+sudo nano /etc/systemd/system/3proxy.service
+```
+
+```ini
+[Unit]
+Description=3proxy Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/3proxy /etc/3proxy.cfg
+Restart=on-failure
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## **Troubleshooting Common Issues**
+
+### **Redsocks Issues**
+
+#### **"bind: Address already in use"**
+```bash
+# Check what's using the port
+sudo netstat -tlnp | grep :12345
+sudo ss -tlnp | grep :12345
+
+# Kill process using the port
+sudo pkill -f redsocks
+
+# Use different port in config
+local_port = 12346;
+```
+
+#### **"Connection refused" to proxy server**
+```bash
+# Verify proxy server is running
+telnet proxy_ip proxy_port
+
+# Check proxy credentials
+# Test with curl
+curl --socks5 username:password@proxy_ip:proxy_port http://httpbin.org/ip
+
+# Check redsocks logs
+sudo tail -f /var/log/redsocks.log
+```
+
+#### **IPTables rules not working**
+```bash
+# Check current rules
+sudo iptables -t nat -L -n -v
+
+# Test rule matching
+sudo iptables -t nat -I OUTPUT -p tcp --dport 80 -j LOG --log-prefix "PROXY_TEST: "
+sudo tail -f /var/log/kern.log
+
+# Reset rules if needed
+sudo iptables -t nat -F
+sudo iptables -t nat -X REDSOCKS
+```
+
+### **Squid Issues**
+
+#### **Permission Denied Errors**
+```bash
+# Fix cache directory permissions
+sudo chown -R proxy:proxy /var/spool/squid
+sudo chmod -R 755 /var/spool/squid
+
+# Initialize cache
+sudo squid -z
+
+# Check config syntax
+sudo squid -k parse
+```
+
+#### **Access Denied (403 Forbidden)**
+```bash
+# Check ACL configuration
+sudo grep -n "http_access" /etc/squid/squid.conf
+
+# Test ACL matching
+sudo squid -k debug
+
+# Common fix - allow local network
+acl localnet src 192.168.0.0/16
+http_access allow localnet
+```
+
+#### **DNS Resolution Issues**
+```bash
+# Add DNS servers to squid.conf
+dns_nameservers 8.8.8.8 1.1.1.1
+
+# Check system DNS
+sudo systemd-resolve --status
+cat /etc/resolv.conf
+```
+
+### **SOCKS Proxy Issues**
+
+#### **Authentication Failures**
+```bash
+# Test SOCKS authentication
+curl --socks5 username:password@localhost:1080 http://httpbin.org/ip
+
+# Check user exists (for system auth)
+getent passwd socksuser
+
+# Verify dante configuration
+sudo danted -V -f /etc/danted.conf
+```
+
+#### **Connection Timeouts**
+```bash
+# Check firewall rules
+sudo ufw status
+sudo iptables -L
+
+# Test port accessibility
+telnet proxy_server 1080
+
+# Monitor connections
+sudo ss -tulnp | grep :1080
+```
+
+### **General Proxy Debugging**
+
+#### **Network Connectivity Tests**
+```bash
+# Test direct connection
+curl -I http://httpbin.org/ip
+
+# Test through HTTP proxy
+curl -I --proxy http://proxy:8080 http://httpbin.org/ip
+
+# Test through SOCKS proxy
+curl -I --socks5 proxy:1080 http://httpbin.org/ip
+
+# Check DNS resolution through proxy
+nslookup google.com proxy_dns_server
+```
+
+#### **Log Analysis**
+```bash
+# Monitor proxy logs in real-time
+sudo tail -f /var/log/squid/access.log
+sudo tail -f /var/log/danted.log
+sudo tail -f /var/log/redsocks.log
+
+# Search for errors
+sudo grep -i error /var/log/squid/cache.log
+sudo grep -i "connection refused" /var/log/redsocks.log
+
+# Analyze traffic patterns
+sudo awk '{print $3}' /var/log/squid/access.log | sort | uniq -c | sort -nr
+```
+
+## **Security Considerations**
+
+### **Access Control**
+- **Implement proper ACLs**: Restrict proxy access to authorized networks/users
+- **Use authentication**: Enable username/password or certificate-based auth
+- **Monitor access logs**: Regularly review proxy usage logs
+- **Limit destination access**: Block malicious or inappropriate destinations
+
+### **Encryption**
+- **Use HTTPS/TLS**: Ensure proxy connections are encrypted
+- **Certificate validation**: Properly validate SSL certificates
+- **Avoid SSL bumping**: Only use HTTPS inspection when absolutely necessary
+- **Secure credentials**: Store proxy passwords securely
+
+### **Network Security**
+```bash
+# Firewall rules for proxy servers
+sudo ufw allow from 192.168.0.0/16 to any port 3128  # HTTP proxy
+sudo ufw allow from 192.168.0.0/16 to any port 1080  # SOCKS proxy
+
+# Rate limiting with iptables
+sudo iptables -A INPUT -p tcp --dport 3128 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+```
+
+### **Monitoring and Alerting**
+```bash
+# Monitor failed authentication attempts
+sudo grep "authentication failed" /var/log/squid/cache.log
+
+# Monitor unusual traffic patterns
+sudo awk '{print $7}' /var/log/squid/access.log | grep -E "(exe|zip|torrent)" | wc -l
+
+# Set up log rotation
+sudo nano /etc/logrotate.d/proxy-logs
+```
+
+## **Performance Optimization**
+
+### **Caching Configuration**
+```conf
+# Squid cache optimization
+cache_mem 512 MB
+maximum_object_size_in_memory 64 KB
+cache_dir ufs /var/spool/squid 2000 16 256
+maximum_object_size 100 MB
+
+# Cache hierarchy
+cache_peer parent.proxy.com parent 3128 0 default
+cache_peer_access parent.proxy.com allow all
+```
+
+### **Connection Limits**
+```conf
+# Squid connection limits
+http_port 3128 connection-limit=1000
+client_lifetime 1 hour
+half_closed_clients off
+```
+
+### **Resource Monitoring**
+```bash
+# Monitor proxy performance
+sudo htop
+sudo iotop
+sudo netstat -i
+
+# Check cache statistics (Squid)
+sudo squidclient -h localhost -p 3128 mgr:info
+sudo squidclient mgr:cachedir
+```
+
+Understanding proxy servers and transparent proxying solutions like redsocks enables you to implement sophisticated network routing, content filtering, and privacy solutions. Whether you need simple web caching, secure SOCKS tunneling, or transparent traffic redirection, these tools provide the foundation for advanced networking configurations.
+
+<BuyMeACoffeeButton />
