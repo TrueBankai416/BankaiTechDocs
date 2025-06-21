@@ -297,6 +297,32 @@ sudo nmcli dev set wlan0 managed no
 sudo lsof | grep wlan0
 ```
 
+#### **"Your adapter can not be a station and an AP"**
+
+**Cause:** WiFi adapter cannot simultaneously be connected to a network (station mode) and create an access point (AP mode). This is especially common with USB WiFi cards.
+
+**Solutions:**
+```bash
+# Option 1: Use virtual interface (lnxrouter's default behavior)
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+# This automatically creates virtual interface x0wlan0
+
+# Option 2: Disconnect from current WiFi first
+sudo nmcli dev disconnect wlan0
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Option 3: Use a second WiFi adapter
+sudo lnxrouter --ap wlan1 "MyHotspot" -p "password"  # Different adapter
+
+# Option 4: Share connection through Ethernet
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password" -o eth0
+```
+
+**USB WiFi Card Limitations:**
+- Most USB WiFi adapters cannot do station + AP simultaneously
+- Consider getting a dedicated USB WiFi adapter for hotspot use
+- Built-in WiFi adapters often have better dual-mode support
+
 #### **"Operation not supported"**
 
 **Cause:** WiFi adapter doesn't support AP mode.
