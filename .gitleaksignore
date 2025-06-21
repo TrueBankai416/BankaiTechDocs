@@ -9,3 +9,6 @@ docs/Docusaurus/Docs/Troubleshooting/CSP.mdx
 
 # Ignore BankaiTech account ID in Buy Me a Coffee widget
 src/components/BuyMeACoffeeFloatingWidget/
+
+# Ignore example Tor HashedControlPassword in proxy documentation
+bc5bf91967ecad9c030302d55ff253d84e11ea3b:docs/Networking/Docs/Proxies.mdx:generic-api-key:530
