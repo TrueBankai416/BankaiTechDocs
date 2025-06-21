@@ -25,6 +25,3 @@ yarn-error.log*
 # Talisman
 .talismanrc
 talisman_report/
-
-# Production files
-package-lock.json
