@@ -319,8 +319,10 @@ sudo lnxrouter --ap wlan0 "MyHotspot" -p "password" -o eth0
 ```
 
 **USB WiFi Card Limitations:**
-- Most USB WiFi adapters cannot do station + AP simultaneously
-- Consider getting a dedicated USB WiFi adapter for hotspot use
+- Most USB WiFi adapters cannot do station + AP simultaneously, even with virtual interfaces
+- **Important**: Even if your adapter specs claim "AP mode support" (like Realtek RTL8812BU/RTL8822BU), it may still fail with this error due to driver limitations
+- The adapter may support AP mode individually but not while connected to another network
+- Consider getting a dedicated USB WiFi adapter for hotspot use, or disconnect from current WiFi first
 - Built-in WiFi adapters often have better dual-mode support
 
 #### **"Operation not supported"**
