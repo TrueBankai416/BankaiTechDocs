@@ -358,6 +358,39 @@ sudo rfkill list
 sudo rfkill unblock wifi
 ```
 
+#### **"iw: command not found" (despite being installed)**
+
+**Cause:** The `iw` command may not be in your PATH or installed in a non-standard location.
+
+**Solutions:**
+```bash
+# Check if iw is installed and find its location
+which iw
+whereis iw
+
+# If not in PATH, try full path
+/usr/sbin/iw dev
+/sbin/iw dev
+
+# Add to PATH temporarily
+export PATH=$PATH:/usr/sbin:/sbin
+
+# Check if you need sudo
+sudo iw dev
+
+# Alternative: use iwconfig instead
+iwconfig  # Shows wireless interfaces
+
+# Install wireless-tools if iwconfig also missing
+sudo apt install wireless-tools  # Ubuntu/Debian
+sudo dnf install wireless-tools  # Fedora
+```
+
+**Common locations for `iw`:**
+- `/usr/sbin/iw` (most common)
+- `/sbin/iw`
+- `/usr/bin/iw`
+
 ### **Connection Issues**
 
 #### **Clients Can Connect But No Internet**
@@ -559,6 +592,12 @@ sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1 -6 --p6 fd00:5:6:7::
 
 ### **Tor Integration Example**
 
+**Understanding the IP Addresses:**
+- `192.168.55.1` is the IP address lnxrouter assigns to itself in the network it creates
+- You can change this with the `-g` option (e.g., `-g 10.0.50.1` or `-g 172.16.100.1`)
+- The `.55.1` part means "IP ending in .55.1" - you can use any valid private IP
+- IPv6 `fd00:5:6:7::` is a private IPv6 prefix - also customizable
+
 **1. Install and configure Tor:**
 ```bash
 # Install Tor
@@ -566,6 +605,7 @@ sudo apt install tor  # Ubuntu/Debian
 sudo dnf install tor  # Fedora
 
 # Configure Tor for transparent proxy
+# Replace 192.168.55.1 with your chosen IP (must match -g option later)
 sudo tee -a /etc/tor/torrc << EOF
 TransPort 192.168.55.1:9040
 DNSPort 192.168.55.1:9053
@@ -579,21 +619,51 @@ sudo systemctl restart tor
 
 **2. Start lnxrouter with Tor integration:**
 ```bash
+# The -g IP must match the IP in torrc above
 sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
     --tp 9040 --dns 9053 \
     -g 192.168.55.1 \
     -6 --p6 fd00:5:6:7::
+
+# Alternative with different IP range
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
+    --tp 9040 --dns 9053 \
+    -g 10.0.50.1 \
+    -6 --p6 fd00:10:20:30::
 ```
 
 ### **Custom Proxy Integration**
 
 **For HTTP/HTTPS proxy (using redsocks):**
 
+**Understanding Proxy Configuration:**
+- `YOUR_PROXY_IP`: The IP address of your proxy server (e.g., `127.0.0.1` for local, `10.0.0.100` for network proxy)
+- `YOUR_PROXY_PORT`: The port your proxy listens on (e.g., `8080`, `3128`, `1080`)
+- `local_ip`: Must match your lnxrouter IP (set with `-g` option)
+
+**Common Proxy Examples:**
+```bash
+# Example 1: Local HTTP proxy (like Squid on port 3128)
+ip = 127.0.0.1;
+port = 3128;
+type = http-connect;
+
+# Example 2: Network SOCKS proxy
+ip = 10.0.0.50;
+port = 1080;
+type = socks5;
+
+# Example 3: Corporate proxy
+ip = proxy.company.com;  # Or IP like 192.168.1.100
+port = 8080;
+type = http-connect;
+```
+
 ```bash
 # Install redsocks
 sudo apt install redsocks
 
-# Configure redsocks
+# Configure redsocks (example with local Squid proxy)
 sudo tee /etc/redsocks.conf << EOF
 base {
     log_debug = off;
@@ -604,11 +674,11 @@ base {
 }
 
 redsocks {
-    local_ip = 192.168.55.1;
+    local_ip = 192.168.55.1;    # Must match your -g setting
     local_port = 9040;
-    ip = YOUR_PROXY_IP;
-    port = YOUR_PROXY_PORT;
-    type = http-connect;
+    ip = 127.0.0.1;            # Replace with your proxy IP
+    port = 3128;               # Replace with your proxy port
+    type = http-connect;       # Or socks5, socks4
 }
 EOF
 
@@ -616,7 +686,7 @@ EOF
 sudo systemctl start redsocks
 
 # Start lnxrouter with transparent proxy
-sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8
+sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8 -g 192.168.55.1
 ```
 
 ### **Transparent Proxy Options**
@@ -669,12 +739,25 @@ A sandbox network creates a secure, isolated environment where:
 
 ### **Basic Sandbox Setup**
 
+**Understanding Sandbox IPs:**
+- lnxrouter creates its own private network with IPs like `192.168.xxx.xxx`
+- You can customize the IP range with `-g` option
+- Default behavior: lnxrouter automatically picks an available IP range
+- Example: `-g 192.168.100.1` creates network 192.168.100.0/24 with gateway at .100.1
+
 ```bash
-# Create isolated guest network
+# Create isolated guest network (automatic IP assignment)
 sudo lnxrouter --ap wlan0 "GuestNetwork" -p "guestpass123" \
     --ban-priv \
     --isolate-clients \
     --random-mac
+
+# Create isolated guest network with custom IP range
+sudo lnxrouter --ap wlan0 "GuestNetwork" -p "guestpass123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    -g 172.16.50.1  # Creates network 172.16.50.0/24
 ```
 
 ### **Advanced Sandbox Configuration**
