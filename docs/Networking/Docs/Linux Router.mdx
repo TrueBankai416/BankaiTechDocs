@@ -372,8 +372,15 @@ whereis iw
 /usr/sbin/iw dev
 /sbin/iw dev
 
-# Add to PATH temporarily
+# Add to PATH temporarily (current session only)
 export PATH=$PATH:/usr/sbin:/sbin
+
+# Make PATH change permanent (add to your shell profile)
+echo 'export PATH=$PATH:/usr/sbin:/sbin' >> ~/.bashrc
+source ~/.bashrc  # Reload current session
+
+# Alternative: make permanent for all users
+echo 'export PATH=$PATH:/usr/sbin:/sbin' | sudo tee -a /etc/environment
 
 # Check if you need sudo
 sudo iw dev
