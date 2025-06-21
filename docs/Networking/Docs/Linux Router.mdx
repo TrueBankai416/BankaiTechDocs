@@ -1068,6 +1068,317 @@ sudo systemctl status redsocks # For redsocks
 curl --proxy socks5://127.0.0.1:9050 http://check.torproject.org
 ```
 
+## **Automatic Startup at Boot**
+
+**Can you make lnxrouter start automatically at system boot?** Yes! Here are several methods to ensure your hotspot/router setup starts automatically when your system boots.
+
+### **Method 1: Systemd Service (Recommended)**
+
+Create a systemd service for automatic startup and management:
+
+#### **Single Hotspot Service**
+
+```bash
+# Create systemd service file
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "MyHotspot" -p "MyPassword123" -g 192.168.100.1
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-hotspot.service
+sudo systemctl start lnxrouter-hotspot.service
+
+# Check status
+sudo systemctl status lnxrouter-hotspot.service
+```
+
+#### **Multiple Hotspots with Separate Services**
+
+```bash
+# Guest network service
+sudo tee /etc/systemd/system/lnxrouter-guest.service << EOF
+[Unit]
+Description=lnxrouter Guest Network
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest-WiFi" -p "guest123" -g 192.168.100.1 --ban-priv --isolate-clients
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# IoT network service
+sudo tee /etc/systemd/system/lnxrouter-iot.service << EOF
+[Unit]
+Description=lnxrouter IoT Network
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan1 "IoT-WiFi" -p "iot123" -g 192.168.101.1 --ban-priv --isolate-clients --hidden
+ExecStop=/usr/local/bin/lnxrouter --stop wlan1
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable both services
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-guest.service lnxrouter-iot.service
+sudo systemctl start lnxrouter-guest.service lnxrouter-iot.service
+```
+
+#### **Systemd Service Management**
+
+```bash
+# Check all lnxrouter services
+sudo systemctl status lnxrouter-*
+
+# Start/stop services
+sudo systemctl start lnxrouter-hotspot.service
+sudo systemctl stop lnxrouter-hotspot.service
+
+# Enable/disable automatic startup
+sudo systemctl enable lnxrouter-hotspot.service
+sudo systemctl disable lnxrouter-hotspot.service
+
+# View logs
+sudo journalctl -u lnxrouter-hotspot.service -f
+
+# Restart service
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+### **Method 2: Cron @reboot**
+
+For simpler setups, use cron to start lnxrouter at boot:
+
+```bash
+# Edit root crontab
+sudo crontab -e
+
+# Add line for automatic startup (wait 30 seconds for network)
+@reboot sleep 30 && /usr/local/bin/lnxrouter --daemon --ap wlan0 "MyHotspot" -p "password123" -g 192.168.100.1
+
+# For multiple hotspots
+@reboot sleep 30 && /usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest" -p "guest123" -g 192.168.100.1 --ban-priv
+@reboot sleep 35 && /usr/local/bin/lnxrouter --daemon --ap wlan1 "IoT" -p "iot123" -g 192.168.101.1 --ban-priv --hidden
+```
+
+### **Method 3: Init Script (rc.local)**
+
+Add to system startup script:
+
+```bash
+# Edit rc.local (Ubuntu/Debian)
+sudo nano /etc/rc.local
+
+# Add before 'exit 0'
+# Wait for network interfaces
+sleep 30
+
+# Start lnxrouter
+/usr/local/bin/lnxrouter --daemon --ap wlan0 "AutoHotspot" -p "autopass123" -g 192.168.100.1
+
+exit 0
+```
+
+### **Method 4: Startup Script with Dependencies**
+
+Create a more robust startup script that waits for dependencies:
+
+```bash
+# Create startup script
+sudo tee /usr/local/bin/start-lnxrouter.sh << 'EOF'
+#!/bin/bash
+
+# Wait for network interfaces
+echo "Waiting for network interfaces..."
+while ! ip link show wlan0 >/dev/null 2>&1; do
+    sleep 2
+done
+
+# Wait for NetworkManager to settle
+sleep 10
+
+# Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap wlan0 "AutoHotspot" -p "password123" \
+    -g 192.168.100.1 --ban-priv --isolate-clients
+
+echo "Hotspot started successfully"
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/start-lnxrouter.sh
+
+# Create systemd service for the script
+sudo tee /etc/systemd/system/lnxrouter-auto.service << EOF
+[Unit]
+Description=lnxrouter Auto Hotspot
+After=network.target NetworkManager.service
+Wants=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/start-lnxrouter.sh
+RemainAfterExit=yes
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable the service
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-auto.service
+```
+
+### **Configuration Tips for Boot Startup**
+
+#### **Path Considerations**
+```bash
+# Find lnxrouter location
+which lnxrouter
+whereis lnxrouter
+
+# Use full path in services
+/usr/local/bin/lnxrouter  # If installed to /usr/local/bin
+/usr/bin/lnxrouter        # If installed to /usr/bin
+./lnxrouter               # If using local script
+```
+
+#### **Network Interface Dependencies**
+```bash
+# Check interfaces are available at boot
+ip link show
+
+# Add dependency checking to scripts
+if ! ip link show wlan0 >/dev/null 2>&1; then
+    echo "Error: wlan0 interface not found"
+    exit 1
+fi
+```
+
+#### **Wait for Network Manager**
+```bash
+# In systemd services, add dependencies
+After=network.target NetworkManager.service
+Wants=network.target
+
+# In scripts, add delays
+sleep 30  # Wait for NetworkManager to initialize
+```
+
+### **Troubleshooting Boot Startup**
+
+#### **Service Won't Start**
+```bash
+# Check service status
+sudo systemctl status lnxrouter-hotspot.service
+
+# View detailed logs
+sudo journalctl -u lnxrouter-hotspot.service -n 50
+
+# Check if interfaces exist
+ip link show
+```
+
+#### **Interface Not Available**
+```bash
+# Check interface names at boot
+dmesg | grep wlan
+ls /sys/class/net/
+
+# Use interface rename rules if needed
+sudo nano /etc/udev/rules.d/70-persistent-net.rules
+```
+
+#### **Permission Issues**
+```bash
+# Ensure service runs as root
+User=root
+
+# Check lnxrouter permissions
+ls -la /usr/local/bin/lnxrouter
+sudo chmod +x /usr/local/bin/lnxrouter
+```
+
+### **Example: Complete Boot Setup**
+
+**Scenario**: Automatic guest WiFi that starts at boot with monitoring
+
+```bash
+# 1. Create the service
+sudo tee /etc/systemd/system/lnxrouter-guest.service << EOF
+[Unit]
+Description=Guest WiFi Hotspot
+After=network.target NetworkManager.service
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest-WiFi" -p "Welcome2024!" -g 192.168.200.1 --ban-priv --isolate-clients --log-dns
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecReload=/bin/kill -HUP \$MAINPID
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 2. Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-guest.service
+sudo systemctl start lnxrouter-guest.service
+
+# 3. Verify it's working
+sudo systemctl status lnxrouter-guest.service
+sudo lnxrouter --list-running
+
+# 4. Test reboot
+sudo reboot
+# After reboot, check if it started automatically
+sudo systemctl status lnxrouter-guest.service
+```
+
+### **Best Practices for Boot Startup**
+
+1. **Use systemd services** for reliability and management features
+2. **Add appropriate delays** to wait for network interfaces
+3. **Include error handling** and restart policies
+4. **Use full paths** to executables in scripts
+5. **Test thoroughly** by rebooting and checking logs
+6. **Monitor resource usage** if running multiple instances at boot
+
 ## **System Cleanup**
 
 lnxrouter automatically cleans up when stopped, but some changes persist:
