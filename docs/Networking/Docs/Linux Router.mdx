@@ -196,21 +196,137 @@ sudo lnxrouter -i eth1 -6 --p6 fd00:50::
 sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
 ```
 
-### **Instance Management**
+### **Multiple Hotspots and Instance Management**
+
+**Can you create multiple hotspots at the same time?** Yes! lnxrouter supports running multiple instances simultaneously to create different networks.
+
+#### **Requirements for Multiple Hotspots**
+- **Multiple WiFi adapters** (each hotspot needs its own WiFi interface)
+- **Different IP ranges** for each network (use `-g` option)
+- **Different SSIDs and passwords**
+
+#### **Creating Multiple Hotspots**
 
 ```bash
-# Run in background
+# Hotspot 1: Guest network on wlan0
+sudo lnxrouter --daemon --ap wlan0 "GuestWiFi" -p "guestpass123" \
+    -g 192.168.10.1 --ban-priv --isolate-clients
+
+# Hotspot 2: Work network on wlan1  
+sudo lnxrouter --daemon --ap wlan1 "WorkWiFi" -p "workpass456" \
+    -g 192.168.20.1 --isolate-clients
+
+# Hotspot 3: IoT network on wlan2
+sudo lnxrouter --daemon --ap wlan2 "IoTNetwork" -p "iotpass789" \
+    -g 192.168.30.1 --ban-priv --isolate-clients --hidden
+```
+
+#### **Different Network Types Simultaneously**
+
+```bash
+# WiFi hotspot on wlan0
+sudo lnxrouter --daemon --ap wlan0 "PublicWiFi" -p "password123" -g 192.168.100.1
+
+# Ethernet sharing on eth1
+sudo lnxrouter --daemon -i eth1 -g 192.168.200.1
+
+# Sandbox network with Tor on wlan1
+sudo lnxrouter --daemon --ap wlan1 "TorNetwork" -p "torpass" \
+    -g 192.168.50.1 --tp 9040 --dns 9053 --ban-priv
+```
+
+#### **Instance Management Commands**
+
+```bash
+# Run in background (required for multiple instances)
 sudo lnxrouter --daemon --ap wlan0 "BackgroundAP" -p "password"
 
 # List running instances
 sudo lnxrouter --list-running
 
-# List connected clients
+# Example output:
+# PID     Interface   Type    SSID
+# 1234    wlan0       AP      GuestWiFi
+# 5678    wlan1       AP      WorkWiFi  
+# 9012    eth1        Bridge  -
+
+# List connected clients for specific instance
 sudo lnxrouter --list-clients wlan0
+sudo lnxrouter --list-clients 1234  # Using PID
 
 # Stop specific instance
-sudo lnxrouter --stop <PID_or_interface>
+sudo lnxrouter --stop wlan0     # Using interface name
+sudo lnxrouter --stop 1234      # Using PID
+
+# Stop all instances
+sudo lnxrouter --stop all
 ```
+
+#### **Best Practices for Multiple Hotspots**
+
+1. **Use Different IP Ranges**
+   ```bash
+   # Good: Non-overlapping ranges
+   -g 192.168.10.1  # Creates 192.168.10.0/24
+   -g 192.168.20.1  # Creates 192.168.20.0/24
+   -g 10.0.50.1     # Creates 10.0.50.0/24
+   ```
+
+2. **Label Your Networks Clearly**
+   ```bash
+   sudo lnxrouter --daemon --ap wlan0 "Home-Guest" -p "guest2024"
+   sudo lnxrouter --daemon --ap wlan1 "Home-IoT" -p "iot2024"
+   ```
+
+3. **Use `--daemon` for Background Running**
+   - Always use `--daemon` when running multiple instances
+   - Allows you to close terminal without stopping networks
+
+4. **Monitor Resource Usage**
+   ```bash
+   # Check system resources with multiple instances
+   sudo lnxrouter --list-running
+   htop  # Monitor CPU/memory usage
+   ```
+
+#### **Common Multiple Hotspot Scenarios**
+
+**Home Network Segmentation:**
+```bash
+# Guest network (isolated)
+sudo lnxrouter --daemon --ap wlan0 "Guest" -p "guest123" \
+    -g 192.168.100.1 --ban-priv --isolate-clients
+
+# IoT devices (isolated, hidden)  
+sudo lnxrouter --daemon --ap wlan1 "IoT" -p "iot123" \
+    -g 192.168.101.1 --ban-priv --isolate-clients --hidden
+
+# Work devices (less restricted)
+sudo lnxrouter --daemon --ap wlan2 "Work" -p "work123" \
+    -g 192.168.102.1 --isolate-clients
+```
+
+**Event/Conference Setup:**
+```bash
+# Public WiFi (heavily restricted)
+sudo lnxrouter --daemon --ap wlan0 "Conference-Public" -p "event2024" \
+    -g 192.168.50.1 --ban-priv --isolate-clients --catch-dns
+
+# Staff WiFi (less restricted)
+sudo lnxrouter --daemon --ap wlan1 "Conference-Staff" -p "staff2024" \
+    -g 192.168.51.1 --isolate-clients
+
+# Speaker/VIP WiFi (full access)
+sudo lnxrouter --daemon --ap wlan2 "Conference-VIP" -p "vip2024" \
+    -g 192.168.52.1
+```
+
+#### **Limitations**
+
+- **One WiFi adapter per hotspot** (you can't create multiple APs on the same adapter)
+- **System resources** - each instance uses CPU/memory
+- **Bandwidth sharing** - all instances share your internet connection
+- **Driver limitations** - some WiFi drivers may not support multiple concurrent APs
 
 ## **Network Interface Compatibility**
 
