@@ -1,0 +1,221 @@
+---
+title: Changing which WiFi Adapter is in Use
+tags:
+   - Networking
+   - WiFi
+   - Adapter
+   - NetworkManager
+   - systemd-networkd
+keywords: [WiFi, NetworkManager, systemd-networkd, wireless, adapter, network interface]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+This guide shows how to change which WiFi adapter (network card) is used for a specific network connection across different Linux network management systems.
+
+## **Why Change WiFi Adapters?**
+
+- **Multiple WiFi cards**: When you have multiple WiFi adapters (built-in + USB)
+- **Performance optimization**: Using a faster or better-positioned adapter
+- **Troubleshooting**: Testing different adapters when experiencing connectivity issues
+- **Hardware-specific features**: Some adapters support different standards (802.11ac, ax, etc.)
+
+## **Method 1: NetworkManager (Most Common)**
+
+### **Graphical Interface**
+
+On systems using NetworkManager (most desktop distributions), press `ALT+F2` to open the run dialog, then paste the following and press Enter:
+
+```bash
+nm-connection-editor
+```
+
+1. In the Network Connections window, highlight the WiFi network you want to modify
+2. Click on the **Gear Icon** (edit button) at the bottom left
+3. In the connection editor that opens, navigate to the **WiFi** tab
+4. Choose which WiFi adapter you wish to use by changing the **Device** dropdown
+5. Click **Save** to apply the changes
+
+### **Command Line Interface**
+
+```bash
+# List all network devices (shows device names and types)
+nmcli device status
+
+# Show only WiFi devices
+nmcli device status | grep wifi
+
+# List existing WiFi connections
+nmcli connection show | grep wifi
+
+# Modify a connection to use a specific device
+nmcli connection modify "Your-WiFi-Name" 802-11-wireless.device wlan1
+
+# Alternative: Delete and recreate connection with specific device
+nmcli connection delete "Your-WiFi-Name"
+nmcli device wifi connect "SSID-Name" password "your-password" ifname wlan1
+```
+
+## **Method 2: systemd-networkd**
+
+For systems using systemd-networkd:
+
+```bash
+# List available network devices
+networkctl list
+
+# Check device status
+networkctl status wlan0
+networkctl status wlan1
+
+# Create/edit network configuration file
+sudo nano /etc/systemd/network/25-wireless.network
+```
+
+Example configuration file (`/etc/systemd/network/25-wireless.network`):
+```ini
+[Match]
+Name=wlan1
+Type=wlan
+
+[Network]
+DHCP=yes
+
+[DHCP]
+UseDNS=yes
+```
+
+Apply changes:
+```bash
+sudo systemctl restart systemd-networkd
+```
+
+## **Method 3: wpa_supplicant + dhcpcd**
+
+For manual WiFi management:
+
+```bash
+# List WiFi interfaces
+sudo iw dev
+
+# Scan for networks on specific interface
+sudo iw dev wlan1 scan | grep SSID
+
+# Create wpa_supplicant configuration
+sudo wpa_passphrase "SSID-Name" "password" | sudo tee /etc/wpa_supplicant/wpa_supplicant-wlan1.conf
+
+# Connect using wpa_supplicant
+sudo wpa_supplicant -B -i wlan1 -c /etc/wpa_supplicant/wpa_supplicant-wlan1.conf
+
+# Get IP address via DHCP
+sudo dhcpcd wlan1
+```
+
+## **Method 4: netplan (Ubuntu/Debian)**
+
+For systems using netplan:
+
+```bash
+# Edit netplan configuration
+sudo nano /etc/netplan/01-network-manager-all.yaml
+```
+
+Example configuration:
+```yaml
+network:
+  version: 2
+  wifis:
+    wlan1:
+      dhcp4: true
+      access-points:
+        "Your-SSID":
+          password: "your-password"
+```
+
+Apply configuration:
+```bash
+sudo netplan apply
+```
+
+## **Method 5: ifupdown (Legacy)**
+
+For older systems using ifupdown:
+
+```bash
+# Edit interfaces file
+sudo nano /etc/network/interfaces
+```
+
+Add configuration:
+```
+auto wlan1
+iface wlan1 inet dhcp
+    wpa-ssid "Your-SSID"
+    wpa-psk "your-password"
+```
+
+Apply changes:
+```bash
+sudo ifdown wlan0  # Disable current adapter
+sudo ifup wlan1    # Enable new adapter
+```
+
+## **Useful Commands for All Methods**
+
+### **Identify WiFi Adapters**
+```bash
+# List all network interfaces
+ip link show
+
+# Show only wireless interfaces
+iwconfig
+
+# Modern alternative to iwconfig
+iw dev
+
+# Check USB WiFi adapters
+lsusb | grep -i wireless
+
+# Check PCI WiFi adapters
+lspci | grep -i wireless
+```
+
+### **Check Adapter Capabilities**
+```bash
+# Check supported standards and frequencies
+iw list
+
+# Check specific adapter info
+iw dev wlan0 info
+iw dev wlan1 info
+
+# Check link quality and signal strength
+iwconfig wlan0
+iwconfig wlan1
+```
+
+### **Monitor Connection Status**
+```bash
+# Watch connection status (NetworkManager)
+watch nmcli device status
+
+# Monitor systemd-networkd
+watch networkctl status
+
+# Check active connections
+ss -tuln | grep :22  # SSH connections
+ss -tuln | grep :80  # HTTP connections
+```
+
+## **Troubleshooting Tips**
+
+1. **Verify adapter is recognized**: `lsusb` or `lspci | grep -i wireless`
+2. **Check for driver issues**: `dmesg | grep -i wireless`
+3. **Ensure adapter is not blocked**: `rfkill list`
+4. **Test adapter functionality**: `iw dev wlan1 scan`
+5. **Check signal strength**: `iwconfig` or `nmcli device wifi list`
+
+Remember to replace adapter names (`wlan0`, `wlan1`) and network names with your actual device names and SSID.
+
+<BuyMeACoffeeButton />
