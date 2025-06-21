@@ -463,6 +463,357 @@ sudo systemctl status danted
 curl --socks5 localhost:1080 http://httpbin.org/ip
 ```
 
+## **Tor - The Onion Router**
+
+Tor (The Onion Router) is a free and open-source privacy network that routes internet traffic through multiple encrypted layers to provide anonymity. Tor runs a SOCKS proxy on localhost that can be used directly by applications or transparently via tools like redsocks.
+
+### **Key Features**
+- **Anonymity**: Routes traffic through multiple encrypted relays
+- **SOCKS proxy**: Provides SOCKS4a/SOCKS5 proxy on port 9050
+- **Hidden services**: Access .onion sites and create hidden services
+- **DNS resolution**: Resolves DNS queries through Tor network
+- **Cross-platform**: Available on Linux, Windows, macOS
+
+### **Installation**
+
+#### **Ubuntu/Debian**
+```bash
+# Install from repositories
+sudo apt update
+sudo apt install tor
+
+# Install Tor Browser (optional)
+sudo apt install torbrowser-launcher
+```
+
+#### **Red Hat/CentOS/Fedora**
+```bash
+# Enable EPEL repository (RHEL/CentOS)
+sudo yum install epel-release
+
+# Install Tor
+sudo dnf install tor  # Fedora
+sudo yum install tor  # RHEL/CentOS
+
+# Install from Tor Project repository (recommended)
+sudo dnf install dnf-plugins-core
+sudo dnf config-manager --add-repo https://rpm.torproject.org/fedora/torproject.repo
+sudo dnf install tor
+```
+
+#### **Arch Linux**
+```bash
+# Install from official repositories
+sudo pacman -S tor
+
+# Install Tor Browser
+sudo pacman -S torbrowser-launcher
+```
+
+### **Configuration**
+
+#### **Basic Tor Configuration**
+```bash
+# Edit Tor configuration
+sudo nano /etc/tor/torrc
+```
+
+```conf
+# Basic Tor configuration
+SocksPort 9050
+SocksPolicy accept 127.0.0.1
+SocksPolicy accept 192.168.0.0/16
+SocksPolicy reject *
+
+# Control port (for management)
+ControlPort 9051
+HashedControlPassword 16:872860B76453A77D60CA2BB8C1D0C6E6F9B9DC6B0D1B4F7E8E1A3CC8D5
+
+# DNS port for transparent proxying
+DNSPort 5353
+
+# Transparent proxy port
+TransPort 9040
+TransListenAddress 127.0.0.1
+```
+
+#### **Generate Control Password**
+```bash
+# Generate hashed password for control port
+tor --hash-password "your_password_here"
+
+# Add the output to torrc as HashedControlPassword
+```
+
+#### **Advanced Configuration**
+```conf
+# Additional configuration options
+Log notice file /var/log/tor/notices.log
+DataDirectory /var/lib/tor
+
+# Bridge configuration (for censored networks)
+UseBridges 1
+Bridge obfs4 192.0.2.2:80 B84F6C6B4BD0F1CD6CA1C6D2F5C9E5F8F1D0B2A3
+
+# Exit node country selection
+ExitNodes {us},{ca},{gb}
+StrictNodes 1
+
+# Bandwidth limits
+BandwidthRate 1 MB
+BandwidthBurst 2 MB
+
+# Hidden service configuration
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 80 127.0.0.1:8080
+```
+
+### **Running Tor**
+
+#### **Start Tor Service**
+```bash
+# Start and enable Tor
+sudo systemctl start tor
+sudo systemctl enable tor
+
+# Check status
+sudo systemctl status tor
+
+# View logs
+sudo journalctl -u tor -f
+sudo tail -f /var/log/tor/notices.log
+```
+
+#### **Test Tor Connection**
+```bash
+# Test SOCKS proxy
+curl --socks5 127.0.0.1:9050 http://httpbin.org/ip
+
+# Check if using Tor (should show Tor exit node IP)
+curl --socks5 127.0.0.1:9050 https://check.torproject.org/api/ip
+
+# Test with different user agents
+curl --socks5 127.0.0.1:9050 -A "Mozilla/5.0" https://icanhazip.com
+```
+
+### **Transparent Proxying with Tor**
+
+#### **Using Redsocks with Tor**
+```bash
+# Configure redsocks for Tor
+sudo nano /etc/redsocks.conf
+```
+
+```conf
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 127.0.0.1;
+    local_port = 12345;
+    ip = 127.0.0.1;
+    port = 9050;           # Tor SOCKS port
+    type = socks5;
+}
+
+redudp {
+    local_ip = 127.0.0.1;
+    local_port = 10053;
+    ip = 127.0.0.1;
+    port = 5353;           # Tor DNS port
+    dest_ip = 8.8.8.8;
+    dest_port = 53;
+}
+```
+
+#### **IPTables Rules for Tor Transparent Proxy**
+```bash
+#!/bin/bash
+# Tor transparent proxy iptables script
+
+# Flush existing rules
+iptables -F
+iptables -t nat -F
+
+# Create Tor user (if not exists)
+sudo useradd -r -s /bin/false tor-user
+
+# Don't route Tor user traffic through Tor (prevent loops)
+iptables -t nat -A OUTPUT -m owner --uid-owner $(id -u tor-user) -j RETURN
+
+# Don't route local traffic through Tor
+iptables -t nat -A OUTPUT -o lo -j RETURN
+
+# Don't route private networks through Tor
+iptables -t nat -A OUTPUT -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A OUTPUT -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A OUTPUT -d 10.0.0.0/8 -j RETURN
+
+# Route all other TCP traffic through Tor TransPort
+iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports 9040
+
+# Route DNS queries through Tor
+iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
+
+# Save rules
+iptables-save > /etc/iptables/tor-rules.v4
+```
+
+### **Tor Browser and Applications**
+
+#### **Configure Applications for Tor**
+```bash
+# Firefox proxy settings (manual configuration)
+Network Settings > Manual proxy configuration:
+SOCKS Host: 127.0.0.1
+Port: 9050
+SOCKS v5: enabled
+Proxy DNS when using SOCKS v5: enabled
+
+# Command line applications
+curl --socks5 127.0.0.1:9050 https://example.com
+wget --proxy=on --https-proxy=127.0.0.1:9050 https://example.com
+
+# SSH through Tor
+ssh -o ProxyCommand="nc -X 5 -x 127.0.0.1:9050 %h %p" user@server.onion
+
+# Git through Tor
+git config --global http.proxy socks5://127.0.0.1:9050
+git config --global https.proxy socks5://127.0.0.1:9050
+```
+
+### **Hidden Services**
+
+#### **Create a Hidden Service**
+```bash
+# Add to /etc/tor/torrc
+HiddenServiceDir /var/lib/tor/my_website/
+HiddenServicePort 80 127.0.0.1:8080
+
+# Restart Tor
+sudo systemctl restart tor
+
+# Get your .onion address
+sudo cat /var/lib/tor/my_website/hostname
+```
+
+#### **Access Hidden Services**
+```bash
+# Access .onion sites through Tor
+curl --socks5 127.0.0.1:9050 http://3g2upl4pq6kufc4m.onion
+
+# Using torsocks wrapper
+torsocks curl http://3g2upl4pq6kufc4m.onion
+```
+
+### **Tor Troubleshooting**
+
+#### **Connection Issues**
+```bash
+# Check if Tor is running
+sudo systemctl status tor
+sudo netstat -tlnp | grep :9050
+
+# Test Tor connectivity
+curl --socks5 127.0.0.1:9050 https://check.torproject.org/api/ip
+
+# Check Tor logs
+sudo journalctl -u tor -f
+sudo tail -f /var/log/tor/notices.log
+
+# Common error: "Could not bind to 127.0.0.1:9050"
+sudo ss -tlnp | grep :9050  # Check what's using the port
+```
+
+#### **Slow Performance**
+```bash
+# Try different exit nodes
+echo "ExitNodes {us},{ca},{de}" | sudo tee -a /etc/tor/torrc
+sudo systemctl restart tor
+
+# Increase circuit timeout
+echo "CircuitBuildTimeout 30" | sudo tee -a /etc/tor/torrc
+
+# Check bandwidth limits
+grep -i bandwidth /etc/tor/torrc
+```
+
+#### **Transparent Proxy Issues**
+```bash
+# Check if transparent proxy is working
+curl https://check.torproject.org/api/ip  # Should show Tor exit IP
+
+# Debug iptables rules
+sudo iptables -t nat -L -n -v
+sudo iptables -L -n -v
+
+# Check for DNS leaks
+dig @127.0.0.1 -p 5353 google.com
+nslookup google.com 127.0.0.1
+
+# Monitor traffic
+sudo tcpdump -i lo port 9040
+sudo netstat -tlnp | grep tor
+```
+
+#### **Bridge Configuration (for Censored Networks)**
+```bash
+# Get bridges from https://bridges.torproject.org/
+# Add to /etc/tor/torrc
+UseBridges 1
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+Bridge obfs4 192.0.2.2:80 B84F6C6B4BD0F1CD6CA1C6D2F5C9E5F8F1D0B2A3 cert=...
+
+# Test bridge connectivity
+sudo systemctl restart tor
+sudo journalctl -u tor -f
+```
+
+### **Security Considerations for Tor**
+
+#### **Important Security Notes**
+- **DNS Leaks**: Always route DNS through Tor (port 5353) or use transparent proxy
+- **Application Leaks**: Some applications may bypass proxy settings
+- **Time Zone**: Consider setting system timezone to UTC
+- **Browser Fingerprinting**: Use Tor Browser for best anonymity
+- **Exit Node Monitoring**: Be aware that exit nodes can see unencrypted traffic
+- **Entry Guards**: Tor automatically selects and reuses entry guards for security
+
+#### **Secure Configuration**
+```conf
+# Additional security settings for /etc/tor/torrc
+AvoidDiskWrites 1
+HardwareAccel 1
+SafeLogging 1
+DisableDebuggerAttachment 1
+
+# Use only stable relays
+UseEntryGuards 1
+StrictNodes 1
+
+# Disable potentially dangerous features
+DisableNetwork 0
+DisableV2DirectoryRequests 1
+```
+
+#### **Monitoring Tor Usage**
+```bash
+# Monitor Tor circuits
+sudo -u tor tor --verify-config
+echo "GETINFO circuit-status" | nc 127.0.0.1 9051
+
+# Check current IP and location
+curl --socks5 127.0.0.1:9050 https://ipinfo.io/json
+
+# Verify Tor usage
+curl --socks5 127.0.0.1:9050 https://check.torproject.org/api/ip
+```
+
 ## **3proxy - Lightweight Proxy Server**
 
 3proxy is a small but feature-rich proxy server supporting multiple protocols.
