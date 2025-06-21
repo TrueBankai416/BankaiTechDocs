@@ -1,0 +1,534 @@
+---
+title: Linux Router (lnxrouter) - Turn Your Laptop into a WiFi Hotspot
+tags:
+   - Networking
+   - WiFi
+   - Hotspot
+   - Router
+   - Internet Sharing
+   - Access Point
+keywords: [lnxrouter, linux-router, WiFi hotspot, access point, internet sharing, router, networking, NAT]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Linux Router (lnxrouter): Complete Guide to WiFi Hotspot Creation**
+
+Linux Router (lnxrouter) is a powerful command-line tool that allows you to turn your Linux laptop or desktop into a WiFi hotspot and router in a single command. It wraps complex networking tools like iptables, dnsmasq, and hostapd to provide Internet sharing, WiFi access point creation, and advanced networking features with minimal configuration.
+
+## **What is lnxrouter?**
+
+lnxrouter is a bash script that sets up Linux as a router, enabling you to:
+- **Share Internet connection** from any interface to another
+- **Create WiFi hotspots** to share your wired or wireless connection
+- **Provide NAT routing** for virtual machines and containers
+- **Set up transparent proxies** for advanced networking scenarios
+- **Manage multiple network instances** simultaneously
+
+It's essentially a modern, feature-rich successor to the original `create_ap` tool with enhanced capabilities.
+
+## **Why Use lnxrouter?**
+
+### **Common Use Cases**
+
+1. **Internet Sharing**
+   - Share your laptop's wired Internet connection via WiFi
+   - Share your WiFi connection through another WiFi adapter
+   - Provide Internet to devices that don't support your network's security protocols
+
+2. **Travel and Remote Work**
+   - Create a personal hotspot in hotels with wired-only Internet
+   - Share a single hotel WiFi connection among multiple devices
+   - Bypass device limits on public WiFi networks
+
+3. **Development and Testing**
+   - Provide isolated networks for testing
+   - Route traffic through development proxies
+   - Create controlled network environments for applications
+
+4. **Legacy Device Support**
+   - Connect older devices that don't support modern WiFi security
+   - Bridge different network protocols and standards
+   - Provide connectivity to IoT devices with limited network capabilities
+
+5. **Privacy and Security**
+   - Create isolated networks for guest devices
+   - Route traffic through VPNs or Tor (with proper configuration)
+   - Monitor and control network traffic
+
+## **Installation**
+
+### **Download and Setup**
+
+lnxrouter is distributed as a single bash script. No package installation required:
+
+```bash
+# Download the script
+curl -L https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter -o lnxrouter
+
+# Make it executable
+chmod +x lnxrouter
+
+# Move to system PATH (optional)
+sudo mv lnxrouter /usr/local/bin/
+```
+
+### **Dependencies**
+
+Install required dependencies based on your Linux distribution:
+
+#### **Ubuntu/Debian**
+```bash
+sudo apt update
+sudo apt install -y bash procps iproute2 dnsmasq iptables hostapd iw wireless-tools haveged
+```
+
+#### **Red Hat/CentOS/Fedora**
+```bash
+# RHEL/CentOS
+sudo yum install -y bash procps-ng iproute dnsmasq iptables hostapd iw wireless-tools haveged
+
+# Fedora
+sudo dnf install -y bash procps-ng iproute dnsmasq iptables hostapd iw wireless-tools haveged
+```
+
+#### **Arch Linux**
+```bash
+sudo pacman -S bash procps-ng iproute2 dnsmasq iptables hostapd iw wireless_tools haveged
+```
+
+### **Dependency Breakdown**
+
+| Package | Purpose | Required For |
+|---------|---------|--------------|
+| `bash` | Script execution | All features |
+| `procps`/`procps-ng` | Process management | All features |
+| `iproute2` | Network interface management | All features |
+| `dnsmasq` | DHCP and DNS server | All features |
+| `iptables` | Firewall and NAT | All features |
+| `hostapd` | WiFi access point creation | WiFi hotspot only |
+| `iw` | Modern wireless tools | WiFi hotspot only |
+| `wireless-tools` (`iwconfig`) | Legacy wireless tools | Fallback for older adapters |
+| `haveged` | Entropy generation | WiFi security (optional) |
+
+## **Basic Usage**
+
+### **Create a WiFi Hotspot**
+
+**Share your current Internet connection via WiFi:**
+
+```bash
+# Basic WiFi hotspot
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123"
+
+# With custom settings
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123" -c 6 --country US
+```
+
+### **Share Internet Between Interfaces**
+
+**Provide Internet from eth0 to eth1:**
+
+```bash
+sudo lnxrouter -i eth1
+```
+
+**Share WiFi connection through Ethernet:**
+
+```bash
+sudo lnxrouter -i eth0 -o wlan0
+```
+
+### **Create LAN Without Internet**
+
+**For local networking only:**
+
+```bash
+# Ethernet LAN
+sudo lnxrouter -n -i eth1
+
+# WiFi LAN
+sudo lnxrouter -n --ap wlan0 "LocalNetwork" -p "password123"
+```
+
+## **Advanced Configuration**
+
+### **WiFi Hotspot Options**
+
+```bash
+# Advanced WiFi hotspot with all options
+sudo lnxrouter --ap wlan1 "MyAdvancedHotspot" \
+    -p "SecurePassword123" \
+    -c 11 \
+    --country US \
+    --freq-band 2.4 \
+    -w 2 \
+    --hidden \
+    --isolate-clients \
+    --mac-filter
+```
+
+#### **WiFi Parameters Explained**
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--ap <interface> <SSID>` | Create AP on interface with SSID | `--ap wlan0 "MyHotspot"` |
+| `-p, --password` | WPA password (8+ characters) | `-p "MyPassword123"` |
+| `-c <channel>` | WiFi channel (1-14 for 2.4GHz) | `-c 6` |
+| `--country <code>` | Two-letter country code | `--country US` |
+| `--freq-band <GHz>` | Frequency band (2.4 or 5) | `--freq-band 5` |
+| `-w <version>` | WPA version (1, 2, or 1+2) | `-w 2` |
+| `--hidden` | Hide SSID (don't broadcast) | |
+| `--isolate-clients` | Prevent client-to-client communication | |
+| `--mac-filter` | Enable MAC address filtering | |
+
+### **Network Configuration**
+
+```bash
+# Custom IP addressing
+sudo lnxrouter -i eth1 -g 10.0.50.1
+
+# IPv6 support
+sudo lnxrouter -i eth1 -6 --p6 fd00:50::
+
+# Custom DNS servers
+sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+### **Instance Management**
+
+```bash
+# Run in background
+sudo lnxrouter --daemon --ap wlan0 "BackgroundAP" -p "password"
+
+# List running instances
+sudo lnxrouter --list-running
+
+# List connected clients
+sudo lnxrouter --list-clients wlan0
+
+# Stop specific instance
+sudo lnxrouter --stop <PID_or_interface>
+```
+
+## **Network Interface Compatibility**
+
+### **Important Limitations**
+
+**⚠️ Not all network interfaces support Access Point (AP) mode while connected to a network:**
+
+1. **Single WiFi Adapter Limitation**
+   - Most WiFi adapters cannot simultaneously connect to a network AND create an AP
+   - Solution: Use virtual interface creation or multiple adapters
+
+2. **Driver Support**
+   - Some WiFi drivers don't support AP mode at all
+   - Check your adapter's capabilities before attempting
+
+3. **Hardware Constraints**
+   - USB WiFi adapters often have limited AP mode support
+   - Built-in adapters typically have better compatibility
+
+### **Check Interface Capabilities**
+
+```bash
+# Check if interface supports AP mode
+iw list | grep -A 10 "Supported interface modes"
+
+# Check specific interface info
+iw dev wlan0 info
+
+# List available interfaces
+ip link show
+```
+
+### **Virtual Interface Solution**
+
+lnxrouter automatically creates virtual interfaces when needed:
+
+```bash
+# This creates virtual interface x0wlan0 for AP
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Disable virtual interface creation (requires separate adapters)
+sudo lnxrouter --ap wlan1 "MyHotspot" -p "password" --no-virt
+```
+
+## **Common Errors and Troubleshooting**
+
+### **Installation Issues**
+
+#### **"Command not found" Errors**
+
+```bash
+# Missing dependencies
+sudo apt install -y hostapd iw dnsmasq iptables
+
+# Check if tools are available
+which hostapd iw dnsmasq iptables
+```
+
+#### **Permission Denied**
+
+```bash
+# Always run with sudo
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Check script permissions
+chmod +x lnxrouter
+```
+
+### **WiFi Hotspot Issues**
+
+#### **"Device or resource busy"**
+
+**Cause:** Interface is managed by NetworkManager or already in use.
+
+**Solutions:**
+```bash
+# Stop NetworkManager temporarily
+sudo systemctl stop NetworkManager
+
+# Or unmanage the interface
+sudo nmcli dev set wlan0 managed no
+
+# Check if interface is in use
+sudo lsof | grep wlan0
+```
+
+#### **"Operation not supported"**
+
+**Cause:** WiFi adapter doesn't support AP mode.
+
+**Solutions:**
+```bash
+# Check AP mode support
+iw list | grep -A 10 "interface modes"
+
+# Try different driver
+sudo lnxrouter --ap wlan0 "Test" -p "password" --driver hostap
+
+# Use external USB WiFi adapter with AP support
+```
+
+#### **"No such device"**
+
+**Cause:** Interface name incorrect or interface down.
+
+**Solutions:**
+```bash
+# List available interfaces
+ip link show
+iwconfig
+
+# Bring interface up
+sudo ip link set wlan0 up
+
+# Check interface status
+sudo rfkill list
+sudo rfkill unblock wifi
+```
+
+### **Connection Issues**
+
+#### **Clients Can Connect But No Internet**
+
+**Causes and Solutions:**
+
+1. **IP forwarding disabled:**
+```bash
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+echo 1 | sudo tee /proc/sys/net/ipv6/conf/all/forwarding
+```
+
+2. **Firewall blocking traffic:**
+```bash
+# Check iptables rules
+sudo iptables -L -n
+
+# Temporarily disable firewall
+sudo ufw disable  # Ubuntu
+sudo systemctl stop firewalld  # RHEL/CentOS
+```
+
+3. **Wrong source interface:**
+```bash
+# Specify source interface explicitly
+sudo lnxrouter -i eth1 -o wlan0  # Share wlan0 through eth1
+```
+
+#### **DNS Resolution Problems**
+
+```bash
+# Use public DNS servers
+sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
+
+# Disable local DNS if problematic
+sudo lnxrouter -i eth1 --no-dns --dhcp-dns 1.1.1.1
+```
+
+### **Performance Issues**
+
+#### **Slow Speeds or High Latency**
+
+**Solutions:**
+```bash
+# Use specific channel to avoid interference
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" -c 1
+
+# Use 5GHz band if supported
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" --freq-band 5
+
+# Enable 802.11n for better performance
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" --wifi4
+```
+
+### **System Integration Issues**
+
+#### **Conflicts with NetworkManager**
+
+```bash
+# lnxrouter automatically handles NetworkManager
+# But if issues persist, manually unmanage interface
+sudo nmcli dev set wlan0 managed no
+
+# Re-enable after stopping lnxrouter
+sudo nmcli dev set wlan0 managed yes
+```
+
+#### **Firewall Conflicts**
+
+```bash
+# lnxrouter handles firewalld automatically
+# For other firewalls, ensure traffic forwarding is allowed
+
+# UFW example
+sudo ufw allow in on wlan0
+sudo ufw allow out on eth0
+```
+
+### **Debugging Commands**
+
+```bash
+# Check running instances
+sudo lnxrouter --list-running
+
+# Monitor system logs
+sudo journalctl -f | grep -i "hostapd\|dnsmasq"
+
+# Check network interfaces
+ip addr show
+ip route show
+
+# Test connectivity
+ping 8.8.8.8
+dig google.com
+```
+
+## **Complete Examples**
+
+### **Travel Setup: Hotel WiFi Sharing**
+
+```bash
+# Connect to hotel WiFi normally, then share via hotspot
+sudo lnxrouter --ap wlan0 "HotelShare" -p "MyTravelPassword" -c 6 --hidden
+```
+
+### **Development Environment**
+
+```bash
+# Create isolated network for development
+sudo lnxrouter -n --ap wlan1 "DevNetwork" -p "devpass123" --isolate-clients
+```
+
+### **Guest Network**
+
+```bash
+# Secure guest network with limited access
+sudo lnxrouter --ap wlan0 "GuestWiFi" -p "guestpass" --ban-priv --random-mac
+```
+
+### **Backup Internet Solution**
+
+```bash
+# Share mobile hotspot through Ethernet
+sudo lnxrouter -i eth0 -o wlan0 --dhcp-dns 8.8.8.8
+```
+
+## **Security Considerations**
+
+### **Best Practices**
+
+1. **Use Strong Passwords**
+   - Minimum 12 characters
+   - Mix of letters, numbers, and symbols
+   - Avoid dictionary words
+
+2. **Enable Client Isolation**
+   ```bash
+   sudo lnxrouter --ap wlan0 "SecureAP" -p "StrongPassword123!" --isolate-clients
+   ```
+
+3. **Hide SSID When Possible**
+   ```bash
+   sudo lnxrouter --ap wlan0 "HiddenAP" -p "password" --hidden
+   ```
+
+4. **Use MAC Filtering for Sensitive Networks**
+   ```bash
+   sudo lnxrouter --ap wlan0 "RestrictedAP" -p "password" --mac-filter
+   ```
+
+5. **Monitor Connected Clients**
+   ```bash
+   # Regularly check who's connected
+   sudo lnxrouter --list-clients wlan0
+   ```
+
+### **Privacy Considerations**
+
+- Be aware that you're routing others' traffic
+- Consider legal implications in your jurisdiction
+- Log traffic if required by local regulations
+- Use `--ban-priv` to protect your private network
+
+## **System Cleanup**
+
+lnxrouter automatically cleans up when stopped, but some changes persist:
+
+**Persistent Changes:**
+- IP forwarding enabled (`/proc/sys/net/ipv4/ip_forward = 1`)
+- IPv6 forwarding enabled
+- WiFi interface unblocked (`rfkill`)
+- WiFi country code setting
+- Some AppArmor policy changes
+
+**Manual Cleanup (if needed):**
+```bash
+# Stop all instances
+sudo lnxrouter --list-running
+sudo lnxrouter --stop all
+
+# Reset IP forwarding (only if you don't need it)
+echo 0 | sudo tee /proc/sys/net/ipv4/ip_forward
+echo 0 | sudo tee /proc/sys/net/ipv6/conf/all/forwarding
+
+# Re-enable NetworkManager management
+sudo nmcli dev set wlan0 managed yes
+```
+
+## **Conclusion**
+
+lnxrouter is a powerful and flexible tool for creating WiFi hotspots and sharing Internet connections on Linux. While it handles most complexities automatically, understanding the underlying concepts and potential limitations—especially regarding network interface compatibility—will help you troubleshoot issues and optimize your setup.
+
+Remember that not all WiFi adapters support simultaneous connection and AP mode, so having a USB WiFi adapter as backup is often helpful for complex scenarios.
+
+**Key Takeaways:**
+- Always run with `sudo` for proper permissions
+- Check WiFi adapter AP mode compatibility before starting
+- Use virtual interfaces when sharing the same WiFi adapter
+- Monitor connected clients and maintain security best practices
+- Understand that some system changes persist after shutdown
+
+<BuyMeACoffeeButton />
