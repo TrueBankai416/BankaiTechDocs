@@ -705,6 +705,50 @@ sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8 -g 192.168.55.1
 | `--catch-dns` | Intercept all DNS queries | `--catch-dns` |
 | `--log-dns` | Log DNS queries | `--log-dns` |
 
+### **Combining Tor and Redsocks**
+
+**Can you use both together?** Yes, but typically you choose one approach:
+
+#### **Option 1: Tor Direct (Recommended for Tor)**
+```bash
+# Use Tor's built-in transparent proxy (TransPort)
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "password" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+#### **Option 2: Redsocks → Tor SOCKS**
+```bash
+# Configure redsocks to use Tor's SOCKS proxy
+sudo tee /etc/redsocks.conf << EOF
+redsocks {
+    local_ip = 192.168.55.1;
+    local_port = 9040;
+    ip = 127.0.0.1;
+    port = 9050;           # Tor's SOCKS port
+    type = socks5;
+}
+EOF
+
+# Start both Tor and redsocks
+sudo systemctl start tor redsocks
+
+# Use redsocks for transparent proxy
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "password" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+#### **Option 3: Chain Proxies**
+```bash
+# Redsocks → HTTP Proxy → Tor
+# Configure redsocks to connect to an HTTP proxy that connects to Tor
+# (Advanced setup for specific enterprise scenarios)
+```
+
+**When to use each:**
+- **Tor Direct**: Simpler, better performance, recommended for most Tor use cases
+- **Redsocks → Tor**: Useful if you need HTTP proxy features or proxy chaining
+- **Separate purposes**: Use Tor for some traffic, different proxy for other traffic
+
 ### **Transparent Proxy Limitations**
 
 ⚠️ **Important Considerations:**
@@ -713,6 +757,7 @@ sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8 -g 192.168.55.1
 2. **DNS Leaks**: Ensure DNS traffic is properly routed through the proxy
 3. **HTTPS Limitations**: Transparent proxies cannot decrypt HTTPS traffic without certificates
 4. **Performance Impact**: Additional latency due to proxy routing
+5. **Single Proxy Chain**: lnxrouter `--tp` option only supports one transparent proxy at a time
 
 ## **Sandbox Network Configuration**
 
