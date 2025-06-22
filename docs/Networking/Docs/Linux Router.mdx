@@ -1649,10 +1649,15 @@ if command -v rfkill >/dev/null 2>&1; then
     rfkill block all
     sleep 3
 
-    # Step 3: Airplane mode off (unblock all wireless)
+    # Step 3: Airplane mode off (unblock all wireless) - this resets the radio hardware
     echo "Disabling airplane mode..."
     rfkill unblock all
-    sleep 5
+    sleep 2
+    
+    # Step 4: IMMEDIATELY block WiFi again (keep WiFi off until lnxrouter is ready)
+    echo "Blocking WiFi again to prevent NetworkManager interference..."
+    rfkill block wifi
+    sleep 3
 else
     echo "rfkill not found, using NetworkManager reset..."
     
@@ -1699,11 +1704,21 @@ echo "Starting lnxrouter hotspot..."
 sleep 8
 if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
     echo "Hotspot started successfully"
+    
+    # Step 6: Now we can unblock WiFi since lnxrouter has control
+    if command -v rfkill >/dev/null 2>&1; then
+        echo "Unblocking WiFi now that hotspot is established..."
+        rfkill unblock wifi
+    fi
+    
     echo "WiFi reset and hotspot creation complete"
     exit 0
 else
     echo "Failed to start hotspot after WiFi reset"
     nmcli dev set "$INTERFACE" managed yes
+    if command -v rfkill >/dev/null 2>&1; then
+        rfkill unblock wifi
+    fi
     exit 1
 fi
 EOF
