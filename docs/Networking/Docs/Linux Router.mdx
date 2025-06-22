@@ -1477,6 +1477,151 @@ sleep 30  # Wait for NetworkManager to initialize
 
 ### **Troubleshooting Boot Startup**
 
+#### **"Device or resource busy" Error on Autostart**
+
+**This is the most common autostart issue.** The error typically appears as:
+```
+RTNETLINK answers: Device or resource busy
+ERROR: Failed bringing x0wlo1 up
+```
+
+**Root Cause:** NetworkManager is managing the WiFi interface and conflicts with lnxrouter trying to create a virtual interface or configure the adapter.
+
+**Solutions (try in order):**
+
+**Solution 1: Add NetworkManager delay to systemd service**
+```bash
+# Edit your existing service
+sudo systemctl edit lnxrouter-hotspot.service
+
+# Add this content to override the timing:
+[Unit]
+After=network.target NetworkManager.service multi-user.target
+Wants=network.target
+
+[Service]
+ExecStartPre=/bin/sleep 15
+ExecStartPre=/bin/bash -c 'until nmcli dev show wlan0 | grep -q "GENERAL.STATE.*connected\\|disconnected"; do sleep 2; done'
+```
+
+**Solution 2: Unmanage interface before starting lnxrouter**
+```bash
+# Edit your existing service
+sudo systemctl edit lnxrouter-hotspot.service
+
+# Add pre-start commands:
+[Service]
+ExecStartPre=/usr/bin/nmcli dev set wlan0 managed no
+ExecStartPre=/bin/sleep 5
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+```
+
+**Solution 3: Create a wrapper script with proper sequencing**
+```bash
+# Create wrapper script
+sudo tee /usr/local/bin/lnxrouter-autostart.sh << 'EOF'
+#!/bin/bash
+
+INTERFACE="wlan0"
+SSID="MyHotspot"
+PASSWORD="MyPassword123"
+
+# Wait for NetworkManager to settle
+echo "Waiting for NetworkManager to initialize..."
+sleep 20
+
+# Check if interface exists
+if ! ip link show "$INTERFACE" >/dev/null 2>&1; then
+    echo "Error: Interface $INTERFACE not found"
+    exit 1
+fi
+
+# Unmanage interface from NetworkManager
+echo "Unmanaging $INTERFACE from NetworkManager..."
+nmcli dev set "$INTERFACE" managed no
+sleep 3
+
+# Kill any existing hostapd processes that might be using the interface
+pkill -f "hostapd.*$INTERFACE" || true
+sleep 2
+
+# Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap "$INTERFACE" "$SSID" -p "$PASSWORD" -g 192.168.100.1
+
+# Check if it started successfully
+sleep 5
+if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
+    echo "Hotspot started successfully"
+    exit 0
+else
+    echo "Failed to start hotspot, re-enabling NetworkManager management"
+    nmcli dev set "$INTERFACE" managed yes
+    exit 1
+fi
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/lnxrouter-autostart.sh
+
+# Update systemd service to use wrapper
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot
+After=network.target NetworkManager.service multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter-autostart.sh
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and restart
+sudo systemctl daemon-reload
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+**Solution 4: Stop NetworkManager on WiFi interface permanently**
+```bash
+# Create NetworkManager ignore rule
+sudo tee /etc/NetworkManager/conf.d/99-unmanaged-devices.conf << EOF
+[keyfile]
+unmanaged-devices=interface-name:wlan0
+EOF
+
+# Restart NetworkManager
+sudo systemctl restart NetworkManager
+
+# Your original systemd service should now work
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+**Quick Debug Commands:**
+```bash
+# Check what's using the interface
+sudo lsof | grep wlan0
+sudo fuser -v /dev/wlan0
+
+# Check NetworkManager status
+nmcli dev status
+nmcli dev show wlan0
+
+# Check for conflicting processes
+ps aux | grep -E "(hostapd|wpa_supplicant|NetworkManager)"
+
+# Check interface state
+ip link show wlan0
+iw dev wlan0 info
+```
+
 #### **Service Won't Start**
 ```bash
 # Check service status
@@ -1507,6 +1652,23 @@ User=root
 # Check lnxrouter permissions
 ls -la /usr/local/bin/lnxrouter
 sudo chmod +x /usr/local/bin/lnxrouter
+```
+
+#### **Multiple Failed Restart Attempts**
+```bash
+# Check restart limit
+sudo systemctl show lnxrouter-hotspot.service | grep Restart
+
+# Reset failed state
+sudo systemctl reset-failed lnxrouter-hotspot.service
+
+# Increase restart delay
+sudo systemctl edit lnxrouter-hotspot.service
+# Add:
+[Service]
+RestartSec=30
+StartLimitBurst=3
+StartLimitIntervalSec=300
 ```
 
 ### **Example: Complete Boot Setup**
