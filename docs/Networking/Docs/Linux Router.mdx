@@ -1608,6 +1608,22 @@ sudo systemctl restart lnxrouter-hotspot.service
 
 **This solution works when the interface needs a complete hardware reset cycle**, especially common with certain WiFi chipsets that get "stuck" in a conflicted state.
 
+**First, install rfkill if not already available:**
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y util-linux
+
+# RHEL/CentOS/Fedora  
+sudo dnf install -y util-linux
+# or on older systems: sudo yum install -y util-linux
+
+# Arch Linux
+sudo pacman -S util-linux
+
+# Verify installation
+rfkill --version
+```
+
 ```bash
 # Create enhanced wrapper script that performs WiFi radio reset
 sudo tee /usr/local/bin/lnxrouter-wifi-reset.sh << 'EOF'
@@ -1619,20 +1635,44 @@ PASSWORD="MyPassword123"
 
 echo "Starting WiFi reset sequence..."
 
-# Step 1: Turn off WiFi completely
-echo "Turning off WiFi..."
-rfkill block wifi
-sleep 3
+# Check if rfkill is available
+if command -v rfkill >/dev/null 2>&1; then
+    echo "Using rfkill for WiFi reset..."
+    
+    # Step 1: Turn off WiFi completely
+    echo "Turning off WiFi..."
+    rfkill block wifi
+    sleep 3
 
-# Step 2: Airplane mode on (block all wireless)
-echo "Enabling airplane mode..."
-rfkill block all
-sleep 3
+    # Step 2: Airplane mode on (block all wireless)
+    echo "Enabling airplane mode..."
+    rfkill block all
+    sleep 3
 
-# Step 3: Airplane mode off (unblock all wireless)
-echo "Disabling airplane mode..."
-rfkill unblock all
-sleep 5
+    # Step 3: Airplane mode off (unblock all wireless)
+    echo "Disabling airplane mode..."
+    rfkill unblock all
+    sleep 5
+else
+    echo "rfkill not found, using NetworkManager reset..."
+    
+    # Alternative: Use NetworkManager to reset WiFi
+    echo "Stopping NetworkManager..."
+    systemctl stop NetworkManager
+    sleep 3
+    
+    echo "Bringing interface down..."
+    ip link set "$INTERFACE" down
+    sleep 2
+    
+    echo "Bringing interface up..."
+    ip link set "$INTERFACE" up
+    sleep 3
+    
+    echo "Starting NetworkManager..."
+    systemctl start NetworkManager
+    sleep 5
+fi
 
 # Wait for interface to come up
 echo "Waiting for $INTERFACE to initialize..."
