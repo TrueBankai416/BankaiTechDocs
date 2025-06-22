@@ -112,6 +112,28 @@ sudo pacman -S bash procps-ng iproute2 dnsmasq iptables hostapd iw wireless_tool
 | `wireless-tools` (`iwconfig`) | Legacy wireless tools | Fallback for older adapters |
 | `haveged` | Entropy generation | WiFi security (optional) |
 
+## **Important: Interface Names**
+
+⚠️ **Before You Start**: Throughout this guide, we use `wlan0` as an example WiFi interface name. **You must replace `wlan0` with your actual WiFi interface name.**
+
+**Find your WiFi interface name:**
+```bash
+# List all network interfaces
+ip link show
+
+# List only WiFi interfaces
+iwconfig 2>/dev/null | grep -E '^[a-z]' | cut -d' ' -f1
+
+# Common interface names:
+# - wlan0, wlan1, wlan2 (traditional naming)
+# - wlp2s0, wlp3s0 (newer systemd naming)
+# - wlo1, wlo2 (Dell/some manufacturers)
+```
+
+**Example interface name substitution:**
+- If your interface is `wlp2s0`, change `--ap wlan0` to `--ap wlp2s0`
+- If your interface is `wlo1`, change `--ap wlan0` to `--ap wlo1`
+
 ## **Basic Usage**
 
 ### **Create a WiFi Hotspot**
@@ -119,10 +141,10 @@ sudo pacman -S bash procps-ng iproute2 dnsmasq iptables hostapd iw wireless_tool
 **Share your current Internet connection via WiFi:**
 
 ```bash
-# Basic WiFi hotspot
+# Basic WiFi hotspot (replace wlan0 with YOUR interface name)
 sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123"
 
-# With custom settings
+# With custom settings (replace wlan0 with YOUR interface name)
 sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123" -c 6 --country US
 ```
 
@@ -1251,6 +1273,28 @@ curl --proxy socks5://127.0.0.1:9050 http://check.torproject.org
 
 **Can you make lnxrouter start automatically at system boot?** Yes! Here are several methods to ensure your hotspot/router setup starts automatically when your system boots.
 
+### **Prerequisites for Boot Startup**
+
+Before setting up automatic startup, ensure you have the required tools installed:
+
+#### **Install rfkill (Required for WiFi Management)**
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y rfkill
+
+# RHEL/CentOS/Fedora  
+sudo dnf install -y util-linux
+# or on older systems: sudo yum install -y util-linux
+
+# Arch Linux
+sudo pacman -S util-linux
+
+# Verify installation
+rfkill --version
+```
+
+**Why rfkill is needed:** rfkill is essential for managing WiFi radio states during boot, especially for resolving interface conflicts and performing WiFi resets when NetworkManager interferes with lnxrouter.
+
 ### **Method 1: Systemd Service (Recommended)**
 
 Create a systemd service for automatic startup and management:
@@ -1258,7 +1302,7 @@ Create a systemd service for automatic startup and management:
 #### **Single Hotspot Service**
 
 ```bash
-# Create systemd service file
+# Create systemd service file (REPLACE wlan0 with YOUR interface name)
 sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
 [Unit]
 Description=lnxrouter WiFi Hotspot
@@ -1608,21 +1652,7 @@ sudo systemctl restart lnxrouter-hotspot.service
 
 **This solution works when the interface needs a complete hardware reset cycle**, especially common with certain WiFi chipsets that get "stuck" in a conflicted state.
 
-**First, install rfkill if not already available:**
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install -y util-linux
-
-# RHEL/CentOS/Fedora  
-sudo dnf install -y util-linux
-# or on older systems: sudo yum install -y util-linux
-
-# Arch Linux
-sudo pacman -S util-linux
-
-# Verify installation
-rfkill --version
-```
+**Note:** rfkill should already be installed if you followed the Prerequisites section above. If not installed:
 
 ```bash
 # Create enhanced wrapper script that performs WiFi radio reset
