@@ -715,19 +715,34 @@ sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1 -6 --p6 fd00:5:6:7::
 
 ### **Tor Integration Example**
 
+**Quick Setup for Tor Transparent Proxy:**
+
+```bash
+# Basic Tor hotspot
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+⚠️ **Important**: This requires proper Tor configuration. For complete setup instructions, troubleshooting, and security considerations, see our **[Tor Transparent Proxy Guide](./Tor%20Transparent%20Proxy.mdx)**.
+
+**Common Issues:**
+- **Connected but no internet**: Usually means Tor service isn't running or configured properly
+- **DNS not working**: Tor DNSPort configuration missing
+- **IP address mismatch**: Tor configuration must match lnxrouter gateway IP
+
 **Understanding the IP Addresses:**
 - `192.168.55.1` is the IP address lnxrouter assigns to itself in the network it creates
 - You can change this with the `-g` option (e.g., `-g 10.0.50.1` or `-g 172.16.100.1`)
 - The `.55.1` part means "IP ending in .55.1" - you can use any valid private IP
 - IPv6 `fd00:5:6:7::` is a private IPv6 prefix - also customizable
 
-**1. Install and configure Tor:**
+**Quick Tor Configuration:**
 ```bash
-# Install Tor
+# 1. Install Tor
 sudo apt install tor  # Ubuntu/Debian
 sudo dnf install tor  # Fedora
 
-# Configure Tor for transparent proxy
+# 2. Configure Tor for transparent proxy
 # Replace 192.168.55.1 with your chosen IP (must match -g option later)
 sudo tee -a /etc/tor/torrc << EOF
 TransPort 192.168.55.1:9040
@@ -736,24 +751,17 @@ TransPort [fd00:5:6:7::1]:9040
 DNSPort [fd00:5:6:7::1]:9053
 EOF
 
-# Restart Tor
+# 3. Restart Tor
 sudo systemctl restart tor
-```
 
-**2. Start lnxrouter with Tor integration:**
-```bash
-# The -g IP must match the IP in torrc above
+# 4. Start lnxrouter (the -g IP must match the IP in torrc above)
 sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
     --tp 9040 --dns 9053 \
     -g 192.168.55.1 \
     -6 --p6 fd00:5:6:7::
-
-# Alternative with different IP range
-sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
-    --tp 9040 --dns 9053 \
-    -g 10.0.50.1 \
-    -6 --p6 fd00:10:20:30::
 ```
+
+**📖 For comprehensive Tor setup, troubleshooting, and security best practices, see the complete [Tor Transparent Proxy Guide](./Tor%20Transparent%20Proxy.mdx).**
 
 ### **Custom Proxy Integration**
 
