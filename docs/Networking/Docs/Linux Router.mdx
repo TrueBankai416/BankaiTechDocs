@@ -1604,6 +1604,107 @@ sudo systemctl restart NetworkManager
 sudo systemctl restart lnxrouter-hotspot.service
 ```
 
+**Solution 5: WiFi Radio Reset (Most Effective for Stubborn Interfaces)**
+
+**This solution works when the interface needs a complete hardware reset cycle**, especially common with certain WiFi chipsets that get "stuck" in a conflicted state.
+
+```bash
+# Create enhanced wrapper script that performs WiFi radio reset
+sudo tee /usr/local/bin/lnxrouter-wifi-reset.sh << 'EOF'
+#!/bin/bash
+
+INTERFACE="wlan0"
+SSID="MyHotspot" 
+PASSWORD="MyPassword123"
+
+echo "Starting WiFi reset sequence..."
+
+# Step 1: Turn off WiFi completely
+echo "Turning off WiFi..."
+rfkill block wifi
+sleep 3
+
+# Step 2: Airplane mode on (block all wireless)
+echo "Enabling airplane mode..."
+rfkill block all
+sleep 3
+
+# Step 3: Airplane mode off (unblock all wireless)
+echo "Disabling airplane mode..."
+rfkill unblock all
+sleep 5
+
+# Wait for interface to come up
+echo "Waiting for $INTERFACE to initialize..."
+timeout=30
+while [ $timeout -gt 0 ] && ! ip link show "$INTERFACE" >/dev/null 2>&1; do
+    sleep 1
+    ((timeout--))
+done
+
+if [ $timeout -eq 0 ]; then
+    echo "Error: $INTERFACE failed to initialize after reset"
+    exit 1
+fi
+
+# Ensure NetworkManager doesn't interfere
+nmcli dev set "$INTERFACE" managed no
+sleep 2
+
+# Step 4: Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap "$INTERFACE" "$SSID" -p "$PASSWORD" -g 192.168.100.1
+
+# Wait and verify
+sleep 8
+if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
+    echo "Hotspot started successfully"
+    echo "WiFi reset and hotspot creation complete"
+    exit 0
+else
+    echo "Failed to start hotspot after WiFi reset"
+    nmcli dev set "$INTERFACE" managed yes
+    exit 1
+fi
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/lnxrouter-wifi-reset.sh
+
+# Create systemd service using the reset script
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot with Radio Reset
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter-wifi-reset.sh
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+ExecStopPost=/usr/bin/rfkill unblock wifi
+Restart=on-failure
+RestartSec=15
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and test
+sudo systemctl daemon-reload
+sudo systemctl restart lnxrouter-hotspot.service
+sudo systemctl status lnxrouter-hotspot.service
+```
+
+**When to use WiFi Radio Reset:**
+- Other solutions still show "Device or resource busy" 
+- WiFi interface appears "stuck" or unresponsive
+- Manual process of airplane mode toggle works
+- Certain Intel WiFi chipsets (like CNVi in your case)
+- USB WiFi adapters with problematic drivers
+
 **Quick Debug Commands:**
 ```bash
 # Check what's using the interface
