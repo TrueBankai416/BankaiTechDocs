@@ -1,0 +1,162 @@
+---
+title: GitHub Basics
+tags:
+   - GitHub
+   - Version Control
+   - Git
+
+keywords: [GitHub, Git, Version Control, Repository, Collaboration]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+GitHub is a web-based Git repository hosting service that provides distributed version control and source code management functionality of Git, plus its own features. It's widely used for hosting open-source projects and facilitating collaboration among developers worldwide.
+
+## **What is GitHub?**
+
+GitHub is a cloud-based platform that allows developers to store, manage, and collaborate on code projects. It builds upon Git, a distributed version control system, adding a web-based graphical interface and additional collaboration features like bug tracking, feature requests, task management, and wikis for every project.
+
+### **Key Features of GitHub**
+
+#### **Repository Management**
+- **Repositories**: Central storage locations for your project files and revision history
+- **Branches**: Parallel versions of your repository for developing features independently
+- **Commits**: Snapshots of your project at specific points in time
+- **Merging**: Combining changes from different branches
+
+#### **Collaboration Tools**
+- **Pull Requests**: Propose changes to a repository and discuss them before merging
+- **Issues**: Track bugs, enhancements, and other tasks
+- **Discussions**: Community conversations about your project
+- **Wiki**: Documentation space for your project
+
+#### **Project Management**
+- **Projects**: Kanban-style boards for organizing and tracking work
+- **Milestones**: Group issues and pull requests for releases or project phases
+- **Labels**: Categorize and filter issues and pull requests
+- **Assignees**: Assign work to specific team members
+
+## **Getting Started with GitHub**
+
+### **Creating a GitHub Account**
+
+1. Visit [github.com](https://github.com)
+2. Click "Sign up" and choose a username, email, and password
+3. Verify your email address
+4. Complete the account setup process
+
+### **Creating Your First Repository**
+
+1. Click the "+" icon in the top right corner
+2. Select "New repository"
+3. Choose a repository name and description
+4. Select public or private visibility
+5. Initialize with a README file (recommended)
+6. Click "Create repository"
+
+### **Repository Structure**
+
+A typical GitHub repository contains:
+```
+project-name/
+├── README.md          # Project description and instructions
+├── .gitignore         # Files to ignore in version control
+├── LICENSE            # Project license
+├── src/               # Source code directory
+├── docs/              # Documentation
+├── tests/             # Test files
+└── .github/           # GitHub-specific configurations
+    ├── workflows/     # GitHub Actions workflows
+    └── ISSUE_TEMPLATE/ # Issue templates
+```
+
+## **Basic GitHub Workflow**
+
+### **1. Clone a Repository**
+```bash
+git clone https://github.com/username/repository-name.git
+```
+
+### **2. Create a Branch**
+```bash
+git checkout -b feature-branch-name
+```
+
+### **3. Make Changes and Commit**
+```bash
+git add .
+git commit -m "Description of changes"
+```
+
+### **4. Push Changes**
+```bash
+git push origin feature-branch-name
+```
+
+### **5. Create a Pull Request**
+1. Navigate to the repository on GitHub
+2. Click "Compare & pull request"
+3. Add a title and description
+4. Click "Create pull request"
+
+## **GitHub Best Practices**
+
+### **Repository Management**
+- Use descriptive repository names
+- Write clear README files
+- Include appropriate licenses
+- Use .gitignore files to exclude unnecessary files
+- Organize code with a logical directory structure
+
+### **Commit Messages**
+- Write clear, concise commit messages
+- Use the imperative mood ("Add feature" not "Added feature")
+- Include relevant issue numbers when applicable
+- Keep the first line under 50 characters
+
+### **Branching Strategy**
+- Use descriptive branch names
+- Keep branches focused on single features or fixes
+- Delete branches after merging
+- Use protected branches for main/master
+
+### **Pull Requests**
+- Write detailed descriptions
+- Reference related issues
+- Request appropriate reviewers
+- Respond to feedback promptly
+- Keep pull requests focused and small
+
+## **GitHub Security**
+
+### **Access Control**
+- Use strong passwords and enable two-factor authentication
+- Manage repository access carefully
+- Use deploy keys for automated deployments
+- Regularly review access permissions
+
+### **Code Security**
+- Scan for vulnerabilities using GitHub's security features
+- Keep dependencies updated
+- Use branch protection rules
+- Enable security advisories for your repositories
+
+## **GitHub Pricing**
+
+### **Free Tier**
+- Unlimited public repositories
+- Unlimited private repositories (with limitations)
+- 500 MB Git LFS storage
+- 120 Core-hours per month for GitHub Actions
+
+### **Paid Plans**
+- **GitHub Pro**: Advanced tools for individual developers
+- **GitHub Team**: Collaboration tools for organizations
+- **GitHub Enterprise**: Advanced security and compliance features
+
+## **Conclusion**
+
+GitHub is an essential platform for modern software development, providing powerful tools for version control, collaboration, and project management. Whether you're working on personal projects or collaborating with large teams, understanding GitHub's features and best practices will significantly improve your development workflow.
+
+<BuyMeACoffeeButton />

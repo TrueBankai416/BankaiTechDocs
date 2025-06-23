@@ -202,6 +202,15 @@ const sidebars: SidebarsConfig = {
            items: [
            ],
          },
+         {
+           type: 'category',
+           label: 'GitHub',
+           items: [
+             'Proxmox/Docs/GitHub/GitHub Basics',
+             'Proxmox/Docs/GitHub/GitHub CLI',
+             'Proxmox/Docs/GitHub/GitHub with Visual Studio',
+           ],
+         },
         ],
       },
   ],
