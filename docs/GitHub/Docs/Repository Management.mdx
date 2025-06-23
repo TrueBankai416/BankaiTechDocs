@@ -1,0 +1,394 @@
+---
+title: Repository Management
+tags:
+   - GitHub
+   - Repository
+   - Management
+   - Settings
+   - Permissions
+
+keywords: [GitHub, Repository, Management, Settings, Permissions, Branches, Security]
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Repository Management**
+
+Effective repository management is crucial for maintaining organized, secure, and collaborative projects on GitHub. This guide covers everything from basic repository settings to advanced security configurations and organizational best practices.
+
+## **Repository Settings Overview**
+
+<Tabs
+  defaultValue="general"
+  values={[
+    {label: 'General Settings', value: 'general'},
+    {label: 'Access & Security', value: 'security'},
+    {label: 'Branches', value: 'branches'},
+    {label: 'Webhooks & Services', value: 'webhooks'},
+  ]}>
+  <TabItem value="general">
+    **Basic Repository Information:**
+    - **Repository Name**: Change the repository name
+    - **Description**: Update project description
+    - **Website**: Link to project homepage or documentation
+    - **Topics**: Add tags to help users find your repository
+    - **Social Preview**: Customize how your repository appears when shared
+
+    **Repository Features:**
+    - **Issues**: Enable/disable issue tracking
+    - **Projects**: Enable project boards for organization
+    - **Wiki**: Enable repository wiki for documentation
+    - **Discussions**: Enable community discussions
+    - **Sponsorships**: Allow sponsorship for your project
+  </TabItem>
+  <TabItem value="security">
+    **Visibility Settings:**
+    - **Public**: Anyone can view the repository
+    - **Private**: Only you and collaborators can access
+    - **Internal**: Available to all organization members (Enterprise only)
+
+    **Access Management:**
+    - **Collaborators**: Add individual users with specific permissions
+    - **Teams**: Add organization teams with role-based access
+    - **Permission Levels**: Read, Triage, Write, Maintain, Admin
+    - **Outside Collaborators**: Grant access to non-organization members
+
+    **Security Features:**
+    - **Dependency Alerts**: Get notified about vulnerable dependencies
+    - **Security Advisories**: Create private security advisories
+    - **Code Scanning**: Automated security code analysis
+    - **Secret Scanning**: Detect committed secrets and tokens
+  </TabItem>
+  <TabItem value="branches">
+    **Default Branch:**
+    - Set the default branch (usually 'main' or 'master')
+    - This is the branch that's shown by default and used for PR targets
+    - Can be changed, but affects existing PRs and clones
+
+    **Branch Protection Rules:**
+    - **Require PR Reviews**: Enforce code review before merging
+    - **Require Status Checks**: Ensure CI/CD passes before merging
+    - **Restrict Pushes**: Limit who can push directly to protected branches
+    - **Require Linear History**: Prevent merge commits
+    - **Force Push Protection**: Prevent force pushes that rewrite history
+  </TabItem>
+  <TabItem value="webhooks">
+    **Webhooks:**
+    - HTTP callbacks triggered by repository events
+    - Configure payload URL and content type
+    - Choose which events trigger the webhook
+    - Secure webhooks with secret tokens
+
+    **GitHub Apps & Services:**
+    - Install GitHub Apps for extended functionality
+    - Configure third-party integrations
+    - Manage app permissions and access
+    - Review installed apps and their activities
+  </TabItem>
+</Tabs>
+
+## **Branch Management**
+
+<Tabs
+  defaultValue="strategy"
+  values={[
+    {label: 'Branching Strategy', value: 'strategy'},
+    {label: 'Protection Rules', value: 'protection'},
+    {label: 'Merge Settings', value: 'merge'},
+  ]}>
+  <TabItem value="strategy">
+    **Git Flow:**
+    - **main/master**: Production-ready code
+    - **develop**: Integration branch for features
+    - **feature/***: Individual feature development
+    - **release/***: Preparation for production releases
+    - **hotfix/***: Critical production fixes
+
+    **GitHub Flow (Simplified):**
+    - **main**: Always deployable branch
+    - **feature branches**: Created from and merged back to main
+    - Continuous deployment from main branch
+    - Ideal for web applications and continuous delivery
+
+    **Naming Conventions:**
+    - **feature/description**: New features
+    - **bugfix/issue-number**: Bug fixes
+    - **hotfix/critical-issue**: Emergency fixes
+    - **chore/maintenance-task**: Maintenance work
+  </TabItem>
+  <TabItem value="protection">
+    **Setting Up Branch Protection:**
+    1. Go to repository **Settings → Branches**
+    2. Click **"Add rule"**
+    3. Enter branch name pattern (e.g., "main", "master", "release/*")
+    4. Configure protection settings
+    5. Save the rule
+
+    **Protection Options:**
+    - **Require pull request reviews before merging**
+    - **Dismiss stale PR approvals when new commits are pushed**
+    - **Require review from code owners**
+    - **Restrict who can dismiss pull request reviews**
+    - **Require status checks to pass before merging**
+    - **Require branches to be up to date before merging**
+    - **Require conversation resolution before merging**
+
+    **Advanced Restrictions:**
+    - **Restrict pushes that create files over 100MB**
+    - **Allow force pushes (not recommended for protected branches)**
+    - **Allow deletions (not recommended for main branches)**
+    - **Restrict who can push to matching branches**
+  </TabItem>
+  <TabItem value="merge">
+    **Merge Methods:**
+    - **Create a merge commit**: Preserves branch history
+    - **Squash and merge**: Combines all commits into one
+    - **Rebase and merge**: Replays commits without merge commit
+
+    **Auto-merge Settings:**
+    - **Automatically delete head branches**: Clean up after merging
+    - **Allow auto-merge**: Enable automatic merging when conditions are met
+    - **Require linear history**: Prevent merge commits
+
+    **Best Practices:**
+    - Use squash merge for feature branches to keep history clean
+    - Use merge commits for release branches to preserve branch points
+    - Enable automatic branch deletion to reduce clutter
+    - Require up-to-date branches to avoid integration issues
+  </TabItem>
+</Tabs>
+
+## **File and Folder Management**
+
+<Tabs
+  defaultValue="structure"
+  values={[
+    {label: 'Repository Structure', value: 'structure'},
+    {label: 'Gitignore', value: 'gitignore'},
+    {label: 'Large Files', value: 'lfs'},
+  ]}>
+  <TabItem value="structure">
+    **Standard Repository Structure:**
+    ```
+my-project/
+├── .github/
+│   ├── workflows/          # GitHub Actions
+│   ├── ISSUE_TEMPLATE/     # Issue templates
+│   └── PULL_REQUEST_TEMPLATE.md
+├── docs/                   # Documentation
+├── src/                    # Source code
+├── tests/                  # Test files
+├── .gitignore             # Git ignore rules
+├── README.md              # Project overview
+├── LICENSE                # License file
+└── package.json           # Dependencies (for Node.js)
+    ```
+
+    **Essential Files:**
+    - **README.md**: Project description, setup instructions, usage examples
+    - **LICENSE**: Legal terms for using your code
+    - **.gitignore**: Files and folders to exclude from Git
+    - **CONTRIBUTING.md**: Guidelines for contributors
+    - **CODE_OF_CONDUCT.md**: Community standards
+  </TabItem>
+  <TabItem value="gitignore">
+    **Creating .gitignore:**
+    - Create a `.gitignore` file in your repository root
+    - Use GitHub's templates for different languages and frameworks
+    - List files and patterns to exclude from version control
+
+    **Common .gitignore Patterns:**
+    ```
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.exe
+*.dll
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+    ```
+
+    **Gitignore Best Practices:**
+    - Add .gitignore before making your first commit
+    - Use specific patterns rather than wildcards when possible
+    - Document why certain files are ignored with comments
+    - Use `git rm --cached filename` to untrack already committed files
+  </TabItem>
+  <TabItem value="lfs">
+    **Git Large File Storage (LFS):**
+    - Handle large files (over 100MB) efficiently
+    - Store file pointers in Git, actual files in LFS
+    - Required for files over GitHub's 100MB limit
+
+    **Setting up Git LFS:**
+    ```
+# Install Git LFS
+git lfs install
+
+# Track large file types
+git lfs track "*.psd"
+git lfs track "*.zip"
+git lfs track "*.mp4"
+
+# Add .gitattributes file
+git add .gitattributes
+
+# Commit and push
+git commit -m "Add Git LFS tracking"
+git push
+    ```
+
+    **LFS Commands:**
+    - `git lfs ls-files`: List tracked LFS files
+    - `git lfs status`: Check LFS file status
+    - `git lfs pull`: Download LFS files
+    - `git lfs push`: Upload LFS files
+  </TabItem>
+</Tabs>
+
+## **Repository Analytics and Insights**
+
+<Tabs
+  defaultValue="insights"
+  values={[
+    {label: 'Repository Insights', value: 'insights'},
+    {label: 'Traffic Analytics', value: 'traffic'},
+    {label: 'Dependency Graph', value: 'dependencies'},
+  ]}>
+  <TabItem value="insights">
+    **Available Insights:**
+    - **Pulse**: Overview of recent repository activity
+    - **Contributors**: Statistics about code contributors
+    - **Community**: Community health check and standards
+    - **Commits**: Commit activity over time
+    - **Code Frequency**: Lines added and deleted over time
+    - **Dependency Graph**: Visualization of dependencies
+    - **Network**: Fork and branch network visualization
+
+    **Using Insights for Project Management:**
+    - Track contributor activity and engagement
+    - Identify periods of high and low activity
+    - Monitor repository health and community standards
+    - Analyze code changes and growth patterns
+  </TabItem>
+  <TabItem value="traffic">
+    **Traffic Metrics:**
+    - **Clones**: Number of repository clones
+    - **Visitors**: Unique visitors to repository page
+    - **Views**: Total page views
+    - **Referring Sites**: Where traffic comes from
+    - **Popular Content**: Most viewed files and folders
+
+    **Understanding Traffic Data:**
+    - Data is available for the past 14 days
+    - Helps understand repository popularity and usage
+    - Identify which files and documentation are most accessed
+    - Track the impact of releases and marketing efforts
+  </TabItem>
+  <TabItem value="dependencies">
+    **Dependency Management:**
+    - Visual representation of repository dependencies
+    - Security vulnerability alerts for dependencies
+    - Automatic dependency updates with Dependabot
+    - License compatibility checking
+
+    **Security Monitoring:**
+    - **Vulnerability Alerts**: Notifications about insecure dependencies
+    - **Security Updates**: Automated pull requests for security fixes
+    - **Dependency Review**: Review dependency changes in pull requests
+    - **Supply Chain Security**: Monitor for compromised packages
+  </TabItem>
+</Tabs>
+
+## **Repository Maintenance**
+
+<Tabs
+  defaultValue="cleanup"
+  values={[
+    {label: 'Cleanup & Organization', value: 'cleanup'},
+    {label: 'Archiving & Deletion', value: 'archiving'},
+    {label: 'Migration & Transfer', value: 'migration'},
+  ]}>
+  <TabItem value="cleanup">
+    **Regular Maintenance Tasks:**
+    - **Remove Stale Branches**: Delete merged feature branches
+    - **Update Dependencies**: Keep dependencies current and secure
+    - **Review Issues**: Close resolved issues, update labels
+    - **Clean Documentation**: Keep README and docs up to date
+    - **Audit Permissions**: Review collaborator access regularly
+
+    **Automated Cleanup:**
+    - Enable automatic branch deletion after merging
+    - Use Dependabot for automated dependency updates
+    - Set up GitHub Actions for periodic maintenance tasks
+    - Use issue templates and automation to manage issues efficiently
+  </TabItem>
+  <TabItem value="archiving">
+    **Archiving Repositories:**
+    - Archive repositories that are no longer actively maintained
+    - Archived repositories become read-only
+    - Issues, pull requests, and wiki become read-only
+    - Repository can be unarchived if needed
+
+    **When to Archive:**
+    - Project is completed and no longer maintained
+    - Experimental projects that didn't continue
+    - Deprecated software or libraries
+    - Historical projects for reference only
+
+    **Deleting Repositories:**
+    - **Warning**: Deletion is permanent and irreversible
+    - All issues, pull requests, and wiki content will be lost
+    - Forks and stars will be disconnected
+    - Consider archiving instead of deleting
+  </TabItem>
+  <TabItem value="migration">
+    **Transferring Repositories:**
+    1. Go to repository **Settings → General**
+    2. Scroll to **"Danger Zone"**
+    3. Click **"Transfer ownership"**
+    4. Enter the new owner's username or organization name
+    5. Confirm the transfer
+
+    **Migration Considerations:**
+    - **Access**: You'll lose admin access unless added by new owner
+    - **Forks**: Existing forks will be redirected
+    - **Issues/PRs**: All history and discussions transfer with repository
+    - **Webhooks**: May need to be reconfigured by new owner
+
+    **Importing from Other Platforms:**
+    - Use GitHub's import tool for repositories from other Git hosts
+    - Supports importing from GitLab, Bitbucket, and other Git services
+    - Preserves commit history and branches
+    - Issues and pull requests may need separate migration
+  </TabItem>
+</Tabs>
+
+<BuyMeACoffeeButton />
