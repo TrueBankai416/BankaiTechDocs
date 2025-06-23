@@ -149,28 +149,29 @@ git config --list
     </ol>
   </TabItem>
   <TabItem value="cli">
-# Create a new directory for your project
+    ```bash
+    # Create a new directory for your project
+    mkdir my-first-repo
+    cd my-first-repo
 
-mkdir my-first-repo
-cd my-first-repo
+    # Initialize a Git repository
+    git init
 
-# Initialize a Git repository
-git init
+    # Create a README file
+    echo "# My First Repository" > README.md
 
-# Create a README file
-echo "# My First Repository" > README.md
+    # Add the file to staging
+    git add README.md
 
-# Add the file to staging
-git add README.md
+    # Make your first commit
+    git commit -m "Initial commit"
 
-# Make your first commit
-git commit -m "Initial commit"
+    # Add GitHub as remote origin (replace with your repository URL)
+    git remote add origin https://github.com/yourusername/my-first-repo.git
 
-# Add GitHub as remote origin (replace with your repository URL)
-git remote add origin https://github.com/yourusername/my-first-repo.git
-
-# Push to GitHub
-git push -u origin main
+    # Push to GitHub
+    git push -u origin main
+    ```
   </TabItem>
 </Tabs>
 
@@ -277,34 +278,49 @@ Now that you have the basics down, consider exploring:
     {label: 'Merge Conflicts', value: 'conflicts'},
   ]}>
   <TabItem value="authentication">
-    <p><strong>Problem</strong>: Authentication failures when pushing to GitHub</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Use Personal Access Tokens instead of passwords</li>
-      <li>Set up SSH keys for password-free authentication</li>
-      <li>Check if your credentials are correctly configured</li>
-    </ul>
+    **Problem**: Authentication failures when pushing to GitHub
+
+    **Solutions:**
+    - Use Personal Access Tokens instead of passwords
+    - Set up SSH keys for password-free authentication
+    - **Use GitHub CLI for authentication**: Run `gh auth login` in terminal and follow the prompts
+    - Check if your credentials are correctly configured
+
+    **GitHub CLI Authentication Steps:**
+    ```bash
+    # Install GitHub CLI (if not already installed)
+    # Download from: https://cli.github.com/
+
+    # Authenticate with GitHub
+    gh auth login
+
+    # Follow the prompts to:
+    # 1. Choose authentication method (browser or token)
+    # 2. Select preferred protocol (HTTPS or SSH)
+    # 3. Complete authentication in browser or enter token
+
+    # Verify authentication
+    gh auth status
+    ```
   </TabItem>
   <TabItem value="pushpull">
-    <p><strong>Problem</strong>: Unable to push or pull from repository</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Check your internet connection</li>
-      <li>Verify repository URL: <code>git remote -v</code></li>
-      <li>Ensure you have proper permissions to the repository</li>
-      <li>Try: <code>git pull</code> before pushing</li>
-    </ul>
+    **Problem**: Unable to push or pull from repository
+
+    **Solutions:**
+    - Check your internet connection
+    - Verify repository URL: `git remote -v`
+    - Ensure you have proper permissions to the repository
+    - Try: `git pull` before pushing
   </TabItem>
   <TabItem value="conflicts">
-    <p><strong>Problem</strong>: Merge conflicts when pulling or merging</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Use <code>git status</code> to identify conflicted files</li>
-      <li>Edit files to resolve conflicts manually</li>
-      <li>Use a merge tool: <code>git mergetool</code></li>
-      <li>Stage resolved files: <code>git add filename</code></li>
-      <li>Complete the merge: <code>git commit</code></li>
-    </ul>
+    **Problem**: Merge conflicts when pulling or merging
+
+    **Solutions:**
+    - Use `git status` to identify conflicted files
+    - Edit files to resolve conflicts manually
+    - Use a merge tool: `git mergetool`
+    - Stage resolved files: `git add filename`
+    - Complete the merge: `git commit`
   </TabItem>
 </Tabs>
 
