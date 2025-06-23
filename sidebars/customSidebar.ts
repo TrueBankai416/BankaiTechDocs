@@ -204,6 +204,16 @@ const sidebars: SidebarsConfig = {
          },
         ],
       },
+      {  
+        type: 'category',
+        label: 'GitHub',
+        link: { type: 'doc', id: 'GitHub/Introduction' },
+        items: [
+         'GitHub/Docs/Getting Started',
+         'GitHub/Docs/GitHub with Visual Studio',
+         'GitHub/Docs/Repository Management',
+        ],
+      },
   ],
 
 

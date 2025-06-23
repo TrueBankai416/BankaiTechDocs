@@ -1,0 +1,426 @@
+---
+title: Using GitHub with Visual Studio
+tags:
+   - GitHub
+   - Visual Studio
+   - IDE
+   - Integration
+   - Development
+
+keywords: [GitHub, Visual Studio, IDE, Integration, Clone, Pull Request, Branch, Commit]
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Using GitHub with Visual Studio**
+
+Visual Studio provides seamless integration with GitHub, allowing developers to perform all version control operations directly within the IDE. This integration eliminates the need to switch between different applications and provides a streamlined development experience from coding to deployment.
+
+## **Prerequisites**
+
+Before you begin, ensure you have:
+- Visual Studio 2019 or later installed
+- A GitHub account
+- Git installed on your system
+- Basic familiarity with Visual Studio interface
+
+## **Setting Up GitHub Integration**
+
+<Tabs
+  defaultValue="signin"
+  values={[
+    {label: 'Sign In to GitHub', value: 'signin'},
+    {label: 'GitHub Extension', value: 'extension'},
+    {label: 'Account Management', value: 'accounts'},
+  ]}>
+  <TabItem value="signin">
+    <ol>
+      <li>Open Visual Studio</li>
+      <li>Go to <strong>File → Account Settings</strong></li>
+      <li>Click <strong>"Sign in"</strong> and select <strong>"GitHub"</strong></li>
+      <li>Enter your GitHub credentials in the browser window that opens</li>
+      <li>Authorize Visual Studio to access your GitHub account</li>
+      <li>Return to Visual Studio - you should see your GitHub account listed</li>
+    </ol>
+    <p><strong>Alternative Method:</strong></p>
+    <ul>
+      <li>Go to <strong>Tools → Options → Source Control → Git Global Settings</strong></li>
+      <li>Enter your GitHub username and email</li>
+      <li>Configure authentication preferences</li>
+    </ul>
+  </TabItem>
+  <TabItem value="extension">
+    <p>Visual Studio 2022 includes GitHub integration by default. For older versions:</p>
+    <ol>
+      <li>Go to <strong>Extensions → Manage Extensions</strong></li>
+      <li>Search for <strong>"GitHub Extension for Visual Studio"</strong></li>
+      <li>Install the extension and restart Visual Studio</li>
+      <li>The GitHub features will appear in the Team Explorer</li>
+    </ol>
+  </TabItem>
+  <TabItem value="accounts">
+    <p>Managing multiple GitHub accounts:</p>
+    <ul>
+      <li><strong>Switch Accounts</strong>: Use File → Account Settings to switch between accounts</li>
+      <li><strong>Organization Access</strong>: Ensure you have access to organization repositories</li>
+      <li><strong>Token Management</strong>: Personal Access Tokens can be managed in GitHub settings</li>
+      <li><strong>SSH Keys</strong>: Configure SSH keys for passwordless authentication</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## **Working with Repositories**
+
+<Tabs
+  defaultValue="clone"
+  values={[
+    {label: 'Cloning Repositories', value: 'clone'},
+    {label: 'Creating Repositories', value: 'create'},
+    {label: 'Opening Projects', value: 'open'},
+  ]}>
+  <TabItem value="clone">
+    <p><strong>Method 1: From Start Window</strong></p>
+    <ol>
+      <li>Open Visual Studio start window</li>
+      <li>Click <strong>"Clone a repository"</strong></li>
+      <li>Enter the GitHub repository URL or browse your GitHub repositories</li>
+      <li>Select the local folder where you want to clone the repository</li>
+      <li>Click <strong>"Clone"</strong></li>
+    </ol>
+    
+    <p><strong>Method 2: From Team Explorer</strong></p>
+    <ol>
+      <li>Open Team Explorer (<strong>View → Team Explorer</strong>)</li>
+      <li>Click <strong>"Clone"</strong> under Local Git Repositories</li>
+      <li>Enter the repository URL</li>
+      <li>Choose the local path and click <strong>"Clone"</strong></li>
+    </ol>
+
+    <p><strong>Method 3: From GitHub Tab</strong></p>
+    <ol>
+      <li>Open the GitHub tab in Team Explorer</li>
+      <li>Browse your repositories or organizations</li>
+      <li>Click <strong>"Clone"</strong> next to the desired repository</li>
+    </ol>
+  </TabItem>
+  <TabItem value="create">
+    <p><strong>Create New Repository on GitHub:</strong></p>
+    <ol>
+      <li>In Team Explorer, click <strong>"New"</strong> under GitHub</li>
+      <li>Fill in repository details:</li>
+      <ul>
+        <li><strong>Name</strong>: Repository name</li>
+        <li><strong>Description</strong>: Brief project description</li>
+        <li><strong>Private/Public</strong>: Choose visibility</li>
+        <li><strong>Initialize with README</strong>: Recommended</li>
+      </ul>
+      <li>Click <strong>"Create"</strong></li>
+      <li>The repository will be created and cloned automatically</li>
+    </ol>
+
+    <p><strong>Publish Existing Project:</strong></p>
+    <ol>
+      <li>Open your existing project in Visual Studio</li>
+      <li>Go to <strong>Git → Create Git Repository</strong></li>
+      <li>Choose <strong>"GitHub"</strong> as the remote</li>
+      <li>Configure repository settings and click <strong>"Create and Push"</strong></li>
+    </ol>
+  </TabItem>
+  <TabItem value="open">
+    <p><strong>Opening GitHub Projects:</strong></p>
+    <ul>
+      <li><strong>Recent Repositories</strong>: Available on the start page</li>
+      <li><strong>File → Open → Repository</strong>: Browse and open local repositories</li>
+      <li><strong>Team Explorer</strong>: Connect to and open repositories</li>
+      <li><strong>Solution Explorer</strong>: Shows all files in the current repository</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## **Version Control Operations**
+
+<Tabs
+  defaultValue="changes"
+  values={[
+    {label: 'Making Changes', value: 'changes'},
+    {label: 'Commits', value: 'commits'},
+    {label: 'Branches', value: 'branches'},
+    {label: 'Sync', value: 'sync'},
+  ]}>
+  <TabItem value="changes">
+    <p><strong>Git Changes Window:</strong></p>
+    <ul>
+      <li>Access via <strong>View → Git Changes</strong> or <strong>Git → Git Changes</strong></li>
+      <li>Shows all modified, added, and deleted files</li>
+      <li>Stage individual files or all changes</li>
+      <li>Write commit messages</li>
+      <li>View file differences inline</li>
+    </ul>
+
+    <p><strong>Working with Changes:</strong></p>
+    <ol>
+      <li><strong>View Changes</strong>: Modified files appear in Git Changes window</li>
+      <li><strong>Stage Files</strong>: Click the <strong>"+"</strong> button next to files to stage them</li>
+      <li><strong>Stage All</strong>: Click <strong>"+"</strong> next to "Changes" to stage all files</li>
+      <li><strong>Unstage Files</strong>: Click the <strong>"-"</strong> button to unstage files</li>
+      <li><strong>Discard Changes</strong>: Right-click files and select "Undo Changes"</li>
+    </ol>
+  </TabItem>
+  <TabItem value="commits">
+    <p><strong>Creating Commits:</strong></p>
+    <ol>
+      <li>Stage the files you want to commit</li>
+      <li>Enter a descriptive commit message in the text box</li>
+      <li>Click <strong>"Commit Staged"</strong> or <strong>"Commit All"</strong></li>
+      <li>Use <strong>"Commit Staged and Push"</strong> to commit and push in one action</li>
+    </ol>
+
+    <p><strong>Commit Best Practices:</strong></p>
+    <ul>
+      <li><strong>Clear Messages</strong>: Write clear, descriptive commit messages</li>
+      <li><strong>Atomic Commits</strong>: Make small, focused commits</li>
+      <li><strong>Frequent Commits</strong>: Commit changes frequently</li>
+      <li><strong>Review Changes</strong>: Always review what you're committing</li>
+    </ul>
+
+    <p><strong>Amending Commits:</strong></p>
+    <ul>
+      <li>Check <strong>"Amend Previous Commit"</strong> in Git Changes</li>
+      <li>Modify the commit message or add more changes</li>
+      <li>Click <strong>"Commit Staged"</strong> to update the previous commit</li>
+    </ul>
+  </TabItem>
+  <TabItem value="branches">
+    <p><strong>Branch Management:</strong></p>
+    <ul>
+      <li>View branches in the <strong>Git Repository</strong> window</li>
+      <li>Current branch is shown in the status bar</li>
+      <li>Switch branches by clicking the branch name in the status bar</li>
+    </ul>
+
+    <p><strong>Creating Branches:</strong></p>
+    <ol>
+      <li>Click the branch name in the status bar</li>
+      <li>Select <strong>"New Branch"</strong></li>
+      <li>Enter branch name and select the base branch</li>
+      <li>Check <strong>"Checkout branch"</strong> to switch immediately</li>
+      <li>Click <strong>"Create"</strong></li>
+    </ol>
+
+    <p><strong>Branch Operations:</strong></p>
+    <ul>
+      <li><strong>Switch Branch</strong>: Click branch name → select branch</li>
+      <li><strong>Merge Branch</strong>: Git → Merge Branch → select source branch</li>
+      <li><strong>Delete Branch</strong>: Right-click branch in Git Repository window</li>
+      <li><strong>Push Branch</strong>: Git → Push Branch</li>
+    </ul>
+  </TabItem>
+  <TabItem value="sync">
+    <p><strong>Synchronizing with GitHub:</strong></p>
+    <ul>
+      <li><strong>Push</strong>: Upload local commits to GitHub</li>
+      <li><strong>Pull</strong>: Download and merge changes from GitHub</li>
+      <li><strong>Fetch</strong>: Download changes without merging</li>
+      <li><strong>Sync</strong>: Pull then push in one operation</li>
+    </ul>
+
+    <p><strong>Using Git Changes Window:</strong></p>
+    <ol>
+      <li>After committing, you'll see options to <strong>"Push"</strong> or <strong>"Sync"</strong></li>
+      <li>Click <strong>"Push"</strong> to upload your commits</li>
+      <li>Use <strong>"Pull"</strong> to get latest changes from remote</li>
+      <li>The sync status is shown with arrows (↑ for outgoing, ↓ for incoming)</li>
+    </ol>
+  </TabItem>
+</Tabs>
+
+## **Working with Pull Requests**
+
+<Tabs
+  defaultValue="create"
+  values={[
+    {label: 'Creating Pull Requests', value: 'create'},
+    {label: 'Reviewing Pull Requests', value: 'review'},
+    {label: 'Managing Pull Requests', value: 'manage'},
+  ]}>
+  <TabItem value="create">
+    <p><strong>From Visual Studio:</strong></p>
+    <ol>
+      <li>Push your feature branch to GitHub</li>
+      <li>Go to <strong>Git → GitHub → View Pull Requests</strong></li>
+      <li>Click <strong>"Create Pull Request"</strong></li>
+      <li>Fill in the pull request details:</li>
+      <ul>
+        <li><strong>Title</strong>: Descriptive title</li>
+        <li><strong>Description</strong>: Detailed description of changes</li>
+        <li><strong>Reviewers</strong>: Add team members to review</li>
+        <li><strong>Labels</strong>: Add relevant labels</li>
+      </ul>
+      <li>Click <strong>"Create Pull Request"</strong></li>
+    </ol>
+
+    <p><strong>Alternative Method:</strong></p>
+    <ul>
+      <li>After pushing, Visual Studio may show a notification</li>
+      <li>Click the notification to create a pull request</li>
+      <li>This opens the GitHub web interface for PR creation</li>
+    </ul>
+  </TabItem>
+  <TabItem value="review">
+    <p><strong>Reviewing Pull Requests in Visual Studio:</strong></p>
+    <ol>
+      <li>Go to <strong>Git → GitHub → View Pull Requests</strong></li>
+      <li>Select the pull request to review</li>
+      <li>Review the changes in the diff viewer</li>
+      <li>Add comments to specific lines by clicking in the margin</li>
+      <li>Use the review tools to approve, request changes, or comment</li>
+    </ol>
+
+    <p><strong>Review Features:</strong></p>
+    <ul>
+      <li><strong>Side-by-side Diff</strong>: Compare changes visually</li>
+      <li><strong>Inline Comments</strong>: Add comments to specific lines</li>
+      <li><strong>File Navigation</strong>: Easily navigate between changed files</li>
+      <li><strong>Conversation View</strong>: See all discussions and comments</li>
+    </ul>
+  </TabItem>
+  <TabItem value="manage">
+    <p><strong>Pull Request Management:</strong></p>
+    <ul>
+      <li><strong>Status Tracking</strong>: View PR status and checks</li>
+      <li><strong>Merge Options</strong>: Choose merge, squash, or rebase</li>
+      <li><strong>Auto-merge</strong>: Enable auto-merge when conditions are met</li>
+      <li><strong>Draft PRs</strong>: Create draft pull requests for work in progress</li>
+    </ul>
+
+    <p><strong>Handling Feedback:</strong></p>
+    <ol>
+      <li>Address reviewer comments by making additional commits</li>
+      <li>Push the new commits to update the pull request</li>
+      <li>Respond to comments and mark them as resolved</li>
+      <li>Request re-review when ready</li>
+    </ol>
+  </TabItem>
+</Tabs>
+
+## **Advanced Features**
+
+<Tabs
+  defaultValue="issues"
+  values={[
+    {label: 'Issues Integration', value: 'issues'},
+    {label: 'GitHub Actions', value: 'actions'},
+    {label: 'Codespaces', value: 'codespaces'},
+  ]}>
+  <TabItem value="issues">
+    <p><strong>Working with GitHub Issues:</strong></p>
+    <ul>
+      <li>View issues in the GitHub extension panel</li>
+      <li>Create new issues directly from Visual Studio</li>
+      <li>Link commits to issues using keywords (fixes #123)</li>
+      <li>Track issue progress and assignments</li>
+    </ul>
+
+    <p><strong>Issue Integration:</strong></p>
+    <ol>
+      <li>Go to <strong>View → Team Explorer</strong></li>
+      <li>Click on <strong>"GitHub"</strong> section</li>
+      <li>View and create issues</li>
+      <li>Reference issues in commit messages</li>
+    </ol>
+  </TabItem>
+  <TabItem value="actions">
+    <p><strong>GitHub Actions Integration:</strong></p>
+    <ul>
+      <li>View workflow runs and status</li>
+      <li>Access build logs and artifacts</li>
+      <li>Re-run failed workflows</li>
+      <li>Create and edit workflow files</li>
+    </ul>
+
+    <p><strong>Setting up CI/CD:</strong></p>
+    <ol>
+      <li>Create <strong>.github/workflows</strong> folder in your repository</li>
+      <li>Add YAML workflow files for your build process</li>
+      <li>Commit and push to trigger the first workflow run</li>
+      <li>Monitor workflow status in Visual Studio or GitHub</li>
+    </ol>
+  </TabItem>
+  <TabItem value="codespaces">
+    <p><strong>GitHub Codespaces:</strong></p>
+    <ul>
+      <li>Create cloud development environments</li>
+      <li>Access codespaces directly from Visual Studio</li>
+      <li>Full Visual Studio experience in the browser</li>
+      <li>Consistent development environment for teams</li>
+    </ul>
+
+    <p><strong>Using Codespaces:</strong></p>
+    <ol>
+      <li>Go to your repository on GitHub</li>
+      <li>Click <strong>"Code"</strong> → <strong>"Open with Codespaces"</strong></li>
+      <li>Choose <strong>"Open in Visual Studio"</strong></li>
+      <li>Work with your project in the cloud environment</li>
+    </ol>
+  </TabItem>
+</Tabs>
+
+## **Troubleshooting Common Issues**
+
+<Tabs
+  defaultValue="authentication"
+  values={[
+    {label: 'Authentication Problems', value: 'authentication'},
+    {label: 'Sync Issues', value: 'sync'},
+    {label: 'Merge Conflicts', value: 'conflicts'},
+  ]}>
+  <TabItem value="authentication">
+    <p><strong>Problem</strong>: Can't authenticate with GitHub</p>
+    <p><strong>Solutions</strong>:</p>
+    <ul>
+      <li>Sign out and sign back in: <strong>File → Account Settings</strong></li>
+      <li>Clear cached credentials in Windows Credential Manager</li>
+      <li>Use Personal Access Token instead of password</li>
+      <li>Check firewall and proxy settings</li>
+      <li>Verify GitHub account permissions</li>
+    </ul>
+  </TabItem>
+  <TabItem value="sync">
+    <p><strong>Problem</strong>: Push/Pull operations failing</p>
+    <p><strong>Solutions</strong>:</p>
+    <ul>
+      <li>Check internet connection</li>
+      <li>Verify repository permissions</li>
+      <li>Pull latest changes before pushing</li>
+      <li>Check for large files that exceed GitHub limits</li>
+      <li>Ensure branch protection rules are followed</li>
+    </ul>
+  </TabItem>
+  <TabItem value="conflicts">
+    <p><strong>Problem</strong>: Merge conflicts during pull/merge</p>
+    <p><strong>Solutions</strong>:</p>
+    <ul>
+      <li>Use Visual Studio's merge conflict resolver</li>
+      <li>Open conflicted files and choose between changes</li>
+      <li>Use <strong>"Take Incoming"</strong> or <strong>"Take Current"</strong> for entire files</li>
+      <li>Test the merged code before committing</li>
+      <li>Consider using a three-way merge tool</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## **Best Practices**
+
+- **Commit Frequently**: Make small, frequent commits with clear messages
+- **Use Branches**: Create feature branches for new development
+- **Code Reviews**: Always use pull requests for code reviews
+- **Stay Updated**: Regularly pull changes from the main branch
+- **Test Before Push**: Run tests locally before pushing changes
+- **Descriptive Messages**: Write clear commit and PR descriptions
+- **Clean History**: Use squash merging for cleaner commit history
+
+<BuyMeACoffeeButton />
