@@ -379,37 +379,52 @@ Before you begin, ensure you have:
     {label: 'Merge Conflicts', value: 'conflicts'},
   ]}>
   <TabItem value="authentication">
-    <p><strong>Problem</strong>: Can't authenticate with GitHub</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Sign out and sign back in: <strong>File → Account Settings</strong></li>
-      <li>Clear cached credentials in Windows Credential Manager</li>
-      <li>Use Personal Access Token instead of password</li>
-      <li>Check firewall and proxy settings</li>
-      <li>Verify GitHub account permissions</li>
-    </ul>
+    **Problem**: Can't authenticate with GitHub
+
+    **Solutions:**
+    - Sign out and sign back in: **File → Account Settings**
+    - Clear cached credentials in Windows Credential Manager
+    - Use Personal Access Token instead of password
+    - **Use GitHub CLI for authentication**: Run `gh auth login` in terminal and follow the prompts
+    - Check firewall and proxy settings
+    - Verify GitHub account permissions
+
+    **GitHub CLI Authentication Steps:**
+    ```bash
+    # Install GitHub CLI (if not already installed)
+    # Download from: https://cli.github.com/
+
+    # Authenticate with GitHub
+    gh auth login
+
+    # Follow the prompts to:
+    # 1. Choose authentication method (browser or token)
+    # 2. Select preferred protocol (HTTPS or SSH)
+    # 3. Complete authentication in browser or enter token
+
+    # Verify authentication
+    gh auth status
+    ```
   </TabItem>
   <TabItem value="sync">
-    <p><strong>Problem</strong>: Push/Pull operations failing</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Check internet connection</li>
-      <li>Verify repository permissions</li>
-      <li>Pull latest changes before pushing</li>
-      <li>Check for large files that exceed GitHub limits</li>
-      <li>Ensure branch protection rules are followed</li>
-    </ul>
+    **Problem**: Push/Pull operations failing
+
+    **Solutions:**
+    - Check internet connection
+    - Verify repository permissions
+    - Pull latest changes before pushing
+    - Check for large files that exceed GitHub limits
+    - Ensure branch protection rules are followed
   </TabItem>
   <TabItem value="conflicts">
-    <p><strong>Problem</strong>: Merge conflicts during pull/merge</p>
-    <p><strong>Solutions</strong>:</p>
-    <ul>
-      <li>Use Visual Studio's merge conflict resolver</li>
-      <li>Open conflicted files and choose between changes</li>
-      <li>Use <strong>"Take Incoming"</strong> or <strong>"Take Current"</strong> for entire files</li>
-      <li>Test the merged code before committing</li>
-      <li>Consider using a three-way merge tool</li>
-    </ul>
+    **Problem**: Merge conflicts during pull/merge
+
+    **Solutions:**
+    - Use Visual Studio's merge conflict resolver
+    - Open conflicted files and choose between changes
+    - Use **"Take Incoming"** or **"Take Current"** for entire files
+    - Test the merged code before committing
+    - Consider using a three-way merge tool
   </TabItem>
 </Tabs>
 
