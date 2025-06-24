@@ -69,10 +69,8 @@ server {
     gzip_min_length 256;
     gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
     gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/wasm application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
-    #                         Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    #                         add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                         Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                         Allow upload of large files
     client_max_body_size 10G;
     #                         Cache
@@ -157,6 +155,8 @@ server {
 // highlight-end
     ssl_stapling on;
     ssl_stapling_verify on;
+    #              Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #              Include Authelia location block
     include /etc/nginx/snippets/authelia-location.conf;
     #              Connect to backend server
@@ -212,9 +212,8 @@ server {
     #        proxy_ssl_verify on;
     #        ssl_stapling on;
     #        ssl_stapling_verify on;
-    add_header X-Xss-Protection "1; mode=block" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Strict-Transport-Security "max-age=2592000; includeSubdomains" always;
+    #        Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     location / {
         proxy_pass $upstream_authelia;
         client_body_buffer_size 128k;
@@ -287,10 +286,8 @@ server {
     #             Logging
     access_log /var/log/nginx/HomeBridge_access.log;
     error_log /var/log/nginx/HomeBridge_error.log;
-    #             Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #             Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #             Allow upload of large files
     client_max_body_size 10G;
     #             Cache
@@ -350,10 +347,8 @@ server {
     #            Logging
     access_log /var/log/nginx/Home_Assistant_access.log;
     error_log /var/log/nginx/Home_Assistant_error.log;
-    #            Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #            Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #            Allow upload of large files
     client_max_body_size 10G;
     #            Cache
@@ -416,14 +411,8 @@ server {
 // highlight-end
     proxy_ssl_verify on;
     proxy_ssl_verify_depth 2;
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    #                     Security / XSS Mitigation Headers
-    #                     NOTE: X-Frame-Options may cause issues with the webOS app
-    #add_header X-Frame-Options "SAMEORIGIN";
-    #                     Do NOT enable. This is obsolete/dangerous
-    add_header X-XSS-Protection "0";
-    add_header X-Content-Type-Options "nosniff";
+    #                     Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                     COOP/COEP. Disable if you use external plugins/images/assets
     # add_header Cross-Origin-Opener-Policy "same-origin" always;
     # add_header Cross-Origin-Embedder-Policy "require-corp" always;
@@ -435,9 +424,10 @@ server {
     expires off;
     etag off;
     #                     Permissions policy. May cause issues on some clients
-    add_header Permissions-Policy "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), clipboard-read=(), display-capture=(), document-domain=(), encrypted-media=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), interest-cohort=(), keyboard-map=(), local-fonts=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()" always;
     #                     Tell browsers to use per-origin process isolation
     add_header Origin-Agent-Cluster "?1" always;
+    #                     Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                     Include Authelia location block
     include /etc/nginx/snippets/authelia-location.conf;
     #                     Content Security Policy
@@ -566,10 +556,8 @@ server {
     #                    Logging
     access_log /var/log/nginx/Jellyseer_access.log;
     error_log /var/log/nginx/Jellyseer_error.log;
-    #                    Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                    Allow upload of large files
     client_max_body_size 0;
     #                    Cache
@@ -614,10 +602,8 @@ server {
     #                      Logging
     access_log /var/log/nginx/Radarr_access.log;
     error_log /var/log/nginx/Radarr_error.log;
-    #                      Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                      Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                      Allow upload of large files
     client_max_body_size 10G;
     #                      Cache
@@ -661,10 +647,8 @@ server {
     #                      Logging
     access_log /var/log/nginx/Sonarr_access.log;
     error_log /var/log/nginx/Sonarr_error.log;
-    #                      Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                      Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                      Allow upload of large files
     client_max_body_size 10G;
     #                      Cache
@@ -708,10 +692,8 @@ server {
     #                      Logging
     access_log /var/log/nginx/Prowlarr_access.log;
     error_log /var/log/nginx/Prowlarr_error.log;
-    #                      Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                      Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                      Allow upload of large files
     client_max_body_size 0;
     #                      Cache
@@ -830,10 +812,8 @@ server {
     #                    Logging
     access_log /var/log/nginx/Immich_access.log;
     error_log /var/log/nginx/Immich_error.log;
-    #                    Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    #                    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                    allow large file uploads
     client_max_body_size 50000M;
     #                    Set headers
@@ -904,10 +884,8 @@ server {
     #                    Logging
     access_log /var/log/nginx/Portainer_access.log;
     error_log /var/log/nginx/Portainer_error.log;
-    #                    Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                    Allow upload of large files
     client_max_body_size 0;
     #                    Cache
@@ -966,10 +944,8 @@ server {
     #                    Logging
     access_log /var/log/nginx/Vaultwarden_access.log;
     error_log /var/log/nginx/Vaultwarden_error.log;
-    #                    Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                    Allow upload of large files
     client_max_body_size 10G;
     #                    Cache
@@ -1031,10 +1007,8 @@ server {
     #                    Logging
     access_log /var/log/nginx/UptimeKuma_access.log;
     error_log /var/log/nginx/UptimeKuma_error.log;
-    #                    Security Headers
-    add_header Expect-CT "enforce, max-age=31536000";
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     #                    Allow upload of large files
     client_max_body_size 10G;
     #                    Cache
@@ -1178,6 +1152,18 @@ location /internal/authelia/authz {
 }
 ```
 
+### security-headers.conf
+```nginx title="Save as /etc/nginx/snippets/security-headers.conf" showLineNumbers
+## Security Headers
+add_header Expect-CT "enforce, max-age=31536000";
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+add_header X-Xss-Protection "1; mode=block" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+```
+
 ### Using Snippets
 
 To use these snippets in your nginx configurations, include them in your server blocks:
@@ -1186,6 +1172,9 @@ To use these snippets in your nginx configurations, include them in your server 
 server {
     listen 443 ssl;
     server_name example.bankai-tech.com;
+    
+    # Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
     
     # Include Authelia location block
     include /etc/nginx/snippets/authelia-location.conf;
