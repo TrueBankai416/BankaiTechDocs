@@ -578,22 +578,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_jellyseerr http://192.168.8.57:5055;
         proxy_pass $upstream_jellyseerr;
+        #                    Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                    Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
     }
 }
@@ -631,28 +626,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                      Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
         set $upstream_radarr http://192.168.8.57:7878;
         proxy_pass $upstream_radarr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 64 256k;
-// highlight-next-line
-        set_real_ip_from 192.168.8.0/24;
-        real_ip_header X-Forwarded-For;
-        real_ip_recursive on;
+        #                      Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                      Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
     }
 }
 ```
@@ -689,28 +673,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                      Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
         set $upstream_sonarr http://192.168.8.57:8989;
         proxy_pass $upstream_sonarr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 64 256k;
-// highlight-next-line
-        set_real_ip_from 192.168.8.0/24;
-        real_ip_header X-Forwarded-For;
-        real_ip_recursive on;
+        #                      Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                      Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
     }
 }
 ```
@@ -747,39 +720,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                      Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
         set $upstream_prowlarr http://192.168.8.57:9696;
         proxy_pass $upstream_prowlarr;
-        proxy_set_header Remote-User $user;
-        proxy_set_header Remote-Groups $groups;
-        #change YOURDOMAIN.COM to your domain
-// highlight-next-line
-        error_page 401 =302 https://auth.bankai-tech.com/?rd=$target_url;
-        client_body_buffer_size 128k;
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        send_timeout 5m;
-        proxy_read_timeout 360;
-        proxy_send_timeout 360;
-        proxy_connect_timeout 360;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 64 256k;
-// highlight-next-line
-        set_real_ip_from 192.168.8.0/24;
-        real_ip_header X-Forwarded-For;
-        real_ip_recursive on;
+        #                      Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                      Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
     }
 }
 ```
@@ -898,18 +849,20 @@ server {
     #                    set timeout
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     send_timeout 600s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_immich http://192.168.8.57:2291;
         proxy_pass $upstream_immich;
+        #                    Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                    Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
     }
     location = /.well-known/immich {
         proxy_pass $upstream_immich;
@@ -963,20 +916,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
 // highlight-next-line
         set $upstream_portainer https://192.168.4.206:9443;
         proxy_pass $upstream_portainer;
+        #                    Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                    Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
@@ -1028,21 +978,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_vaultwarden http://192.168.8.77:80;
         proxy_pass $upstream_vaultwarden;
+        #                    Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                    Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
@@ -1097,21 +1043,17 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #                    Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_uptime http://192.168.8.164:3001;
         proxy_pass $upstream_uptime;
+        #                    Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                    Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
