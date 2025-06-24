@@ -1,0 +1,27 @@
+server {
+    listen [::]:443 ssl http2;
+    listen 443 ssl http2;
+    server_name bankai-tech.com;
+    #              Logging
+    access_log /var/log/nginx/AdGuardHome_access.log;
+    error_log /var/log/nginx/AdGuardHome_error.log;
+    #              Load TLS Certs
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    #              Connect to backend server
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_redirect / /;
+        proxy_cookie_path / /;
+        proxy_pass https://192.168.4.108:80;
+        #websockets
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
