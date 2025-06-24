@@ -1,0 +1,39 @@
+server {
+    listen 443 ssl http2;
+    server_name home.local;
+    # Load TLS Certs
+    ssl_certificate /etc/letsencrypt/live/local/cert.pem;
+    ssl_certificate_key /etc/letsencrypt/live/local/key.pem;
+    ssl_stapling off;
+    # Logging
+    access_log /var/log/nginx/Home_Assistant_access.log;
+    error_log /var/log/nginx/Home_Assistant_error.log;
+    # Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
+    # Allow upload of large files
+    client_max_body_size 10G;
+    # Cache
+    proxy_cache_key $scheme$proxy_host$request_uri;
+    add_header X-Cache-Status $upstream_cache_status;
+    client_header_buffer_size 50m;
+    client_body_buffer_size 50m;
+    client_body_timeout 300s;
+    # Connect to backend server
+    location / {
+        proxy_set_header Host $host;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
+        proxy_http_version 1.1;
+        proxy_set_header "Connection" "";
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://192.168.4.207:8123;
+        proxy_read_timeout 300s;
+        #Cache
+        proxy_buffering on;
+        proxy_cache_valid 200;
+        proxy_cache_background_update on;
+    }
+}
