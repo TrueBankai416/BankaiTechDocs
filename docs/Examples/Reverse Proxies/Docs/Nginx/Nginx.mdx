@@ -86,19 +86,20 @@ server {
     rewrite ^/\.well-known/carddav https://cloud.bankai-tech.com/remote.php/dav/ redirect;
     rewrite ^/\.well-known/caldav https://cloud.bankai-tech.com/remote.php/dav/ redirect;
 // highlight-end
+    #                         Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                         Connect to backend server
     location / {
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
         #proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
 // highlight-next-line
         set $upstream_nextcloud http://192.168.8.181;
         proxy_pass $upstream_nextcloud:8080$request_uri;
-        proxy_set_header Host $host;
         proxy_set_header Upgrade websocket;
         proxy_set_header Connection Upgrade;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #                         Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #                         Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
