@@ -55,10 +55,10 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
-    #                         ssl_stapling on;
-    #                         ssl_stapling_verify on;
+    #                         ssl_stapling off;
+    #                         ssl_stapling_verify off;
     #                         Logging
     access_log /var/log/nginx/nextcloud_access.log;
     error_log /var/log/nginx/nextcloud_error.log;
@@ -84,20 +84,19 @@ server {
     rewrite ^/\.well-known/carddav https://cloud.bankai-tech.com/remote.php/dav/ redirect;
     rewrite ^/\.well-known/caldav https://cloud.bankai-tech.com/remote.php/dav/ redirect;
 // highlight-end
-    #                         Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
     #                         Connect to backend server
     location / {
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
         #proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
 // highlight-next-line
-        set $upstream_nextcloud http://192.168.8.181;
-        proxy_pass $upstream_nextcloud:8080$request_uri;
+        proxy_pass http://192.168.8.181:8080$request_uri;
+        #proxy_pass http://192.168.4.109:8080;
+        proxy_set_header Host $host;
         proxy_set_header Upgrade websocket;
         proxy_set_header Connection Upgrade;
-        #                         Include Authelia auth request (uncomment if using auth)
-        # include /etc/nginx/snippets/authelia-authrequest.conf;
-        #                         Include proxy configuration
-        include /etc/nginx/snippets/proxy.conf;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
@@ -109,7 +108,8 @@ server {
         return 301 /index.php$uri;
     }
     location ^~ /push/ {
-        proxy_pass $upstream_nextcloud:7867/;
+// highlight-next-line
+        proxy_pass http://192.168.8.181:7867/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -117,7 +117,8 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
     location ^~ /metrics/ {
-        proxy_pass $upstream_nextcloud:7868/metrics;
+// highlight-next-line
+        proxy_pass http://192.168.8.181:7868/metrics;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -134,6 +135,8 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
+    #                         Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -151,36 +154,38 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
-    ssl_stapling on;
-    ssl_stapling_verify on;
+    ssl_stapling off;
+    ssl_stapling_verify off;
+    
     #              Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
-    #              Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+    
     #              Connect to backend server
     location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
         proxy_redirect / /;
         proxy_cookie_path / /;
 // highlight-next-line
-        set $upstream_adguard https://192.168.4.55:3001;
-        proxy_pass $upstream_adguard;
-        #              Include Authelia auth request (uncomment if using auth)
-        # include /etc/nginx/snippets/authelia-authrequest.conf;
-        #              Include proxy configuration
-        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass https://192.168.4.55:3001;
         #websockets
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
     location /dns-query {
+        # …
         real_ip_header CF-Connecting-IP;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
 // highlight-next-line
         proxy_bind 192.168.4.204;
     }
+    #              Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -207,11 +212,11 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
     #        proxy_ssl_verify on;
-    #        ssl_stapling on;
-    #        ssl_stapling_verify on;
+    #        ssl_stapling off;
+    #        ssl_stapling_verify off;
     #        Use standardized security headers
     # Minimal security headers for Authelia (avoid CSP conflicts)
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
@@ -266,11 +271,11 @@ server {
     http2 on;
 // highlight-next-line
     server_name homebridge.bankai-tech.com;
-    #             L/api/authz/oad TLS Certs
+    #             Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
     #             Logging
     access_log /var/log/nginx/HomeBridge_access.log;
@@ -285,8 +290,6 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
-    #             Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
     #             Connect to backend server
     location / {
 // highlight-next-line
@@ -302,6 +305,8 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
+    #             Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -331,7 +336,7 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
     #            Logging
     access_log /var/log/nginx/Home_Assistant_access.log;
@@ -346,8 +351,6 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
-    #            Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
     #            Connect to backend server
     location / {
 // highlight-next-line
@@ -363,6 +366,8 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
+    #            Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -390,35 +395,31 @@ server {
     #                     (if you aren't using DNS remove the resolver line and change the variable to point to an IP address e.g `set $jellyfin 127.0.0.1`)
 // highlight-next-line
     set $jellyfin 192.168.9.151:8096;
-    ssl_stapling on;
-    ssl_stapling_verify on;
+    ssl_stapling off;
+    ssl_stapling_verify off;
     #                     Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
-    proxy_ssl_verify on;
-    proxy_ssl_verify_depth 2;
     #                     Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
-    #                     COOP/COEP. Disable if you use external plugins/images/assets
-    # add_header Cross-Origin-Opener-Policy "same-origin" always;
-    # add_header Cross-Origin-Embedder-Policy "require-corp" always;
-    # add_header Cross-Origin-Resource-Policy "same-origin" always;
-    #                     kill cache
+    
+    #                     Jellyfin-specific media streaming overrides
+    add_header X-XSS-Protection "0";  # Explicitly disabled for media streaming
+    
+    #                     Media streaming cache killing
     add_header Last-Modified $date_gmt;
     add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
     if_modified_since off;
     expires off;
     etag off;
-    #                     Permissions policy. May cause issues on some clients
-    #                     Tell browsers to use per-origin process isolation
+    
+    #                     Enhanced media streaming permissions policy (more restrictive than standard)
+    add_header Permissions-Policy "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), clipboard-read=(), display-capture=(), document-domain=(), encrypted-media=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), interest-cohort=(), keyboard-map=(), local-fonts=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()" always;
+    
+    #                     Media streaming process isolation
     add_header Origin-Agent-Cluster "?1" always;
-    #                     Use standardized security headers
-    include /etc/nginx/snippets/security-headers.conf;
-    #                     Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
     #                     Content Security Policy
     #                     See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     #                     Enforces https content and restricts JS/CSS to origin
@@ -430,27 +431,31 @@ server {
     # return 302 https://$host/web/;
     # }
     location / {
-        # Proxy main Jellyfin traffic
         proxy_pass http://$jellyfin;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        #                     Use enhanced proxy configuration without rate limiting for media streaming
+        include /etc/nginx/snippets/enhanced-proxy-no-limits.conf;
+        
+        #                     WebSocket support for real-time features
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        
+        #                     Jellyfin-specific streaming settings
         proxy_set_header X-Forwarded-Protocol $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        # Disable buffering when the nginx proxy gets very resource heavy upon streaming
-        proxy_buffering off;
     }
     #                     location block for /web - This is purely for aesthetics so /web/!/ works instead of having to go to /web/index.html/!/
     location = /web/ {
-        # Proxy main Jellyfin traffic
         proxy_pass http://$jellyfin/web/index.html;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        #                     Use enhanced proxy configuration without rate limiting for media streaming
+        include /etc/nginx/snippets/enhanced-proxy-no-limits.conf;
+        
+        #                     WebSocket support for real-time features
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        
+        #                     Jellyfin-specific header
         proxy_set_header X-Forwarded-Protocol $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
     }
     location /socket {
         # Proxy Jellyfin Websockets traffic
@@ -472,42 +477,42 @@ server {
 // highlight-next-line
         set $upstream_accounts http://192.168.9.151:8056;
         proxy_pass $upstream_accounts;
-        auth_request /authelia;
+        
+        #                     Authentication configuration (legacy method for compatibility)
+        auth_request /internal/authelia/authz;
         auth_request_set $target_url $scheme://$http_host$request_uri;
         auth_request_set $user $upstream_http_remote_user;
         auth_request_set $groups $upstream_http_remote_groups;
         proxy_set_header Remote-User $user;
         proxy_set_header Remote-Groups $groups;
-        #change YOURDOMAIN.COM to your domain
 // highlight-next-line
         error_page 401 =302 https://auth.bankai-tech.com/?rd=$target_url;
-        client_body_buffer_size 128k;
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        send_timeout 5m;
-        proxy_read_timeout 360;
-        proxy_send_timeout 360;
-        proxy_connect_timeout 360;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
+        
+        #                     Use Jellyfin-optimized proxy configuration
+        include /etc/nginx/snippets/jellyfin-proxy.conf;
+        
+        #                     Proxy timeouts
+        proxy_connect_timeout 240s;
+        proxy_send_timeout 240s;
+        proxy_read_timeout 300s;
+        
+        #                     Jellyfin accounts-specific settings
         proxy_cache_bypass $cookie_session;
         proxy_no_cache $cookie_session;
-        proxy_buffers 64 256k;
+        send_timeout 5m;
+        
+        #                     Real IP configuration for this network
 // highlight-next-line
         set_real_ip_from 192.168.9.0/24;
         real_ip_header X-Forwarded-For;
         real_ip_recursive on;
-        #websockets
+        
+        #                     WebSocket support
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
+    #                     Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -537,11 +542,11 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
 // highlight-end
     #       proxy_ssl_verify on;
-    #       ssl_stapling on;
-    #       ssl_stapling_verify on;
+    #       ssl_stapling off;
+    #       ssl_stapling_verify off;
     #                    Logging
     access_log /var/log/nginx/Jellyseer_access.log;
     error_log /var/log/nginx/Jellyseer_error.log;
@@ -1107,25 +1112,25 @@ error_page 401 =302 $redirection_url;
 ### authelia-location.conf
 ```nginx title="Save as /etc/nginx/snippets/authelia-location.conf" showLineNumbers
 // highlight-next-line
-set $upstream_authelia http://192.168.4.202:9091/api/authz/auth-request;
+set $upstream_authelia http://192.168.8.77:9091/api/authz/auth-request;
 
 ## Virtual endpoint created by nginx to forward auth requests.
+## Modern Authelia API configuration
 location /internal/authelia/authz {
     ## Essential Proxy Configuration
     internal;
     proxy_pass $upstream_authelia;
+    proxy_pass_request_body off;
 
-    ## Headers
-    ## The headers starting with X-* are required.
+    ## Modern Headers (required for authz endpoint)
     proxy_set_header X-Original-Method $request_method;
     proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
     proxy_set_header X-Forwarded-For $remote_addr;
     proxy_set_header Content-Length "";
     proxy_set_header Connection "";
 
-    ## Basic Proxy Configuration
-    proxy_pass_request_body off;
-    proxy_next_upstream error timeout invalid_header http_500 http_502 http_503; # Timeout if the real server is dead
+    ## Standard Proxy Configuration
+    proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
     proxy_redirect http:// $scheme://;
     proxy_http_version 1.1;
     proxy_cache_bypass $cookie_session;
@@ -1133,7 +1138,7 @@ location /internal/authelia/authz {
     proxy_buffers 4 32k;
     client_body_buffer_size 128k;
 
-    ## Advanced Proxy Configuration
+    ## Timeouts for authentication
     send_timeout 5m;
     proxy_read_timeout 240;
     proxy_send_timeout 240;
@@ -1153,6 +1158,85 @@ add_header X-Frame-Options "SAMEORIGIN" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 ```
 
+### enhanced-proxy-no-limits.conf
+```nginx title="Save as /etc/nginx/snippets/enhanced-proxy-no-limits.conf" showLineNumbers
+# Enhanced Proxy Configuration - No Rate Limiting
+# Use this for media streaming applications that need high concurrent requests
+
+# Basic proxy headers
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $http_host;
+proxy_set_header X-Forwarded-Uri $request_uri;
+proxy_set_header X-Forwarded-Ssl on;
+
+# Security headers
+proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+proxy_hide_header X-Powered-By;
+proxy_hide_header Server;
+
+# Performance and reliability
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_redirect http:// $scheme://;
+proxy_buffering off;
+proxy_request_buffering off;
+
+# Timeouts and retries (auth-compatible)
+proxy_connect_timeout 240s;
+proxy_send_timeout 240s;
+proxy_read_timeout 300s;
+proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+
+# Buffer configuration
+client_body_buffer_size 128k;
+proxy_buffers 4 256k;
+proxy_buffer_size 128k;
+proxy_busy_buffers_size 256k;
+
+# No rate limiting for media streaming
+```
+
+### jellyfin-proxy.conf
+```nginx title="Save as /etc/nginx/snippets/jellyfin-proxy.conf" showLineNumbers
+# Enhanced Proxy Configuration for Jellyfin
+# Optimized for media streaming with custom buffer sizes
+
+# Basic proxy headers
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $http_host;
+proxy_set_header X-Forwarded-Uri $request_uri;
+proxy_set_header X-Forwarded-Ssl on;
+
+# Security headers
+proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+proxy_hide_header X-Powered-By;
+proxy_hide_header Server;
+
+# Performance and reliability
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_redirect http:// $scheme://;
+proxy_buffering off;
+proxy_request_buffering off;
+
+# Retries configuration
+proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+
+# Buffer configuration optimized for media streaming
+client_body_buffer_size 128k;
+proxy_buffers 64 256k;
+proxy_buffer_size 128k;
+proxy_busy_buffers_size 256k;
+
+# No rate limiting for media streaming
+```
+
 ### Using Snippets
 
 To use these snippets in your nginx configurations, include them in your server blocks:
@@ -1165,9 +1249,6 @@ server {
     # Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
     
-    # Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
-    
     location / {
         # Include Authelia auth request
         include /etc/nginx/snippets/authelia-authrequest.conf;
@@ -1178,6 +1259,9 @@ server {
         set $upstream_service http://192.168.1.100:8080;
         proxy_pass $upstream_service;
     }
+    
+    # Include Authelia location block at the end
+    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
