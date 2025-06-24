@@ -136,36 +136,6 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.8.77:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
-    }
 }
 ```
 
@@ -187,17 +157,19 @@ server {
 // highlight-end
     ssl_stapling on;
     ssl_stapling_verify on;
+    #              Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #              Connect to backend server
     location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
         proxy_redirect / /;
         proxy_cookie_path / /;
 // highlight-next-line
         set $upstream_adguard https://192.168.4.55:3001;
         proxy_pass $upstream_adguard;
+        #              Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #              Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         #websockets
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -208,36 +180,6 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
 // highlight-next-line
         proxy_bind 192.168.4.204;
-    }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.4.202:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
     }
 }
 ```
@@ -357,56 +299,22 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #             Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #             Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_homebridge http://192.168.8.120:8581;
         proxy_pass $upstream_homebridge;
+        #             Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #             Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
         proxy_cache_valid 200;
         proxy_cache_background_update on;
-    }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.8.77:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
     }
 }
 ```
@@ -454,56 +362,22 @@ server {
     client_header_buffer_size 50m;
     client_body_buffer_size 50m;
     client_body_timeout 300s;
+    #            Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #            Connect to backend server
     location / {
-        proxy_set_header Host $host;
-        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
-        proxy_buffer_size 128k;
-        proxy_buffers 4 256k;
-        proxy_busy_buffers_size 256k;
-        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
-        proxy_http_version 1.1;
-        proxy_set_header "Connection" "";
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
 // highlight-next-line
         set $upstream_ha http://192.168.8.157:8123;
         proxy_pass $upstream_ha;
+        #            Include Authelia auth request (uncomment if using auth)
+        # include /etc/nginx/snippets/authelia-authrequest.conf;
+        #            Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
         proxy_cache_valid 200;
         proxy_cache_background_update on;
-    }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.8.77:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
     }
 }
 ```
@@ -564,6 +438,8 @@ server {
     add_header Permissions-Policy "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), clipboard-read=(), display-capture=(), document-domain=(), encrypted-media=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), interest-cohort=(), keyboard-map=(), local-fonts=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()" always;
     #                     Tell browsers to use per-origin process isolation
     add_header Origin-Agent-Cluster "?1" always;
+    #                     Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
     #                     Content Security Policy
     #                     See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     #                     Enforces https content and restricts JS/CSS to origin
@@ -653,36 +529,6 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.8.77:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
-    }
 }
 ```
 
@@ -749,36 +595,6 @@ server {
         set $upstream_jellyseerr http://192.168.8.57:5055;
         proxy_pass $upstream_jellyseerr;
         proxy_read_timeout 300s;
-    }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.8.77:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
     }
 }
 ```
@@ -1166,36 +982,6 @@ server {
         proxy_buffering on;
         proxy_cache_valid 200;
         proxy_cache_background_update on;
-    }
-    location /authelia {
-        internal;
-        #ADD YOUR IP AND PORT OF AUTHELIA
-// highlight-next-line
-        set $upstream_authelia http://192.168.4.202:9091/api/verify;
-        proxy_pass_request_body off;
-        proxy_pass $upstream_authelia;
-        proxy_set_header Content-Length "";
-        # Timeout if the real server is dead
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
-        client_body_buffer_size 128k;
-        proxy_set_header Host $host;
-        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header X-Forwarded-Uri $request_uri;
-        proxy_set_header X-Forwarded-Ssl on;
-        proxy_redirect http:// $scheme://;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_cache_bypass $cookie_session;
-        proxy_no_cache $cookie_session;
-        proxy_buffers 4 32k;
-        send_timeout 5m;
-        proxy_read_timeout 240;
-        proxy_send_timeout 240;
-        proxy_connect_timeout 240;
     }
 }
 ```
