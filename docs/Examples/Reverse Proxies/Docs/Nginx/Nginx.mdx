@@ -15,7 +15,12 @@ tags:
    - Sonarr
    - Prowlarr
    - Lidarr
-keywords: [Reverse Proxy,Nginx,Nextcloud,Adguard,Authelia,HomeBridge,Home Assistant,Jellyfin,JFA-GO,Jellyseer,Radarr,Sonarr,Prowlarr,Lidarr,Arr Suite]
+   - Immich
+   - Portainer
+   - Vaultwarden
+   - Uptime Kuma
+   - Snippets
+keywords: [Reverse Proxy,Nginx,Nextcloud,Adguard,Authelia,HomeBridge,Home Assistant,Jellyfin,JFA-GO,Jellyseer,Radarr,Sonarr,Prowlarr,Lidarr,Arr Suite,Immich,Portainer,Vaultwarden,Uptime Kuma,Snippets]
 last_update:
   author: BankaiTech
 ---
@@ -88,7 +93,8 @@ server {
         proxy_busy_buffers_size 256k;
         #proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
 // highlight-next-line
-        proxy_pass http://192.168.8.181:8080$request_uri;
+        set $upstream_nextcloud http://192.168.8.181;
+        proxy_pass $upstream_nextcloud:8080$request_uri;
         proxy_set_header Host $host;
         proxy_set_header Upgrade websocket;
         proxy_set_header Connection Upgrade;
@@ -104,8 +110,7 @@ server {
         return 301 /index.php$uri;
     }
     location ^~ /push/ {
-// highlight-next-line
-        proxy_pass http://192.168.8.181:7867/;
+        proxy_pass $upstream_nextcloud:7867/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -113,8 +118,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
     location ^~ /metrics/ {
-// highlight-next-line
-        proxy_pass http://192.168.8.181:7868/metrics;
+        proxy_pass $upstream_nextcloud:7868/metrics;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -191,7 +195,8 @@ server {
         proxy_redirect / /;
         proxy_cookie_path / /;
 // highlight-next-line
-        proxy_pass https://192.168.4.55:3001;
+        set $upstream_adguard https://192.168.4.55:3001;
+        proxy_pass $upstream_adguard;
         #websockets
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -364,7 +369,8 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 // highlight-next-line
-        proxy_pass http://192.168.8.120:8581;
+        set $upstream_homebridge http://192.168.8.120:8581;
+        proxy_pass $upstream_homebridge;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
@@ -460,7 +466,8 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 // highlight-next-line
-        proxy_pass http://192.168.8.157:8123;
+        set $upstream_ha http://192.168.8.157:8123;
+        proxy_pass $upstream_ha;
         proxy_read_timeout 300s;
         #Cache
         proxy_buffering on;
@@ -738,7 +745,8 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 // highlight-next-line
-        proxy_pass http://192.168.8.57:5055;
+        set $upstream_jellyseerr http://192.168.8.57:5055;
+        proxy_pass $upstream_jellyseerr;
         proxy_read_timeout 300s;
     }
     location /authelia {
@@ -988,7 +996,8 @@ server {
     #                      Connect to backend server
     location / {
 // highlight-next-line
-        proxy_pass http://192.168.4.109:8091;
+        set $upstream_docs http://192.168.4.109:8091;
+        proxy_pass $upstream_docs;
         client_body_buffer_size 128k;
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
         send_timeout 5m;
@@ -1015,6 +1024,452 @@ server {
         #websockets
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+## Immich
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+    http2 on;
+// highlight-next-line
+    server_name photos.bankai-tech.com;
+    #                    Redirect to https version of website
+// highlight-next-line
+    return 301 https://photos.bankai-tech.com;
+    #                    Logging
+    access_log /var/log/nginx/Immich_access.log;
+    error_log /var/log/nginx/Immich_error.log;
+}
+server {
+    listen 443 ssl;
+    http2 on;
+// highlight-next-line
+    server_name photos.bankai-tech.com;
+    #                    Load TLS Certs
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+// highlight-end
+    #                    ssl_stapling on;
+    #                    ssl_stapling_verify on;
+    #                    Logging
+    access_log /var/log/nginx/Immich_access.log;
+    error_log /var/log/nginx/Immich_error.log;
+    #                    Security Headers
+    add_header Expect-CT "enforce, max-age=31536000";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    #                    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    allow large file uploads
+    client_max_body_size 50000M;
+    #                    Set headers
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    #                    enable websockets: http://nginx.org/en/docs/http/websocket.html
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_redirect off;
+    #                    set timeout
+    proxy_read_timeout 600s;
+    proxy_send_timeout 600s;
+    send_timeout 600s;
+    #                    Connect to backend server
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_set_header "Connection" "";
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+// highlight-next-line
+        set $upstream_immich http://192.168.8.57:2291;
+        proxy_pass $upstream_immich;
+    }
+    location = /.well-known/immich {
+        proxy_pass $upstream_immich;
+    }
+}
+```
+
+## Portainer
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+    listen [::]:80;
+// highlight-next-line
+    server_name docker.bankai-tech.com;
+    #                    Redirect to https version of website
+// highlight-next-line
+    return 301 https://docker.bankai-tech.com;
+    #                    Logging
+    access_log /var/log/nginx/Portainer_access.log;
+    error_log /var/log/nginx/Portainer_error.log;
+}
+server {
+    listen [::]:443 ssl http2;
+    listen 443 ssl http2;
+// highlight-next-line
+    server_name docker.bankai-tech.com;
+    #                    Load TLS Certs
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+// highlight-end
+    #                    ssl_stapling on;
+    #                    ssl_stapling_verify on;
+    #                    Logging
+    access_log /var/log/nginx/Portainer_access.log;
+    error_log /var/log/nginx/Portainer_error.log;
+    #                    Security Headers
+    add_header Expect-CT "enforce, max-age=31536000";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Allow upload of large files
+    client_max_body_size 0;
+    #                    Cache
+    proxy_cache_key $scheme$proxy_host$request_uri;
+    add_header X-Cache-Status $upstream_cache_status;
+    client_header_buffer_size 50m;
+    client_body_buffer_size 50m;
+    client_body_timeout 300s;
+    #                    Connect to backend server
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
+        proxy_http_version 1.1;
+        proxy_set_header "Connection" "";
+        proxy_set_header Upgrade $http_upgrade;
+// highlight-next-line
+        set $upstream_portainer https://192.168.4.206:9443;
+        proxy_pass $upstream_portainer;
+        proxy_read_timeout 300s;
+        #Cache
+        proxy_buffering on;
+        proxy_cache_valid 200;
+        proxy_cache_background_update on;
+    }
+    location /authelia {
+        internal;
+        #ADD YOUR IP AND PORT OF AUTHELIA
+// highlight-next-line
+        set $upstream_authelia http://192.168.4.202:9091/api/verify;
+        proxy_pass_request_body off;
+        proxy_pass $upstream_authelia;
+        proxy_set_header Content-Length "";
+        # Timeout if the real server is dead
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        client_body_buffer_size 128k;
+        proxy_set_header Host $host;
+        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_redirect http:// $scheme://;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_cache_bypass $cookie_session;
+        proxy_no_cache $cookie_session;
+        proxy_buffers 4 32k;
+        send_timeout 5m;
+        proxy_read_timeout 240;
+        proxy_send_timeout 240;
+        proxy_connect_timeout 240;
+    }
+}
+```
+
+## Vaultwarden
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+// highlight-next-line
+    server_name vault.bankai-tech.com;
+    #                    Redirect to https version of website
+// highlight-next-line
+    return 301 https://vault.bankai-tech.com;
+    #                    Logging
+    access_log /var/log/nginx/Vaultwarden_access.log;
+    error_log /var/log/nginx/Vaultwarden_error.log;
+}
+server {
+    listen 443 ssl;
+    http2 on;
+// highlight-next-line
+    server_name vault.bankai-tech.com;
+    #                    Load TLS Certs
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+// highlight-end
+    #                    Logging
+    access_log /var/log/nginx/Vaultwarden_access.log;
+    error_log /var/log/nginx/Vaultwarden_error.log;
+    #                    Security Headers
+    add_header Expect-CT "enforce, max-age=31536000";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Allow upload of large files
+    client_max_body_size 10G;
+    #                    Cache
+    proxy_cache_key $scheme$proxy_host$request_uri;
+    add_header X-Cache-Status $upstream_cache_status;
+    client_header_buffer_size 50m;
+    client_body_buffer_size 50m;
+    client_body_timeout 300s;
+    #                    Connect to backend server
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
+        proxy_http_version 1.1;
+        proxy_set_header "Connection" "";
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+// highlight-next-line
+        set $upstream_vaultwarden http://192.168.8.77:80;
+        proxy_pass $upstream_vaultwarden;
+        proxy_read_timeout 300s;
+        #Cache
+        proxy_buffering on;
+        proxy_cache_valid 200;
+        proxy_cache_background_update on;
+    }
+}
+```
+
+## Uptime Kuma
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+// highlight-next-line
+    server_name status.bankai-tech.com;
+    #                    Redirect to https version of website
+// highlight-next-line
+    return 301 https://status.bankai-tech.com;
+    #                    Logging
+    access_log /var/log/nginx/UptimeKuma_access.log;
+    error_log /var/log/nginx/UptimeKuma_error.log;
+}
+server {
+    listen 443 ssl;
+    http2 on;
+// highlight-next-line
+    server_name status.bankai-tech.com;
+    #                    Load TLS Certs
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+// highlight-end
+    #                    ssl_stapling on;
+    #                    ssl_stapling_verify on;
+    #                    Logging
+    access_log /var/log/nginx/UptimeKuma_access.log;
+    error_log /var/log/nginx/UptimeKuma_error.log;
+    #                    Security Headers
+    add_header Expect-CT "enforce, max-age=31536000";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header Permissions-Policy "accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),cross-origin-isolated=(self),display-capture=(),document-domain=(),encrypted-media=(),execution-while-not-rendered=(),execution-while-out-of-viewport=(),fullscreen=(self),geolocation=(),gyroscope=(),hid=(),idle-detection=(),magnetometer=(),microphone=(),midi=(),navigation-override=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),web-share=(),web-share=(),clipboard-read=(self),clipboard-write=(self)";
+    #                    Allow upload of large files
+    client_max_body_size 10G;
+    #                    Cache
+    proxy_cache_key $scheme$proxy_host$request_uri;
+    add_header X-Cache-Status $upstream_cache_status;
+    client_header_buffer_size 50m;
+    client_body_buffer_size 50m;
+    client_body_timeout 300s;
+    #                    Connect to backend server
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+        proxy_cookie_path / "/; SameSite=strict; HTTPOnly; Secure";
+        proxy_http_version 1.1;
+        proxy_set_header "Connection" "";
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+// highlight-next-line
+        set $upstream_uptime http://192.168.8.164:3001;
+        proxy_pass $upstream_uptime;
+        proxy_read_timeout 300s;
+        #Cache
+        proxy_buffering on;
+        proxy_cache_valid 200;
+        proxy_cache_background_update on;
+    }
+}
+```
+
+## Nginx Snippets
+
+The following snippets can be used to simplify nginx configurations and ensure consistency across multiple services. These files should be placed in `/etc/nginx/snippets/`.
+
+### proxy.conf
+```nginx title="Save as /etc/nginx/snippets/proxy.conf" showLineNumbers
+## Headers
+proxy_set_header Host $host;
+proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $http_host;
+proxy_set_header X-Forwarded-URI $request_uri;
+proxy_set_header X-Forwarded-Ssl on;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Real-IP $remote_addr;
+
+## Basic Proxy Configuration
+client_body_buffer_size 128k;
+proxy_next_upstream error timeout invalid_header http_500 http_502 http_503; ## Timeout if the real server is dead.
+proxy_redirect  http://  $scheme://;
+proxy_http_version 1.1;
+proxy_cache_bypass $cookie_session;
+proxy_no_cache $cookie_session;
+proxy_buffers 64 256k;
+
+## Trusted Proxies Configuration
+## Please read the following documentation before configuring this:
+##     https://www.authelia.com/integration/proxies/nginx/#trusted-proxies
+# set_real_ip_from 10.0.0.0/8;
+# set_real_ip_from 172.16.0.0/12;
+# set_real_ip_from 192.168.0.0/16;
+# set_real_ip_from fc00::/7;
+real_ip_header X-Forwarded-For;
+real_ip_recursive on;
+
+## Advanced Proxy Configuration
+send_timeout 5m;
+proxy_read_timeout 360;
+proxy_send_timeout 360;
+proxy_connect_timeout 360;
+```
+
+### authelia-authrequest.conf
+```nginx title="Save as /etc/nginx/snippets/authelia-authrequest.conf" showLineNumbers
+## Send a subrequest to Authelia to verify if the user is authenticated and has permission to access the resource.
+auth_request /internal/authelia/authz;
+
+## Save the upstream metadata response headers from Authelia to variables.
+auth_request_set $user $upstream_http_remote_user;
+auth_request_set $groups $upstream_http_remote_groups;
+auth_request_set $name $upstream_http_remote_name;
+auth_request_set $email $upstream_http_remote_email;
+
+## Inject the metadata response headers from the variables into the request made to the backend.
+proxy_set_header Remote-User $user;
+proxy_set_header Remote-Groups $groups;
+proxy_set_header Remote-Email $email;
+proxy_set_header Remote-Name $name;
+
+## Configure the redirection when the authz failure occurs. Lines starting with 'Modern Method' and 'Legacy Method'
+## should be commented / uncommented as pairs. The modern method uses the session cookies configuration's authelia_url
+## value to determine the redirection URL here. It's much simpler and compatible with the mutli-cookie domain easily.
+
+## Modern Method: Set the $redirection_url to the Location header of the response to the Authz endpoint.
+auth_request_set $redirection_url $upstream_http_location;
+
+## Modern Method: When there is a 401 response code from the authz endpoint redirect to the $redirection_url.
+error_page 401 =302 $redirection_url;
+
+## Legacy Method: Set $target_url to the original requested URL.
+## This requires http_set_misc module, replace 'set_escape_uri' with 'set' if you don't have this module.
+# set_escape_uri $target_url $scheme://$http_host$request_uri;
+
+## Legacy Method: When there is a 401 response code from the authz endpoint redirect to the portal with the 'rd'
+## URL parameter set to $target_url. This requires users update 'auth.example.com/' with their external authelia URL.
+# error_page 401 =302 https://auth.example.com/?rd=$target_url;
+```
+
+### authelia-location.conf
+```nginx title="Save as /etc/nginx/snippets/authelia-location.conf" showLineNumbers
+// highlight-next-line
+set $upstream_authelia http://192.168.4.202:9091/api/authz/auth-request;
+
+## Virtual endpoint created by nginx to forward auth requests.
+location /internal/authelia/authz {
+    ## Essential Proxy Configuration
+    internal;
+    proxy_pass $upstream_authelia;
+
+    ## Headers
+    ## The headers starting with X-* are required.
+    proxy_set_header X-Original-Method $request_method;
+    proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Content-Length "";
+    proxy_set_header Connection "";
+
+    ## Basic Proxy Configuration
+    proxy_pass_request_body off;
+    proxy_next_upstream error timeout invalid_header http_500 http_502 http_503; # Timeout if the real server is dead
+    proxy_redirect http:// $scheme://;
+    proxy_http_version 1.1;
+    proxy_cache_bypass $cookie_session;
+    proxy_no_cache $cookie_session;
+    proxy_buffers 4 32k;
+    client_body_buffer_size 128k;
+
+    ## Advanced Proxy Configuration
+    send_timeout 5m;
+    proxy_read_timeout 240;
+    proxy_send_timeout 240;
+    proxy_connect_timeout 240;
+}
+```
+
+### Using Snippets
+
+To use these snippets in your nginx configurations, include them in your server blocks:
+
+```nginx title="Example usage in server configuration"
+server {
+    listen 443 ssl;
+    server_name example.bankai-tech.com;
+    
+    # Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
+    
+    location / {
+        # Include Authelia auth request
+        include /etc/nginx/snippets/authelia-authrequest.conf;
+        
+        # Include proxy configuration
+        include /etc/nginx/snippets/proxy.conf;
+        
+        set $upstream_service http://192.168.1.100:8080;
+        proxy_pass $upstream_service;
     }
 }
 ```
