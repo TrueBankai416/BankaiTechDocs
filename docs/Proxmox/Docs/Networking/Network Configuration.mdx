@@ -1,0 +1,627 @@
+---
+title: Proxmox Network Configuration
+tags:
+   - Proxmox
+   - Networking
+   - Bridge
+   - Interface
+   - Configuration
+   - Setup
+
+keywords: [Proxmox, Network Configuration, Bridge Setup, Interface Management, Network Settings]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxmox Network Configuration: Complete Setup Guide**
+
+This comprehensive guide covers the practical aspects of configuring network interfaces, bridges, and connectivity in Proxmox VE. Whether you're setting up a simple home lab or a complex enterprise environment, this guide will walk you through the essential network configuration steps.
+
+## **Network Configuration Interfaces**
+
+Proxmox provides multiple ways to configure networking:
+
+<Tabs
+  defaultValue="webui"
+  values={[
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+    {label: 'Configuration Files', value: 'config'},
+  ]}>
+
+<TabItem value="webui">
+**Proxmox Web Interface**
+- Navigate to **Node → System → Network**
+- Graphical interface for network configuration
+- Real-time validation and error checking
+- Easy-to-use forms for interface creation
+- Immediate visual feedback on changes
+</TabItem>
+
+<TabItem value="cli">
+**Command Line Interface**
+- Use `pvesh` for API access
+- Standard Linux networking commands (`ip`, `ifconfig`)
+- Network configuration through `systemctl`
+- Advanced scripting and automation capabilities
+</TabItem>
+
+<TabItem value="config">
+**Configuration Files**
+- `/etc/network/interfaces` - Main network configuration
+- `/etc/hosts` - Local hostname resolution
+- `/etc/resolv.conf` - DNS configuration
+- Direct file editing for advanced configurations
+</TabItem>
+</Tabs>
+
+## **Initial Network Setup**
+
+### **Understanding Default Configuration**
+
+During Proxmox installation, the installer typically creates:
+
+```bash
+# Default bridge configuration
+auto lo
+iface lo inet loopback
+
+auto enp0s3
+iface enp0s3 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **Verification of Current Configuration**
+
+Before making changes, verify your current network setup:
+
+<Tabs
+  defaultValue="webui"
+  values={[
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+  ]}>
+
+<TabItem value="webui">
+**Via Proxmox Web Interface:**
+1. Log into Proxmox web interface
+2. Navigate to **Node → System → Network**
+3. Review existing interfaces and their configurations
+4. Check the **Summary** tab for active connections
+</TabItem>
+
+<TabItem value="cli">
+**Via Command Line:**
+```bash
+# Show all network interfaces
+ip addr show
+
+# Show bridge information
+brctl show
+
+# Display routing table
+ip route show
+
+# Check network configuration file
+cat /etc/network/interfaces
+
+# Test connectivity
+ping -c 4 8.8.8.8
+ping -c 4 google.com
+```
+</TabItem>
+</Tabs>
+
+## **Creating and Configuring Linux Bridges**
+
+### **Bridge Creation via Web Interface**
+
+**Step 1: Access Network Configuration**
+1. Navigate to **Node → System → Network**
+2. Click **Create** → **Linux Bridge**
+
+**Step 2: Configure Bridge Settings**
+```
+Name: vmbr1
+IPv4/CIDR: 192.168.100.1/24
+Gateway: 192.168.100.1 (if this is the gateway)
+Bridge ports: enp0s8 (physical interface)
+Comment: VM Network Bridge
+```
+
+**Step 3: Advanced Options**
+- **VLAN aware**: Enable for VLAN support
+- **Multicast snooping**: Enable for multicast optimization
+- **Learning**: Enable MAC address learning
+
+### **Bridge Creation via Command Line**
+
+**Create bridge configuration:**
+
+```bash
+# Edit network interfaces file
+nano /etc/network/interfaces
+
+# Add bridge configuration
+auto vmbr1
+iface vmbr1 inet static
+    address 192.168.100.1/24
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Optional: Add comment
+    # Bridge for VM network
+```
+
+**Apply configuration:**
+
+```bash
+# Restart networking service
+systemctl restart networking
+
+# Or reload network configuration
+ifreload -a
+
+# Verify bridge creation
+ip addr show vmbr1
+brctl show vmbr1
+```
+
+### **Bridge Configuration Options**
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `address` | Bridge IP address with CIDR | `192.168.1.1/24` |
+| `gateway` | Default gateway | `192.168.1.1` |
+| `bridge-ports` | Physical interfaces to include | `enp0s3 enp0s8` |
+| `bridge-stp` | Spanning Tree Protocol | `off` (recommended for VMs) |
+| `bridge-fd` | Forward delay | `0` (recommended for VMs) |
+| `bridge-vlan-aware` | VLAN support | `yes` |
+| `bridge-vids` | Allowed VLANs | `2-4094` |
+
+## **Advanced Bridge Configurations**
+
+### **Multi-Port Bridge with Bond**
+
+Create a bridge with bonded interfaces for redundancy:
+
+```bash
+# Bond configuration
+auto bond0
+iface bond0 inet manual
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode active-backup
+    bond-primary enp0s3
+
+# Bridge with bond
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports bond0
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **VLAN-Aware Bridge**
+
+Configure a bridge to support VLANs:
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+```
+
+### **Bridge with No IP (Pure Switch)**
+
+Create a bridge that acts only as a switch:
+
+```bash
+auto vmbr1
+iface vmbr1 inet manual
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+```
+
+## **Network Interface Management**
+
+### **Physical Interface Configuration**
+
+**Dedicated Physical Interface:**
+
+```bash
+auto enp0s8
+iface enp0s8 inet static
+    address 10.0.10.100/24
+    gateway 10.0.10.1
+    # For storage or backup network
+```
+
+**Physical Interface with VLAN:**
+
+```bash
+auto enp0s3.10
+iface enp0s3.10 inet static
+    address 192.168.10.100/24
+    vlan-raw-device enp0s3
+```
+
+### **Bond Interface Configuration**
+
+**Active-Backup Bond:**
+
+```bash
+auto bond0
+iface bond0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode active-backup
+    bond-primary enp0s3
+```
+
+**802.3ad (LACP) Bond:**
+
+```bash
+auto bond0
+iface bond0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode 802.3ad
+    bond-lacp-rate fast
+    bond-xmit-hash-policy layer2+3
+```
+
+### **Bond Configuration Options**
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `active-backup` | One interface active, others standby | Simple redundancy |
+| `802.3ad` | IEEE 802.3ad Dynamic link aggregation | High performance + redundancy |
+| `balance-tlb` | Transmit load balancing | Outbound load balancing |
+| `balance-alb` | Adaptive load balancing | Bidirectional load balancing |
+| `balance-rr` | Round-robin | Simple load balancing |
+
+## **IP Address Configuration**
+
+### **Static IP Configuration**
+
+**Single IP Address:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 1.1.1.1
+    dns-search example.com
+```
+
+**Multiple IP Addresses:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+
+auto vmbr0:1
+iface vmbr0:1 inet static
+    address 192.168.1.101/24
+
+auto vmbr0:2
+iface vmbr0:2 inet static
+    address 10.0.0.100/24
+```
+
+### **DHCP Configuration**
+
+```bash
+auto vmbr0
+iface vmbr0 inet dhcp
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **IPv6 Configuration**
+
+**Static IPv6:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet6 static
+    address 2001:db8::100/64
+    gateway 2001:db8::1
+    dns-nameservers 2001:4860:4860::8888
+```
+
+**IPv6 Autoconfiguration:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet6 auto
+    privext 0
+```
+
+## **DNS and Hostname Configuration**
+
+### **DNS Configuration**
+
+**Configure DNS servers:**
+
+```bash
+# Edit resolv.conf
+nano /etc/resolv.conf
+
+# Add DNS servers
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+nameserver 192.168.1.1
+search local.domain
+```
+
+**Or via network interface:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 1.1.1.1 192.168.1.1
+    dns-search local.domain example.com
+```
+
+### **Hostname Configuration**
+
+```bash
+# Set hostname
+hostnamectl set-hostname proxmox-node1
+
+# Edit hosts file
+nano /etc/hosts
+
+# Add entries
+127.0.0.1 localhost
+192.168.1.100 proxmox-node1.local.domain proxmox-node1
+
+# Verify hostname
+hostnamectl status
+hostname -f
+```
+
+## **Network Configuration Validation**
+
+### **Testing Network Connectivity**
+
+**Basic connectivity tests:**
+
+```bash
+# Test local interface
+ping -c 4 192.168.1.100
+
+# Test gateway
+ping -c 4 192.168.1.1
+
+# Test external connectivity
+ping -c 4 8.8.8.8
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+```
+
+**Advanced network testing:**
+
+```bash
+# Test specific interface
+ping -I vmbr0 -c 4 8.8.8.8
+
+# Test with different packet sizes
+ping -s 1472 -c 4 8.8.8.8
+
+# Trace network path
+traceroute 8.8.8.8
+
+# Test bandwidth
+iperf3 -c iperf.he.net
+```
+
+### **Network Interface Status**
+
+```bash
+# Show interface statistics
+ip -s link show
+
+# Show bridge details
+bridge link show
+bridge fdb show
+
+# Show routing table
+ip route show table all
+
+# Show network connections
+ss -tuln
+netstat -tuln
+```
+
+## **Common Configuration Examples**
+
+### **Home Lab Setup**
+
+**Single bridge for all VMs:**
+
+```bash
+auto lo
+iface lo inet loopback
+
+auto enp0s3
+iface enp0s3 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    dns-nameservers 8.8.8.8 1.1.1.1
+```
+
+### **Enterprise Setup**
+
+**Multiple bridges for different purposes:**
+
+```bash
+# Management bridge
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+
+# VM production network
+auto vmbr1
+iface vmbr1 inet static
+    address 10.0.10.1/24
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+
+# Storage network
+auto vmbr2
+iface vmbr2 inet static
+    address 10.0.20.1/24
+    bridge-ports enp0s9
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **VLAN Trunk Setup**
+
+**Single interface with multiple VLANs:**
+
+```bash
+# Main bridge (VLAN aware)
+auto vmbr0
+iface vmbr0 inet manual
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+
+# Management VLAN
+auto vmbr0.10
+iface vmbr0.10 inet static
+    address 192.168.10.100/24
+    gateway 192.168.10.1
+
+# Server VLAN
+auto vmbr0.20
+iface vmbr0.20 inet static
+    address 192.168.20.100/24
+```
+
+## **Troubleshooting Network Configuration**
+
+### **Common Issues and Solutions**
+
+**Network Interface Not Coming Up:**
+
+```bash
+# Check interface status
+ip link show enp0s3
+
+# Bring interface up manually
+ip link set enp0s3 up
+
+# Restart networking
+systemctl restart networking
+```
+
+**Bridge Not Working:**
+
+```bash
+# Check bridge status
+brctl show
+ip link show vmbr0
+
+# Verify bridge ports
+bridge link show
+
+# Check for conflicts
+dmesg | grep -i network
+```
+
+**No Internet Connectivity:**
+
+```bash
+# Check routing
+ip route show
+
+# Verify DNS
+cat /etc/resolv.conf
+nslookup google.com
+
+# Test gateway
+ping $(ip route show default | awk '/default/ {print $3}')
+```
+
+### **Configuration Rollback**
+
+**Save current configuration:**
+
+```bash
+# Backup current config
+cp /etc/network/interfaces /etc/network/interfaces.backup.$(date +%Y%m%d)
+```
+
+**Rollback if needed:**
+
+```bash
+# Restore backup
+cp /etc/network/interfaces.backup.20240101 /etc/network/interfaces
+systemctl restart networking
+```
+
+## **Best Practices**
+
+1. **Always backup configurations** before making changes
+2. **Test changes in stages** to isolate issues
+3. **Use descriptive naming** for bridges and interfaces
+4. **Document your network topology** for future reference
+5. **Monitor network performance** after configuration changes
+6. **Keep configurations consistent** across cluster nodes
+7. **Use version control** for configuration files in production
+
+This comprehensive network configuration guide provides the foundation for building robust and scalable network infrastructure in your Proxmox environment.
+
+<BuyMeACoffeeButton />
