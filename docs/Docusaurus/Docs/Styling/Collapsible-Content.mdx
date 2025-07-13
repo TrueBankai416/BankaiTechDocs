@@ -22,19 +22,7 @@ Collapsible content helps organize information and improve page readability by a
 
 The simplest way to create collapsible content is using the HTML `<details>` element:
 
-```mdx
-&lt;details&gt;
-&lt;summary&gt;Click to expand&lt;/summary&gt;
-
-This content is hidden by default and revealed when the user clicks the summary.
-
-You can include **markdown** formatting, `code`, and other elements here.
-
-&lt;/details&gt;
-```
-
-**Result:**
-
+```html
 <details>
 <summary>Click to expand</summary>
 
@@ -43,28 +31,33 @@ This content is hidden by default and revealed when the user clicks the summary.
 You can include **markdown** formatting, `code`, and other elements here.
 
 </details>
+```
+
+**Result:**
+
+<>
+<details>
+<summary>Click to expand</summary>
+
+This content is hidden by default and revealed when the user clicks the summary.
+
+You can include **markdown** formatting, `code`, and other elements here.
+
+</details>
+</>
 
 ### **Open by Default**
 
 Make a details element expanded by default using the `open` attribute:
 
-```mdx
-&lt;details open&gt;
-&lt;summary&gt;This is expanded by default&lt;/summary&gt;
-
-This content is visible immediately when the page loads.
-
-&lt;/details&gt;
-```
-
-**Result:**
-
+<>
 <details open>
 <summary>This is expanded by default</summary>
 
 This content is visible immediately when the page loads.
 
 </details>
+</>
 
 ## **Collapsible Code Blocks**
 
@@ -72,30 +65,7 @@ This content is visible immediately when the page loads.
 
 Wrap code blocks in details elements for collapsible code examples:
 
-````mdx
-&lt;details&gt;
-&lt;summary&gt;Show Docker Compose Example&lt;/summary&gt;
-
-```yaml title="docker-compose.yml"
-version: '3.8'
-services:
-  web:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./html:/usr/share/nginx/html
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_PASSWORD: password
-```
-
-&lt;/details&gt;
-````
-
-**Result:**
-
+<>
 <details>
 <summary>Show Docker Compose Example</summary>
 
@@ -115,51 +85,11 @@ services:
 ```
 
 </details>
+</>
 
 ### **Multiple Code Examples**
 
 Create collapsible sections for different examples:
-
-````mdx
-&lt;details&gt;
-&lt;summary&gt;Basic Configuration&lt;/summary&gt;
-
-```nginx title="nginx.conf"
-server {
-    listen 80;
-    server_name example.com;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-    }
-}
-```
-
-&lt;/details&gt;
-
-&lt;details&gt;
-&lt;summary&gt;Advanced Configuration with SSL&lt;/summary&gt;
-
-```nginx title="nginx.conf"
-server {
-    listen 443 ssl http2;
-    server_name example.com;
-    
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-&lt;/details&gt;
-````
-
-**Result:**
 
 <details>
 <summary>Basic Configuration</summary>
@@ -203,45 +133,6 @@ server {
 ### **Nested Details**
 
 You can nest details elements for hierarchical content organization:
-
-```mdx
-&lt;details&gt;
-&lt;summary&gt;Installation Methods&lt;/summary&gt;
-
-&lt;details&gt;
-&lt;summary&gt;Docker Installation&lt;/summary&gt;
-
-1. Pull the image:
-   ```bash
-   docker pull nginx:latest
-   ```
-
-2. Run the container:
-   ```bash
-   docker run -d -p 80:80 nginx:latest
-   ```
-
-&lt;/details&gt;
-
-&lt;details&gt;
-&lt;summary&gt;Manual Installation&lt;/summary&gt;
-
-1. Update package list:
-   ```bash
-   sudo apt update
-   ```
-
-2. Install Nginx:
-   ```bash
-   sudo apt install nginx
-   ```
-
-&lt;/details&gt;
-
-&lt;/details&gt;
-```
-
-**Result:**
 
 <details>
 <summary>Installation Methods</summary>
@@ -371,11 +262,8 @@ Ensure your collapsible content works well in dark mode:
 
 Create an FAQ section using multiple details elements:
 
-```mdx
-## Frequently Asked Questions
-
-&lt;details&gt;
-&lt;summary&gt;How do I install Docker?&lt;/summary&gt;
+<details>
+<summary>How do I install Docker?</summary>
 
 Docker installation varies by operating system:
 
@@ -384,20 +272,20 @@ Docker installation varies by operating system:
 - **macOS**: Download Docker Desktop from the official website
 - **Windows**: Download Docker Desktop from the official website
 
-&lt;/details&gt;
+</details>
 
-&lt;details&gt;
-&lt;summary&gt;What's the difference between Docker and Docker Compose?&lt;/summary&gt;
+<details>
+<summary>What's the difference between Docker and Docker Compose?</summary>
 
 - **Docker**: A containerization platform for running individual containers
 - **Docker Compose**: A tool for defining and running multi-container applications using YAML files
 
 Docker Compose makes it easier to manage complex applications with multiple services.
 
-&lt;/details&gt;
+</details>
 
-&lt;details&gt;
-&lt;summary&gt;How do I persist data in Docker containers?&lt;/summary&gt;
+<details>
+<summary>How do I persist data in Docker containers?</summary>
 
 Use Docker volumes or bind mounts:
 
@@ -409,18 +297,14 @@ docker run -v myvolume:/data myimage
 docker run -v /host/path:/container/path myimage
 ```
 
-&lt;/details&gt;
-```
+</details>
 
 ### **Collapsible Troubleshooting Sections**
 
 Organize troubleshooting information in collapsible sections:
 
-```mdx
-## Troubleshooting
-
-&lt;details&gt;
-&lt;summary&gt;🔴 Service won't start&lt;/summary&gt;
+<details>
+<summary>🔴 Service won't start</summary>
 
 ### Possible Causes:
 1. Port already in use
@@ -439,10 +323,10 @@ docker logs container_name
 sudo docker restart container_name
 ```
 
-&lt;/details&gt;
+</details>
 
-&lt;details&gt;
-&lt;summary&gt;⚠️ Performance issues&lt;/summary&gt;
+<details>
+<summary>⚠️ Performance issues</summary>
 
 ### Common Performance Problems:
 - Insufficient memory allocation
@@ -461,8 +345,7 @@ docker run -m 512m myimage
 docker run -v /dev/shm:/tmp myimage
 ```
 
-&lt;/details&gt;
-```
+</details>
 
 ## **Best Practices**
 
@@ -473,22 +356,6 @@ docker run -v /dev/shm:/tmp myimage
 - **Clear Summaries**: Make summary text descriptive and actionable
 
 ### **User Experience**
-
-```mdx
-<!-- Good: Clear, descriptive summary -->
-&lt;details&gt;
-&lt;summary&gt;Configure SSL certificates with Let's Encrypt&lt;/summary&gt;
-Detailed SSL setup instructions...
-&lt;/details&gt;
-
-<!-- Avoid: Vague or unclear summary -->
-&lt;details&gt;
-&lt;summary&gt;More info&lt;/summary&gt;
-Various details...
-&lt;/details&gt;
-```
-
-### **Accessibility Considerations**
 
 - Use semantic HTML elements
 - Ensure summaries are descriptive
