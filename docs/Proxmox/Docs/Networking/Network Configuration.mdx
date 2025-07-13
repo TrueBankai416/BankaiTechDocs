@@ -636,14 +636,34 @@ proxmox kernel: e1000e 0000:00:1f.6 eno2: Detected Hardware Unit Hang
 
 **Solution Scripts:**
 
-**Create the network fix script:**
+**Recommended Installation Method (One-liner):**
+
+The easiest way to install the Intel e1000e hardware hang fix is using the automated installer:
+
+```bash
+# Download and run the automated installer
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TrueBankai416/Scripts/refs/heads/main/Proxmox/Networking/NIC%20Fix/install.sh)"
+```
+
+This command will:
+- Download the latest fix and monitoring scripts
+- Install them to the proper locations
+- Set up automated monitoring
+- Apply the Intel e1000e workaround if needed
+- Create all necessary services and configurations
+
+**Alternative Method - Manual Script Creation:**
+
+If you prefer to create the scripts manually or the automated installer isn't available, you can use the embedded scripts below.
+
+**Create the network fix script manually:**
 
 :::warning Important
 **Copy the ENTIRE code block below** - You must copy and paste the complete command including all the script content between the backticks. This is one long command that creates the complete fix script.
 :::
 
 ```bash
-# Create the fix script
+# Create the fix script manually
 sudo tee /usr/local/bin/fix-network.sh > /dev/null << 'EOF'
 #!/bin/bash
 
@@ -1077,9 +1097,26 @@ sudo chmod +x /usr/local/bin/fix-network.sh
 echo 'alias fix-network="sudo /usr/local/bin/fix-network.sh"' | sudo tee -a /root/.bashrc
 ```
 
-**How to use the script:**
+**How to use the fix scripts:**
 
-**Step 1:** Copy the entire script creation command above (from `# Create the fix script` to the final `EOF`)
+**If you used the recommended one-liner installer:**
+
+The installer automatically sets up everything. To use the fix:
+
+```bash
+# Auto-detect and fix primary interface
+fix-network
+
+# Fix specific interface  
+fix-network eno2
+
+# Check monitoring status
+network-monitor status
+```
+
+**If you used the manual script creation method:**
+
+**Step 1:** Copy the entire script creation command above (from `# Create the fix script manually` to the final `EOF`)
 **Step 2:** Paste it into your Proxmox terminal and press Enter
 **Step 3:** Run the fix script when needed:
 
@@ -1172,12 +1209,32 @@ The Intel e1000e hardware hang issue can occur unpredictably, often during perio
 
 **Automated monitoring:**
 
+**If you used the recommended one-liner installer:**
+
+Monitoring is automatically configured! The installer sets up:
+- Network monitoring script at `/usr/local/bin/network-monitor.sh`
+- Cron job for automatic monitoring every 5 minutes
+- All logging and notification systems
+
+No additional setup required. Check status with:
+```bash
+# Check monitoring status
+network-monitor status
+
+# View monitoring logs
+sudo tail -f /var/log/network-monitor.log
+```
+
+**Manual monitoring setup (alternative method):**
+
+If you used the manual script creation method, you'll need to set up monitoring separately:
+
 :::warning Important
 **Copy the ENTIRE code block below** - You must copy and paste the complete command including all the monitoring script content between the backticks. This is one long command that creates the complete monitoring script.
 :::
 
 ```bash
-# Create the network monitoring script
+# Create the network monitoring script manually
 sudo tee /usr/local/bin/network-monitor.sh > /dev/null << 'EOF'
 #!/bin/bash
 
