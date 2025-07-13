@@ -1,0 +1,630 @@
+---
+title: Advanced Components & Features
+tags:
+   - Docusaurus
+   - Components
+   - Admonitions
+   - Callouts
+   - Advanced
+keywords: [Docusaurus, Components, Admonitions, Callouts, Advanced Features]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Advanced Components & Features**
+
+Docusaurus provides many advanced components and features beyond basic markdown that can enhance your documentation's interactivity and visual appeal. This guide covers admonitions, callouts, custom components, and more advanced styling techniques.
+
+## **Admonitions (Callouts)**
+
+Admonitions are specially formatted blocks that highlight important information. They're perfect for notes, warnings, tips, and other contextual information.
+
+### **Basic Admonitions**
+
+Here are the five default admonition types:
+
+```mdx
+:::note
+This is a note admonition. Use it for additional information that's helpful but not critical.
+:::
+
+:::tip
+This is a tip admonition. Use it for helpful advice or best practices.
+:::
+
+:::info
+This is an info admonition. Use it for neutral, informational content.
+:::
+
+:::caution
+This is a caution admonition. Use it for warnings about potential issues.
+:::
+
+:::danger
+This is a danger admonition. Use it for critical warnings about serious problems.
+:::
+```
+
+**Results:**
+
+:::note
+This is a note admonition. Use it for additional information that's helpful but not critical.
+:::
+
+:::tip
+This is a tip admonition. Use it for helpful advice or best practices.
+:::
+
+:::info
+This is an info admonition. Use it for neutral, informational content.
+:::
+
+:::caution
+This is a caution admonition. Use it for warnings about potential issues.
+:::
+
+:::danger
+This is a danger admonition. Use it for critical warnings about serious problems.
+:::
+
+### **Custom Titles**
+
+You can customize the title of any admonition:
+
+```mdx
+:::tip Pro Tip
+Always backup your data before making major changes to your system.
+:::
+
+:::caution Breaking Change in v2.0
+The API endpoint `/api/v1/users` has been deprecated. Use `/api/v2/users` instead.
+:::
+
+:::info Did You Know?
+Docusaurus was originally created by Facebook (now Meta) for their own documentation needs.
+:::
+```
+
+**Results:**
+
+:::tip Pro Tip
+Always backup your data before making major changes to your system.
+:::
+
+:::caution Breaking Change in v2.0
+The API endpoint `/api/v1/users` has been deprecated. Use `/api/v2/users` instead.
+:::
+
+:::info Did You Know?
+Docusaurus was originally created by Facebook (now Meta) for their own documentation needs.
+:::
+
+### **Nested Content**
+
+Admonitions can contain complex content including code blocks, lists, and other markdown:
+
+```mdx
+:::note Installation Requirements
+Before proceeding, ensure you have:
+
+1. **Node.js** (version 16 or higher)
+   ```bash
+   node --version
+   ```
+
+2. **npm** or **yarn** package manager
+   ```bash
+   npm --version
+   # or
+   yarn --version
+   ```
+
+3. **Git** for version control
+   ```bash
+   git --version
+   ```
+
+> **Note**: On Windows, we recommend using Git Bash or Windows Subsystem for Linux (WSL).
+:::
+```
+
+**Result:**
+
+:::note Installation Requirements
+Before proceeding, ensure you have:
+
+1. **Node.js** (version 16 or higher)
+   ```bash
+   node --version
+   ```
+
+2. **npm** or **yarn** package manager
+   ```bash
+   npm --version
+   # or
+   yarn --version
+   ```
+
+3. **Git** for version control
+   ```bash
+   git --version
+   ```
+
+> **Note**: On Windows, we recommend using Git Bash or Windows Subsystem for Linux (WSL).
+:::
+
+### **Nested Admonitions**
+
+You can nest admonitions inside each other for complex information hierarchies:
+
+```mdx
+:::info Docker Installation
+Docker can be installed in several ways:
+
+:::tip Recommended Method
+Use the official Docker installer:
+
+:::caution System Requirements
+- 64-bit operating system
+- Virtualization enabled in BIOS
+- At least 4GB RAM
+:::
+
+1. Download from [docker.com](https://docker.com)
+2. Run the installer
+3. Restart your computer
+:::
+
+:::note Alternative: Package Manager
+You can also install via package managers:
+
+```bash
+# Ubuntu/Debian
+sudo apt install docker.io
+
+# macOS with Homebrew
+brew install --cask docker
+```
+:::
+:::
+```
+
+**Result:**
+
+:::info Docker Installation
+Docker can be installed in several ways:
+
+:::tip Recommended Method
+Use the official Docker installer:
+
+:::caution System Requirements
+- 64-bit operating system
+- Virtualization enabled in BIOS
+- At least 4GB RAM
+:::
+
+1. Download from [docker.com](https://docker.com)
+2. Run the installer
+3. Restart your computer
+:::
+
+:::note Alternative: Package Manager
+You can also install via package managers:
+
+```bash
+# Ubuntu/Debian
+sudo apt install docker.io
+
+# macOS with Homebrew
+brew install --cask docker
+```
+:::
+:::
+
+## **Custom Admonitions**
+
+### **Creating Custom Types**
+
+You can create custom admonition types by configuring them in `docusaurus.config.ts`:
+
+```typescript title="docusaurus.config.ts"
+module.exports = {
+  presets: [
+    [
+      '@docusaurus/preset-classic',
+      {
+        docs: {
+          admonitions: {
+            tag: ':::',
+            keywords: [
+              'note',
+              'tip',
+              'info',
+              'caution',
+              'danger',
+              'example',
+              'exercise',
+              'question',
+              'answer',
+            ],
+          },
+        },
+      },
+    ],
+  ],
+};
+```
+
+### **Styling Custom Admonitions**
+
+Add custom CSS for your new admonition types:
+
+```css title="src/css/custom.css"
+/* Custom example admonition */
+.theme-admonition-example {
+  border: 1px solid #059669;
+  border-left: 4px solid #059669;
+}
+
+.theme-admonition-example .admonitionHeading_Gvgb {
+  background-color: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+
+.theme-admonition-example .admonitionIcon_Rf37 svg {
+  fill: #059669;
+}
+
+/* Custom exercise admonition */
+.theme-admonition-exercise {
+  border: 1px solid #7c3aed;
+  border-left: 4px solid #7c3aed;
+}
+
+.theme-admonition-exercise .admonitionHeading_Gvgb {
+  background-color: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+.theme-admonition-exercise .admonitionIcon_Rf37 svg {
+  fill: #7c3aed;
+}
+
+/* Dark mode support */
+[data-theme='dark'] .theme-admonition-example .admonitionHeading_Gvgb {
+  background-color: rgba(5, 150, 105, 0.15);
+  color: #10b981;
+}
+
+[data-theme='dark'] .theme-admonition-exercise .admonitionHeading_Gvgb {
+  background-color: rgba(124, 58, 237, 0.15);
+  color: #8b5cf6;
+}
+```
+
+### **Using Custom Admonitions**
+
+Once configured, you can use your custom admonitions:
+
+```mdx
+:::example
+This is a custom example admonition that highlights code examples or demonstrations.
+
+```javascript
+const greeting = "Hello, World!";
+console.log(greeting);
+```
+:::
+
+:::exercise Try It Yourself
+Create a simple HTML page with the following requirements:
+1. A header with your name
+2. A paragraph about your favorite hobby
+3. A list of three skills you want to learn
+
+Save it as `index.html` and open it in your browser.
+:::
+```
+
+## **Interactive Elements**
+
+### **Expandable Sections with Admonitions**
+
+Combine admonitions with details elements for progressive disclosure:
+
+```mdx
+:::tip Advanced Configuration
+For most users, the default settings work fine. Click below for advanced options.
+
+<details>
+<summary>Show advanced configuration</summary>
+
+```yaml title="advanced-config.yml"
+server:
+  port: 3000
+  ssl:
+    enabled: true
+    cert: /path/to/cert.pem
+    key: /path/to/key.pem
+  
+database:
+  host: localhost
+  port: 5432
+  ssl_mode: require
+  connection_pool:
+    min: 5
+    max: 20
+    
+cache:
+  redis:
+    host: localhost
+    port: 6379
+    password: ${REDIS_PASSWORD}
+    db: 0
+```
+
+**Important**: Never commit passwords or certificates to version control!
+
+</details>
+:::
+```
+
+### **Multi-Step Processes**
+
+Use numbered admonitions for step-by-step guides:
+
+```mdx
+:::info Step 1: Initial Setup
+Create a new project directory and navigate to it:
+
+```bash
+mkdir my-project
+cd my-project
+```
+:::
+
+:::info Step 2: Initialize Project
+Initialize a new Node.js project:
+
+```bash
+npm init -y
+```
+:::
+
+:::info Step 3: Install Dependencies
+Install the required packages:
+
+```bash
+npm install express cors helmet
+npm install -D nodemon
+```
+:::
+
+:::tip Final Step: Start Development
+Create your main file and start the development server:
+
+```bash
+touch app.js
+npm run dev
+```
+:::
+```
+
+## **Content Organization Patterns**
+
+### **FAQ Sections**
+
+Organize frequently asked questions using admonitions:
+
+```mdx
+## Frequently Asked Questions
+
+:::question How do I update Docusaurus?
+Run the following command to update to the latest version:
+
+```bash
+npm update @docusaurus/core @docusaurus/preset-classic
+```
+
+Check the [changelog](https://github.com/facebook/docusaurus/blob/main/CHANGELOG.md) for breaking changes.
+:::
+
+:::question Can I use custom domains?
+Yes! You can deploy Docusaurus to any hosting provider that supports static sites:
+
+- **GitHub Pages**: Built-in support with GitHub Actions
+- **Netlify**: Automatic deployments from Git
+- **Vercel**: Zero-configuration deployments
+- **Custom server**: Deploy the `build` folder anywhere
+
+Configure your domain in the hosting provider's settings.
+:::
+
+:::question How do I add search functionality?
+Docusaurus supports several search solutions:
+
+1. **Algolia DocSearch** (recommended for open source)
+2. **Local search** with `@docusaurus/theme-search-algolia`
+3. **Custom search** integration
+
+See the [search documentation](https://docusaurus.io/docs/search) for setup instructions.
+:::
+```
+
+### **Troubleshooting Guides**
+
+Structure troubleshooting information clearly:
+
+```mdx
+## Troubleshooting
+
+:::danger Build Failures
+If your build is failing, try these solutions in order:
+
+:::caution Check Node.js Version
+Ensure you're using a supported Node.js version:
+
+```bash
+node --version
+# Should be 16.x or higher
+```
+:::
+
+:::caution Clear Cache
+Clear npm/yarn cache and node_modules:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+:::
+
+:::caution Check for Syntax Errors
+Look for MDX syntax errors in your files:
+- Unclosed JSX tags
+- Missing imports for components
+- Invalid frontmatter
+:::
+:::
+
+:::warning Performance Issues
+If your site is loading slowly:
+
+1. **Optimize images**: Use WebP format when possible
+2. **Bundle analysis**: Run `npm run build -- --bundle-analyzer`
+3. **Lazy loading**: Use dynamic imports for heavy components
+4. **CDN**: Consider using a Content Delivery Network
+
+:::info Bundle Size Analysis
+Install and run the bundle analyzer:
+
+```bash
+npm install --save-dev webpack-bundle-analyzer
+npm run build -- --bundle-analyzer
+```
+:::
+:::
+```
+
+## **Visual Enhancements**
+
+### **Color-Coded Information**
+
+Use different admonition types to create visual hierarchies:
+
+```mdx
+:::danger Critical Security Update
+**Action Required**: Update immediately to patch security vulnerability CVE-2024-XXXX.
+
+:::caution Before Updating
+1. Backup your data
+2. Test in staging environment
+3. Schedule maintenance window
+:::
+
+:::info Update Commands
+```bash
+# For npm users
+npm update package-name
+
+# For yarn users
+yarn upgrade package-name
+```
+:::
+
+:::tip Post-Update Steps
+After updating:
+- Clear browser cache
+- Restart your application
+- Verify all functionality works
+- Monitor logs for errors
+:::
+:::
+```
+
+### **Progressive Information Disclosure**
+
+Layer information complexity using nested structures:
+
+```mdx
+:::info Docker Basics
+Docker containers are lightweight, portable environments for running applications.
+
+:::note Key Concepts
+- **Image**: A template for creating containers
+- **Container**: A running instance of an image
+- **Dockerfile**: Instructions for building an image
+- **Registry**: A repository for storing images
+:::
+
+:::tip Getting Started
+Try running your first container:
+
+```bash
+docker run hello-world
+```
+
+:::caution Common Issues
+If you get permission errors, you may need to:
+1. Add your user to the docker group: `sudo usermod -aG docker $USER`
+2. Log out and log back in
+3. Or use `sudo` with docker commands
+:::
+:::
+:::
+```
+
+## **Best Practices**
+
+### **Admonition Usage Guidelines**
+
+- **Be consistent**: Use the same admonition types for similar content throughout your documentation
+- **Don't overuse**: Too many admonitions can make content hard to scan
+- **Hierarchy matters**: Use different types to create information hierarchy
+- **Mobile friendly**: Test how admonitions look on mobile devices
+
+### **Content Structure**
+
+```mdx
+<!-- Good: Clear purpose and appropriate type -->
+:::tip Performance Optimization
+Enable gzip compression on your web server to reduce file sizes by up to 70%.
+:::
+
+<!-- Avoid: Wrong type for content -->
+:::danger
+This section explains how to configure your database settings.
+:::
+
+<!-- Good: Nested structure for complex information -->
+:::info Database Setup
+Configure your database connection:
+
+:::caution Security
+Never commit database credentials to version control.
+:::
+
+```yaml
+database:
+  host: ${DB_HOST}
+  password: ${DB_PASSWORD}
+```
+:::
+```
+
+### **Accessibility Considerations**
+
+- Use semantic markup within admonitions
+- Ensure color contrast meets accessibility standards
+- Provide text alternatives for important visual information
+- Test with screen readers
+
+## **Resources**
+
+- [Docusaurus Admonitions Documentation](https://docusaurus.io/docs/markdown-features/admonitions)
+- [MDX Documentation](https://mdxjs.com/) - For understanding JSX in markdown
+- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/) - Web Content Accessibility Guidelines
+- [Color Contrast Checker](https://webaim.org/resources/contrastchecker/) - Test color accessibility
+
+<BuyMeACoffeeButton />

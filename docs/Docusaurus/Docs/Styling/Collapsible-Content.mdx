@@ -1,0 +1,598 @@
+---
+title: Collapsible Content & Details
+tags:
+   - Docusaurus
+   - Styling
+   - Collapsible
+   - Details
+   - Interactive
+keywords: [Docusaurus, Collapsible, Details, Accordion, Interactive, UI]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Collapsible Content & Details**
+
+Collapsible content helps organize information and improve page readability by allowing users to expand sections on demand. Docusaurus supports several ways to create collapsible content, from simple HTML details elements to custom components.
+
+## **HTML Details Element**
+
+### **Basic Details**
+
+The simplest way to create collapsible content is using the HTML `<details>` element:
+
+```mdx
+<details>
+<summary>Click to expand</summary>
+
+This content is hidden by default and revealed when the user clicks the summary.
+
+You can include **markdown** formatting, `code`, and other elements here.
+
+</details>
+```
+
+**Result:**
+
+<details>
+<summary>Click to expand</summary>
+
+This content is hidden by default and revealed when the user clicks the summary.
+
+You can include **markdown** formatting, `code`, and other elements here.
+
+</details>
+
+### **Open by Default**
+
+Make a details element expanded by default using the `open` attribute:
+
+```mdx
+<details open>
+<summary>This is expanded by default</summary>
+
+This content is visible immediately when the page loads.
+
+</details>
+```
+
+**Result:**
+
+<details open>
+<summary>This is expanded by default</summary>
+
+This content is visible immediately when the page loads.
+
+</details>
+
+## **Collapsible Code Blocks**
+
+### **Simple Collapsible Code**
+
+Wrap code blocks in details elements for collapsible code examples:
+
+````mdx
+<details>
+<summary>Show Docker Compose Example</summary>
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: password
+```
+
+</details>
+````
+
+**Result:**
+
+<details>
+<summary>Show Docker Compose Example</summary>
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: password
+```
+
+</details>
+
+### **Multiple Code Examples**
+
+Create collapsible sections for different examples:
+
+````mdx
+<details>
+<summary>Basic Configuration</summary>
+
+```nginx title="nginx.conf"
+server {
+    listen 80;
+    server_name example.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Advanced Configuration with SSL</summary>
+
+```nginx title="nginx.conf"
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+</details>
+````
+
+**Result:**
+
+<details>
+<summary>Basic Configuration</summary>
+
+```nginx title="nginx.conf"
+server {
+    listen 80;
+    server_name example.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Advanced Configuration with SSL</summary>
+
+```nginx title="nginx.conf"
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+</details>
+
+## **Nested Collapsible Content**
+
+### **Nested Details**
+
+You can nest details elements for hierarchical content organization:
+
+```mdx
+<details>
+<summary>Installation Methods</summary>
+
+<details>
+<summary>Docker Installation</summary>
+
+1. Pull the image:
+   ```bash
+   docker pull nginx:latest
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -d -p 80:80 nginx:latest
+   ```
+
+</details>
+
+<details>
+<summary>Manual Installation</summary>
+
+1. Update package list:
+   ```bash
+   sudo apt update
+   ```
+
+2. Install Nginx:
+   ```bash
+   sudo apt install nginx
+   ```
+
+</details>
+
+</details>
+```
+
+**Result:**
+
+<details>
+<summary>Installation Methods</summary>
+
+<details>
+<summary>Docker Installation</summary>
+
+1. Pull the image:
+   ```bash
+   docker pull nginx:latest
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -d -p 80:80 nginx:latest
+   ```
+
+</details>
+
+<details>
+<summary>Manual Installation</summary>
+
+1. Update package list:
+   ```bash
+   sudo apt update
+   ```
+
+2. Install Nginx:
+   ```bash
+   sudo apt install nginx
+   ```
+
+</details>
+
+</details>
+
+## **Styling Collapsible Content**
+
+### **Custom CSS for Details**
+
+Add custom styling to your details elements in `src/css/custom.css`:
+
+```css
+/* Basic details styling */
+details {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+details summary {
+  background: var(--ifm-color-emphasis-100);
+  padding: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+details summary:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+
+details[open] summary {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+details .details-content {
+  padding: 1rem;
+  background: var(--ifm-background-surface-color);
+}
+
+/* Remove default marker and add custom icon */
+details summary {
+  list-style: none;
+  position: relative;
+  padding-right: 2rem;
+}
+
+details summary::after {
+  content: '▶';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+}
+
+details[open] summary::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+/* Hide webkit default marker */
+details summary::-webkit-details-marker {
+  display: none;
+}
+```
+
+### **Dark Mode Support**
+
+Ensure your collapsible content works well in dark mode:
+
+```css
+[data-theme='dark'] details {
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] details summary {
+  background: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] details summary:hover {
+  background: var(--ifm-color-emphasis-300);
+}
+
+[data-theme='dark'] details[open] summary {
+  background: var(--ifm-color-primary-dark);
+}
+```
+
+## **Advanced Collapsible Patterns**
+
+### **FAQ Section**
+
+Create an FAQ section using multiple details elements:
+
+```mdx
+## Frequently Asked Questions
+
+<details>
+<summary>How do I install Docker?</summary>
+
+Docker installation varies by operating system:
+
+- **Ubuntu/Debian**: `sudo apt install docker.io`
+- **CentOS/RHEL**: `sudo yum install docker`
+- **macOS**: Download Docker Desktop from the official website
+- **Windows**: Download Docker Desktop from the official website
+
+</details>
+
+<details>
+<summary>What's the difference between Docker and Docker Compose?</summary>
+
+- **Docker**: A containerization platform for running individual containers
+- **Docker Compose**: A tool for defining and running multi-container applications using YAML files
+
+Docker Compose makes it easier to manage complex applications with multiple services.
+
+</details>
+
+<details>
+<summary>How do I persist data in Docker containers?</summary>
+
+Use Docker volumes or bind mounts:
+
+```bash
+# Using volumes
+docker run -v myvolume:/data myimage
+
+# Using bind mounts
+docker run -v /host/path:/container/path myimage
+```
+
+</details>
+```
+
+### **Collapsible Troubleshooting Sections**
+
+Organize troubleshooting information in collapsible sections:
+
+```mdx
+## Troubleshooting
+
+<details>
+<summary>🔴 Service won't start</summary>
+
+### Possible Causes:
+1. Port already in use
+2. Configuration file errors
+3. Permission issues
+
+### Solutions:
+```bash
+# Check if port is in use
+netstat -tulpn | grep :80
+
+# Check service logs
+docker logs container_name
+
+# Restart with correct permissions
+sudo docker restart container_name
+```
+
+</details>
+
+<details>
+<summary>⚠️ Performance issues</summary>
+
+### Common Performance Problems:
+- Insufficient memory allocation
+- Disk I/O bottlenecks
+- Network latency
+
+### Performance Tuning:
+```bash
+# Monitor resource usage
+docker stats
+
+# Increase memory limit
+docker run -m 512m myimage
+
+# Use faster storage
+docker run -v /dev/shm:/tmp myimage
+```
+
+</details>
+```
+
+## **Best Practices**
+
+### **Content Organization**
+
+- **Logical Grouping**: Group related information together
+- **Progressive Disclosure**: Show basic info first, details on demand
+- **Clear Summaries**: Make summary text descriptive and actionable
+
+### **User Experience**
+
+```mdx
+<!-- Good: Clear, descriptive summary -->
+<details>
+<summary>Configure SSL certificates with Let's Encrypt</summary>
+Detailed SSL setup instructions...
+</details>
+
+<!-- Avoid: Vague or unclear summary -->
+<details>
+<summary>More info</summary>
+Various details...
+</details>
+```
+
+### **Accessibility Considerations**
+
+- Use semantic HTML elements
+- Ensure summaries are descriptive
+- Test with keyboard navigation
+- Consider screen reader compatibility
+
+### **Mobile Optimization**
+
+- Ensure collapsible content works well on touch devices
+- Make summary text large enough for easy tapping
+- Test expand/collapse animations on mobile
+
+## **Common Use Cases**
+
+### **API Documentation**
+
+<details>
+<summary>GET /api/users - Retrieve user list</summary>
+
+**Parameters:**
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Response:**
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "total": 100
+  }
+}
+```
+
+</details>
+
+### **Configuration Examples**
+
+<details>
+<summary>Environment Variables Configuration</summary>
+
+Create a `.env` file in your project root:
+
+```bash title=".env"
+# Database configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp
+DB_USER=postgres
+DB_PASSWORD=secret
+
+# Application settings
+APP_PORT=3000
+APP_ENV=development
+JWT_SECRET=your-secret-key
+
+# External services
+REDIS_URL=redis://localhost:6379
+EMAIL_SERVICE=sendgrid
+EMAIL_API_KEY=your-sendgrid-key
+```
+
+</details>
+
+### **Step-by-Step Guides**
+
+<details>
+<summary>Complete Docker Setup Guide</summary>
+
+### Step 1: Install Docker
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+### Step 2: Start Docker Service
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+### Step 3: Add User to Docker Group
+```bash
+sudo usermod -aG docker $USER
+```
+
+### Step 4: Test Installation
+```bash
+docker run hello-world
+```
+
+</details>
+
+## **Resources**
+
+- [MDN Details Element Documentation](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details)
+- [Docusaurus Admonitions](https://docusaurus.io/docs/markdown-features/admonitions) - Alternative to details for highlighting content
+- [HTML5 Details and Summary](https://caniuse.com/details) - Browser support information
+- [Accessible Rich Internet Applications (ARIA)](https://www.w3.org/WAI/ARIA/apg/) - Accessibility guidelines
+
+<BuyMeACoffeeButton />
