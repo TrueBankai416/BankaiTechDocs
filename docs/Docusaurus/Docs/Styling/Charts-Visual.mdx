@@ -45,7 +45,7 @@ module.exports = {
 
 Create flowcharts to show processes and decision trees:
 
-````mdx
+````jsx
 ```mermaid
 flowchart TD
     A[Start] --> B{Is it working?}
@@ -77,7 +77,7 @@ flowchart TD
 
 Show interactions between different systems or components:
 
-````mdx
+````jsx
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -115,7 +115,7 @@ sequenceDiagram
 
 Document database schemas and relationships:
 
-````mdx
+````jsx
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ ORDER : places
@@ -167,7 +167,7 @@ erDiagram
 
 Create project timelines and schedules:
 
-````mdx
+````jsx
 ```mermaid
 gantt
     title Project Development Timeline
@@ -211,7 +211,7 @@ gantt
 
 Visualize Git branching strategies:
 
-````mdx
+````jsx
 ```mermaid
 gitgraph
     commit id: "Initial"
@@ -257,7 +257,7 @@ gitgraph
 
 Show how different components interact:
 
-````mdx
+````jsx
 ```mermaid
 graph TB
     subgraph "Frontend"
@@ -341,7 +341,7 @@ graph TB
 
 Visualize containerized applications:
 
-````mdx
+````jsx
 ```mermaid
 graph LR
     subgraph "Docker Host"
@@ -399,7 +399,7 @@ graph LR
 
 Create custom progress indicators using CSS:
 
-```mdx
+```jsx
 <div style={{
   background: 'var(--ifm-color-emphasis-200)',
   borderRadius: '8px',
@@ -449,7 +449,7 @@ Create custom progress indicators using CSS:
 
 Create informative status indicators:
 
-```mdx
+```jsx
 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
   <span style={{
     background: '#4CAF50',
@@ -651,7 +651,7 @@ export function LineChart({ data, options }) {
 
 ### **API Flow Documentation**
 
-````mdx
+````jsx
 ```mermaid
 sequenceDiagram
     participant C as Client
@@ -682,7 +682,7 @@ sequenceDiagram
 
 ### **Infrastructure Documentation**
 
-````mdx
+````jsx
 ```mermaid
 graph TB
     subgraph "Production Environment"
@@ -726,7 +726,7 @@ graph TB
 
 ### **Process Documentation**
 
-````mdx
+````jsx
 ```mermaid
 flowchart LR
     A[Receive Request] --> B{Valid Input?}
