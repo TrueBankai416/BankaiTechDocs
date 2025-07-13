@@ -29,7 +29,7 @@ const config: Config = {
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-live-codeblock', ['@docusaurus/theme-mermaid'],
+  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
   
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
