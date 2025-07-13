@@ -94,7 +94,7 @@ INNER JOIN posts ON users.id = posts.user_id
 WHERE users.active = true;
 ```
 
-```dockerfile
+```docker
 FROM node:16-alpine
 WORKDIR /app
 COPY package*.json ./
@@ -147,7 +147,7 @@ INNER JOIN posts ON users.id = posts.user_id
 WHERE users.active = true;
 ```
 
-```dockerfile
+```docker
 FROM node:16-alpine
 WORKDIR /app
 COPY package*.json ./
