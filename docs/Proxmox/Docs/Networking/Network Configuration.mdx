@@ -1126,6 +1126,40 @@ sudo systemctl daemon-reload
 sudo systemctl enable ethtool-workaround-eno2.service
 ```
 
+**Why Automated Monitoring is Essential:**
+
+The Intel e1000e hardware hang issue can occur unpredictably, often during periods of low activity or after extended uptime. Manual detection and fixing isn't practical for production systems. Automated monitoring provides:
+
+**Benefits of Automated Monitoring:**
+- **Proactive Detection**: Continuously monitors for network connectivity loss
+- **Automatic Recovery**: Immediately applies the hardware hang fix when issues are detected
+- **Minimal Downtime**: Reduces network outage duration from hours to minutes
+- **24/7 Protection**: Works around the clock without human intervention
+- **Prevents Service Disruption**: Keeps VMs and containers connected even when host networking fails
+- **Early Warning System**: Logs all network issues for pattern analysis
+- **Hands-off Operation**: Perfect for remote systems or production environments
+
+**How the Monitoring Works:**
+1. **Periodic Connectivity Tests**: Pings external servers every 5 minutes
+2. **Failure Threshold**: Requires 2 consecutive failures before taking action (prevents false positives)
+3. **Automatic Fix Application**: Runs the hardware reset script when needed
+4. **Comprehensive Logging**: Records all events for troubleshooting and analysis
+5. **Smart Recovery**: Resets failure counter after successful fixes
+
+**What Problems It Prevents:**
+- **Undetected Network Outages**: Catches issues before users notice
+- **Extended Downtime**: Immediately applies fixes instead of waiting for manual intervention
+- **Service Interruptions**: Keeps critical services running during hardware hangs
+- **Remote Access Loss**: Prevents being locked out of remote Proxmox systems
+- **Production Impact**: Minimizes business disruption from network issues
+
+**Use Cases:**
+- **Production Servers**: Essential for business-critical Proxmox deployments
+- **Remote Systems**: Prevents the need for physical access to fix network issues
+- **Unattended Systems**: Provides reliability for systems that run without constant monitoring
+- **Development Environments**: Ensures development work isn't interrupted by network hangs
+- **Home Labs**: Peace of mind for personal projects and learning environments
+
 **Automated monitoring:**
 ```bash
 # Create the network monitoring script
