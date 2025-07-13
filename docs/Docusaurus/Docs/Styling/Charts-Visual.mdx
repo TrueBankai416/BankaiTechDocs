@@ -31,14 +31,11 @@ npm install --save @docusaurus/theme-mermaid
 Then configure it in your `docusaurus.config.ts`:
 
 ```typescript title="docusaurus.config.ts"
-module.exports = {
-  themes: ['@docusaurus/theme-mermaid'],
-  themeConfig: {
-    mermaid: {
-      theme: {light: 'neutral', dark: 'dark'},
-    },
+  // Adds Diagram support via Mermaid
+  markdown: {
+    mermaid: true,
   },
-};
+  themes: ['@docusaurus/theme-mermaid'],
 ```
 
 ### **Flowcharts**
