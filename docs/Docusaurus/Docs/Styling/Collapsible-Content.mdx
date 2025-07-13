@@ -23,14 +23,14 @@ Collapsible content helps organize information and improve page readability by a
 The simplest way to create collapsible content is using the HTML `<details>` element:
 
 ```mdx
-<details>
-<summary>Click to expand</summary>
+&lt;details&gt;
+&lt;summary&gt;Click to expand&lt;/summary&gt;
 
 This content is hidden by default and revealed when the user clicks the summary.
 
 You can include **markdown** formatting, `code`, and other elements here.
 
-</details>
+&lt;/details&gt;
 ```
 
 **Result:**
@@ -49,12 +49,12 @@ You can include **markdown** formatting, `code`, and other elements here.
 Make a details element expanded by default using the `open` attribute:
 
 ```mdx
-<details open>
-<summary>This is expanded by default</summary>
+&lt;details open&gt;
+&lt;summary&gt;This is expanded by default&lt;/summary&gt;
 
 This content is visible immediately when the page loads.
 
-</details>
+&lt;/details&gt;
 ```
 
 **Result:**
@@ -73,8 +73,8 @@ This content is visible immediately when the page loads.
 Wrap code blocks in details elements for collapsible code examples:
 
 ````mdx
-<details>
-<summary>Show Docker Compose Example</summary>
+&lt;details&gt;
+&lt;summary&gt;Show Docker Compose Example&lt;/summary&gt;
 
 ```yaml title="docker-compose.yml"
 version: '3.8'
@@ -91,7 +91,7 @@ services:
       POSTGRES_PASSWORD: password
 ```
 
-</details>
+&lt;/details&gt;
 ````
 
 **Result:**
@@ -121,8 +121,8 @@ services:
 Create collapsible sections for different examples:
 
 ````mdx
-<details>
-<summary>Basic Configuration</summary>
+&lt;details&gt;
+&lt;summary&gt;Basic Configuration&lt;/summary&gt;
 
 ```nginx title="nginx.conf"
 server {
@@ -135,10 +135,10 @@ server {
 }
 ```
 
-</details>
+&lt;/details&gt;
 
-<details>
-<summary>Advanced Configuration with SSL</summary>
+&lt;details&gt;
+&lt;summary&gt;Advanced Configuration with SSL&lt;/summary&gt;
 
 ```nginx title="nginx.conf"
 server {
@@ -156,7 +156,7 @@ server {
 }
 ```
 
-</details>
+&lt;/details&gt;
 ````
 
 **Result:**
@@ -205,11 +205,11 @@ server {
 You can nest details elements for hierarchical content organization:
 
 ```mdx
-<details>
-<summary>Installation Methods</summary>
+&lt;details&gt;
+&lt;summary&gt;Installation Methods&lt;/summary&gt;
 
-<details>
-<summary>Docker Installation</summary>
+&lt;details&gt;
+&lt;summary&gt;Docker Installation&lt;/summary&gt;
 
 1. Pull the image:
    ```bash
@@ -221,10 +221,10 @@ You can nest details elements for hierarchical content organization:
    docker run -d -p 80:80 nginx:latest
    ```
 
-</details>
+&lt;/details&gt;
 
-<details>
-<summary>Manual Installation</summary>
+&lt;details&gt;
+&lt;summary&gt;Manual Installation&lt;/summary&gt;
 
 1. Update package list:
    ```bash
@@ -236,9 +236,9 @@ You can nest details elements for hierarchical content organization:
    sudo apt install nginx
    ```
 
-</details>
+&lt;/details&gt;
 
-</details>
+&lt;/details&gt;
 ```
 
 **Result:**
@@ -374,8 +374,8 @@ Create an FAQ section using multiple details elements:
 ```mdx
 ## Frequently Asked Questions
 
-<details>
-<summary>How do I install Docker?</summary>
+&lt;details&gt;
+&lt;summary&gt;How do I install Docker?&lt;/summary&gt;
 
 Docker installation varies by operating system:
 
@@ -384,20 +384,20 @@ Docker installation varies by operating system:
 - **macOS**: Download Docker Desktop from the official website
 - **Windows**: Download Docker Desktop from the official website
 
-</details>
+&lt;/details&gt;
 
-<details>
-<summary>What's the difference between Docker and Docker Compose?</summary>
+&lt;details&gt;
+&lt;summary&gt;What's the difference between Docker and Docker Compose?&lt;/summary&gt;
 
 - **Docker**: A containerization platform for running individual containers
 - **Docker Compose**: A tool for defining and running multi-container applications using YAML files
 
 Docker Compose makes it easier to manage complex applications with multiple services.
 
-</details>
+&lt;/details&gt;
 
-<details>
-<summary>How do I persist data in Docker containers?</summary>
+&lt;details&gt;
+&lt;summary&gt;How do I persist data in Docker containers?&lt;/summary&gt;
 
 Use Docker volumes or bind mounts:
 
@@ -409,7 +409,7 @@ docker run -v myvolume:/data myimage
 docker run -v /host/path:/container/path myimage
 ```
 
-</details>
+&lt;/details&gt;
 ```
 
 ### **Collapsible Troubleshooting Sections**
@@ -419,8 +419,8 @@ Organize troubleshooting information in collapsible sections:
 ```mdx
 ## Troubleshooting
 
-<details>
-<summary>🔴 Service won't start</summary>
+&lt;details&gt;
+&lt;summary&gt;🔴 Service won't start&lt;/summary&gt;
 
 ### Possible Causes:
 1. Port already in use
@@ -439,10 +439,10 @@ docker logs container_name
 sudo docker restart container_name
 ```
 
-</details>
+&lt;/details&gt;
 
-<details>
-<summary>⚠️ Performance issues</summary>
+&lt;details&gt;
+&lt;summary&gt;⚠️ Performance issues&lt;/summary&gt;
 
 ### Common Performance Problems:
 - Insufficient memory allocation
@@ -461,7 +461,7 @@ docker run -m 512m myimage
 docker run -v /dev/shm:/tmp myimage
 ```
 
-</details>
+&lt;/details&gt;
 ```
 
 ## **Best Practices**
@@ -476,16 +476,16 @@ docker run -v /dev/shm:/tmp myimage
 
 ```mdx
 <!-- Good: Clear, descriptive summary -->
-<details>
-<summary>Configure SSL certificates with Let's Encrypt</summary>
+&lt;details&gt;
+&lt;summary&gt;Configure SSL certificates with Let's Encrypt&lt;/summary&gt;
 Detailed SSL setup instructions...
-</details>
+&lt;/details&gt;
 
 <!-- Avoid: Vague or unclear summary -->
-<details>
-<summary>More info</summary>
+&lt;details&gt;
+&lt;summary&gt;More info&lt;/summary&gt;
 Various details...
-</details>
+&lt;/details&gt;
 ```
 
 ### **Accessibility Considerations**

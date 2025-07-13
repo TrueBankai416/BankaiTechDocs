@@ -27,17 +27,17 @@ Here's the basic syntax for creating tabs in your MDX files:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-<Tabs>
-  <TabItem value="apple" label="Apple" default>
+&lt;Tabs&gt;
+  &lt;TabItem value="apple" label="Apple" default&gt;
     This is an apple 🍎
-  </TabItem>
-  <TabItem value="orange" label="Orange">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="orange" label="Orange"&gt;
     This is an orange 🍊
-  </TabItem>
-  <TabItem value="banana" label="Banana">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="banana" label="Banana"&gt;
     This is a banana 🍌
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 **Result:**
@@ -59,23 +59,23 @@ import TabItem from '@theme/TabItem';
 Tabs are especially useful for showing different installation methods or code examples:
 
 ```mdx
-<Tabs>
-  <TabItem value="npm" label="npm">
+&lt;Tabs&gt;
+  &lt;TabItem value="npm" label="npm"&gt;
     ```bash
     npm install docusaurus
     ```
-  </TabItem>
-  <TabItem value="yarn" label="Yarn">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="yarn" label="Yarn"&gt;
     ```bash
     yarn add docusaurus
     ```
-  </TabItem>
-  <TabItem value="pnpm" label="pnpm">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="pnpm" label="pnpm"&gt;
     ```bash
     pnpm add docusaurus
     ```
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 **Result:**
@@ -105,17 +105,17 @@ Tabs are especially useful for showing different installation methods or code ex
 Use the `default` attribute to specify which tab should be selected by default:
 
 ```mdx
-<Tabs>
-  <TabItem value="windows" label="Windows" default>
+&lt;Tabs&gt;
+  &lt;TabItem value="windows" label="Windows" default&gt;
     Windows instructions here
-  </TabItem>
-  <TabItem value="macos" label="macOS">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="macos" label="macOS"&gt;
     macOS instructions here
-  </TabItem>
-  <TabItem value="linux" label="Linux">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="linux" label="Linux"&gt;
     Linux instructions here
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 ### **Tab Groups and Syncing**
@@ -123,24 +123,24 @@ Use the `default` attribute to specify which tab should be selected by default:
 You can sync multiple tab groups across your page using the `groupId` attribute:
 
 ```mdx
-<Tabs groupId="operating-systems">
-  <TabItem value="windows" label="Windows">
+&lt;Tabs groupId="operating-systems"&gt;
+  &lt;TabItem value="windows" label="Windows"&gt;
     Windows content
-  </TabItem>
-  <TabItem value="macos" label="macOS">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="macos" label="macOS"&gt;
     macOS content
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 
 <!-- Later in the same page -->
-<Tabs groupId="operating-systems">
-  <TabItem value="windows" label="Windows">
+&lt;Tabs groupId="operating-systems"&gt;
+  &lt;TabItem value="windows" label="Windows"&gt;
     More Windows content
-  </TabItem>
-  <TabItem value="macos" label="macOS">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="macos" label="macOS"&gt;
     More macOS content
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 When users select a tab in one group, all other groups with the same `groupId` will automatically switch to the corresponding tab.
@@ -150,14 +150,14 @@ When users select a tab in one group, all other groups with the same `groupId` w
 You can make tab selections persist in the URL by using the `queryString` attribute:
 
 ```mdx
-<Tabs queryString="current-os">
-  <TabItem value="windows" label="Windows">
+&lt;Tabs queryString="current-os"&gt;
+  &lt;TabItem value="windows" label="Windows"&gt;
     Windows instructions
-  </TabItem>
-  <TabItem value="macos" label="macOS">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="macos" label="macOS"&gt;
     macOS instructions
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 This creates URLs like `yoursite.com/docs/page?current-os=windows`.
@@ -231,24 +231,24 @@ Ensure your tab styling works well in both light and dark modes:
 
 ```mdx
 <!-- Good: Clear, related content -->
-<Tabs>
-  <TabItem value="docker" label="Docker Installation">
+&lt;Tabs&gt;
+  &lt;TabItem value="docker" label="Docker Installation"&gt;
     Docker-specific instructions...
-  </TabItem>
-  <TabItem value="manual" label="Manual Installation">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="manual" label="Manual Installation"&gt;
     Manual installation steps...
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 
 <!-- Avoid: Unrelated content in tabs -->
-<Tabs>
-  <TabItem value="install" label="Installation">
+&lt;Tabs&gt;
+  &lt;TabItem value="install" label="Installation"&gt;
     How to install...
-  </TabItem>
-  <TabItem value="history" label="Project History">
+  &lt;/TabItem&gt;
+  &lt;TabItem value="history" label="Project History"&gt;
     The project was started in...
-  </TabItem>
-</Tabs>
+  &lt;/TabItem&gt;
+&lt;/Tabs&gt;
 ```
 
 ## **Common Use Cases**
