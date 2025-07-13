@@ -151,35 +151,6 @@ Deep child content
 - **Hierarchy matters**: Use different types to create information hierarchy
 - **Mobile friendly**: Test how admonitions look on mobile devices
 
-### **Content Structure**
-
-```jsx
-<!-- Good: Clear purpose and appropriate type -->
-:::tip Performance Optimization
-Enable gzip compression on your web server to reduce file sizes by up to 70%.
-:::
-
-<!-- Avoid: Wrong type for content -->
-:::danger
-This section explains how to configure your database settings.
-:::
-
-<!-- Good: Nested structure for complex information -->
-:::info Database Setup
-Configure your database connection:
-
-  :::caution Security
-  Never commit database credentials to version control.
-  :::
-
-```yaml
-database:
-  host: ${DB_HOST}
-  password: ${DB_PASSWORD}
-```
-:::
-```
-
 ### **Accessibility Considerations**
 
 - Use semantic markup within admonitions
