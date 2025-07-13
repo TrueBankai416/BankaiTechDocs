@@ -105,7 +105,6 @@ Docusaurus was originally created by Facebook (now Meta) for their own documenta
 Admonitions can contain complex content including code blocks, lists, and other markdown:
 
 ```
-```
 :::note[Installation Requirements]
 Before proceeding, ensure you have:
 
@@ -128,7 +127,6 @@ Before proceeding, ensure you have:
 
 **Note**: On Windows, we recommend using Git Bash or Windows Subsystem for Linux (WSL).
 :::
-```
 ```
 
 **Result:**
@@ -163,22 +161,21 @@ Before proceeding, ensure you have:
 You can nest admonitions inside each other for complex information hierarchies:
 
 ```jsx
-:::info Docker Installation
+:::::::info Docker Installation
 Docker can be installed in several ways:
 
-  :::tip Recommended Method
+  ::::::tip Recommended Method
   Use the official Docker installer:
 
-    :::caution System Requirements
+    :::::caution System Requirements
     - 64-bit operating system
     - Virtualization enabled in BIOS
     - At least 4GB RAM
-    :::
+    ::::
 
   1. Download from [docker.com](https://docker.com)
   2. Run the installer
   3. Restart your computer
-  :::
 
   :::note Alternative: Package Manager
   You can also install via package managers:
@@ -190,8 +187,11 @@ Docker can be installed in several ways:
   # macOS with Homebrew
   brew install --cask docker
   ```
-  :::
 :::
+::::
+:::::
+::::::
+:::::::
 ```
 
 **Result:**
