@@ -11,6 +11,7 @@ last_update:
   author: BankaiTech
 ---
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+import Mermaid from '@theme/Mermaid';
 
 # **Charts & Visual Elements in Docusaurus**
 
@@ -37,6 +38,8 @@ Then configure it in your `docusaurus.config.ts`:
   },
   themes: ['@docusaurus/theme-mermaid'],
 ```
+
+Then make sure `import Mermaid from '@theme/Mermaid';` is at the top of your file containing the mermaid chart
 
 ### **Flowcharts**
 
@@ -69,13 +72,7 @@ flowchart TD
     C --> G[Deploy]
     G --> H[End]
 ```
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
+
 ### **Sequence Diagrams**
 
 Show interactions between different systems or components:
