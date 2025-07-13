@@ -662,6 +662,9 @@ If you prefer to create the scripts manually or the automated installer isn't av
 **Copy the ENTIRE code block below** - You must copy and paste the complete command including all the script content between the backticks. This is one long command that creates the complete fix script.
 :::
 
+<details>
+<summary><strong>Click to expand: Complete Network Fix Script (~450 lines)</strong></summary>
+
 ```bash
 # Create the fix script manually
 sudo tee /usr/local/bin/fix-network.sh > /dev/null << 'EOF'
@@ -1097,6 +1100,8 @@ sudo chmod +x /usr/local/bin/fix-network.sh
 echo 'alias fix-network="sudo /usr/local/bin/fix-network.sh"' | sudo tee -a /root/.bashrc
 ```
 
+</details>
+
 **How to use the fix scripts:**
 
 **If you used the recommended one-liner installer:**
@@ -1232,6 +1237,9 @@ If you used the manual script creation method, you'll need to set up monitoring 
 :::warning Important
 **Copy the ENTIRE code block below** - You must copy and paste the complete command including all the monitoring script content between the backticks. This is one long command that creates the complete monitoring script.
 :::
+
+<details>
+<summary><strong>Click to expand: Complete Network Monitoring Script (~200 lines)</strong></summary>
 
 ```bash
 # Create the network monitoring script manually
@@ -1422,6 +1430,8 @@ sudo chmod +x /usr/local/bin/network-monitor.sh
 
 echo "Network monitoring script installed. Check logs with: sudo tail -f /var/log/network-monitor.log"
 ```
+
+</details>
 
 **Verification:**
 ```bash
