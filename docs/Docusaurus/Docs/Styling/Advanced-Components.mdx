@@ -1,0 +1,168 @@
+---
+title: Advanced Components & Features
+tags:
+   - Docusaurus
+   - Components
+   - Admonitions
+   - Callouts
+   - Advanced
+keywords: [Docusaurus, Components, Admonitions, Callouts, Advanced Features]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Advanced Components & Features**
+
+Docusaurus provides many advanced components and features beyond basic markdown that can enhance your documentation's interactivity and visual appeal. This guide covers admonitions, callouts, custom components, and more advanced styling techniques.
+
+## **Admonitions (Callouts)**
+
+Admonitions are specially formatted blocks that highlight important information. They're perfect for notes, warnings, tips, and other contextual information.
+
+### **Basic Admonitions**
+
+Here are the five default admonition types:
+
+```jsx
+:::note
+This is a note admonition. Use it for additional information that's helpful but not critical.
+:::
+
+:::tip
+This is a tip admonition. Use it for helpful advice or best practices.
+:::
+
+:::info
+This is an info admonition. Use it for neutral, informational content.
+:::
+
+:::caution
+This is a caution admonition. Use it for warnings about potential issues.
+:::
+
+:::danger
+This is a danger admonition. Use it for critical warnings about serious problems.
+:::
+```
+
+**Results:**
+
+:::note
+This is a note admonition. Use it for additional information that's helpful but not critical.
+:::
+
+:::tip
+This is a tip admonition. Use it for helpful advice or best practices.
+:::
+
+:::info
+This is an info admonition. Use it for neutral, informational content.
+:::
+
+:::caution
+This is a caution admonition. Use it for warnings about potential issues.
+:::
+
+:::danger
+This is a danger admonition. Use it for critical warnings about serious problems.
+:::
+
+### **Custom Titles**
+
+You can customize the title of any admonition:
+
+```jsx
+:::tip Pro Tip
+Always backup your data before making major changes to your system.
+:::
+
+:::caution Breaking Change in v2.0
+The API endpoint `/api/v1/users` has been deprecated. Use `/api/v2/users` instead.
+:::
+
+:::info Did You Know?
+Docusaurus was originally created by Facebook (now Meta) for their own documentation needs.
+:::
+```
+
+**Results:**
+
+:::tip Pro Tip
+Always backup your data before making major changes to your system.
+:::
+
+:::caution Breaking Change in v2.0
+The API endpoint `/api/v1/users` has been deprecated. Use `/api/v2/users` instead.
+:::
+
+:::info Did You Know?
+Docusaurus was originally created by Facebook (now Meta) for their own documentation needs.
+:::
+
+### **Nested Admonitions**
+
+```
+:::::info[Parent]
+
+Parent content
+
+::::danger[Child]
+
+Child content
+
+:::tip[Deep Child]
+
+Deep child content
+
+:::
+
+::::
+
+:::::
+```
+
+**Result:**
+
+:::::info[Parent]
+
+Parent content
+
+::::danger[Child]
+
+Child content
+
+:::tip[Deep Child]
+
+Deep child content
+
+:::
+
+::::
+
+:::::
+
+## **Best Practices**
+
+### **Admonition Usage Guidelines**
+
+- **Be consistent**: Use the same admonition types for similar content throughout your documentation
+- **Don't overuse**: Too many admonitions can make content hard to scan
+- **Hierarchy matters**: Use different types to create information hierarchy
+- **Mobile friendly**: Test how admonitions look on mobile devices
+
+### **Accessibility Considerations**
+
+- Use semantic markup within admonitions
+- Ensure color contrast meets accessibility standards
+- Provide text alternatives for important visual information
+- Test with screen readers
+
+## **Resources**
+
+- [Docusaurus Admonitions Documentation](https://docusaurus.io/docs/markdown-features/admonitions)
+- [MDX Documentation](https://mdxjs.com/) - For understanding JSX in markdown
+- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/) - Web Content Accessibility Guidelines
+- [Color Contrast Checker](https://webaim.org/resources/contrastchecker/) - Test color accessibility
+
+<BuyMeACoffeeButton />

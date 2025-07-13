@@ -1,0 +1,755 @@
+---
+title: Charts & Visual Elements
+tags:
+   - Docusaurus
+   - Charts
+   - Visualization
+   - Mermaid
+   - Diagrams
+keywords: [Docusaurus, Charts, Mermaid, Diagrams, Visualization, Graphs]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Charts & Visual Elements in Docusaurus**
+
+Visual elements like charts, diagrams, and flowcharts can significantly enhance your documentation by making complex information easier to understand. This guide covers various ways to add visual elements to your Docusaurus site.
+
+## **Mermaid Diagrams**
+
+Mermaid is the most popular choice for creating diagrams in Docusaurus. It supports various diagram types using simple text syntax.
+
+### **Setup Mermaid**
+
+First, install the Mermaid plugin:
+
+```bash
+npm install --save @docusaurus/theme-mermaid
+```
+
+Then configure it in your `docusaurus.config.ts`:
+
+```typescript title="docusaurus.config.ts"
+  // Adds Diagram support via Mermaid
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+```
+
+### **Flowcharts**
+
+Create flowcharts to show processes and decision trees:
+
+````jsx
+```mermaid
+flowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No| D[Debug]
+    D --> E[Check logs]
+    E --> F[Fix issue]
+    F --> B
+    C --> G[Deploy]
+    G --> H[End]
+```
+````
+
+**Result:**
+
+```mermaid
+flowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No| D[Debug]
+    D --> E[Check logs]
+    E --> F[Fix issue]
+    F --> B
+    C --> G[Deploy]
+    G --> H[End]
+```
+
+### **Sequence Diagrams**
+
+Show interactions between different systems or components:
+
+````jsx
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Web App
+    participant A as API
+    participant D as Database
+    
+    U->>W: Login request
+    W->>A: Authenticate user
+    A->>D: Query user data
+    D-->>A: Return user info
+    A-->>W: Authentication result
+    W-->>U: Login response
+```
+````
+
+**Result:**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Web App
+    participant A as API
+    participant D as Database
+    
+    U->>W: Login request
+    W->>A: Authenticate user
+    A->>D: Query user data
+    D-->>A: Return user info
+    A-->>W: Authentication result
+    W-->>U: Login response
+```
+
+### **Entity Relationship Diagrams**
+
+Document database schemas and relationships:
+
+````jsx
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+    
+    CUSTOMER {
+        string name
+        string custNumber
+        string sector
+    }
+    ORDER {
+        int orderNumber
+        string deliveryAddress
+    }
+    LINE-ITEM {
+        string productCode
+        int quantity
+        float pricePerUnit
+    }
+```
+````
+
+**Result:**
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+    
+    CUSTOMER {
+        string name
+        string custNumber
+        string sector
+    }
+    ORDER {
+        int orderNumber
+        string deliveryAddress
+    }
+    LINE-ITEM {
+        string productCode
+        int quantity
+        float pricePerUnit
+    }
+```
+
+### **Gantt Charts**
+
+Create project timelines and schedules:
+
+````jsx
+```mermaid
+gantt
+    title Project Development Timeline
+    dateFormat  YYYY-MM-DD
+    section Planning
+    Requirements    :done,    req, 2024-01-01,2024-01-07
+    Design          :done,    des, 2024-01-08,2024-01-14
+    section Development
+    Backend API     :active,  dev1, 2024-01-15,2024-02-15
+    Frontend UI     :         dev2, 2024-01-22,2024-02-22
+    Integration     :         int, 2024-02-16,2024-03-01
+    section Testing
+    Unit Testing    :         test1, 2024-02-23,2024-03-08
+    QA Testing      :         test2, 2024-03-02,2024-03-15
+    section Deployment
+    Production      :         deploy, 2024-03-16,2024-03-20
+```
+````
+
+**Result:**
+
+```mermaid
+gantt
+    title Project Development Timeline
+    dateFormat  YYYY-MM-DD
+    section Planning
+    Requirements    :done,    req, 2024-01-01,2024-01-07
+    Design          :done,    des, 2024-01-08,2024-01-14
+    section Development
+    Backend API     :active,  dev1, 2024-01-15,2024-02-15
+    Frontend UI     :         dev2, 2024-01-22,2024-02-22
+    Integration     :         int, 2024-02-16,2024-03-01
+    section Testing
+    Unit Testing    :         test1, 2024-02-23,2024-03-08
+    QA Testing      :         test2, 2024-03-02,2024-03-15
+    section Deployment
+    Production      :         deploy, 2024-03-16,2024-03-20
+```
+
+### **Git Flow Diagrams**
+
+Visualize Git branching strategies:
+
+````jsx
+```mermaid
+gitgraph
+    commit id: "Initial"
+    branch develop
+    checkout develop
+    commit id: "Feature prep"
+    branch feature
+    checkout feature
+    commit id: "Feature work"
+    commit id: "Feature complete"
+    checkout develop
+    merge feature
+    commit id: "Integration"
+    checkout main
+    merge develop
+    commit id: "Release 1.0"
+```
+````
+
+**Result:**
+
+```mermaid
+gitgraph
+    commit id: "Initial"
+    branch develop
+    checkout develop
+    commit id: "Feature prep"
+    branch feature
+    checkout feature
+    commit id: "Feature work"
+    commit id: "Feature complete"
+    checkout develop
+    merge feature
+    commit id: "Integration"
+    checkout main
+    merge develop
+    commit id: "Release 1.0"
+```
+
+## **Network and Architecture Diagrams**
+
+### **System Architecture**
+
+Show how different components interact:
+
+````jsx
+```mermaid
+graph TB
+    subgraph "Frontend"
+        A[React App]
+        B[Mobile App]
+    end
+    
+    subgraph "API Gateway"
+        C[Load Balancer]
+        D[API Gateway]
+    end
+    
+    subgraph "Services"
+        E[User Service]
+        F[Order Service]
+        G[Payment Service]
+    end
+    
+    subgraph "Data Layer"
+        H[PostgreSQL]
+        I[Redis Cache]
+        J[File Storage]
+    end
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    E --> H
+    F --> H
+    G --> H
+    E --> I
+    F --> I
+    G --> J
+```
+````
+
+**Result:**
+
+```mermaid
+graph TB
+    subgraph "Frontend"
+        A[React App]
+        B[Mobile App]
+    end
+    
+    subgraph "API Gateway"
+        C[Load Balancer]
+        D[API Gateway]
+    end
+    
+    subgraph "Services"
+        E[User Service]
+        F[Order Service]
+        G[Payment Service]
+    end
+    
+    subgraph "Data Layer"
+        H[PostgreSQL]
+        I[Redis Cache]
+        J[File Storage]
+    end
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    E --> H
+    F --> H
+    G --> H
+    E --> I
+    F --> I
+    G --> J
+```
+
+### **Docker Architecture**
+
+Visualize containerized applications:
+
+````jsx
+```mermaid
+graph LR
+    subgraph "Docker Host"
+        subgraph "Container 1"
+            A[Nginx]
+        end
+        subgraph "Container 2"
+            B[Node.js App]
+        end
+        subgraph "Container 3"
+            C[PostgreSQL]
+        end
+        D[Docker Engine]
+    end
+    
+    E[Client] --> A
+    A --> B
+    B --> C
+    
+    style A fill:#f96
+    style B fill:#9f6
+    style C fill:#69f
+```
+````
+
+**Result:**
+
+```mermaid
+graph LR
+    subgraph "Docker Host"
+        subgraph "Container 1"
+            A[Nginx]
+        end
+        subgraph "Container 2"
+            B[Node.js App]
+        end
+        subgraph "Container 3"
+            C[PostgreSQL]
+        end
+        D[Docker Engine]
+    end
+    
+    E[Client] --> A
+    A --> B
+    B --> C
+    
+    style A fill:#f96
+    style B fill:#9f6
+    style C fill:#69f
+```
+
+## **Custom Chart Components**
+
+### **Simple Progress Bars**
+
+Create custom progress indicators using CSS:
+
+```jsx
+<div style={{
+  background: 'var(--ifm-color-emphasis-200)',
+  borderRadius: '8px',
+  padding: '4px',
+  marginBottom: '1rem'
+}}>
+  <div style={{
+    background: 'linear-gradient(90deg, #4CAF50 0%, #45a049 100%)',
+    height: '24px',
+    width: '75%',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontWeight: 'bold'
+  }}>
+    75% Complete
+  </div>
+</div>
+```
+
+**Result:**
+
+<div style={{
+  background: 'var(--ifm-color-emphasis-200)',
+  borderRadius: '8px',
+  padding: '4px',
+  marginBottom: '1rem'
+}}>
+  <div style={{
+    background: 'linear-gradient(90deg, #4CAF50 0%, #45a049 100%)',
+    height: '24px',
+    width: '75%',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontWeight: 'bold'
+  }}>
+    75% Complete
+  </div>
+</div>
+
+### **Status Badges**
+
+Create informative status indicators:
+
+```jsx
+<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+  <span style={{
+    background: '#4CAF50',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    ✅ Operational
+  </span>
+  <span style={{
+    background: '#FF9800',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    ⚠️ Maintenance
+  </span>
+  <span style={{
+    background: '#f44336',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    🔴 Down
+  </span>
+</div>
+```
+
+**Result:**
+
+<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+  <span style={{
+    background: '#4CAF50',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    ✅ Operational
+  </span>
+  <span style={{
+    background: '#FF9800',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    ⚠️ Maintenance
+  </span>
+  <span style={{
+    background: '#f44336',
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '0.875rem',
+    fontWeight: 'bold'
+  }}>
+    🔴 Down
+  </span>
+</div>
+
+## **ASCII Art and Text Diagrams**
+
+### **Network Topology**
+
+Use monospace fonts for ASCII diagrams:
+
+```
+                    ┌─────────────┐
+                    │   Internet  │
+                    └──────┬──────┘
+                           │
+                    ┌──────▼──────┐
+                    │   Router    │
+                    │ 192.168.1.1 │
+                    └──────┬──────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+       ┌──────▼──────┐ ┌───▼───┐ ┌──────▼──────┐
+       │   Server    │ │  PC   │ │   Laptop    │
+       │192.168.1.10 │ │ .1.20 │ │ 192.168.1.30│
+       └─────────────┘ └───────┘ └─────────────┘
+```
+
+### **File Structure**
+
+Show directory structures clearly:
+
+```
+project/
+├── src/
+│   ├── components/
+│   │   ├── Header/
+│   │   │   ├── Header.jsx
+│   │   │   └── Header.css
+│   │   └── Footer/
+│   │       ├── Footer.jsx
+│   │       └── Footer.css
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   └── About.jsx
+│   └── utils/
+│       └── helpers.js
+├── public/
+│   ├── index.html
+│   └── favicon.ico
+├── package.json
+└── README.md
+```
+
+## **Third-Party Chart Libraries**
+
+### **Chart.js Integration**
+
+For more complex charts, you can integrate Chart.js:
+
+```bash
+npm install chart.js react-chartjs-2
+```
+
+Create a custom component:
+
+```jsx title="src/components/Chart/LineChart.jsx"
+import React from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+export function LineChart({ data, options }) {
+  return <Line data={data} options={options} />;
+}
+```
+
+## **Best Practices**
+
+### **Diagram Design**
+
+- **Keep it simple**: Don't overcomplicate diagrams
+- **Use consistent styling**: Maintain visual consistency across diagrams
+- **Label clearly**: Ensure all elements are properly labeled
+- **Consider color accessibility**: Use colorblind-friendly palettes
+
+### **Performance Considerations**
+
+- **Lazy loading**: Consider lazy loading for complex diagrams
+- **Optimize images**: Compress any raster graphics
+- **SVG when possible**: Use SVG for scalable graphics
+
+### **Responsive Design**
+
+```css
+/* Make Mermaid diagrams responsive */
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Mobile-friendly charts */
+@media (max-width: 768px) {
+  .chart-container {
+    overflow-x: auto;
+  }
+}
+```
+
+## **Common Use Cases**
+
+### **API Flow Documentation**
+
+````jsx
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant G as API Gateway
+    participant A as Auth Service
+    participant U as User Service
+    participant D as Database
+    
+    C->>G: POST /api/login
+    G->>A: Validate credentials
+    A->>D: Query user
+    D-->>A: User data
+    A->>A: Generate JWT
+    A-->>G: Return token
+    G-->>C: 200 OK + JWT
+    
+    Note over C,G: Subsequent requests
+    C->>G: GET /api/profile (with JWT)
+    G->>A: Validate JWT
+    A-->>G: Token valid
+    G->>U: Get user profile
+    U->>D: Query profile
+    D-->>U: Profile data
+    U-->>G: Return profile
+    G-->>C: 200 OK + Profile
+```
+````
+
+### **Infrastructure Documentation**
+
+````jsx
+```mermaid
+graph TB
+    subgraph "Production Environment"
+        subgraph "Load Balancer"
+            LB[Nginx Load Balancer]
+        end
+        
+        subgraph "Application Servers"
+            APP1[App Server 1]
+            APP2[App Server 2]
+            APP3[App Server 3]
+        end
+        
+        subgraph "Database Cluster"
+            DB1[(Primary DB)]
+            DB2[(Replica 1)]
+            DB3[(Replica 2)]
+        end
+        
+        subgraph "Cache Layer"
+            REDIS[(Redis Cluster)]
+        end
+    end
+    
+    LB --> APP1
+    LB --> APP2
+    LB --> APP3
+    
+    APP1 --> DB1
+    APP2 --> DB1
+    APP3 --> DB1
+    
+    DB1 --> DB2
+    DB1 --> DB3
+    
+    APP1 --> REDIS
+    APP2 --> REDIS
+    APP3 --> REDIS
+```
+````
+
+### **Process Documentation**
+
+````jsx
+```mermaid
+flowchart LR
+    A[Receive Request] --> B{Valid Input?}
+    B -->|No| C[Return Error]
+    B -->|Yes| D[Process Data]
+    D --> E{Data Exists?}
+    E -->|No| F[Create New]
+    E -->|Yes| G[Update Existing]
+    F --> H[Save to DB]
+    G --> H
+    H --> I{Success?}
+    I -->|No| J[Rollback]
+    I -->|Yes| K[Return Success]
+    J --> C
+    C --> L[End]
+    K --> L
+```
+````
+
+## **Resources**
+
+- [Mermaid Official Documentation](https://mermaid-js.github.io/mermaid/)
+- [Mermaid Live Editor](https://mermaid.live/) - Test and create diagrams online
+- [Chart.js Documentation](https://www.chartjs.org/docs/latest/)
+- [ASCII Art Generator](https://www.ascii-art-generator.org/) - Create ASCII art and diagrams
+- [Lucidchart](https://www.lucidchart.com/) - Professional diagram creation tool
+- [Draw.io](https://app.diagrams.net/) - Free online diagram editor
+
+<BuyMeACoffeeButton />

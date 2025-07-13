@@ -25,6 +25,12 @@ const config: Config = {
     mendableAnonKey: process.env.MENDABLE_KEY,
   },
 
+    // Adds Diagram support via Mermaid
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
+  
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
   // Set the /<baseUrl>/ pathname under which your site is servedd
@@ -231,7 +237,7 @@ const config: Config = {
     prism: {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
-      additionalLanguages: ['dax', 'csharp', 'powerquery', 'powershell', 'yaml', 'nginx', 'editorconfig', 'typescript', 'javascript', 'systemd', 'ini', 'bash', 'apacheconf'],
+      additionalLanguages: ['dax', 'csharp', 'powerquery', 'powershell', 'yaml', 'nginx', 'editorconfig', 'typescript', 'javascript', 'systemd', 'ini', 'bash', 'apacheconf', 'docker'],
     },
 
   } satisfies Preset.ThemeConfig,
