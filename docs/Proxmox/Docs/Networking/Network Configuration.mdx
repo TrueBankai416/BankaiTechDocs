@@ -612,6 +612,287 @@ cp /etc/network/interfaces.backup.20240101 /etc/network/interfaces
 systemctl restart networking
 ```
 
+## **Network Troubleshooting**
+
+### **Intel e1000e Hardware Hang Issue**
+
+**Problem Description:**
+Intel e1000e network controllers in Proxmox can experience hardware hangs, causing network connectivity loss with kernel messages like:
+```
+proxmox kernel: e1000e 0000:00:1f.6 eno2: Detected Hardware Unit Hang
+```
+
+**Symptoms:**
+- Complete network connectivity loss
+- Kernel log messages about hardware hangs
+- Interface appears up but no traffic flows
+- Usually affects Intel Ethernet controllers
+- More common with recent Proxmox kernels (6.8.12+)
+
+**Root Cause:**
+- Driver/hardware interaction issues with Intel e1000e controllers
+- Problematic ethtool features (GSO, GRO, TSO, etc.)
+- Hardware state corruption requiring reset
+
+**Solution Scripts:**
+
+**Download and setup the fix script:**
+```bash
+# Download the network fix script
+wget https://raw.githubusercontent.com/TrueBankai416/Proxmox/main/fix-network.sh
+
+# Make it executable
+chmod +x fix-network.sh
+
+# Move to system location
+sudo mv fix-network.sh /usr/local/bin/fix-network
+```
+
+**Run the fix:**
+```bash
+# Auto-detect and fix primary interface
+sudo /usr/local/bin/fix-network
+
+# Fix specific interface
+sudo /usr/local/bin/fix-network eno2
+```
+
+**What the script does:**
+1. **Detects hardware hangs** from kernel logs
+2. **Applies hardware-level resets**:
+   - ethtool interface reset
+   - Intel e1000e module reload
+   - PCI bus reset if needed
+3. **Disables problematic features**:
+   ```bash
+   ethtool -K eno2 gso off gro off tso off tx off rx off rxvlan off txvlan off sg off
+   ```
+4. **Creates persistent configuration**:
+   - Systemd service to apply settings on boot
+   - Prevents recurrence of the issue
+
+**Manual workaround:**
+```bash
+# Disable problematic features manually
+sudo ethtool -K eno2 gso off
+sudo ethtool -K eno2 gro off  
+sudo ethtool -K eno2 tso off
+sudo ethtool -K eno2 sg off
+
+# Create persistent service
+sudo tee /etc/systemd/system/ethtool-workaround-eno2.service > /dev/null << 'EOF'
+[Unit]
+Description=Apply ethtool workaround for Intel e1000e hardware hang
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/bash -c 'sleep 10 && ethtool -K eno2 gso off gro off tso off sg off'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable the service
+sudo systemctl daemon-reload
+sudo systemctl enable ethtool-workaround-eno2.service
+```
+
+**Automated monitoring:**
+```bash
+# Download monitoring script
+wget https://raw.githubusercontent.com/TrueBankai416/Proxmox/main/network-monitor.sh
+chmod +x network-monitor.sh
+sudo mv network-monitor.sh /usr/local/bin/
+
+# Create cron job for monitoring
+sudo crontab -e
+# Add: */5 * * * * /usr/local/bin/network-monitor.sh check > /dev/null 2>&1
+```
+
+**Verification:**
+```bash
+# Check for hardware hang messages
+dmesg -T | grep -i "hardware unit hang"
+journalctl --since "1 hour ago" | grep -i "hardware unit hang"
+
+# Verify current features
+ethtool -k eno2 | grep -E "(gso|gro|tso|sg):"
+
+# Check if workaround service is active
+systemctl status ethtool-workaround-eno2.service
+```
+
+### **Common Network Troubleshooting**
+
+**Network Interface Not Coming Up:**
+
+```bash
+# Check interface status
+ip link show eno2
+
+# Check for hardware issues
+dmesg | grep -i eno2
+
+# Manually bring interface up
+sudo ip link set eno2 up
+
+# Restart networking service
+sudo systemctl restart networking
+
+# Check network configuration
+cat /etc/network/interfaces | grep -A 10 eno2
+```
+
+**Bridge Configuration Issues:**
+
+```bash
+# Check bridge status
+brctl show vmbr0
+bridge link show
+
+# Verify bridge members
+ls /sys/class/net/vmbr0/brif/
+
+# Check bridge VLAN settings
+bridge vlan show dev vmbr0
+
+# Restart bridge interface
+sudo ip link set vmbr0 down
+sudo ip link set vmbr0 up
+```
+
+**No Internet Connectivity:**
+
+```bash
+# Test local connectivity
+ping -c 4 $(ip route show default | awk '/default/ {print $3}')
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+
+# Check routing table
+ip route show
+
+# Verify DNS configuration
+cat /etc/resolv.conf
+
+# Test with different DNS
+nslookup google.com 8.8.8.8
+```
+
+**DHCP Issues:**
+
+```bash
+# Release and renew DHCP lease
+sudo dhclient -r vmbr0
+sudo dhclient vmbr0
+
+# Check DHCP client status
+sudo systemctl status dhclient
+
+# View DHCP lease information
+cat /var/lib/dhcp/dhclient.leases
+```
+
+**Performance Issues:**
+
+```bash
+# Check interface statistics
+ip -s link show vmbr0
+
+# Monitor network traffic
+iftop -i vmbr0
+nload vmbr0
+
+# Test network performance
+iperf3 -c target_server
+# On target: iperf3 -s
+
+# Check for packet drops
+netstat -i
+cat /proc/net/dev
+```
+
+**Hardware Driver Issues:**
+
+```bash
+# Check network driver
+ls -l /sys/class/net/*/device/driver
+
+# Reload network driver
+sudo modprobe -r e1000e
+sudo modprobe e1000e
+
+# Check driver version
+modinfo e1000e
+
+# View hardware information
+lspci | grep Ethernet
+lshw -C network
+```
+
+### **Log Analysis**
+
+**Network-related logs:**
+```bash
+# View network service logs
+journalctl -u networking
+journalctl -u systemd-networkd
+
+# Check kernel network messages
+dmesg | grep -i "network\|eth\|link"
+
+# Monitor real-time network events
+journalctl -f | grep -i network
+```
+
+**Common error patterns:**
+```bash
+# Hardware hangs (Intel e1000e)
+dmesg | grep -i "hardware unit hang"
+
+# Link state changes
+dmesg | grep -i "link up\|link down"
+
+# Driver errors
+dmesg | grep -i "e1000e\|driver"
+
+# Bridge issues
+journalctl | grep -i bridge
+```
+
+### **Recovery Procedures**
+
+**Network configuration rollback:**
+```bash
+# Restore backup configuration
+sudo cp /etc/network/interfaces.backup /etc/network/interfaces
+sudo systemctl restart networking
+```
+
+**Emergency network reset:**
+```bash
+# Complete network restart
+sudo systemctl stop networking
+sleep 5
+sudo systemctl start networking
+
+# Or use netplan (Ubuntu systems)
+sudo netplan apply
+```
+
+**Remote access recovery:**
+```bash
+# If you lose SSH access, use console/IPMI to:
+# 1. Check interface status: ip addr show
+# 2. Manually configure temporary IP: ip addr add 192.168.1.100/24 dev eth0
+# 3. Add default route: ip route add default via 192.168.1.1
+# 4. Test connectivity: ping 8.8.8.8
+```
+
 ## **Best Practices**
 
 1. **Always backup configurations** before making changes
@@ -621,6 +902,8 @@ systemctl restart networking
 5. **Monitor network performance** after configuration changes
 6. **Keep configurations consistent** across cluster nodes
 7. **Use version control** for configuration files in production
+8. **Implement monitoring** for hardware hang detection
+9. **Create emergency access procedures** for remote recovery
 
 This comprehensive network configuration guide provides the foundation for building robust and scalable network infrastructure in your Proxmox environment.
 
