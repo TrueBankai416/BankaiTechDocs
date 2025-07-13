@@ -191,18 +191,21 @@ console.log(`The sum is: ${sum}`);
 
 ### **Line Highlighting**
 
-Highlight specific lines to draw attention:
+Highlight specific lines to draw attention using comments (recommended approach):
 
 ````
-```javascript {2,4-6} showLineNumbers
+```javascript showLineNumbers
 function processData(data) {
+  // highlight-next-line
   const cleaned = data.filter(item => item !== null); // Important filtering
+  // highlight-start
   const processed = cleaned.map(item => {
     return {
       id: item.id,
       value: item.value * 2
     };
   });
+  // highlight-end
   return processed;
 }
 ```
@@ -210,9 +213,30 @@ function processData(data) {
 
 **Result:**
 
-```javascript {2,4-6} showLineNumbers
+```javascript showLineNumbers
 function processData(data) {
+  // highlight-next-line
   const cleaned = data.filter(item => item !== null); // Important filtering
+  // highlight-start
+  const processed = cleaned.map(item => {
+    return {
+      id: item.id,
+      value: item.value * 2
+    };
+  });
+  // highlight-end
+  return processed;
+}
+```
+
+### **Alternative: Range-based Highlighting**
+
+You can also use the range syntax (though comment-based is preferred):
+
+````
+```javascript {2,4-8} showLineNumbers
+function processData(data) {
+  const cleaned = data.filter(item => item !== null);
   const processed = cleaned.map(item => {
     return {
       id: item.id,
@@ -222,6 +246,7 @@ function processData(data) {
   return processed;
 }
 ```
+````
 
 ### **Code Block Titles**
 
@@ -253,15 +278,17 @@ export function multiply(a, b) {
 
 ### **Custom Line Number Start**
 
-Start line numbering from a specific number:
+Start line numbering from a specific number with highlighting:
 
 ````
-```python showLineNumbers {3-5}
+```python showLineNumbers
 # Starting from line 45 of a larger file
 def process_user_data(user_data):
+    # highlight-start
     """Process and validate user data."""
     if not user_data:
         raise ValueError("User data cannot be empty")
+    # highlight-end
     
     return {
         'id': user_data.get('id'),
@@ -457,7 +484,7 @@ npm start
 
 ### **Configuration Files**
 
-```yaml title="docker-compose.yml" showLineNumbers {8-10}
+```yaml title="docker-compose.yml" showLineNumbers
 version: '3.8'
 services:
   web:
@@ -465,9 +492,11 @@ services:
     ports:
       - "80:80"
     volumes:
+      # highlight-start
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./html:/usr/share/nginx/html
       - ./logs:/var/log/nginx
+      # highlight-end
     restart: unless-stopped
 ```
 
@@ -505,7 +534,7 @@ const newUser = await apiClient.post('/users', { name: 'John' });
 
 1. **No syntax highlighting**: Check that the language is supported and spelled correctly
 2. **Line numbers not showing**: Ensure `showLineNumbers` is added to the code block
-3. **Highlighting not working**: Verify the line number syntax `{1,3-5}`
+3. **Highlighting not working**: Use comment-based highlighting (`// highlight-next-line`, `// highlight-start`, `// highlight-end`)
 
 ### **Adding New Languages**
 
