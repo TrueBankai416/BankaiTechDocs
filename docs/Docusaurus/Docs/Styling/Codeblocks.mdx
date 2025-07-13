@@ -31,7 +31,7 @@ Result: Use the `npm install` command to install packages.
 
 For multi-line code, use triple backticks with language specification:
 
-````jsx
+````
 ```javascript
 function hello() {
   console.log("Hello, World!");
@@ -53,7 +53,7 @@ Docusaurus supports syntax highlighting for many languages through Prism.js:
 
 ### **Popular Languages**
 
-````jsx
+````
 ```bash
 echo "Shell/Bash commands"
 ls -la
@@ -163,7 +163,7 @@ CMD ["npm", "start"]
 
 Add line numbers to your code blocks using `showLineNumbers`:
 
-````jsx
+````
 ```javascript showLineNumbers
 function calculateSum(a, b) {
   // Add two numbers together
@@ -193,7 +193,7 @@ console.log(`The sum is: ${sum}`);
 
 Highlight specific lines to draw attention:
 
-````jsx
+````
 ```javascript {2,4-6} showLineNumbers
 function processData(data) {
   const cleaned = data.filter(item => item !== null); // Important filtering
@@ -227,7 +227,7 @@ function processData(data) {
 
 Add descriptive titles to your code blocks:
 
-````jsx
+````
 ```javascript title="src/utils/calculator.js" showLineNumbers
 export function add(a, b) {
   return a + b;
@@ -255,7 +255,7 @@ export function multiply(a, b) {
 
 Start line numbering from a specific number:
 
-````jsx
+````
 ```python showLineNumbers {3-5}
 # Starting from line 45 of a larger file
 def process_user_data(user_data):
@@ -345,7 +345,7 @@ module.exports = {
 
 For React components, you can create live, editable code examples:
 
-````jsx
+````
 ```jsx live
 function Welcome(props) {
   return <h1>Hello, {props.name}!</h1>;
@@ -359,7 +359,7 @@ render(<Welcome name="World" />);
 
 Show command output alongside commands:
 
-````jsx
+````
 ```bash
 npm --version
 ```
@@ -389,7 +389,7 @@ npm --version
 
 ### **Code Organization**
 
-```jsx
+```
 <!-- Good: Descriptive title and proper language -->
 ```yaml title="docker-compose.yml"
 version: '3.8'
