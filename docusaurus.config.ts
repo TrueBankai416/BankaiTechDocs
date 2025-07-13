@@ -3,6 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import webpack from 'webpack';
 
 // Environment Variable Config - fixed redundant imports and removed debug mode
 import dotenv from 'dotenv';
@@ -94,7 +95,13 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
-    plugins: [
+  
+  // Client modules to handle process.env polyfill
+  clientModules: [
+    require.resolve('./src/clientModules/processPolyfill.js'),
+  ],
+  
+  plugins: [
 //      [
 //        'docusaurus-plugin-dotenv',
 //        {
