@@ -28,7 +28,7 @@
     "disqus-react": "^1.1.7",
     "docusaurus": "^1.14.7",
     "dotenv": "^17.2.0",
-    "mermaid": "^11.8.1",
+    "mermaid": "11.6.0",
     "posthog-docusaurus": "^2.0.4",
     "prism-react-renderer": "^2.4.1",
     "react": "18.3.1",
