@@ -100,133 +100,47 @@ The API endpoint `/api/v1/users` has been deprecated. Use `/api/v2/users` instea
 Docusaurus was originally created by Facebook (now Meta) for their own documentation needs.
 :::
 
-### **Nested Content**
-
-Admonitions can contain complex content including code blocks, lists, and other markdown:
-
-```
-:::note[Installation Requirements]
-Before proceeding, ensure you have:
-
-1. **Node.js** (version 16 or higher)
-   ```bash
-   node --version
-   ```
-
-2. **npm** or **yarn** package manager
-   ```bash
-   npm --version
-   # or
-   yarn --version
-   ```
-
-3. **Git** for version control
-   ```bash
-   git --version
-   ```
-
-**Note**: On Windows, we recommend using Git Bash or Windows Subsystem for Linux (WSL).
-:::
-```
-
-**Result:**
-
-```
-:::note[Installation Requirements]
-Before proceeding, ensure you have:
-
-1. **Node.js** (version 16 or higher)
-   ```bash
-   node --version
-   ```
-
-2. **npm** or **yarn** package manager
-   ```bash
-   npm --version
-   # or
-   yarn --version
-   ```
-
-3. **Git** for version control
-   ```bash
-   git --version
-   ```
-
-**Note**: On Windows, we recommend using Git Bash or Windows Subsystem for Linux (WSL).
-:::
-```
-
 ### **Nested Admonitions**
 
-You can nest admonitions inside each other for complex information hierarchies:
+```
+:::::info[Parent]
 
-```jsx
-:::::::info Docker Installation
-Docker can be installed in several ways:
+Parent content
 
-  ::::::tip Recommended Method
-  Use the official Docker installer:
+::::danger[Child]
 
-    :::::caution System Requirements
-    - 64-bit operating system
-    - Virtualization enabled in BIOS
-    - At least 4GB RAM
-    ::::
+Child content
 
-  1. Download from [docker.com](https://docker.com)
-  2. Run the installer
-  3. Restart your computer
+:::tip[Deep Child]
 
-  :::note Alternative: Package Manager
-  You can also install via package managers:
+Deep child content
 
-  ```bash
-  # Ubuntu/Debian
-  sudo apt install docker.io
-
-  # macOS with Homebrew
-  brew install --cask docker
-  ```
 :::
+
 ::::
+
 :::::
-::::::
-:::::::
 ```
 
 **Result:**
 
-:::::::info Docker Installation
-Docker can be installed in several ways:
+:::::info[Parent]
 
-::::::tip Recommended Method
-Use the official Docker installer:
+Parent content
 
-:::::caution System Requirements
-- 64-bit operating system
-- Virtualization enabled in BIOS
-- At least 4GB RAM
-::::
+::::danger[Child]
 
-1. Download from [docker.com](https://docker.com)
-2. Run the installer
-3. Restart your computer
+Child content
 
-:::note Alternative: Package Manager
-You can also install via package managers:
+:::tip[Deep Child]
 
-```bash
-# Ubuntu/Debian
-sudo apt install docker.io
+Deep child content
 
-# macOS with Homebrew
-brew install --cask docker
-```
 :::
+
 ::::
+
 :::::
-::::::
-:::::::
 
 ## **Custom Admonitions**
 
