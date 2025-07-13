@@ -25,6 +25,8 @@ const config: Config = {
     mendableAnonKey: process.env.MENDABLE_KEY,
   },
 
+  themes: ['@docusaurus/theme-live-codeblock'],
+  
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
   // Set the /<baseUrl>/ pathname under which your site is servedd
