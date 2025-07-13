@@ -14,8 +14,6 @@ export default function FooterWrapper(props) {
 
   return (
     <>
-      //mendable needs updated, currently breaks javascript
-//      <MendableFloatingButton anon_key={mendableKey} />
       <BuyMeACoffeeFloatingWidget />
       <Footer {...props} />
     </>
