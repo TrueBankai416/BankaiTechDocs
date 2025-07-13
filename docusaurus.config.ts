@@ -23,13 +23,26 @@ const config: Config = {
     // Mendable API key for AI-powered search functionality
     // Get your key at https://mendable.ai
     mendableAnonKey: process.env.MENDABLE_KEY,
+    
+    // Mermaid configuration
+    mermaid: {
+      theme: {
+        light: 'neutral',
+        dark: 'dark',
+      },
+      options: {
+        fontFamily: 'inherit',
+        fontSize: 16,
+        theme: 'neutral',
+      },
+    },
   },
 
     // Adds Diagram support via Mermaid
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
+  themes: ['@docusaurus/theme-mermaid'],
   
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
