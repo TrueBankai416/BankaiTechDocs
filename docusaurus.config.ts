@@ -118,6 +118,19 @@ const config: Config = {
       textColor: '#091E42',
       isCloseable: true,
     },
+
+    // Mermaid configuration
+    mermaid: {
+      theme: {
+        light: 'neutral',
+        dark: 'dark',
+      },
+      options: {
+        fontFamily: 'inherit',
+        fontSize: 16,
+        theme: 'neutral',
+      },
+    },
    // Declare some <meta> tags
     metadata: [
       {name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation'},
