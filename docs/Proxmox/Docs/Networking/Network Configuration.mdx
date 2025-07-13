@@ -1,0 +1,1565 @@
+---
+title: Proxmox Network Configuration
+tags:
+   - Proxmox
+   - Networking
+   - Bridge
+   - Interface
+   - Configuration
+   - Setup
+
+keywords: [Proxmox, Network Configuration, Bridge Setup, Interface Management, Network Settings]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxmox Network Configuration: Complete Setup Guide**
+
+This comprehensive guide covers the practical aspects of configuring network interfaces, bridges, and connectivity in Proxmox VE. Whether you're setting up a simple home lab or a complex enterprise environment, this guide will walk you through the essential network configuration steps.
+
+## **Network Configuration Interfaces**
+
+Proxmox provides multiple ways to configure networking:
+
+<Tabs
+  defaultValue="webui"
+  values={[
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+    {label: 'Configuration Files', value: 'config'},
+  ]}>
+
+<TabItem value="webui">
+**Proxmox Web Interface**
+- Navigate to **Node → System → Network**
+- Graphical interface for network configuration
+- Real-time validation and error checking
+- Easy-to-use forms for interface creation
+- Immediate visual feedback on changes
+</TabItem>
+
+<TabItem value="cli">
+**Command Line Interface**
+- Use `pvesh` for API access
+- Standard Linux networking commands (`ip`, `ifconfig`)
+- Network configuration through `systemctl`
+- Advanced scripting and automation capabilities
+</TabItem>
+
+<TabItem value="config">
+**Configuration Files**
+- `/etc/network/interfaces` - Main network configuration
+- `/etc/hosts` - Local hostname resolution
+- `/etc/resolv.conf` - DNS configuration
+- Direct file editing for advanced configurations
+</TabItem>
+</Tabs>
+
+## **Initial Network Setup**
+
+### **Understanding Default Configuration**
+
+During Proxmox installation, the installer typically creates:
+
+```bash
+# Default bridge configuration
+auto lo
+iface lo inet loopback
+
+auto enp0s3
+iface enp0s3 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **Verification of Current Configuration**
+
+Before making changes, verify your current network setup:
+
+<Tabs
+  defaultValue="webui"
+  values={[
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+  ]}>
+
+<TabItem value="webui">
+**Via Proxmox Web Interface:**
+1. Log into Proxmox web interface
+2. Navigate to **Node → System → Network**
+3. Review existing interfaces and their configurations
+4. Check the **Summary** tab for active connections
+</TabItem>
+
+<TabItem value="cli">
+**Via Command Line:**
+```bash
+# Show all network interfaces
+ip addr show
+
+# Show bridge information
+brctl show
+
+# Display routing table
+ip route show
+
+# Check network configuration file
+cat /etc/network/interfaces
+
+# Test connectivity
+ping -c 4 8.8.8.8
+ping -c 4 google.com
+```
+</TabItem>
+</Tabs>
+
+## **Creating and Configuring Linux Bridges**
+
+### **Bridge Creation via Web Interface**
+
+**Step 1: Access Network Configuration**
+1. Navigate to **Node → System → Network**
+2. Click **Create** → **Linux Bridge**
+
+**Step 2: Configure Bridge Settings**
+```
+Name: vmbr1
+IPv4/CIDR: 192.168.100.1/24
+Gateway: 192.168.100.1 (if this is the gateway)
+Bridge ports: enp0s8 (physical interface)
+Comment: VM Network Bridge
+```
+
+**Step 3: Advanced Options**
+- **VLAN aware**: Enable for VLAN support
+- **Multicast snooping**: Enable for multicast optimization
+- **Learning**: Enable MAC address learning
+
+### **Bridge Creation via Command Line**
+
+**Create bridge configuration:**
+
+```bash
+# Edit network interfaces file
+nano /etc/network/interfaces
+
+# Add bridge configuration
+auto vmbr1
+iface vmbr1 inet static
+    address 192.168.100.1/24
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Optional: Add comment
+    # Bridge for VM network
+```
+
+**Apply configuration:**
+
+```bash
+# Restart networking service
+systemctl restart networking
+
+# Or reload network configuration
+ifreload -a
+
+# Verify bridge creation
+ip addr show vmbr1
+brctl show vmbr1
+```
+
+### **Bridge Configuration Options**
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `address` | Bridge IP address with CIDR | `192.168.1.1/24` |
+| `gateway` | Default gateway | `192.168.1.1` |
+| `bridge-ports` | Physical interfaces to include | `enp0s3 enp0s8` |
+| `bridge-stp` | Spanning Tree Protocol | `off` (recommended for VMs) |
+| `bridge-fd` | Forward delay | `0` (recommended for VMs) |
+| `bridge-vlan-aware` | VLAN support | `yes` |
+| `bridge-vids` | Allowed VLANs | `2-4094` |
+
+## **Advanced Bridge Configurations**
+
+### **Multi-Port Bridge with Bond**
+
+Create a bridge with bonded interfaces for redundancy:
+
+```bash
+# Bond configuration
+auto bond0
+iface bond0 inet manual
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode active-backup
+    bond-primary enp0s3
+
+# Bridge with bond
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports bond0
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **VLAN-Aware Bridge**
+
+Configure a bridge to support VLANs:
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+```
+
+### **Bridge with No IP (Pure Switch)**
+
+Create a bridge that acts only as a switch:
+
+```bash
+auto vmbr1
+iface vmbr1 inet manual
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+```
+
+## **Network Interface Management**
+
+### **Physical Interface Configuration**
+
+**Dedicated Physical Interface:**
+
+```bash
+auto enp0s8
+iface enp0s8 inet static
+    address 10.0.10.100/24
+    gateway 10.0.10.1
+    # For storage or backup network
+```
+
+**Physical Interface with VLAN:**
+
+```bash
+auto enp0s3.10
+iface enp0s3.10 inet static
+    address 192.168.10.100/24
+    vlan-raw-device enp0s3
+```
+
+### **Bond Interface Configuration**
+
+**Active-Backup Bond:**
+
+```bash
+auto bond0
+iface bond0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode active-backup
+    bond-primary enp0s3
+```
+
+**802.3ad (LACP) Bond:**
+
+```bash
+auto bond0
+iface bond0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode 802.3ad
+    bond-lacp-rate fast
+    bond-xmit-hash-policy layer2+3
+```
+
+### **Bond Configuration Options**
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `active-backup` | One interface active, others standby | Simple redundancy |
+| `802.3ad` | IEEE 802.3ad Dynamic link aggregation | High performance + redundancy |
+| `balance-tlb` | Transmit load balancing | Outbound load balancing |
+| `balance-alb` | Adaptive load balancing | Bidirectional load balancing |
+| `balance-rr` | Round-robin | Simple load balancing |
+
+## **IP Address Configuration**
+
+### **Static IP Configuration**
+
+**Single IP Address:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 1.1.1.1
+    dns-search example.com
+```
+
+**Multiple IP Addresses:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+
+auto vmbr0:1
+iface vmbr0:1 inet static
+    address 192.168.1.101/24
+
+auto vmbr0:2
+iface vmbr0:2 inet static
+    address 10.0.0.100/24
+```
+
+### **DHCP Configuration**
+
+```bash
+auto vmbr0
+iface vmbr0 inet dhcp
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **IPv6 Configuration**
+
+**Static IPv6:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet6 static
+    address 2001:db8::100/64
+    gateway 2001:db8::1
+    dns-nameservers 2001:4860:4860::8888
+```
+
+**IPv6 Autoconfiguration:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet6 auto
+    privext 0
+```
+
+## **DNS and Hostname Configuration**
+
+### **DNS Configuration**
+
+**Configure DNS servers:**
+
+```bash
+# Edit resolv.conf
+nano /etc/resolv.conf
+
+# Add DNS servers
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+nameserver 192.168.1.1
+search local.domain
+```
+
+**Or via network interface:**
+
+```bash
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 1.1.1.1 192.168.1.1
+    dns-search local.domain example.com
+```
+
+### **Hostname Configuration**
+
+```bash
+# Set hostname
+hostnamectl set-hostname proxmox-node1
+
+# Edit hosts file
+nano /etc/hosts
+
+# Add entries
+127.0.0.1 localhost
+192.168.1.100 proxmox-node1.local.domain proxmox-node1
+
+# Verify hostname
+hostnamectl status
+hostname -f
+```
+
+## **Network Configuration Validation**
+
+### **Testing Network Connectivity**
+
+**Basic connectivity tests:**
+
+```bash
+# Test local interface
+ping -c 4 192.168.1.100
+
+# Test gateway
+ping -c 4 192.168.1.1
+
+# Test external connectivity
+ping -c 4 8.8.8.8
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+```
+
+**Advanced network testing:**
+
+```bash
+# Test specific interface
+ping -I vmbr0 -c 4 8.8.8.8
+
+# Test with different packet sizes
+ping -s 1472 -c 4 8.8.8.8
+
+# Trace network path
+traceroute 8.8.8.8
+
+# Test bandwidth
+iperf3 -c iperf.he.net
+```
+
+### **Network Interface Status**
+
+```bash
+# Show interface statistics
+ip -s link show
+
+# Show bridge details
+bridge link show
+bridge fdb show
+
+# Show routing table
+ip route show table all
+
+# Show network connections
+ss -tuln
+netstat -tuln
+```
+
+## **Common Configuration Examples**
+
+### **Home Lab Setup**
+
+**Single bridge for all VMs:**
+
+```bash
+auto lo
+iface lo inet loopback
+
+auto enp0s3
+iface enp0s3 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    dns-nameservers 8.8.8.8 1.1.1.1
+```
+
+### **Enterprise Setup**
+
+**Multiple bridges for different purposes:**
+
+```bash
+# Management bridge
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+
+# VM production network
+auto vmbr1
+iface vmbr1 inet static
+    address 10.0.10.1/24
+    bridge-ports enp0s8
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+
+# Storage network
+auto vmbr2
+iface vmbr2 inet static
+    address 10.0.20.1/24
+    bridge-ports enp0s9
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **VLAN Trunk Setup**
+
+**Single interface with multiple VLANs:**
+
+```bash
+# Main bridge (VLAN aware)
+auto vmbr0
+iface vmbr0 inet manual
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+
+# Management VLAN
+auto vmbr0.10
+iface vmbr0.10 inet static
+    address 192.168.10.100/24
+    gateway 192.168.10.1
+
+# Server VLAN
+auto vmbr0.20
+iface vmbr0.20 inet static
+    address 192.168.20.100/24
+```
+
+## **Troubleshooting Network Configuration**
+
+### **Common Issues and Solutions**
+
+**Network Interface Not Coming Up:**
+
+```bash
+# Check interface status
+ip link show enp0s3
+
+# Bring interface up manually
+ip link set enp0s3 up
+
+# Restart networking
+systemctl restart networking
+```
+
+**Bridge Not Working:**
+
+```bash
+# Check bridge status
+brctl show
+ip link show vmbr0
+
+# Verify bridge ports
+bridge link show
+
+# Check for conflicts
+dmesg | grep -i network
+```
+
+**No Internet Connectivity:**
+
+```bash
+# Check routing
+ip route show
+
+# Verify DNS
+cat /etc/resolv.conf
+nslookup google.com
+
+# Test gateway
+ping $(ip route show default | awk '/default/ {print $3}')
+```
+
+### **Configuration Rollback**
+
+**Save current configuration:**
+
+```bash
+# Backup current config
+cp /etc/network/interfaces /etc/network/interfaces.backup.$(date +%Y%m%d)
+```
+
+**Rollback if needed:**
+
+```bash
+# Restore backup
+cp /etc/network/interfaces.backup.20240101 /etc/network/interfaces
+systemctl restart networking
+```
+
+## **Network Troubleshooting**
+
+### **Intel e1000e Hardware Hang Issue**
+
+**Problem Description:**
+Intel e1000e network controllers in Proxmox can experience hardware hangs, causing network connectivity loss with kernel messages like:
+```
+proxmox kernel: e1000e 0000:00:1f.6 eno2: Detected Hardware Unit Hang
+```
+
+**Symptoms:**
+- Complete network connectivity loss
+- Kernel log messages about hardware hangs
+- Interface appears up but no traffic flows
+- Usually affects Intel Ethernet controllers
+- More common with recent Proxmox kernels (6.8.12+)
+
+**Root Cause:**
+- Driver/hardware interaction issues with Intel e1000e controllers
+- Problematic ethtool features (GSO, GRO, TSO, etc.)
+- Hardware state corruption requiring reset
+
+**Solution Scripts:**
+
+**Create the network fix script:**
+
+:::warning Important
+**Copy the ENTIRE code block below** - You must copy and paste the complete command including all the script content between the backticks. This is one long command that creates the complete fix script.
+:::
+
+```bash
+# Create the fix script
+sudo tee /usr/local/bin/fix-network.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+# Network Interface Restart Script for Proxmox
+# This script restarts the network interface when connectivity is lost
+# Usage: ./fix-network.sh [interface_name]
+
+# Configuration
+LOG_FILE="/var/log/network-fix.log"
+MAX_RETRIES=3
+RETRY_DELAY=5
+PING_TARGET="8.8.8.8"
+CONNECTIVITY_TIMEOUT=5
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to log messages
+log_message() {
+    local level="$1"
+    local message="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+}
+
+# Function to check if we have root privileges
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${RED}Error: This script must be run as root${NC}"
+        exit 1
+    fi
+}
+
+# Function to check network connectivity
+check_connectivity() {
+    local target="$1"
+    local timeout="$2"
+    
+    if ping -c 1 -W "$timeout" "$target" &>/dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to check if interface is a bridge
+is_bridge_interface() {
+    local interface="$1"
+    [[ -d "/sys/class/net/$interface/bridge" ]]
+}
+
+# Function to get bridge members (physical interfaces attached to bridge)
+get_bridge_members() {
+    local bridge="$1"
+    if [[ -d "/sys/class/net/$bridge/brif" ]]; then
+        ls "/sys/class/net/$bridge/brif" 2>/dev/null | tr '\n' ' '
+    fi
+}
+
+# Function to detect hardware hangs from kernel logs
+detect_hardware_hang() {
+    local interface="$1"
+    local recent_minutes=5
+    
+    # Check for hardware hang messages in recent kernel logs
+    if dmesg -T | tail -200 | grep -i "detected hardware unit hang" | grep "$interface" >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    # Also check journalctl for recent hang messages
+    if journalctl --since="$recent_minutes minutes ago" --no-pager 2>/dev/null | grep -i "detected hardware unit hang" | grep "$interface" >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    return 1
+}
+
+# Function to get network controller driver
+get_interface_driver() {
+    local interface="$1"
+    if [[ -L "/sys/class/net/$interface/device/driver" ]]; then
+        basename $(readlink "/sys/class/net/$interface/device/driver")
+    fi
+}
+
+# Function to disable problematic ethtool features (Proxmox forum workaround)
+disable_problematic_features() {
+    local interface="$1"
+    
+    echo -e "${YELLOW}Applying Proxmox forum workaround: disabling problematic features...${NC}"
+    log_message "INFO" "Disabling problematic ethtool features for $interface (Proxmox forum workaround)"
+    
+    # Disable features known to cause issues with Intel e1000e in recent Proxmox kernels
+    local features_to_disable="gso gro tso tx rx rxvlan txvlan sg"
+    local features_applied=()
+    
+    for feature in $features_to_disable; do
+        if ethtool -K "$interface" "$feature" off 2>/dev/null; then
+            log_message "INFO" "Disabled $feature for $interface"
+            features_applied+=("$feature")
+        else
+            log_message "WARN" "Failed to disable $feature for $interface"
+        fi
+    done
+    
+    # Create persistent configuration if features were successfully applied
+    if [[ ${#features_applied[@]} -gt 0 ]]; then
+        create_persistent_ethtool_config "$interface" "${features_applied[@]}"
+    fi
+    
+    sleep 3
+    return 0
+}
+
+# Function to create persistent ethtool configuration
+create_persistent_ethtool_config() {
+    local interface="$1"
+    shift
+    local features=("$@")
+    
+    local config_file="/etc/systemd/system/ethtool-workaround-${interface}.service"
+    
+    echo -e "${YELLOW}Creating persistent configuration for $interface...${NC}"
+    log_message "INFO" "Creating persistent ethtool configuration for $interface"
+    
+    # Create systemd service to apply settings on boot
+    cat > "$config_file" << EOF2
+[Unit]
+Description=Apply ethtool workaround for Intel e1000e hardware hang ($interface)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/bash -c 'sleep 10 && $(printf "ethtool -K $interface %s off; " "${features[@]}")'
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF2
+
+    if [[ -f "$config_file" ]]; then
+        # Enable the service
+        systemctl daemon-reload
+        if systemctl enable "ethtool-workaround-${interface}.service" 2>/dev/null; then
+            log_message "INFO" "Created and enabled persistent ethtool workaround service for $interface"
+            echo -e "${GREEN}✓ Persistent configuration created: $config_file${NC}"
+        else
+            log_message "WARN" "Created ethtool workaround service but failed to enable it"
+            echo -e "${YELLOW}⚠ Service created but not enabled: $config_file${NC}"
+        fi
+    else
+        log_message "ERROR" "Failed to create persistent ethtool configuration"
+    fi
+}
+
+# Function to perform hardware-level reset
+hardware_reset_interface() {
+    local interface="$1"
+    local driver=$(get_interface_driver "$interface")
+    local reset_success=false
+    
+    log_message "INFO" "Attempting hardware-level reset for $interface (driver: $driver)"
+    echo -e "${YELLOW}Performing hardware reset for $interface...${NC}"
+    
+    # Step 1: Try ethtool reset first (if available)
+    if command -v ethtool >/dev/null 2>&1; then
+        echo -e "${YELLOW}Step 1: Attempting ethtool reset...${NC}"
+        log_message "INFO" "Attempting ethtool reset for $interface"
+        
+        # Reset the interface using ethtool
+        if ethtool -r "$interface" 2>/dev/null; then
+            log_message "INFO" "ethtool reset successful for $interface"
+            reset_success=true
+        fi
+        sleep 2
+        
+        # Try to reset specific features that might help
+        ethtool -K "$interface" rx off tx off 2>/dev/null
+        sleep 1
+        ethtool -K "$interface" rx on tx on 2>/dev/null
+        sleep 2
+    fi
+    
+    # Step 2: For Intel e1000e controllers, try module reload
+    if [[ "$driver" == "e1000e" ]]; then
+        echo -e "${YELLOW}Step 2: Detected Intel e1000e controller, attempting module reload...${NC}"
+        log_message "INFO" "Attempting e1000e module reload for hardware hang recovery"
+        
+        # Bring interface down first
+        ip link set "$interface" down
+        sleep 2
+        
+        # Remove and reload the e1000e module
+        if lsmod | grep -q "^e1000e"; then
+            echo -e "${YELLOW}Removing e1000e module...${NC}"
+            if modprobe -r e1000e 2>/dev/null; then
+                log_message "INFO" "e1000e module removed successfully"
+                sleep 3
+                
+                echo -e "${YELLOW}Reloading e1000e module...${NC}"
+                if modprobe e1000e 2>/dev/null; then
+                    log_message "INFO" "e1000e module reload completed successfully"
+                    reset_success=true
+                else
+                    log_message "ERROR" "Failed to reload e1000e module"
+                fi
+                sleep 5
+            else
+                log_message "WARN" "Failed to remove e1000e module (may be in use)"
+            fi
+        fi
+        
+        # Step 3: Apply Proxmox forum workaround (feature disabling)
+        echo -e "${YELLOW}Step 3: Applying Proxmox community workaround...${NC}"
+        disable_problematic_features "$interface"
+        reset_success=true
+    fi
+    
+    return 0
+}
+
+# Function to get primary network interface
+get_primary_interface() {
+    # Get the interface used for the default route
+    local interface=$(ip route show default | head -1 | sed 's/.*dev \([^ ]*\).*/\1/')
+    
+    if [[ -z "$interface" ]]; then
+        # Fallback: get first non-loopback interface
+        interface=$(ip -o link show | grep -v "lo:" | head -1 | cut -d: -f2 | tr -d ' ')
+    fi
+    
+    echo "$interface"
+}
+
+# Function to restart network interface
+restart_interface() {
+    local interface="$1"
+    local is_bridge=false
+    local bridge_members=""
+    
+    log_message "INFO" "Attempting to restart interface: $interface"
+    
+    # Check if this is a bridge interface (common in Proxmox)
+    if is_bridge_interface "$interface"; then
+        is_bridge=true
+        bridge_members=$(get_bridge_members "$interface")
+        log_message "INFO" "Interface $interface is a bridge with members: $bridge_members"
+        echo -e "${YELLOW}Detected bridge interface $interface with members: $bridge_members${NC}"
+    fi
+    
+    # Check if the main interface itself has hardware issues
+    local main_needs_hardware_reset=false
+    if detect_hardware_hang "$interface"; then
+        echo -e "${RED}Hardware hang detected for main interface $interface${NC}"
+        log_message "WARN" "Hardware hang detected for main interface $interface"
+        main_needs_hardware_reset=true
+    fi
+    
+    # For non-bridge interfaces, also check if they might benefit from hardware reset
+    if [[ "$is_bridge" == false ]]; then
+        local driver=$(get_interface_driver "$interface")
+        log_message "INFO" "Interface $interface uses driver: $driver"
+        
+        # Intel e1000e is known to have hardware hang issues
+        if [[ "$driver" == "e1000e" ]]; then
+            echo -e "${YELLOW}Intel e1000e controller detected, will use hardware reset approach${NC}"
+            log_message "INFO" "Intel e1000e controller detected for $interface"
+            main_needs_hardware_reset=true
+        fi
+    fi
+    
+    if [[ "$main_needs_hardware_reset" == true && "$is_bridge" == false ]]; then
+        # Use hardware reset for the main interface
+        hardware_reset_interface "$interface"
+    else
+        # Standard software reset for the main interface (or bridge)
+        echo -e "${YELLOW}Bringing down interface $interface...${NC}"
+        ip link set "$interface" down
+        sleep 2
+        
+        echo -e "${YELLOW}Bringing up interface $interface...${NC}"
+        ip link set "$interface" up
+    fi
+    
+    # Wait for interface to stabilize
+    sleep 5
+    
+    # Try DHCP renewal
+    echo -e "${YELLOW}Attempting DHCP renewal...${NC}"
+    pkill -f "dhclient.*$interface" 2>/dev/null
+    sleep 1
+    dhclient "$interface" 2>/dev/null
+    sleep 5
+    
+    return 0
+}
+
+# Function to verify network fix
+verify_fix() {
+    local interface="$1"
+    local max_attempts=15
+    local attempt=1
+    
+    echo -e "${YELLOW}Verifying network connectivity...${NC}"
+    
+    while [[ $attempt -le $max_attempts ]]; do
+        if check_connectivity "$PING_TARGET" "$CONNECTIVITY_TIMEOUT"; then
+            echo -e "${GREEN}Network connectivity restored!${NC}"
+            log_message "INFO" "Network connectivity verified after $attempt attempts"
+            return 0
+        fi
+        
+        echo "Attempt $attempt/$max_attempts: Network still not reachable, waiting 3s..."
+        sleep 3
+        ((attempt++))
+    done
+    
+    echo -e "${RED}Network connectivity could not be verified after $max_attempts attempts${NC}"
+    log_message "ERROR" "Network connectivity verification failed after $max_attempts attempts"
+    return 1
+}
+
+# Main function
+main() {
+    local interface="$1"
+    local retry_count=0
+    
+    echo -e "${YELLOW}=== Proxmox Network Interface Restart Script ===${NC}"
+    log_message "INFO" "Script started"
+    
+    # Check if running as root
+    check_root
+    
+    # Create log file if it doesn't exist
+    touch "$LOG_FILE"
+    
+    # Get interface if not provided
+    if [[ -z "$interface" ]]; then
+        interface=$(get_primary_interface)
+        if [[ -z "$interface" ]]; then
+            echo -e "${RED}Error: Could not determine primary network interface${NC}"
+            log_message "ERROR" "Could not determine primary network interface"
+            exit 1
+        fi
+    fi
+    
+    echo "Using network interface: $interface"
+    log_message "INFO" "Using network interface: $interface"
+    
+    # Check if interface exists
+    if ! ip link show "$interface" &>/dev/null; then
+        echo -e "${RED}Error: Interface $interface does not exist${NC}"
+        log_message "ERROR" "Interface $interface does not exist"
+        exit 1
+    fi
+    
+    # Check current connectivity
+    echo "Checking current network connectivity..."
+    if check_connectivity "$PING_TARGET" "$CONNECTIVITY_TIMEOUT"; then
+        echo -e "${GREEN}Network appears to be working. Are you sure you want to restart the interface? (y/N)${NC}"
+        read -r response
+        if [[ ! "$response" =~ ^[Yy]$ ]]; then
+            echo "Aborted by user."
+            log_message "INFO" "Script aborted by user - network was working"
+            exit 0
+        fi
+    else
+        echo -e "${RED}Network connectivity issue detected. Proceeding with interface restart...${NC}"
+        log_message "WARN" "Network connectivity issue detected"
+    fi
+    
+    # Attempt to fix network with retries
+    while [[ $retry_count -lt $MAX_RETRIES ]]; do
+        ((retry_count++))
+        
+        echo -e "${YELLOW}Attempt $retry_count/$MAX_RETRIES to restart network interface...${NC}"
+        
+        if restart_interface "$interface"; then
+            # Verify the fix worked
+            if verify_fix "$interface"; then
+                echo -e "${GREEN}Network interface restart completed successfully!${NC}"
+                log_message "INFO" "Network interface restart completed successfully on attempt $retry_count"
+                exit 0
+            fi
+        fi
+        
+        if [[ $retry_count -lt $MAX_RETRIES ]]; then
+            echo -e "${YELLOW}Retry $retry_count failed. Waiting $RETRY_DELAY seconds before next attempt...${NC}"
+            sleep "$RETRY_DELAY"
+        fi
+    done
+    
+    echo -e "${RED}Failed to restore network connectivity after $MAX_RETRIES attempts${NC}"
+    log_message "ERROR" "Failed to restore network connectivity after $MAX_RETRIES attempts"
+    exit 1
+}
+
+# Show usage if help is requested
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "Usage: $0 [interface_name]"
+    echo ""
+    echo "Network Interface Restart Script for Proxmox"
+    echo "Restarts the network interface to fix connectivity issues"
+    echo ""
+    echo "Options:"
+    echo "  interface_name    Specific network interface to restart (optional)"
+    echo "  -h, --help       Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0               # Auto-detect and restart primary interface"
+    echo "  $0 eth0          # Restart specific interface"
+    echo "  $0 eno2          # Restart specific interface"
+    exit 0
+fi
+
+# Run main function
+main "$@"
+EOF
+
+# Make the script executable
+sudo chmod +x /usr/local/bin/fix-network.sh
+
+# Create a simple alias for easy use
+echo 'alias fix-network="sudo /usr/local/bin/fix-network.sh"' | sudo tee -a /root/.bashrc
+```
+
+**How to use the script:**
+
+**Step 1:** Copy the entire script creation command above (from `# Create the fix script` to the final `EOF`)
+**Step 2:** Paste it into your Proxmox terminal and press Enter
+**Step 3:** Run the fix script when needed:
+
+```bash
+# Auto-detect and fix primary interface
+sudo /usr/local/bin/fix-network.sh
+
+# Fix specific interface
+sudo /usr/local/bin/fix-network.sh eno2
+
+# Or use the alias (after running the script creation command)
+fix-network eno2
+```
+
+**What the script does:**
+1. **Detects hardware hangs** from kernel logs
+2. **Applies hardware-level resets**:
+   - ethtool interface reset
+   - Intel e1000e module reload
+   - PCI bus reset if needed
+3. **Disables problematic features**:
+   ```bash
+   ethtool -K eno2 gso off gro off tso off tx off rx off rxvlan off txvlan off sg off
+   ```
+4. **Creates persistent configuration**:
+   - Systemd service to apply settings on boot
+   - Prevents recurrence of the issue
+
+**Manual workaround:**
+```bash
+# Disable problematic features manually
+sudo ethtool -K eno2 gso off
+sudo ethtool -K eno2 gro off  
+sudo ethtool -K eno2 tso off
+sudo ethtool -K eno2 sg off
+
+# Create persistent service
+sudo tee /etc/systemd/system/ethtool-workaround-eno2.service > /dev/null << 'EOF'
+[Unit]
+Description=Apply ethtool workaround for Intel e1000e hardware hang
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/bash -c 'sleep 10 && ethtool -K eno2 gso off gro off tso off sg off'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable the service
+sudo systemctl daemon-reload
+sudo systemctl enable ethtool-workaround-eno2.service
+```
+
+**Why Automated Monitoring is Essential:**
+
+The Intel e1000e hardware hang issue can occur unpredictably, often during periods of low activity or after extended uptime. Manual detection and fixing isn't practical for production systems. Automated monitoring provides:
+
+**Benefits of Automated Monitoring:**
+- **Proactive Detection**: Continuously monitors for network connectivity loss
+- **Automatic Recovery**: Immediately applies the hardware hang fix when issues are detected
+- **Minimal Downtime**: Reduces network outage duration from hours to minutes
+- **24/7 Protection**: Works around the clock without human intervention
+- **Prevents Service Disruption**: Keeps VMs and containers connected even when host networking fails
+- **Early Warning System**: Logs all network issues for pattern analysis
+- **Hands-off Operation**: Perfect for remote systems or production environments
+
+**How the Monitoring Works:**
+1. **Periodic Connectivity Tests**: Pings external servers every 5 minutes
+2. **Failure Threshold**: Requires 2 consecutive failures before taking action (prevents false positives)
+3. **Automatic Fix Application**: Runs the hardware reset script when needed
+4. **Comprehensive Logging**: Records all events for troubleshooting and analysis
+5. **Smart Recovery**: Resets failure counter after successful fixes
+
+**What Problems It Prevents:**
+- **Undetected Network Outages**: Catches issues before users notice
+- **Extended Downtime**: Immediately applies fixes instead of waiting for manual intervention
+- **Service Interruptions**: Keeps critical services running during hardware hangs
+- **Remote Access Loss**: Prevents being locked out of remote Proxmox systems
+- **Production Impact**: Minimizes business disruption from network issues
+
+**Use Cases:**
+- **Production Servers**: Essential for business-critical Proxmox deployments
+- **Remote Systems**: Prevents the need for physical access to fix network issues
+- **Unattended Systems**: Provides reliability for systems that run without constant monitoring
+- **Development Environments**: Ensures development work isn't interrupted by network hangs
+- **Home Labs**: Peace of mind for personal projects and learning environments
+
+**Automated monitoring:**
+
+:::warning Important
+**Copy the ENTIRE code block below** - You must copy and paste the complete command including all the monitoring script content between the backticks. This is one long command that creates the complete monitoring script.
+:::
+
+```bash
+# Create the network monitoring script
+sudo tee /usr/local/bin/network-monitor.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+# Network Monitor Script for Proxmox
+# Continuously monitors network connectivity and automatically fixes issues
+# This script can be run as a cron job or systemd service
+
+# Configuration
+LOG_FILE="/var/log/network-monitor.log"
+PING_TARGET="8.8.8.8"
+PING_TIMEOUT=5
+CHECK_INTERVAL=300  # 5 minutes
+MAX_FAILURES=2      # Require 2 consecutive failures before attempting fix
+FIX_SCRIPT="/usr/local/bin/fix-network.sh"
+
+# Failure counter
+FAILURE_COUNT=0
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to log messages
+log_message() {
+    local level="$1"
+    local message="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+}
+
+# Function to check network connectivity
+check_connectivity() {
+    if ping -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" &>/dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to attempt network fix
+attempt_fix() {
+    log_message "WARN" "Attempting to fix network connectivity"
+    
+    if [[ -x "$FIX_SCRIPT" ]]; then
+        log_message "INFO" "Running network fix script: $FIX_SCRIPT"
+        "$FIX_SCRIPT" >> "$LOG_FILE" 2>&1
+        local exit_code=$?
+        
+        if [[ $exit_code -eq 0 ]]; then
+            log_message "INFO" "Network fix script completed successfully"
+            return 0
+        else
+            log_message "ERROR" "Network fix script failed with exit code: $exit_code"
+            return 1
+        fi
+    else
+        log_message "ERROR" "Network fix script not found or not executable: $FIX_SCRIPT"
+        return 1
+    fi
+}
+
+# Function to send notification (placeholder for future enhancement)
+send_notification() {
+    local message="$1"
+    # Could be enhanced to send email, slack, etc.
+    log_message "NOTIFY" "$message"
+}
+
+# Main monitoring function
+monitor_network() {
+    log_message "INFO" "Network monitoring started (PID: $$)"
+    log_message "INFO" "Check interval: ${CHECK_INTERVAL}s, Max failures: $MAX_FAILURES"
+    
+    while true; do
+        if check_connectivity; then
+            if [[ $FAILURE_COUNT -gt 0 ]]; then
+                log_message "INFO" "Network connectivity restored"
+                send_notification "Network connectivity restored after $FAILURE_COUNT failures"
+                FAILURE_COUNT=0
+            else
+                log_message "DEBUG" "Network connectivity OK"
+            fi
+        else
+            ((FAILURE_COUNT++))
+            log_message "WARN" "Network connectivity failed (failure $FAILURE_COUNT/$MAX_FAILURES)"
+            
+            if [[ $FAILURE_COUNT -ge $MAX_FAILURES ]]; then
+                log_message "ERROR" "Network connectivity failed $MAX_FAILURES consecutive times"
+                send_notification "Network connectivity failed, attempting automatic fix"
+                
+                if attempt_fix; then
+                    log_message "INFO" "Network fix attempted, will verify on next check"
+                    FAILURE_COUNT=0
+                else
+                    log_message "ERROR" "Network fix failed, manual intervention may be required"
+                    send_notification "Automatic network fix failed, manual intervention required"
+                    # Reset counter to prevent spam
+                    FAILURE_COUNT=0
+                fi
+            fi
+        fi
+        
+        sleep "$CHECK_INTERVAL"
+    done
+}
+
+# Function to run single check (for cron usage)
+single_check() {
+    if ! check_connectivity; then
+        log_message "WARN" "Network connectivity failed, attempting fix"
+        attempt_fix
+    else
+        log_message "DEBUG" "Network connectivity OK"
+    fi
+}
+
+# Handle command line arguments
+case "${1:-monitor}" in
+    "monitor")
+        # Check if running as root
+        if [[ $EUID -ne 0 ]]; then
+            echo -e "${RED}Error: This script must be run as root${NC}"
+            exit 1
+        fi
+        
+        # Create log file if it doesn't exist
+        touch "$LOG_FILE"
+        
+        # Start monitoring
+        monitor_network
+        ;;
+    "check")
+        # Single check mode (for cron)
+        if [[ $EUID -ne 0 ]]; then
+            echo -e "${RED}Error: This script must be run as root${NC}"
+            exit 1
+        fi
+        
+        # Create log file if it doesn't exist
+        touch "$LOG_FILE"
+        
+        # Perform single check
+        single_check
+        ;;
+    "status")
+        # Show recent log entries
+        if [[ -f "$LOG_FILE" ]]; then
+            echo "Recent network monitor log entries:"
+            tail -20 "$LOG_FILE"
+        else
+            echo "No log file found at $LOG_FILE"
+        fi
+        ;;
+    "help"|"-h"|"--help")
+        echo "Usage: $0 [command]"
+        echo ""
+        echo "Commands:"
+        echo "  monitor  - Start continuous network monitoring (default)"
+        echo "  check    - Perform single connectivity check (for cron)"
+        echo "  status   - Show recent log entries"
+        echo "  help     - Show this help message"
+        echo ""
+        echo "Configuration (edit script to change):"
+        echo "  Check interval: ${CHECK_INTERVAL}s"
+        echo "  Max failures: $MAX_FAILURES"
+        echo "  Ping target: $PING_TARGET"
+        echo "  Log file: $LOG_FILE"
+        echo "  Fix script: $FIX_SCRIPT"
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $1${NC}"
+        echo "Use '$0 help' for usage information"
+        exit 1
+        ;;
+esac
+EOF
+
+# Make the monitoring script executable
+sudo chmod +x /usr/local/bin/network-monitor.sh
+
+# Create cron job for monitoring (check every 5 minutes)
+(sudo crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/network-monitor.sh check > /dev/null 2>&1") | sudo crontab -
+
+echo "Network monitoring script installed. Check logs with: sudo tail -f /var/log/network-monitor.log"
+```
+
+**Verification:**
+```bash
+# Check for hardware hang messages
+dmesg -T | grep -i "hardware unit hang"
+journalctl --since "1 hour ago" | grep -i "hardware unit hang"
+
+# Verify current features
+ethtool -k eno2 | grep -E "(gso|gro|tso|sg):"
+
+# Check if workaround service is active
+systemctl status ethtool-workaround-eno2.service
+```
+
+### **Common Network Troubleshooting**
+
+**Network Interface Not Coming Up:**
+
+```bash
+# Check interface status
+ip link show eno2
+
+# Check for hardware issues
+dmesg | grep -i eno2
+
+# Manually bring interface up
+sudo ip link set eno2 up
+
+# Restart networking service
+sudo systemctl restart networking
+
+# Check network configuration
+cat /etc/network/interfaces | grep -A 10 eno2
+```
+
+**Bridge Configuration Issues:**
+
+```bash
+# Check bridge status
+brctl show vmbr0
+bridge link show
+
+# Verify bridge members
+ls /sys/class/net/vmbr0/brif/
+
+# Check bridge VLAN settings
+bridge vlan show dev vmbr0
+
+# Restart bridge interface
+sudo ip link set vmbr0 down
+sudo ip link set vmbr0 up
+```
+
+**No Internet Connectivity:**
+
+```bash
+# Test local connectivity
+ping -c 4 $(ip route show default | awk '/default/ {print $3}')
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+
+# Check routing table
+ip route show
+
+# Verify DNS configuration
+cat /etc/resolv.conf
+
+# Test with different DNS
+nslookup google.com 8.8.8.8
+```
+
+**DHCP Issues:**
+
+```bash
+# Release and renew DHCP lease
+sudo dhclient -r vmbr0
+sudo dhclient vmbr0
+
+# Check DHCP client status
+sudo systemctl status dhclient
+
+# View DHCP lease information
+cat /var/lib/dhcp/dhclient.leases
+```
+
+**Performance Issues:**
+
+```bash
+# Check interface statistics
+ip -s link show vmbr0
+
+# Monitor network traffic
+iftop -i vmbr0
+nload vmbr0
+
+# Test network performance
+iperf3 -c target_server
+# On target: iperf3 -s
+
+# Check for packet drops
+netstat -i
+cat /proc/net/dev
+```
+
+**Hardware Driver Issues:**
+
+```bash
+# Check network driver
+ls -l /sys/class/net/*/device/driver
+
+# Reload network driver
+sudo modprobe -r e1000e
+sudo modprobe e1000e
+
+# Check driver version
+modinfo e1000e
+
+# View hardware information
+lspci | grep Ethernet
+lshw -C network
+```
+
+### **Log Analysis**
+
+**Network-related logs:**
+```bash
+# View network service logs
+journalctl -u networking
+journalctl -u systemd-networkd
+
+# Check kernel network messages
+dmesg | grep -i "network\|eth\|link"
+
+# Monitor real-time network events
+journalctl -f | grep -i network
+```
+
+**Common error patterns:**
+```bash
+# Hardware hangs (Intel e1000e)
+dmesg | grep -i "hardware unit hang"
+
+# Link state changes
+dmesg | grep -i "link up\|link down"
+
+# Driver errors
+dmesg | grep -i "e1000e\|driver"
+
+# Bridge issues
+journalctl | grep -i bridge
+```
+
+### **Recovery Procedures**
+
+**Network configuration rollback:**
+```bash
+# Restore backup configuration
+sudo cp /etc/network/interfaces.backup /etc/network/interfaces
+sudo systemctl restart networking
+```
+
+**Emergency network reset:**
+```bash
+# Complete network restart
+sudo systemctl stop networking
+sleep 5
+sudo systemctl start networking
+
+# Or use netplan (Ubuntu systems)
+sudo netplan apply
+```
+
+**Remote access recovery:**
+```bash
+# If you lose SSH access, use console/IPMI to:
+# 1. Check interface status: ip addr show
+# 2. Manually configure temporary IP: ip addr add 192.168.1.100/24 dev eth0
+# 3. Add default route: ip route add default via 192.168.1.1
+# 4. Test connectivity: ping 8.8.8.8
+```
+
+## **Best Practices**
+
+1. **Always backup configurations** before making changes
+2. **Test changes in stages** to isolate issues
+3. **Use descriptive naming** for bridges and interfaces
+4. **Document your network topology** for future reference
+5. **Monitor network performance** after configuration changes
+6. **Keep configurations consistent** across cluster nodes
+7. **Use version control** for configuration files in production
+8. **Implement monitoring** for hardware hang detection
+9. **Create emergency access procedures** for remote recovery
+
+This comprehensive network configuration guide provides the foundation for building robust and scalable network infrastructure in your Proxmox environment.
+
+<BuyMeACoffeeButton />
