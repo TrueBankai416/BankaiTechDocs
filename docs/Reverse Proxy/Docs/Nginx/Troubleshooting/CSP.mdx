@@ -138,6 +138,27 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
 - `fonts.googleapis.com` → CSS stylesheets (add to `style-src`)
 - `fonts.gstatic.com` → Font files (add to `font-src`)
 
+### **Nextcloud with Collabora Integration**
+If you're running Nextcloud with Collabora (OnlyOffice) integration, you might encounter CSP errors like:
+
+```
+refused to connect to
+'https://cloud.domain.com/extra-apps/richdocumentscode/proxy.php?status'
+because it violates the following content security policy directive:
+"connect-src 'self' blob: stun.nextcloud.com:443.
+```
+
+This happens when the Collabora integration tries to connect to its proxy endpoints but is blocked by CSP. Add your Nextcloud domain to the `connect-src` directive:
+
+```nginx title="Nextcloud + Collabora CSP Example" showLineNumbers
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; connect-src 'self' https://cloud.your-domain.com https://stun.nextcloud.com:443; style-src 'self' 'unsafe-inline'; frame-src 'self' https://cloud.your-domain.com;" always;
+```
+
+**Key additions for Nextcloud:**
+- `connect-src`: Add your Nextcloud domain (e.g., `https://cloud.your-domain.com`)
+- `frame-src`: Add your Nextcloud domain for embedded document editing
+- `connect-src`: Include `https://stun.nextcloud.com:443` for WebRTC connections
+
 ## ***Minimal CSP Configuration***
 
 For basic testing, use this minimal configuration:
