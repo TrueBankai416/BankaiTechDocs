@@ -374,11 +374,22 @@ For React components, you can create live, editable code examples:
 
 ````
 ```jsx live
-function Welcome(props) {
-  return <h1>Hello, {props.name}!</h1>;
-}
+function App() {
+    const handleClick = () => {
+        const response = window.confirm("Do you love my Documentation?");
+        if (response) {
+            alert("Awesome! Please support me!");
+        } else {
+            alert("Im sorry to hear that, Please give me feedback on how I can improve!");
+        }
+    };
 
-render(<Welcome name="World" />);
+    return (
+        <div>
+            <button onClick={handleClick}>Click Me</button>
+        </div>
+    );
+}
 ```
 ````
 
