@@ -140,6 +140,60 @@ server {
 }
 ```
 
+## OnlyOffice
+```nginx title="Highlighted items will need to be modified: showLineNumbers
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+// highlight-next-line
+    server_name onlyoffice.bankai-tech.com;
+    access_log /var/log/nginx/onlyoffice.log;
+    return 301 https://$host$request_uri;
+}
+server {
+    listen 443 ssl;
+    http2 on;
+// highlight-start
+    server_name onlyoffice.bankai-tech.com;
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+// highlight-end
+    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    ssl_stapling off;
+    ssl_stapling_verify off;
+    # OnlyOffice-specific security headers (modified from global headers to allow framing)
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "0" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()" always;
+    add_header Expect-CT "enforce, max-age=86400" always;
+    
+    # Allow framing from Nextcloud domain for OnlyOffice integration using CSP frame-ancestors
+    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net *.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data:https: http:; connect-src 'self' wss: ws: https:; frame-ancestors 'self' https://cloud.bankai-tech.com; object-src 'none'; base-uri 'self'; form-action 'self';" always;
+    # Connect to backend server
+// highlight-next-line
+    set $onlyoffice http://192.168.8.181:87;
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket support
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        
+        proxy_pass $onlyoffice;
+    }
+}
+```
+
 ## Adguard Home
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 server {
