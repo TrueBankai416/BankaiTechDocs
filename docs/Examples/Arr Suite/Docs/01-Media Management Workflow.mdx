@@ -45,7 +45,7 @@ flowchart TD
     O --> P[Encoding/Transcoding]
     P --> Q{Content Type?}
     
-    Q -->|Movie| R[Move to Finished/movies]
+    Q -->|Movie| R[Move to Finished/Movies]
     Q -->|TV Show| S[Move to Finished/TV]
     
     S --> T[FileBot Rename]
@@ -75,7 +75,7 @@ flowchart TD
 ## Workflow Components
 
 ### 1. Request Management
-- **Jellyseerr**: Web interface for users to request movies and TV shows
+- **Jellyseerr**: Web interface for users to request Movies and TV shows
 - Provides a clean, user-friendly interface for content requests
 - Integrates with Radarr and Sonarr for automated processing
 
@@ -88,7 +88,7 @@ flowchart TD
 ### 3. Download Management
 - **qBittorrent**: Primary torrent client for downloading content
 - Downloads to organized folders:
-  - `/downloads/radarr` for movies
+  - `/downloads/radarr` for Movies
   - `/downloads/tv-sonarr` for TV shows
 - Continues seeding to maintain 1.0 ratio while processing
 
@@ -97,7 +97,7 @@ flowchart TD
 - Monitors dedicated folders for new content
 - Processes files while original continues seeding
 - Moves completed files to organized directories:
-  - `Finished/movies` for processed movies
+  - `Finished/Movies` for processed Movies
   - `Finished/TV` for processed TV shows
 
 ### 5. File Organization & Metadata
@@ -129,7 +129,7 @@ flowchart TD
 /tdarr/              # Tdarr processing folder
 
 /Finished/
-├── movies/          # Processed movies
+├── Movies/          # Processed Movies
 └── TV/              # Processed TV shows
 
 /jellyfin/           # Final library folders
