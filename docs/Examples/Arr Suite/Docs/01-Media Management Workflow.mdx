@@ -1,0 +1,150 @@
+---
+title: Media Management Workflow
+tags:
+    - Arr Suite
+    - Workflow
+    - Media Management
+keywords: [Arr Suite, Workflow, Media Management, Jellyseerr, Radarr, Sonarr, Prowlarr, qBittorrent, Tdarr, FileBot, TMM, Jellyfin]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# Media Management Workflow
+
+This document illustrates a comprehensive media management workflow using the *Arr suite of applications, along with additional tools for encoding, metadata management, and final library organization.
+
+## Complete Workflow Diagram
+
+```mermaid
+flowchart TD
+    A[User Request] --> B[Jellyseerr]
+    B --> C{Content Type?}
+    
+    C -->|Movie| D[Radarr]
+    C -->|TV Show| E[Sonarr]
+    
+    D --> F[Prowlarr + Flaresolverr]
+    E --> F
+    
+    F --> G[Find Torrent/NZB]
+    G --> H[qBittorrent]
+    
+    H --> I[Download to /downloads/radarr]
+    H --> J[Download to /downloads/tv-sonarr]
+    
+    I --> K[Seed to 1.0 ratio]
+    J --> L[Seed to 1.0 ratio]
+    
+    K --> M[Copy to Tdarr folder]
+    L --> N[Copy to Tdarr folder]
+    
+    M --> O[Tdarr Processing]
+    N --> O
+    
+    O --> P[Encoding/Transcoding]
+    P --> Q{Content Type?}
+    
+    Q -->|Movie| R[Move to Finished/movies]
+    Q -->|TV Show| S[Move to Finished/TV]
+    
+    S --> T[FileBot Rename]
+    T --> U[TMM Metadata]
+    R --> V[TMM Metadata]
+    
+    U --> W[Manual Move to Jellyfin Library]
+    V --> W
+    
+    W --> X[Jellyfin Media Library]
+    X --> Y[Available for Streaming]
+    
+    %% Styling with better contrast
+    classDef requestFlow fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
+    classDef arrSuite fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
+    classDef downloadFlow fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
+    classDef processFlow fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
+    classDef finalFlow fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
+    
+    class A,B requestFlow
+    class C,D,E,F arrSuite
+    class G,H,I,J,K,L downloadFlow
+    class M,N,O,P,Q,R,S processFlow
+    class T,U,V,W,X,Y finalFlow
+```
+
+## Workflow Components
+
+### 1. Request Management
+- **Jellyseerr**: Web interface for users to request movies and TV shows
+- Provides a clean, user-friendly interface for content requests
+- Integrates with Radarr and Sonarr for automated processing
+
+### 2. Content Management (*Arr Suite)
+- **Radarr**: Handles movie requests and management
+- **Sonarr**: Manages TV show requests and episode tracking
+- **Prowlarr**: Unified indexer management with Flaresolverr for CloudFlare bypass
+- **Flaresolverr**: Solves CloudFlare challenges for indexer access
+
+### 3. Download Management
+- **qBittorrent**: Primary torrent client for downloading content
+- Downloads to organized folders:
+  - `/downloads/radarr` for movies
+  - `/downloads/tv-sonarr` for TV shows
+- Continues seeding to maintain 1.0 ratio while processing
+
+### 4. Media Processing
+- **Tdarr**: Automated media encoding and transcoding
+- Monitors dedicated folders for new content
+- Processes files while original continues seeding
+- Moves completed files to organized directories:
+  - `Finished/movies` for processed movies
+  - `Finished/TV` for processed TV shows
+
+### 5. File Organization & Metadata
+- **FileBot**: Automated renaming for TV shows
+- **TMM (TinyMediaManager)**: Metadata scraping and management
+- Ensures proper naming conventions and rich metadata
+
+### 6. Final Library Integration
+- **Manual move**: Final step to move content to Jellyfin library folders
+- **Jellyfin**: Media server for streaming organized content
+- Content becomes available for streaming to users
+
+## Key Benefits
+
+1. **Automated Workflow**: Minimal manual intervention required
+2. **Quality Control**: Tdarr ensures consistent encoding standards
+3. **Organized Storage**: Proper folder structure and naming conventions
+4. **Metadata Rich**: TMM provides comprehensive media information
+5. **User-Friendly**: Jellyseerr provides easy request interface
+6. **Efficient Seeding**: Maintains torrent ratios while processing
+
+## Folder Structure
+
+```
+/downloads/
+├── radarr/          # Movie downloads
+└── tv-sonarr/       # TV show downloads
+
+/tdarr/              # Tdarr processing folder
+
+/Finished/
+├── movies/          # Processed movies
+└── TV/              # Processed TV shows
+
+/jellyfin/           # Final library folders
+├── Movies/
+└── TV Shows/
+```
+
+## Additional Considerations
+
+- **Storage Requirements**: Multiple copies exist during processing
+- **Processing Time**: Encoding can be time-intensive
+- **Network Usage**: Seeding requirements may impact bandwidth
+- **Monitoring**: Regular checks ensure smooth operation
+- **Backup Strategy**: Important to backup configurations and metadata
+
+This workflow provides a robust, automated solution for media management while maintaining high quality standards and proper organization.
+
+<BuyMeACoffeeButton />
