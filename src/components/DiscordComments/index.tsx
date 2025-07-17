@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDoc } from '@docusaurus/plugin-content-docs/client';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './styles.module.css';
 
-interface DiscordWebhookMessage {
+interface Comment {
+  id: number;
+  page_url: string;
+  page_title: string;
+  author_name: string;
   content: string;
-  embeds?: {
-    title?: string;
-    description?: string;
-    color?: number;
-    url?: string;
-    timestamp?: string;
-    author?: {
-      name: string;
-    };
-    fields?: {
-      name: string;
-      value: string;
-      inline?: boolean;
-    }[];
-  }[];
+  discord_message_id: string;
+  discord_channel_id: string;
+  created_at: string;
+  replies: Reply[];
+}
+
+interface Reply {
+  id: number;
+  discord_message_id: string;
+  discord_user_id: string;
+  discord_username: string;
+  discord_avatar: string;
+  content: string;
+  created_at: string;
 }
 
 export default function DiscordComments() {
@@ -27,29 +30,63 @@ export default function DiscordComments() {
   const [author, setAuthor] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
 
-  const sendToDiscord = async (message: DiscordWebhookMessage) => {
-    // Get Discord webhook URL from environment variable
-    const webhookUrl = process.env.REACT_APP_DISCORD_WEBHOOK_URL;
-    
-    if (!webhookUrl) {
-      throw new Error('Discord webhook URL not configured');
-    }
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
-    const response = await fetch(webhookUrl, {
+  const fetchComments = async () => {
+    try {
+      const currentUrl = window.location.href;
+      const encodedUrl = encodeURIComponent(currentUrl);
+      const response = await fetch(`${apiUrl}/api/comments/${encodedUrl}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comments');
+      }
+      
+      const data = await response.json();
+      setComments(data.comments || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendToDiscord = async (pageUrl: string, pageTitle: string, authorName: string, content: string) => {
+    const response = await fetch(`${apiUrl}/api/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(message),
+      body: JSON.stringify({
+        pageUrl,
+        pageTitle,
+        authorName,
+        content,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to send message to Discord');
+      const error = await response.json();
+      throw new Error(error.details || 'Failed to send message to Discord');
     }
+
+    return response.json();
   };
+
+  // Load comments on component mount and set up polling
+  useEffect(() => {
+    fetchComments();
+    
+    // Poll for new comments/replies every 30 seconds
+    const interval = setInterval(fetchComments, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,34 +103,14 @@ export default function DiscordComments() {
       const currentUrl = window.location.href;
       const pageTitle = metadata.title || 'Documentation Page';
       
-      const discordMessage: DiscordWebhookMessage = {
-        content: '',
-        embeds: [
-          {
-            title: `New Comment on: ${pageTitle}`,
-            description: comment,
-            color: 0x5865F2, // Discord blurple color
-            url: currentUrl,
-            timestamp: new Date().toISOString(),
-            author: {
-              name: author,
-            },
-            fields: [
-              {
-                name: 'Page',
-                value: `[${pageTitle}](${currentUrl})`,
-                inline: true,
-              },
-            ],
-          },
-        ],
-      };
-
-      await sendToDiscord(discordMessage);
+      await sendToDiscord(currentUrl, pageTitle, author, comment);
       
       setComment('');
       setAuthor('');
       setSubmitMessage('Comment sent to Discord successfully! 🎉');
+      
+      // Refresh comments after successful submission
+      setTimeout(fetchComments, 2000);
     } catch (error) {
       console.error('Error sending comment to Discord:', error);
       setSubmitMessage('Failed to send comment to Discord. Please try again.');
@@ -102,11 +119,16 @@ export default function DiscordComments() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+
   return (
     <div className={styles.discordComments}>
-      <h3>💬 Send Comment to Discord</h3>
-      <p>Share your thoughts directly with our Discord community!</p>
+      <h3>💬 Discord Community Chat</h3>
+      <p>Join the conversation! Comments here sync with our Discord community.</p>
       
+      {/* Comment Form */}
       <form onSubmit={handleSubmit} className={styles.commentForm}>
         <div className={styles.formGroup}>
           <label htmlFor="author">Name:</label>
@@ -146,6 +168,58 @@ export default function DiscordComments() {
           {submitMessage}
         </div>
       )}
+
+      {/* Comments and Replies Display */}
+      <div className={styles.commentsSection}>
+        <h4>💬 Recent Comments</h4>
+        {isLoading ? (
+          <div className={styles.loading}>Loading comments...</div>
+        ) : comments.length === 0 ? (
+          <div className={styles.noComments}>
+            No comments yet. Be the first to start the conversation!
+          </div>
+        ) : (
+          <div className={styles.commentsList}>
+            {comments.map((comment) => (
+              <div key={comment.id} className={styles.comment}>
+                <div className={styles.commentHeader}>
+                  <span className={styles.authorName}>{comment.author_name}</span>
+                  <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
+                </div>
+                <div className={styles.commentContent}>{comment.content}</div>
+                
+                {/* Discord Replies */}
+                {comment.replies.length > 0 && (
+                  <div className={styles.repliesSection}>
+                    <h5>💬 Discord Replies</h5>
+                    {comment.replies.map((reply) => (
+                      <div key={reply.id} className={styles.reply}>
+                        <div className={styles.replyHeader}>
+                          <div className={styles.discordUser}>
+                            {reply.discord_avatar && (
+                              <img 
+                                src={reply.discord_avatar} 
+                                alt={reply.discord_username}
+                                className={styles.discordAvatar}
+                              />
+                            )}
+                            <span className={styles.discordUsername}>
+                              {reply.discord_username}
+                            </span>
+                            <span className={styles.discordBadge}>Discord</span>
+                          </div>
+                          <span className={styles.replyDate}>{formatDate(reply.created_at)}</span>
+                        </div>
+                        <div className={styles.replyContent}>{reply.content}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
