@@ -58,6 +58,12 @@ DISCORD_CHANNEL_ID=your_channel_id_here
 
 # API Configuration
 REACT_APP_API_URL=http://localhost:3001
+
+# Discord Context Configuration
+DISCORD_CONTEXT_LEVEL=full
+DISCORD_SHOW_BREADCRUMBS=true
+DISCORD_SHOW_SECTION_INFO=true
+DISCORD_SITE_NAME=Your Site Name
 ```
 
 #### Backend Server (server/.env)
@@ -68,6 +74,18 @@ DISCORD_CHANNEL_ID=your_channel_id_here
 
 # API Configuration
 PORT=3001
+
+# Discord Context Configuration
+DISCORD_CONTEXT_LEVEL=full
+DISCORD_SHOW_PAGE_CONTEXT=true
+DISCORD_SHOW_BREADCRUMBS=true
+DISCORD_SHOW_SECTION_INFO=true
+DISCORD_SHOW_PAGE_PATH=false
+DISCORD_SHOW_TIMESTAMP=true
+DISCORD_SHOW_AUTHOR_FIELD=true
+DISCORD_CREATE_THREADS=true
+DISCORD_THREAD_DURATION=1440
+DISCORD_SITE_NAME=Your Site Name
 ```
 
 :::warning Security Note
@@ -100,6 +118,7 @@ For production deployments, set environment variables in your hosting platform:
 - **Frontend**: Set `REACT_APP_API_URL` to your production API URL
 - **Backend**: Deploy the server folder with bot token and channel ID
 - **Database**: SQLite database will be created automatically
+- **Context**: Configure Discord context level and options per your preferences
 
 ## How It Works
 
@@ -130,6 +149,78 @@ The website shows:
 - **Discord Replies**: Replies from Discord users with avatars and usernames
 - **Real-time Updates**: Automatic polling for new replies
 - **Threaded Conversations**: Organized comment → reply structure
+
+## Context Configuration
+
+### Context Levels
+
+Configure how much context appears in Discord messages:
+
+#### `DISCORD_CONTEXT_LEVEL=minimal`
+- **Shows**: Just page title and comment content
+- **Use case**: Clean, simple messages without extra context
+
+#### `DISCORD_CONTEXT_LEVEL=basic`
+- **Shows**: Page title, comment content, and clickable page URL
+- **Use case**: Moderate context with essential information
+
+#### `DISCORD_CONTEXT_LEVEL=full` (default)
+- **Shows**: All context information including breadcrumbs, sections, timestamps
+- **Use case**: Maximum context for detailed discussions
+
+#### `DISCORD_CONTEXT_LEVEL=custom`
+- **Shows**: Only the context elements you enable individually
+- **Use case**: Fine-tuned control over what appears
+
+### Individual Context Controls
+
+When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
+
+```env
+DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
+DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
+DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
+DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
+DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
+DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
+```
+
+### Thread Configuration
+
+```env
+DISCORD_CREATE_THREADS=true         # Create threads for replies
+DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
+DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+```
+
+### Example Context Outputs
+
+**Minimal Context:**
+```
+Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
+```
+
+**Basic Context:**
+```
+💬 Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
+[Link to page]
+```
+
+**Full Context:**
+```
+💬 New Comment: Docker Installation Guide
+👤 John Doe
+"This tutorial was really helpful! How do I handle port conflicts?"
+
+📄 Page: Docker Installation Guide
+📍 Navigation: Docker > Docs > Installing Docker
+📂 Section: Docker
+🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+
+Your Site Name • Comment System
+```
 
 ## Customization
 

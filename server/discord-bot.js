@@ -102,6 +102,150 @@ class DiscordBot {
     }
   }
 
+  buildEmbed(pageUrl, pageTitle, authorName, content) {
+    const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
+    const showPageContext = process.env.DISCORD_SHOW_PAGE_CONTEXT !== 'false';
+    const showBreadcrumbs = process.env.DISCORD_SHOW_BREADCRUMBS !== 'false';
+    const showSectionInfo = process.env.DISCORD_SHOW_SECTION_INFO !== 'false';
+    const showPagePath = process.env.DISCORD_SHOW_PAGE_PATH !== 'false';
+    const showTimestamp = process.env.DISCORD_SHOW_TIMESTAMP !== 'false';
+    const showAuthorField = process.env.DISCORD_SHOW_AUTHOR_FIELD !== 'false';
+    const siteName = process.env.DISCORD_SITE_NAME || 'Documentation';
+
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setDescription(content);
+
+    // Context level presets
+    if (contextLevel === 'minimal') {
+      embed.setTitle(pageTitle);
+      return embed;
+    }
+
+    if (contextLevel === 'basic') {
+      embed.setTitle(`💬 ${pageTitle}`)
+        .setURL(pageUrl);
+      return embed;
+    }
+
+    // Full context (default) or custom
+    if (contextLevel === 'full' || contextLevel === 'custom') {
+      embed.setTitle(`💬 New Comment: ${pageTitle}`)
+        .setURL(pageUrl);
+
+      if (showAuthorField) {
+        embed.setAuthor({ name: authorName });
+      }
+
+      if (showTimestamp) {
+        embed.setTimestamp();
+      }
+
+      const fields = [];
+
+      if (showPageContext) {
+        fields.push({
+          name: '📄 Page',
+          value: `[${pageTitle}](${pageUrl})`,
+          inline: true
+        });
+      }
+
+      if (showBreadcrumbs) {
+        const breadcrumbs = this.extractBreadcrumbs(pageUrl);
+        if (breadcrumbs) {
+          fields.push({
+            name: '📍 Navigation',
+            value: breadcrumbs,
+            inline: true
+          });
+        }
+      }
+
+      if (showSectionInfo) {
+        const section = this.extractSection(pageUrl);
+        if (section) {
+          fields.push({
+            name: '📂 Section',
+            value: section,
+            inline: true
+          });
+        }
+      }
+
+      if (showPagePath) {
+        const path = this.extractPath(pageUrl);
+        if (path) {
+          fields.push({
+            name: '🔗 Path',
+            value: `\`${path}\``,
+            inline: false
+          });
+        }
+      }
+
+      if (fields.length > 0) {
+        embed.addFields(fields);
+      }
+
+      // Add site footer
+      embed.setFooter({ text: `${siteName} • Comment System` });
+    }
+
+    return embed;
+  }
+
+  extractBreadcrumbs(pageUrl) {
+    try {
+      const url = new URL(pageUrl);
+      const pathParts = url.pathname.split('/').filter(part => part);
+      
+      if (pathParts.length > 1) {
+        // Convert URL parts to readable breadcrumbs
+        const breadcrumbs = pathParts.map(part => 
+          decodeURIComponent(part)
+            .replace(/%20/g, ' ')
+            .replace(/([A-Z])/g, ' $1')
+            .trim()
+        );
+        return breadcrumbs.join(' > ');
+      }
+      return null;
+    } catch (error) {
+      console.error('Error extracting breadcrumbs:', error);
+      return null;
+    }
+  }
+
+  extractSection(pageUrl) {
+    try {
+      const url = new URL(pageUrl);
+      const pathParts = url.pathname.split('/').filter(part => part);
+      
+      if (pathParts.length > 0) {
+        // Return the first part as the main section
+        return decodeURIComponent(pathParts[0])
+          .replace(/%20/g, ' ')
+          .replace(/([A-Z])/g, ' $1')
+          .trim();
+      }
+      return null;
+    } catch (error) {
+      console.error('Error extracting section:', error);
+      return null;
+    }
+  }
+
+  extractPath(pageUrl) {
+    try {
+      const url = new URL(pageUrl);
+      return url.pathname;
+    } catch (error) {
+      console.error('Error extracting path:', error);
+      return null;
+    }
+  }
+
   async sendComment(pageUrl, pageTitle, authorName, content) {
     try {
       if (!this.client.isReady()) {
@@ -113,19 +257,7 @@ class DiscordBot {
         throw new Error('Discord channel not found');
       }
 
-      const embed = new EmbedBuilder()
-        .setTitle(`💬 New Comment: ${pageTitle}`)
-        .setDescription(content)
-        .setColor(0x5865F2)
-        .setURL(pageUrl)
-        .setAuthor({ name: authorName })
-        .addFields({
-          name: 'Page',
-          value: `[${pageTitle}](${pageUrl})`,
-          inline: true
-        })
-        .setTimestamp();
-
+      const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
       const message = await channel.send({ embeds: [embed] });
 
       // Store in database
@@ -138,11 +270,20 @@ class DiscordBot {
         this.channelId
       );
 
-      // Create a thread for replies
-      await message.startThread({
-        name: `💬 ${pageTitle.substring(0, 50)}...`,
-        autoArchiveDuration: 1440 // 24 hours
-      });
+      // Create a thread for replies (if not minimal context)
+      const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
+      const createThreads = process.env.DISCORD_CREATE_THREADS !== 'false';
+      
+      if (contextLevel !== 'minimal' && createThreads) {
+        const threadName = pageTitle.length > 50 
+          ? `💬 ${pageTitle.substring(0, 47)}...`
+          : `💬 ${pageTitle}`;
+          
+        await message.startThread({
+          name: threadName,
+          autoArchiveDuration: parseInt(process.env.DISCORD_THREAD_DURATION || '1440') // 24 hours default
+        });
+      }
 
       return message.id;
     } catch (error) {
