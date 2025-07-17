@@ -1,0 +1,121 @@
+---
+title: Comments Integration
+description: How to integrate Discord comments with your Docusaurus site
+sidebar_position: 2
+---
+
+# Discord Comments Integration
+
+This documentation site includes a Discord comments integration that allows visitors to send comments directly to your Discord server alongside the existing GitHub-based Giscus comments.
+
+## Features
+
+- **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
+- **Rich Discord Embeds**: Comments appear as formatted embeds in your Discord channel
+- **Page Context**: Comments include the page title and URL for context
+- **Responsive Design**: Works on both desktop and mobile devices
+
+## Setup Instructions
+
+### 1. Create a Discord Webhook
+
+1. Go to your Discord server
+2. Navigate to **Server Settings** > **Integrations** > **Webhooks**
+3. Click **Create Webhook**
+4. Choose the channel where you want comments to appear
+5. Copy the **Webhook URL**
+
+### 2. Configure Environment Variables
+
+Add your Discord webhook URL to your `.env` file:
+
+```env
+# Discord webhook URL for comments
+REACT_APP_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+```
+
+:::warning Security Note
+Make sure to add `.env` to your `.gitignore` file to keep your webhook URL secure.
+:::
+
+### 3. Deploy Configuration
+
+For production deployments, set the environment variable in your hosting platform:
+
+- **Netlify**: Site settings > Environment variables
+- **Vercel**: Project settings > Environment Variables
+- **GitHub Actions**: Repository settings > Secrets and variables > Actions
+
+## How It Works
+
+When users submit a comment through the Discord form:
+
+1. The comment is formatted as a Discord embed with:
+   - **Author name** provided by the user
+   - **Comment content** 
+   - **Page title** and **URL** for context
+   - **Timestamp** of when the comment was posted
+   - **Discord branding** (blurple color)
+
+2. The embed is sent directly to your Discord channel via webhook
+
+3. Users receive immediate feedback on successful submission
+
+## Customization
+
+### Styling
+
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+
+```
+src/components/DiscordComments/styles.module.css
+```
+
+### Message Format
+
+To customize the Discord embed format, edit the `discordMessage` object in:
+
+```
+src/components/DiscordComments/index.tsx
+```
+
+### Component Placement
+
+The Discord comments appear below the Giscus comments by default. To change this, modify:
+
+```
+src/theme/DocItem/Layout/index.js
+```
+
+## Troubleshooting
+
+### Comments Not Appearing in Discord
+
+1. **Check webhook URL**: Ensure the `REACT_APP_DISCORD_WEBHOOK_URL` is correctly set
+2. **Verify permissions**: Make sure the webhook has permission to post in the target channel
+3. **Check console**: Look for JavaScript errors in the browser console
+4. **Test webhook**: Try sending a test message directly to the webhook URL
+
+### Environment Variables Not Working
+
+- **Development**: Restart your development server after adding environment variables
+- **Production**: Redeploy your site after setting environment variables
+- **Prefix**: Ensure you're using `REACT_APP_` prefix for client-side variables
+
+### Form Validation Issues
+
+The form requires both name and comment fields. Users will see validation messages if fields are empty.
+
+## Security Considerations
+
+- **Webhook URL**: Keep your webhook URL secret and don't commit it to version control
+- **Rate Limiting**: Discord has rate limits for webhooks (30 requests per minute)
+- **Input Validation**: The component validates user input before sending to Discord
+- **Error Handling**: Failed submissions are handled gracefully with user feedback
+
+## Browser Support
+
+The Discord comments component works in all modern browsers that support:
+- ES6 fetch API
+- React 18+
+- CSS Grid and Flexbox
