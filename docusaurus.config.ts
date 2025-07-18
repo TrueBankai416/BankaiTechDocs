@@ -23,6 +23,13 @@ const config: Config = {
     // Mendable API key for AI-powered search functionality
     // Get your key at https://mendable.ai
     mendableAnonKey: process.env.MENDABLE_KEY,
+    
+    // Comment System Configuration
+    comments: {
+      enableGiscus: true,          // Enable/disable Giscus comments
+      enableDiscord: true,         // Enable/disable Discord comments
+      discordApiUrl: undefined,    // Will use environment variable or default
+    },
   },
 
     // Adds Diagram support via Mermaid

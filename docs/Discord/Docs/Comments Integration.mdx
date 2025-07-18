@@ -1,0 +1,322 @@
+---
+title: Comments Integration
+description: How to integrate bidirectional Discord comments with your Docusaurus site
+sidebar_position: 2
+---
+
+# Discord Comments Integration
+
+This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+
+## Features
+
+- **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
+- **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
+- **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
+- **Thread Management**: Automatic thread creation for organized replies
+- **Real-time Updates**: Website displays Discord replies automatically
+- **Full Page Context**: Comments include page title, URL, and navigation context
+- **User Avatars**: Discord replies show user avatars and usernames
+- **Responsive Design**: Works on both desktop and mobile devices
+
+## Setup Instructions
+
+### 1. Create a Discord Bot
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application
+3. Go to "Bot" section and create a bot
+4. Copy the bot token
+5. Under "Privileged Gateway Intents", enable:
+   - **Message Content Intent**
+   - **Server Members Intent** (optional)
+
+### 2. Configure Bot Permissions
+
+Your bot needs these permissions:
+- Read Messages
+- Send Messages
+- Create Public Threads
+- Send Messages in Threads
+- Read Message History
+- Use Slash Commands (optional)
+
+### 3. Invite Bot to Server
+
+1. Go to OAuth2 > URL Generator
+2. Select "bot" scope
+3. Select the permissions listed above
+4. Use the generated URL to invite the bot to your server
+
+### 4. Configure Environment Variables
+
+#### Frontend (.env)
+```env
+# Discord Bot Configuration
+DISCORD_BOT_TOKEN=your_bot_token_here
+DISCORD_CHANNEL_ID=your_channel_id_here
+
+# API Configuration
+REACT_APP_API_URL=http://localhost:3001
+
+# Discord Context Configuration
+DISCORD_CONTEXT_LEVEL=full
+DISCORD_SHOW_BREADCRUMBS=true
+DISCORD_SHOW_SECTION_INFO=true
+DISCORD_SITE_NAME=Your Site Name
+```
+
+#### Backend Server (server/.env)
+```env
+# Discord Bot Configuration
+DISCORD_BOT_TOKEN=your_bot_token_here
+DISCORD_CHANNEL_ID=your_channel_id_here
+
+# API Configuration
+PORT=3001
+
+# Discord Context Configuration
+DISCORD_CONTEXT_LEVEL=full
+DISCORD_SHOW_PAGE_CONTEXT=true
+DISCORD_SHOW_BREADCRUMBS=true
+DISCORD_SHOW_SECTION_INFO=true
+DISCORD_SHOW_PAGE_PATH=false
+DISCORD_SHOW_TIMESTAMP=true
+DISCORD_SHOW_AUTHOR_FIELD=true
+DISCORD_CREATE_THREADS=true
+DISCORD_THREAD_DURATION=1440
+DISCORD_SITE_NAME=Your Site Name
+```
+
+:::warning Security Note
+- Never commit `.env` files to version control
+- Use environment variables in production
+- Keep your bot token secure
+:::
+
+### 5. Install Server Dependencies
+
+```bash
+cd server
+npm install
+```
+
+### 6. Start the Backend Server
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm start
+```
+
+### 7. Deploy Configuration
+
+For production deployments, set environment variables in your hosting platform:
+
+- **Frontend**: Set `REACT_APP_API_URL` to your production API URL
+- **Backend**: Deploy the server folder with bot token and channel ID
+- **Database**: SQLite database will be created automatically
+- **Context**: Configure Discord context level and options per your preferences
+
+## How It Works
+
+### Complete Bidirectional Flow
+
+1. **Website Comment**: User submits comment via website form
+2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
+3. **Thread Creation**: Bot automatically creates a thread for organized replies
+4. **Discord Replies**: Discord users reply in the thread or to the message
+5. **Database Storage**: Bot stores all comments and replies in SQLite database
+6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+
+### Discord Message Format
+
+Discord embeds include:
+- **Title**: "💬 New Comment: \{Page Title\}"
+- **Description**: The actual comment content
+- **Author**: The commenter's name
+- **URL**: Clickable link to the exact page
+- **Page Field**: Shows page title with clickable link
+- **Timestamp**: When the comment was posted
+- **Thread**: Auto-created thread for replies
+
+### Website Display
+
+The website shows:
+- **Original Comments**: Website form submissions
+- **Discord Replies**: Replies from Discord users with avatars and usernames
+- **Real-time Updates**: Automatic polling for new replies
+- **Threaded Conversations**: Organized comment → reply structure
+
+## Context Configuration
+
+### Context Levels
+
+Configure how much context appears in Discord messages:
+
+#### `DISCORD_CONTEXT_LEVEL=minimal`
+- **Shows**: Just page title and comment content
+- **Use case**: Clean, simple messages without extra context
+
+#### `DISCORD_CONTEXT_LEVEL=basic`
+- **Shows**: Page title, comment content, and clickable page URL
+- **Use case**: Moderate context with essential information
+
+#### `DISCORD_CONTEXT_LEVEL=full` (default)
+- **Shows**: All context information including breadcrumbs, sections, timestamps
+- **Use case**: Maximum context for detailed discussions
+
+#### `DISCORD_CONTEXT_LEVEL=custom`
+- **Shows**: Only the context elements you enable individually
+- **Use case**: Fine-tuned control over what appears
+
+### Individual Context Controls
+
+When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
+
+```env
+DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
+DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
+DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
+DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
+DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
+DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
+```
+
+### Thread Configuration
+
+```env
+DISCORD_CREATE_THREADS=true         # Create threads for replies
+DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
+DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+```
+
+### Example Context Outputs
+
+**Minimal Context:**
+```
+Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
+```
+
+**Basic Context:**
+```
+💬 Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
+[Link to page]
+```
+
+**Full Context:**
+```
+💬 New Comment: Docker Installation Guide
+👤 John Doe
+"This tutorial was really helpful! How do I handle port conflicts?"
+
+📄 Page: Docker Installation Guide
+📍 Navigation: Docker > Docs > Installing Docker
+📂 Section: Docker
+🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+
+Your Site Name • Comment System
+```
+
+## Customization
+
+### Styling
+
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+
+```
+src/components/DiscordComments/styles.module.css
+```
+
+### Message Format
+
+To customize the Discord embed format, edit the `discordMessage` object in:
+
+```
+src/components/DiscordComments/index.tsx
+```
+
+### Component Placement
+
+The Discord comments appear below the Giscus comments by default. To change this, modify:
+
+```
+src/theme/DocItem/Layout/index.js
+```
+
+## Troubleshooting
+
+### Bot Not Responding
+
+1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
+2. **Verify permissions**: Make sure bot has required permissions in the channel
+3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
+4. **Bot in server**: Verify bot is actually in your Discord server
+
+### Comments Not Appearing
+
+1. **Server running**: Check if backend server is running on correct port
+2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
+3. **Database**: Check if SQLite database is being created in server folder
+4. **CORS**: Ensure CORS is configured for your frontend domain
+
+### Discord Replies Not Showing
+
+1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
+2. **Bot permissions**: Verify bot can read messages in the channel
+3. **Database connection**: Check server logs for database errors
+4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+
+### Environment Variables Not Working
+
+- **Development**: Restart both frontend and backend servers
+- **Production**: Redeploy both frontend and backend with correct environment variables
+- **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+
+### Database Issues
+
+1. **File permissions**: Ensure server can write to the database directory
+2. **Disk space**: Check available disk space for SQLite database
+3. **Server logs**: Check server console for database connection errors
+
+## Security Considerations
+
+- **Bot Token**: Keep your bot token secret and never commit it to version control
+- **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
+- **Input Validation**: Both frontend and backend validate user input
+- **Database Security**: SQLite database should be protected with proper file permissions
+- **API Security**: Consider implementing rate limiting on your API endpoints
+- **CORS**: Configure CORS properly for your production domain
+
+## Architecture
+
+```
+Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+                    ↓
+                SQLite Database
+```
+
+## File Structure
+
+```
+project/
+├── src/components/DiscordComments/     # Frontend component
+├── server/                            # Backend server
+│   ├── api.js                        # Express API server
+│   ├── discord-bot.js                # Discord bot logic
+│   ├── database.js                   # SQLite database functions
+│   └── package.json                  # Server dependencies
+└── docs/Discord/Docs/                # Documentation
+```
+
+## Browser Support
+
+The Discord comments component works in all modern browsers that support:
+- ES6 fetch API
+- React 18+
+- CSS Grid and Flexbox
+- Local Storage (for form persistence)

@@ -14,6 +14,8 @@ import ContentVisibility from '@theme/ContentVisibility';
 import styles from './styles.module.css';
 import Giscus from '@giscus/react';
 import { useColorMode } from '@docusaurus/theme-common';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import DiscordComments from '@site/src/components/DiscordComments';
 /**
  * Decide if the toc should be rendered, on mobile or desktop viewports
  */
@@ -36,7 +38,10 @@ function useDocTOC() {
 export default function DocItemLayout({children}) {
   const docTOC = useDocTOC();
   const { colorMode } = useColorMode();
-  const giscus = (
+  const { siteConfig } = useDocusaurusContext();
+  const { comments } = siteConfig.customFields || {};
+  
+  const giscus = comments?.enableGiscus !== false ? (
     <React.Fragment>
       <hr />
       <br></br>
@@ -55,7 +60,9 @@ export default function DocItemLayout({children}) {
         loading="lazy"
       />
     </React.Fragment>
-  )
+  ) : null;
+  
+  const discordComments = comments?.enableDiscord !== false ? <DiscordComments /> : null;
   const {metadata} = useDoc();
   return (
     <div className="row">
@@ -72,6 +79,7 @@ export default function DocItemLayout({children}) {
           </article>
           <DocItemPaginator />
           {giscus}
+          {discordComments}
         </div>
       </div>
       {docTOC.desktop && <div className="col col--3">{docTOC.desktop}</div>}
