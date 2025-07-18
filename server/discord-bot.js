@@ -18,6 +18,12 @@ class DiscordBot {
   setupEventListeners() {
     this.client.once('ready', () => {
       console.log(`Discord bot logged in as ${this.client.user.tag}!`);
+      
+      // Set bot presence to show as online
+      this.client.user.setPresence({
+        activities: [{ name: 'for website comments', type: 3 }], // Type 3 = "Watching"
+        status: 'online'
+      });
     });
 
     // Listen for messages in the configured channel
