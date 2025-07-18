@@ -14,6 +14,7 @@ interface Comment {
   discord_thread_id?: string;
   thread_deleted?: boolean;
   thread_tags?: string;
+  problem_summary?: string;
   created_at: string;
   replies: Reply[];
 }
@@ -32,11 +33,15 @@ interface Reply {
 export default function DiscordComments() {
   const [comment, setComment] = useState('');
   const [author, setAuthor] = useState('');
+  const [problemSummary, setProblemSummary] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [replyForms, setReplyForms] = useState<{[key: number]: {show: boolean, content: string, author: string, submitting: boolean}}>({});
+  const [modView, setModView] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{[key: number]: boolean}>({});
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
   
@@ -84,6 +89,7 @@ export default function DiscordComments() {
         pageTitle,
         authorName,
         content,
+        problemSummary: problemSummary.trim() || null,
       }),
     });
 
@@ -126,6 +132,7 @@ export default function DiscordComments() {
       await sendToDiscord(currentUrl, pageTitle, author, comment);
       
       setComment('');
+      setProblemSummary('');
       // Don't clear author name - keep it for next comment
       setSubmitMessage('Comment sent to Discord successfully! 🎉');
       
@@ -224,6 +231,106 @@ export default function DiscordComments() {
     }
   };
 
+  const toggleModView = () => {
+    if (!modView && !isAuthenticated) {
+      // Prompt for password
+      const password = prompt('Enter moderation password:');
+      if (password) {
+        // Check password with API
+        fetch(`${apiUrl}/api/auth/mod`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            setIsAuthenticated(true);
+            setModView(true);
+            // Store auth token in session
+            sessionStorage.setItem('mod-auth', data.token);
+          } else {
+            alert('Invalid password');
+          }
+        })
+        .catch(error => {
+          console.error('Auth error:', error);
+          alert('Authentication failed');
+        });
+      }
+    } else {
+      setModView(!modView);
+    }
+  };
+
+  const deleteComment = async (commentId: number) => {
+    if (!isAuthenticated) return;
+
+    const token = sessionStorage.getItem('mod-auth');
+    if (!token) {
+      setIsAuthenticated(false);
+      setModView(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Remove comment from state
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        setDeleteConfirm(prev => ({ ...prev, [commentId]: false }));
+      } else {
+        alert('Failed to delete comment');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete comment');
+    }
+  };
+
+  const confirmDelete = (commentId: number) => {
+    setDeleteConfirm(prev => ({ ...prev, [commentId]: true }));
+  };
+
+  const cancelDelete = (commentId: number) => {
+    setDeleteConfirm(prev => ({ ...prev, [commentId]: false }));
+  };
+
+  // Check for stored auth token on component mount
+  useEffect(() => {
+    const token = sessionStorage.getItem('mod-auth');
+    if (token) {
+      // Verify token is still valid
+      fetch(`${apiUrl}/api/auth/verify`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          setIsAuthenticated(true);
+        } else {
+          sessionStorage.removeItem('mod-auth');
+        }
+      })
+      .catch(error => {
+        console.error('Token verification error:', error);
+        sessionStorage.removeItem('mod-auth');
+      });
+    }
+  }, []);
+
   return (
     <div className={styles.discordComments}>
       <h3>💬 Discord Community Chat</h3>
@@ -240,6 +347,17 @@ export default function DiscordComments() {
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="Your name"
             required
+          />
+        </div>
+        
+        <div className={styles.formGroup}>
+          <label htmlFor="problemSummary">Problem Summary (optional):</label>
+          <input
+            id="problemSummary"
+            type="text"
+            value={problemSummary}
+            onChange={(e) => setProblemSummary(e.target.value)}
+            placeholder="Brief description of the issue (used for Discord thread title)"
           />
         </div>
         
@@ -272,7 +390,20 @@ export default function DiscordComments() {
 
       {/* Comments and Replies Display */}
       <div className={styles.commentsSection}>
-        <h4>💬 Recent Comments</h4>
+        <div className={styles.commentsHeader}>
+          <h4>💬 Recent Comments</h4>
+          <button 
+            className={`${styles.modButton} ${modView ? styles.modButtonActive : ''}`}
+            onClick={toggleModView}
+          >
+            {modView ? '🔓 Exit Mod View' : '🔒 Mod View'}
+          </button>
+        </div>
+        {modView && (
+          <div className={styles.modWarning}>
+            ⚠️ Moderation Mode Active - You can delete comments
+          </div>
+        )}
         {isLoading ? (
           <div className={styles.loading}>Loading comments...</div>
         ) : comments.length === 0 ? (
@@ -282,17 +413,47 @@ export default function DiscordComments() {
         ) : (
           <div className={styles.commentsList}>
             {comments.map((comment) => (
-              <div key={comment.id} className={styles.comment}>
+              <div key={comment.id} className={`${styles.comment} ${modView ? styles.commentModView : ''}`}>
                 <div className={styles.commentHeader}>
-                  <span className={styles.authorName}>{comment.author_name}</span>
-                  <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
-                  {comment.thread_tags && (
-                    <div className={styles.threadTags}>
-                      {comment.thread_tags.split(', ').map((tag, index) => (
-                        <span key={index} className={`${styles.threadTag} ${styles[`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`]}`}>
-                          {tag}
-                        </span>
-                      ))}
+                  <div className={styles.commentHeaderLeft}>
+                    <span className={styles.authorName}>{comment.author_name}</span>
+                    <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
+                    {comment.thread_tags && (
+                      <div className={styles.threadTags}>
+                        {comment.thread_tags.split(', ').map((tag, index) => (
+                          <span key={index} className={`${styles.threadTag} ${styles[`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`]}`}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {modView && (
+                    <div className={styles.modActions}>
+                      {deleteConfirm[comment.id] ? (
+                        <div className={styles.deleteConfirm}>
+                          <span>Delete this comment?</span>
+                          <button 
+                            className={styles.confirmDelete}
+                            onClick={() => deleteComment(comment.id)}
+                          >
+                            Yes
+                          </button>
+                          <button 
+                            className={styles.cancelDelete}
+                            onClick={() => cancelDelete(comment.id)}
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          className={styles.deleteButton}
+                          onClick={() => confirmDelete(comment.id)}
+                        >
+                          🗑️ Delete
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

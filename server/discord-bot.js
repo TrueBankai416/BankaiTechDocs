@@ -140,7 +140,7 @@ class DiscordBot {
     }
   }
 
-  buildEmbed(pageUrl, pageTitle, authorName, content) {
+  buildEmbed(pageUrl, pageTitle, authorName, content, problemSummary = null) {
     const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
     const showPageContext = process.env.DISCORD_SHOW_PAGE_CONTEXT !== 'false';
     const showBreadcrumbs = process.env.DISCORD_SHOW_BREADCRUMBS !== 'false';
@@ -156,19 +156,22 @@ class DiscordBot {
 
     // Context level presets
     if (contextLevel === 'minimal') {
-      embed.setTitle(pageTitle);
+      embed.setTitle(problemSummary || pageTitle);
       return embed;
     }
 
     if (contextLevel === 'basic') {
-      embed.setTitle(`💬 ${pageTitle}`)
+      embed.setTitle(`💬 ${problemSummary || pageTitle}`)
         .setURL(pageUrl);
       return embed;
     }
 
     // Full context (default) or custom
     if (contextLevel === 'full' || contextLevel === 'custom') {
-      embed.setTitle(`💬 New Comment: ${pageTitle}`)
+      const title = problemSummary 
+        ? `💬 ${problemSummary} - ${pageTitle}`
+        : `💬 New Comment: ${pageTitle}`;
+      embed.setTitle(title)
         .setURL(pageUrl);
 
       if (showAuthorField) {
@@ -284,7 +287,7 @@ class DiscordBot {
     }
   }
 
-  async sendComment(pageUrl, pageTitle, authorName, content) {
+  async sendComment(pageUrl, pageTitle, authorName, content, problemSummary = null) {
     try {
       if (!this.client.isReady()) {
         throw new Error('Discord bot is not ready');
@@ -311,22 +314,22 @@ class DiscordBot {
             threadId = existingThreadId;
           } else {
             // Thread is archived or doesn't exist, create new one
-            const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+            const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content, problemSummary);
             message = await channel.send({ embeds: [embed] });
-            threadId = await this.createThread(message, authorName, pageTitle);
+            threadId = await this.createThread(message, authorName, problemSummary || pageTitle);
           }
         } catch (error) {
           console.error('Error accessing existing thread:', error);
           // Fall back to creating new message and thread
-          const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+          const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content, problemSummary);
           message = await channel.send({ embeds: [embed] });
-          threadId = await this.createThread(message, authorName, pageTitle);
+          threadId = await this.createThread(message, authorName, problemSummary || pageTitle);
         }
       } else {
         // No existing thread, create new message and thread
-        const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+        const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content, problemSummary);
         message = await channel.send({ embeds: [embed] });
-        threadId = await this.createThread(message, authorName, pageTitle);
+        threadId = await this.createThread(message, authorName, problemSummary || pageTitle);
       }
 
       // Store in database
@@ -337,7 +340,8 @@ class DiscordBot {
         content,
         message.id,
         this.channelId,
-        threadId
+        threadId,
+        problemSummary
       );
 
       return message.id;
@@ -347,15 +351,15 @@ class DiscordBot {
     }
   }
 
-  async createThread(message, authorName, pageTitle) {
+  async createThread(message, authorName, threadTitle) {
     try {
       const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
       const createThreads = process.env.DISCORD_CREATE_THREADS !== 'false';
       
       if (contextLevel !== 'minimal' && createThreads) {
-        const threadName = `💬 ${authorName} - ${pageTitle}`;
+        const threadName = `💬 ${authorName} - ${threadTitle}`;
         const finalThreadName = threadName.length > 50 
-          ? `💬 ${authorName} - ${pageTitle.substring(0, 47 - authorName.length)}...`
+          ? `💬 ${authorName} - ${threadTitle.substring(0, 47 - authorName.length)}...`
           : threadName;
           
         const thread = await message.startThread({

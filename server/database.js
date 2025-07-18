@@ -42,6 +42,13 @@ db.serialize(() => {
       console.error('Error adding thread_tags column:', err);
     }
   });
+  
+  // Add problem summary column
+  db.run(`ALTER TABLE comments ADD COLUMN problem_summary TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding problem_summary column:', err);
+    }
+  });
 
   // Replies table - stores Discord replies to comments
   db.run(`
@@ -76,14 +83,14 @@ db.serialize(() => {
 // Database functions
 const dbFunctions = {
   // Store a new comment
-  storeComment: (pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId = null) => {
+  storeComment: (pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId = null, problemSummary = null) => {
     return new Promise((resolve, reject) => {
       const stmt = db.prepare(`
-        INSERT INTO comments (page_url, page_title, author_name, content, discord_message_id, discord_channel_id, discord_thread_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO comments (page_url, page_title, author_name, content, discord_message_id, discord_channel_id, discord_thread_id, problem_summary)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
       
-      stmt.run([pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId], function(err) {
+      stmt.run([pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId, problemSummary], function(err) {
         if (err) reject(err);
         else resolve(this.lastID);
       });
@@ -127,7 +134,7 @@ const dbFunctions = {
       db.all(`
         SELECT 
           c.id, c.page_url, c.page_title, c.author_name, c.content, c.discord_message_id, c.discord_channel_id,
-          c.discord_thread_id, c.thread_deleted, c.thread_tags, c.created_at,
+          c.discord_thread_id, c.thread_deleted, c.thread_tags, c.problem_summary, c.created_at,
           r.id as reply_id,
           r.discord_message_id as reply_discord_id,
           r.discord_user_id,
@@ -159,6 +166,7 @@ const dbFunctions = {
                 discord_thread_id: row.discord_thread_id,
                 thread_deleted: row.thread_deleted,
                 thread_tags: row.thread_tags,
+                problem_summary: row.problem_summary,
                 created_at: row.created_at,
                 replies: []
               });
@@ -245,6 +253,22 @@ const dbFunctions = {
         if (err) reject(err);
         else resolve(rows);
       });
+    });
+  },
+
+  // Delete a comment
+  deleteComment: (commentId) => {
+    return new Promise((resolve, reject) => {
+      const stmt = db.prepare(`
+        DELETE FROM comments WHERE id = ?
+      `);
+      
+      stmt.run([commentId], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes > 0);
+      });
+      
+      stmt.finalize();
     });
   }
 };

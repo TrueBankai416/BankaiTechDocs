@@ -103,9 +103,49 @@
   padding-top: 1.5rem;
 }
 
-.commentsSection h4 {
+.commentsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
+}
+
+.commentsSection h4 {
+  margin: 0;
   color: var(--ifm-heading-color);
+}
+
+.modButton {
+  background: none;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-content);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modButton:hover {
+  background-color: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-primary);
+}
+
+.modButtonActive {
+  background-color: var(--ifm-color-warning-alpha-20);
+  border-color: var(--ifm-color-warning);
+  color: var(--ifm-color-warning-dark);
+}
+
+.modWarning {
+  background-color: var(--ifm-color-warning-alpha-20);
+  color: var(--ifm-color-warning-dark);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9em;
+  font-weight: 500;
+  border: 1px solid var(--ifm-color-warning);
 }
 
 .loading {
@@ -145,6 +185,71 @@
   margin-bottom: 0.75rem;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.commentHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.commentModView {
+  border: 2px solid var(--ifm-color-warning-alpha-50);
+  background-color: var(--ifm-color-warning-alpha-10);
+}
+
+.modActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteButton {
+  background-color: var(--ifm-color-danger);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.deleteButton:hover {
+  background-color: var(--ifm-color-danger-dark);
+}
+
+.deleteConfirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8em;
+}
+
+.deleteConfirm span {
+  color: var(--ifm-color-danger-dark);
+  font-weight: 500;
+}
+
+.confirmDelete {
+  background-color: var(--ifm-color-danger);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.cancelDelete {
+  background-color: var(--ifm-color-secondary);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  cursor: pointer;
 }
 
 .authorName {

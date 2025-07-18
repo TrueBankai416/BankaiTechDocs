@@ -19,7 +19,7 @@ const bot = new DiscordBot();
 // POST /api/comments - Send a new comment to Discord
 app.post('/api/comments', async (req, res) => {
   try {
-    const { pageUrl, pageTitle, authorName, content } = req.body;
+    const { pageUrl, pageTitle, authorName, content, problemSummary } = req.body;
 
     if (!pageUrl || !pageTitle || !authorName || !content) {
       return res.status(400).json({ 
@@ -27,7 +27,7 @@ app.post('/api/comments', async (req, res) => {
       });
     }
 
-    const messageId = await bot.sendComment(pageUrl, pageTitle, authorName, content);
+    const messageId = await bot.sendComment(pageUrl, pageTitle, authorName, content, problemSummary);
     
     res.json({ 
       success: true, 
@@ -123,6 +123,84 @@ app.post('/api/replies', async (req, res) => {
     console.error('Error sending reply:', error);
     res.status(500).json({ 
       error: 'Failed to send reply to Discord',
+      details: error.message 
+    });
+  }
+});
+
+// POST /api/auth/mod - Authenticate moderator
+app.post('/api/auth/mod', (req, res) => {
+  try {
+    const { password } = req.body;
+    const correctPassword = process.env.MOD_PASSWORD || 'admin123';
+    
+    if (password === correctPassword) {
+      // Generate a simple token (in production, use proper JWT)
+      const token = Buffer.from(`mod-${Date.now()}-${Math.random()}`).toString('base64');
+      
+      // Store token in memory (in production, use proper session storage)
+      global.modTokens = global.modTokens || new Set();
+      global.modTokens.add(token);
+      
+      res.json({ success: true, token });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid password' });
+    }
+  } catch (error) {
+    console.error('Mod auth error:', error);
+    res.status(500).json({ success: false, message: 'Authentication failed' });
+  }
+});
+
+// POST /api/auth/verify - Verify moderator token
+app.post('/api/auth/verify', (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+    
+    global.modTokens = global.modTokens || new Set();
+    
+    if (global.modTokens.has(token)) {
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(500).json({ success: false, message: 'Token verification failed' });
+  }
+});
+
+// DELETE /api/comments/:id - Delete a comment (moderator only)
+app.delete('/api/comments/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    
+    global.modTokens = global.modTokens || new Set();
+    
+    if (!global.modTokens.has(token)) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    const commentId = parseInt(req.params.id);
+    const deleted = await db.deleteComment(commentId);
+    
+    if (deleted) {
+      res.json({ success: true, message: 'Comment deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Comment not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ 
+      error: 'Failed to delete comment',
       details: error.message 
     });
   }
