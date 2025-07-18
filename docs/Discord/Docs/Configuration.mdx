@@ -22,7 +22,7 @@ export default {
     comments: {
       enableGiscus: true,          // Enable/disable Giscus comments
       enableDiscord: true,         // Enable/disable Discord comments
-      discordApiUrl: process.env.REACT_APP_API_URL,
+      discordApiUrl: undefined,    // Will use environment variable or default
     },
   },
   // ... rest of config
@@ -44,9 +44,9 @@ export default {
 - **Example**: `enableDiscord: false` to disable Discord comments
 
 ### `discordApiUrl`
-- **Type**: `string`
-- **Default**: `process.env.REACT_APP_API_URL`
-- **Description**: URL of your Discord comments API server
+- **Type**: `string | undefined`
+- **Default**: `undefined` (uses environment variable)
+- **Description**: URL of your Discord comments API server. If not set, uses `REACT_APP_API_URL` environment variable
 - **Example**: `discordApiUrl: 'https://api.yoursite.com'`
 
 ## Usage Examples
@@ -56,7 +56,7 @@ export default {
 comments: {
   enableGiscus: true,
   enableDiscord: true,
-  discordApiUrl: process.env.REACT_APP_API_URL,
+  discordApiUrl: undefined,  // Uses environment variable
 }
 ```
 
@@ -77,7 +77,7 @@ comments: {
 comments: {
   enableGiscus: false,
   enableDiscord: true,
-  discordApiUrl: process.env.REACT_APP_API_URL,
+  discordApiUrl: undefined,  // Uses environment variable
 }
 ```
 
@@ -107,7 +107,7 @@ You can override this in the Docusaurus config:
 ```typescript
 comments: {
   enableDiscord: true,
-  discordApiUrl: 'https://your-production-api.com',
+  discordApiUrl: 'https://your-production-api.com',  // Override environment variable
 }
 ```
 
@@ -159,9 +159,9 @@ You can also use environment variables to control comment systems:
 
 ```typescript
 comments: {
-  enableGiscus: process.env.ENABLE_GISCUS !== 'false',
-  enableDiscord: process.env.ENABLE_DISCORD !== 'false',
-  discordApiUrl: process.env.REACT_APP_API_URL,
+  enableGiscus: true,   // Set directly or use logic
+  enableDiscord: true,  // Set directly or use logic
+  discordApiUrl: undefined,  // Uses environment variable
 }
 ```
 

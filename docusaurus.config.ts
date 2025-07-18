@@ -28,7 +28,7 @@ const config: Config = {
     comments: {
       enableGiscus: true,          // Enable/disable Giscus comments
       enableDiscord: true,         // Enable/disable Discord comments
-      discordApiUrl: process.env.REACT_APP_API_URL,
+      discordApiUrl: undefined,    // Will use environment variable or default
     },
   },
 
