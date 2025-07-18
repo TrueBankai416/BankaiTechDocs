@@ -462,9 +462,9 @@ export default function DiscordComments() {
                 {/* Discord Replies */}
                 {comment.replies.length > 0 && (
                   <div className={styles.repliesSection}>
-                    <h5>💬 Discord Replies</h5>
+                    <h5>💬 Replies</h5>
                     {comment.replies.map((reply) => (
-                      <div key={reply.id} className={styles.reply}>
+                      <div key={reply.id} className={`${styles.reply} ${reply.discord_user_id === 'website' ? styles.websiteReply : styles.discordReply}`}>
                         <div className={styles.replyHeader}>
                           <div className={styles.discordUser}>
                             {reply.discord_avatar && (

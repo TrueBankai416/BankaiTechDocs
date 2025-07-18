@@ -284,9 +284,19 @@
 .reply {
   padding: 1rem;
   margin-bottom: 1rem;
-  border-left: 3px solid #5865F2;
-  background-color: var(--ifm-color-emphasis-100);
   border-radius: 4px;
+}
+
+.discordReply {
+  border-left: 3px solid #5865F2;
+  background-color: rgba(88, 101, 242, 0.05);
+  border: 1px solid rgba(88, 101, 242, 0.1);
+}
+
+.websiteReply {
+  border-left: 3px solid var(--ifm-color-primary);
+  background-color: var(--ifm-color-primary-alpha-10);
+  border: 1px solid var(--ifm-color-primary-alpha-20);
 }
 
 .replyHeader {
