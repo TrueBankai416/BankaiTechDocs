@@ -474,10 +474,12 @@ export default function DiscordComments() {
                                 className={styles.discordAvatar}
                               />
                             )}
-                            <span className={styles.discordUsername}>
+                            <span className={reply.discord_user_id === 'website' ? styles.websiteUsername : styles.discordUsername}>
                               {reply.discord_username}
                             </span>
-                            <span className={styles.discordBadge}>Discord</span>
+                            {reply.discord_user_id !== 'website' && (
+                              <span className={styles.discordBadge}>Discord</span>
+                            )}
                           </div>
                           <span className={styles.replyDate}>{formatDate(reply.created_at)}</span>
                         </div>

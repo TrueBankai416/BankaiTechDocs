@@ -315,6 +315,11 @@
   color: #5865F2;
 }
 
+.websiteUsername {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
 .discordBadge {
   background-color: #5865F2;
   color: white;
