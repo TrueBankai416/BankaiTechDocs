@@ -49,6 +49,9 @@ app.get('/api/comments/:pageUrl', async (req, res) => {
     const pageUrl = decodeURIComponent(req.params.pageUrl);
     const comments = await db.getCommentsForPage(pageUrl);
     
+    console.log(`Fetched ${comments.length} comments for page: ${pageUrl}`);
+    console.log('Comments:', comments.map(c => ({ id: c.id, deleted: c.thread_deleted, author: c.author_name })));
+    
     res.json({ 
       success: true, 
       comments 

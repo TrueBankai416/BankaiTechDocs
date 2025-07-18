@@ -383,9 +383,22 @@ class DiscordBot {
   }
 
   setupThreadMonitoring() {
+    // Check threads immediately on startup (after bot is ready)
+    this.client.once('ready', async () => {
+      console.log('Starting initial thread status check...');
+      setTimeout(async () => {
+        try {
+          await this.checkThreadStatus();
+        } catch (error) {
+          console.error('Error in initial thread check:', error);
+        }
+      }, 5000); // Wait 5 seconds after bot is ready
+    });
+
     // Monitor threads every 5 minutes
     setInterval(async () => {
       try {
+        console.log('Running scheduled thread status check...');
         await this.checkThreadStatus();
       } catch (error) {
         console.error('Error monitoring threads:', error);
@@ -396,33 +409,55 @@ class DiscordBot {
   async checkThreadStatus() {
     try {
       const activeThreads = await db.getActiveThreads();
+      console.log(`Checking ${activeThreads.length} active threads...`);
       
       for (const thread of activeThreads) {
         try {
+          console.log(`Checking thread ${thread.discord_thread_id}...`);
+          
           const channel = await this.client.channels.fetch(thread.discord_channel_id);
-          if (!channel) continue;
+          if (!channel) {
+            console.log(`Channel ${thread.discord_channel_id} not found`);
+            continue;
+          }
 
-          const discordThread = await channel.threads.fetch(thread.discord_thread_id);
+          // Try to fetch the thread directly
+          let discordThread = null;
+          try {
+            discordThread = await this.client.channels.fetch(thread.discord_thread_id);
+          } catch (fetchError) {
+            if (fetchError.code === 10003) {
+              // Thread not found (deleted)
+              await db.updateThreadStatus(thread.discord_thread_id, true, null);
+              console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
+              continue;
+            } else {
+              throw fetchError;
+            }
+          }
           
           if (!discordThread) {
             // Thread was deleted
             await db.updateThreadStatus(thread.discord_thread_id, true, null);
-            console.log(`Thread ${thread.discord_thread_id} was deleted`);
+            console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
           } else {
             // Thread exists, check for tags
             const tags = this.extractThreadTags(discordThread);
             await db.updateThreadStatus(thread.discord_thread_id, false, tags);
+            console.log(`Thread ${thread.discord_thread_id} exists with tags: ${tags || 'none'}`);
           }
         } catch (error) {
           if (error.code === 10003) {
             // Thread not found (deleted)
             await db.updateThreadStatus(thread.discord_thread_id, true, null);
-            console.log(`Thread ${thread.discord_thread_id} was deleted`);
+            console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
           } else {
             console.error(`Error checking thread ${thread.discord_thread_id}:`, error);
           }
         }
       }
+      
+      console.log('Thread status check completed');
     } catch (error) {
       console.error('Error in checkThreadStatus:', error);
     }

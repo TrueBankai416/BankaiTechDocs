@@ -221,8 +221,13 @@ const dbFunctions = {
       `);
       
       stmt.run([isDeleted, tags, threadId], function(err) {
-        if (err) reject(err);
-        else resolve(this.changes);
+        if (err) {
+          console.error('Error updating thread status:', err);
+          reject(err);
+        } else {
+          console.log(`Updated ${this.changes} comments for thread ${threadId}, deleted: ${isDeleted}, tags: ${tags}`);
+          resolve(this.changes);
+        }
       });
       
       stmt.finalize();
