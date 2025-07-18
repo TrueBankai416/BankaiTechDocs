@@ -34,8 +34,12 @@ export default function DiscordComments() {
   const [isLoading, setIsLoading] = useState(true);
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
+  
+  // Get Discord API URL from config or environment
+  const commentsConfig = siteConfig.customFields?.comments || {};
+  const configApiUrl = commentsConfig.discordApiUrl;
 
-  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const apiUrl = configApiUrl || process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
   const fetchComments = async () => {
     try {

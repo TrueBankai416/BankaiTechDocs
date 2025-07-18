@@ -1,0 +1,225 @@
+---
+title: Configuration
+description: Configure comment systems in Docusaurus
+sidebar_position: 4
+---
+
+# Comment System Configuration
+
+The Discord comments integration can be configured alongside Giscus comments using Docusaurus configuration options. This gives you centralized control over which comment systems are active.
+
+## Docusaurus Configuration
+
+Add comment system configuration to your `docusaurus.config.ts`:
+
+```typescript
+export default {
+  // ... other config
+  customFields: {
+    // ... other custom fields
+    
+    // Comment System Configuration
+    comments: {
+      enableGiscus: true,          // Enable/disable Giscus comments
+      enableDiscord: true,         // Enable/disable Discord comments
+      discordApiUrl: process.env.REACT_APP_API_URL,
+    },
+  },
+  // ... rest of config
+};
+```
+
+## Configuration Options
+
+### `enableGiscus`
+- **Type**: `boolean`
+- **Default**: `true`
+- **Description**: Enable or disable Giscus (GitHub-based) comments
+- **Example**: `enableGiscus: false` to disable Giscus
+
+### `enableDiscord`
+- **Type**: `boolean`
+- **Default**: `true`
+- **Description**: Enable or disable Discord comments integration
+- **Example**: `enableDiscord: false` to disable Discord comments
+
+### `discordApiUrl`
+- **Type**: `string`
+- **Default**: `process.env.REACT_APP_API_URL`
+- **Description**: URL of your Discord comments API server
+- **Example**: `discordApiUrl: 'https://api.yoursite.com'`
+
+## Usage Examples
+
+### Both Systems Enabled (Default)
+```typescript
+comments: {
+  enableGiscus: true,
+  enableDiscord: true,
+  discordApiUrl: process.env.REACT_APP_API_URL,
+}
+```
+
+**Result**: Both Giscus and Discord comments appear on documentation pages
+
+### Only Giscus Comments
+```typescript
+comments: {
+  enableGiscus: true,
+  enableDiscord: false,
+}
+```
+
+**Result**: Only Giscus comments appear (traditional GitHub-based comments)
+
+### Only Discord Comments
+```typescript
+comments: {
+  enableGiscus: false,
+  enableDiscord: true,
+  discordApiUrl: process.env.REACT_APP_API_URL,
+}
+```
+
+**Result**: Only Discord comments appear (bidirectional Discord integration)
+
+### All Comments Disabled
+```typescript
+comments: {
+  enableGiscus: false,
+  enableDiscord: false,
+}
+```
+
+**Result**: No comment systems appear on documentation pages
+
+## Environment Variables
+
+The Discord API URL can be configured via environment variables:
+
+```env
+# Frontend environment variable
+REACT_APP_API_URL=http://localhost:3001
+```
+
+You can override this in the Docusaurus config:
+
+```typescript
+comments: {
+  enableDiscord: true,
+  discordApiUrl: 'https://your-production-api.com',
+}
+```
+
+## Use Cases
+
+### Development Environment
+```typescript
+comments: {
+  enableGiscus: true,
+  enableDiscord: false,  // Disable Discord during development
+}
+```
+
+### Production with Both Systems
+```typescript
+comments: {
+  enableGiscus: true,
+  enableDiscord: true,
+  discordApiUrl: 'https://api.yoursite.com',
+}
+```
+
+### Migration from Giscus to Discord
+```typescript
+// Phase 1: Both enabled
+comments: {
+  enableGiscus: true,
+  enableDiscord: true,
+}
+
+// Phase 2: Discord only
+comments: {
+  enableGiscus: false,
+  enableDiscord: true,
+}
+```
+
+### Documentation-only Site
+```typescript
+comments: {
+  enableGiscus: false,
+  enableDiscord: false,  // No comments needed
+}
+```
+
+## Dynamic Configuration
+
+You can also use environment variables to control comment systems:
+
+```typescript
+comments: {
+  enableGiscus: process.env.ENABLE_GISCUS !== 'false',
+  enableDiscord: process.env.ENABLE_DISCORD !== 'false',
+  discordApiUrl: process.env.REACT_APP_API_URL,
+}
+```
+
+Then control via environment variables:
+```env
+ENABLE_GISCUS=true
+ENABLE_DISCORD=false
+REACT_APP_API_URL=http://localhost:3001
+```
+
+## Best Practices
+
+1. **Start with both enabled** - Let users choose their preferred system
+2. **Test in development** - Disable complex systems during development
+3. **Gradual migration** - Enable both during transitions
+4. **Environment-specific** - Use different configs for dev/staging/prod
+5. **Clear documentation** - Document which systems are active for your users
+
+## Troubleshooting
+
+### Comments Not Appearing
+- Check that the desired comment system is enabled in config
+- Verify environment variables are set correctly
+- Ensure the Discord API server is running (if Discord is enabled)
+
+### Giscus Not Working
+- Check `enableGiscus: true` in config
+- Verify Giscus configuration (repo, repoId, category, categoryId)
+- Ensure GitHub repository settings are correct
+
+### Discord Comments Not Working
+- Check `enableDiscord: true` in config
+- Verify `discordApiUrl` is set correctly
+- Ensure Discord bot and API server are running
+
+### Configuration Changes Not Applied
+- Restart the Docusaurus development server
+- Clear browser cache
+- Check for TypeScript errors in config file
+
+## Migration Guide
+
+### From Giscus Only to Both Systems
+1. Add Discord comment configuration
+2. Set `enableDiscord: true`
+3. Keep `enableGiscus: true`
+4. Deploy Discord API server
+5. Test both systems
+
+### From Discord Only to Both Systems
+1. Add Giscus configuration
+2. Set `enableGiscus: true`
+3. Keep `enableDiscord: true`
+4. Configure GitHub repository
+5. Test both systems
+
+### Disabling a System
+1. Set the appropriate enable flag to `false`
+2. Redeploy the site
+3. Optionally remove related configuration
+4. Document the change for users
