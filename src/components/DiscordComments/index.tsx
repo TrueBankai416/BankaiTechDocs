@@ -36,9 +36,17 @@ export default function DiscordComments() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [replyForms, setReplyForms] = useState<{[key: number]: {show: boolean, content: string, author: string}}>({});
+  const [replyForms, setReplyForms] = useState<{[key: number]: {show: boolean, content: string, author: string, submitting: boolean}}>({});
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
+  
+  // Load saved name from localStorage on component mount
+  useEffect(() => {
+    const savedName = localStorage.getItem('discord-comments-author');
+    if (savedName) {
+      setAuthor(savedName);
+    }
+  }, []);
   
   // Get Discord API URL from config or environment
   const commentsConfig = siteConfig.customFields?.comments || {};
@@ -112,10 +120,13 @@ export default function DiscordComments() {
       const currentUrl = window.location.href;
       const pageTitle = metadata.title || 'Documentation Page';
       
+      // Save name to localStorage
+      localStorage.setItem('discord-comments-author', author);
+      
       await sendToDiscord(currentUrl, pageTitle, author, comment);
       
       setComment('');
-      setAuthor('');
+      // Don't clear author name - keep it for next comment
       setSubmitMessage('Comment sent to Discord successfully! 🎉');
       
       // Refresh comments after successful submission
@@ -133,12 +144,15 @@ export default function DiscordComments() {
   };
 
   const toggleReplyForm = (replyId: number) => {
+    const savedName = localStorage.getItem('discord-comments-author') || '';
+    
     setReplyForms(prev => ({
       ...prev,
       [replyId]: {
         show: !prev[replyId]?.show,
         content: prev[replyId]?.content || '',
-        author: prev[replyId]?.author || ''
+        author: prev[replyId]?.author || savedName,
+        submitting: false
       }
     }));
   };
@@ -151,13 +165,24 @@ export default function DiscordComments() {
         [field]: value
       }
     }));
+    
+    // Save name to localStorage when author field changes
+    if (field === 'author') {
+      localStorage.setItem('discord-comments-author', value);
+    }
   };
 
-  const submitReply = async (replyId: number, originalReply: Reply) => {
+  const submitReply = async (replyId: number, originalReply: Reply, originalComment: Comment) => {
     const replyForm = replyForms[replyId];
     if (!replyForm?.content.trim() || !replyForm?.author.trim()) {
       return;
     }
+
+    // Set submitting state
+    setReplyForms(prev => ({
+      ...prev,
+      [replyId]: { ...prev[replyId], submitting: true }
+    }));
 
     try {
       const response = await fetch(`${apiUrl}/api/replies`, {
@@ -166,7 +191,7 @@ export default function DiscordComments() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          discordMessageId: originalReply.discord_message_id,
+          discordMessageId: originalComment.discord_message_id, // Use original comment's message ID
           authorName: replyForm.author,
           content: replyForm.content,
         }),
@@ -174,14 +199,28 @@ export default function DiscordComments() {
 
       if (response.ok) {
         // Hide reply form and refresh comments
+        const savedName = localStorage.getItem('discord-comments-author') || '';
         setReplyForms(prev => ({
           ...prev,
-          [replyId]: { show: false, content: '', author: '' }
+          [replyId]: { show: false, content: '', author: savedName, submitting: false }
         }));
         fetchComments();
+      } else {
+        const errorData = await response.json();
+        console.error('Reply failed:', errorData);
+        // Show error but don't clear form
+        setReplyForms(prev => ({
+          ...prev,
+          [replyId]: { ...prev[replyId], submitting: false }
+        }));
       }
     } catch (error) {
       console.error('Error submitting reply:', error);
+      // Show error but don't clear form
+      setReplyForms(prev => ({
+        ...prev,
+        [replyId]: { ...prev[replyId], submitting: false }
+      }));
     }
   };
 
@@ -317,10 +356,10 @@ export default function DiscordComments() {
                             </div>
                             <button
                               className={styles.replySubmit}
-                              onClick={() => submitReply(reply.id, reply)}
-                              disabled={!replyForms[reply.id]?.content.trim() || !replyForms[reply.id]?.author.trim()}
+                              onClick={() => submitReply(reply.id, reply, comment)}
+                              disabled={!replyForms[reply.id]?.content.trim() || !replyForms[reply.id]?.author.trim() || replyForms[reply.id]?.submitting}
                             >
-                              Send Reply
+                              {replyForms[reply.id]?.submitting ? 'Sending...' : 'Send Reply'}
                             </button>
                           </div>
                         )}
