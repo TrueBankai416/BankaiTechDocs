@@ -294,8 +294,39 @@ class DiscordBot {
         throw new Error('Discord channel not found');
       }
 
-      const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
-      const message = await channel.send({ embeds: [embed] });
+      // Check if there's an existing thread for this author on this page
+      const existingThreadId = await db.findThreadForAuthor(authorName, pageUrl);
+      let targetChannel = channel;
+      let message;
+      let threadId = null;
+
+      if (existingThreadId) {
+        try {
+          // Try to use existing thread
+          const existingThread = await channel.threads.fetch(existingThreadId);
+          if (existingThread && !existingThread.archived) {
+            targetChannel = existingThread;
+            message = await targetChannel.send(`**${authorName}**: ${content}`);
+            threadId = existingThreadId;
+          } else {
+            // Thread is archived or doesn't exist, create new one
+            const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+            message = await channel.send({ embeds: [embed] });
+            threadId = await this.createThread(message, authorName, pageTitle);
+          }
+        } catch (error) {
+          console.error('Error accessing existing thread:', error);
+          // Fall back to creating new message and thread
+          const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+          message = await channel.send({ embeds: [embed] });
+          threadId = await this.createThread(message, authorName, pageTitle);
+        }
+      } else {
+        // No existing thread, create new message and thread
+        const embed = this.buildEmbed(pageUrl, pageTitle, authorName, content);
+        message = await channel.send({ embeds: [embed] });
+        threadId = await this.createThread(message, authorName, pageTitle);
+      }
 
       // Store in database
       await db.storeComment(
@@ -304,28 +335,40 @@ class DiscordBot {
         authorName,
         content,
         message.id,
-        this.channelId
+        this.channelId,
+        threadId
       );
-
-      // Create a thread for replies (if not minimal context)
-      const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
-      const createThreads = process.env.DISCORD_CREATE_THREADS !== 'false';
-      
-      if (contextLevel !== 'minimal' && createThreads) {
-        const threadName = pageTitle.length > 50 
-          ? `💬 ${pageTitle.substring(0, 47)}...`
-          : `💬 ${pageTitle}`;
-          
-        await message.startThread({
-          name: threadName,
-          autoArchiveDuration: parseInt(process.env.DISCORD_THREAD_DURATION || '1440') // 24 hours default
-        });
-      }
 
       return message.id;
     } catch (error) {
       console.error('Error sending comment to Discord:', error);
       throw error;
+    }
+  }
+
+  async createThread(message, authorName, pageTitle) {
+    try {
+      const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
+      const createThreads = process.env.DISCORD_CREATE_THREADS !== 'false';
+      
+      if (contextLevel !== 'minimal' && createThreads) {
+        const threadName = `💬 ${authorName} - ${pageTitle}`;
+        const finalThreadName = threadName.length > 50 
+          ? `💬 ${authorName} - ${pageTitle.substring(0, 47 - authorName.length)}...`
+          : threadName;
+          
+        const thread = await message.startThread({
+          name: finalThreadName,
+          autoArchiveDuration: parseInt(process.env.DISCORD_THREAD_DURATION || '1440') // 24 hours default
+        });
+        
+        return thread.id;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error creating thread:', error);
+      return null;
     }
   }
 

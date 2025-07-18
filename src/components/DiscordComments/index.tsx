@@ -33,6 +33,7 @@ export default function DiscordComments() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [replyForms, setReplyForms] = useState<{[key: number]: {show: boolean, content: string, author: string}}>({});
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
   
@@ -128,6 +129,59 @@ export default function DiscordComments() {
     return new Date(dateString).toLocaleString();
   };
 
+  const toggleReplyForm = (replyId: number) => {
+    setReplyForms(prev => ({
+      ...prev,
+      [replyId]: {
+        show: !prev[replyId]?.show,
+        content: prev[replyId]?.content || '',
+        author: prev[replyId]?.author || ''
+      }
+    }));
+  };
+
+  const updateReplyForm = (replyId: number, field: 'content' | 'author', value: string) => {
+    setReplyForms(prev => ({
+      ...prev,
+      [replyId]: {
+        ...prev[replyId],
+        [field]: value
+      }
+    }));
+  };
+
+  const submitReply = async (replyId: number, originalReply: Reply) => {
+    const replyForm = replyForms[replyId];
+    if (!replyForm?.content.trim() || !replyForm?.author.trim()) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/api/replies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          discordMessageId: originalReply.discord_message_id,
+          authorName: replyForm.author,
+          content: replyForm.content,
+        }),
+      });
+
+      if (response.ok) {
+        // Hide reply form and refresh comments
+        setReplyForms(prev => ({
+          ...prev,
+          [replyId]: { show: false, content: '', author: '' }
+        }));
+        fetchComments();
+      }
+    } catch (error) {
+      console.error('Error submitting reply:', error);
+    }
+  };
+
   return (
     <div className={styles.discordComments}>
       <h3>💬 Discord Community Chat</h3>
@@ -219,8 +273,43 @@ export default function DiscordComments() {
                         {reply.discord_roles && (
                           <div className={styles.replyFooter}>
                             <span className={styles.discordRoles}>
-                              🎭 {reply.discord_roles}
+                              Discord Roles: {reply.discord_roles}
                             </span>
+                          </div>
+                        )}
+                        <div className={styles.replyActions}>
+                          <button
+                            className={styles.replyButton}
+                            onClick={() => toggleReplyForm(reply.id)}
+                          >
+                            {replyForms[reply.id]?.show ? 'Cancel' : 'Reply'}
+                          </button>
+                        </div>
+                        
+                        {replyForms[reply.id]?.show && (
+                          <div className={styles.replyForm}>
+                            <div className={styles.replyFormInputs}>
+                              <input
+                                type="text"
+                                placeholder="Your name"
+                                value={replyForms[reply.id]?.author || ''}
+                                onChange={(e) => updateReplyForm(reply.id, 'author', e.target.value)}
+                                className={styles.replyInput}
+                              />
+                              <textarea
+                                placeholder="Your reply..."
+                                value={replyForms[reply.id]?.content || ''}
+                                onChange={(e) => updateReplyForm(reply.id, 'content', e.target.value)}
+                                className={styles.replyTextarea}
+                              />
+                            </div>
+                            <button
+                              className={styles.replySubmit}
+                              onClick={() => submitReply(reply.id, reply)}
+                              disabled={!replyForms[reply.id]?.content.trim() || !replyForms[reply.id]?.author.trim()}
+                            >
+                              Send Reply
+                            </button>
                           </div>
                         )}
                       </div>

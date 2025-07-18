@@ -62,6 +62,69 @@ app.get('/api/comments/:pageUrl', async (req, res) => {
   }
 });
 
+// POST /api/replies - Post a reply to a Discord message
+app.post('/api/replies', async (req, res) => {
+  try {
+    const { discordMessageId, authorName, content } = req.body;
+
+    if (!discordMessageId || !authorName || !content) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: discordMessageId, authorName, content' 
+      });
+    }
+
+    // Find the comment by Discord message ID
+    const comment = await db.getCommentByDiscordId(discordMessageId);
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    // Send reply to Discord thread
+    const channel = await bot.client.channels.fetch(comment.discord_channel_id);
+    if (!channel) {
+      return res.status(404).json({ error: 'Discord channel not found' });
+    }
+
+    // Find the original message
+    const originalMessage = await channel.messages.fetch(discordMessageId);
+    if (!originalMessage) {
+      return res.status(404).json({ error: 'Original Discord message not found' });
+    }
+
+    // Check if message has a thread
+    let targetChannel = channel;
+    if (originalMessage.thread) {
+      targetChannel = originalMessage.thread;
+    }
+
+    // Send the reply
+    const replyMessage = await targetChannel.send(`**${authorName}** (from website): ${content}`);
+
+    // Store the reply in database
+    await db.storeReply(
+      comment.id,
+      replyMessage.id,
+      'website',
+      authorName,
+      null, // no avatar for website users
+      null, // no roles for website users
+      content
+    );
+
+    res.json({ 
+      success: true, 
+      messageId: replyMessage.id,
+      message: 'Reply sent to Discord successfully' 
+    });
+  } catch (error) {
+    console.error('Error sending reply:', error);
+    res.status(500).json({ 
+      error: 'Failed to send reply to Discord',
+      details: error.message 
+    });
+  }
+});
+
 // GET /api/health - Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 

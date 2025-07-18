@@ -17,9 +17,18 @@ db.serialize(() => {
       content TEXT NOT NULL,
       discord_message_id TEXT UNIQUE,
       discord_channel_id TEXT,
+      discord_thread_id TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  
+  // Add discord_thread_id column to existing tables if it doesn't exist
+  db.run(`ALTER TABLE comments ADD COLUMN discord_thread_id TEXT`, (err) => {
+    // Ignore error if column already exists
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding discord_thread_id column:', err);
+    }
+  });
 
   // Replies table - stores Discord replies to comments
   db.run(`
@@ -54,14 +63,14 @@ db.serialize(() => {
 // Database functions
 const dbFunctions = {
   // Store a new comment
-  storeComment: (pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId) => {
+  storeComment: (pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId = null) => {
     return new Promise((resolve, reject) => {
       const stmt = db.prepare(`
-        INSERT INTO comments (page_url, page_title, author_name, content, discord_message_id, discord_channel_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO comments (page_url, page_title, author_name, content, discord_message_id, discord_channel_id, discord_thread_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
       
-      stmt.run([pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId], function(err) {
+      stmt.run([pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId], function(err) {
         if (err) reject(err);
         else resolve(this.lastID);
       });
@@ -166,6 +175,21 @@ const dbFunctions = {
       `, [discordMessageId], (err, row) => {
         if (err) reject(err);
         else resolve(!!row);
+      });
+    });
+  },
+
+  // Find existing thread for author
+  findThreadForAuthor: (authorName, pageUrl) => {
+    return new Promise((resolve, reject) => {
+      db.get(`
+        SELECT discord_thread_id FROM comments 
+        WHERE author_name = ? AND page_url = ? AND discord_thread_id IS NOT NULL
+        ORDER BY created_at DESC
+        LIMIT 1
+      `, [authorName, pageUrl], (err, row) => {
+        if (err) reject(err);
+        else resolve(row ? row.discord_thread_id : null);
       });
     });
   }
