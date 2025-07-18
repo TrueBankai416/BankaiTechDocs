@@ -31,6 +31,12 @@ class DiscordBot {
       // Ignore bot messages
       if (message.author.bot) return;
 
+      // Handle mentions in any channel
+      if (message.mentions.has(this.client.user)) {
+        await this.handleMention(message);
+        return;
+      }
+
       // Only process messages in the configured channel
       if (message.channel.id !== this.channelId) return;
 
@@ -47,6 +53,23 @@ class DiscordBot {
         await this.handleThreadReply(message);
       }
     });
+  }
+
+  async handleMention(message) {
+    try {
+      const responses = [
+        "👋 Hello! I'm Live Docs Bot. I help manage comments between your website and Discord!",
+        "🤖 I'm working! I listen for website comments and Discord replies.",
+        "✅ Bot is online and ready to handle website comments!",
+        "📝 I sync comments from your documentation site to Discord channels.",
+        "🔗 I create threads for website comments and track Discord replies back to the site!"
+      ];
+
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      await message.reply(randomResponse);
+    } catch (error) {
+      console.error('Error handling mention:', error);
+    }
   }
 
   async handlePotentialReply(message) {
