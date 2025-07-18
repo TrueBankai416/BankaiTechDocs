@@ -1,5 +1,6 @@
 # Dependencies
 /node_modules
+server/node_modules/
 
 # Production
 /build
@@ -10,6 +11,7 @@
 
 # dotenv
 .env
+server/.env
 
 # Misc
 .DS_Store
