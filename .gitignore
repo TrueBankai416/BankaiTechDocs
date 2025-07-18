@@ -27,3 +27,4 @@ yarn-error.log*
 # Talisman
 .talismanrc
 talisman_report/
+server/node_modules/
