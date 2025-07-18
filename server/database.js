@@ -30,11 +30,20 @@ db.serialize(() => {
       discord_user_id TEXT NOT NULL,
       discord_username TEXT NOT NULL,
       discord_avatar TEXT,
+      discord_roles TEXT,
       content TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (comment_id) REFERENCES comments (id)
     )
   `);
+  
+  // Add discord_roles column to existing tables if it doesn't exist
+  db.run(`ALTER TABLE replies ADD COLUMN discord_roles TEXT`, (err) => {
+    // Ignore error if column already exists
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding discord_roles column:', err);
+    }
+  });
 
   // Index for faster lookups
   db.run(`CREATE INDEX IF NOT EXISTS idx_comments_page_url ON comments(page_url)`);
@@ -62,14 +71,14 @@ const dbFunctions = {
   },
 
   // Store a Discord reply
-  storeReply: (commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, content) => {
+  storeReply: (commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, discordRoles, content) => {
     return new Promise((resolve, reject) => {
       const stmt = db.prepare(`
-        INSERT INTO replies (comment_id, discord_message_id, discord_user_id, discord_username, discord_avatar, content)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO replies (comment_id, discord_message_id, discord_user_id, discord_username, discord_avatar, discord_roles, content)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
       
-      stmt.run([commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, content], function(err) {
+      stmt.run([commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, discordRoles, content], function(err) {
         if (err) reject(err);
         else resolve(this.lastID);
       });
@@ -101,6 +110,7 @@ const dbFunctions = {
           r.discord_user_id,
           r.discord_username,
           r.discord_avatar,
+          r.discord_roles,
           r.content as reply_content,
           r.created_at as reply_created_at
         FROM comments c
@@ -135,6 +145,7 @@ const dbFunctions = {
                 discord_user_id: row.discord_user_id,
                 discord_username: row.discord_username,
                 discord_avatar: row.discord_avatar,
+                discord_roles: row.discord_roles,
                 content: row.reply_content,
                 created_at: row.reply_created_at
               });

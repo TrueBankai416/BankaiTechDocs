@@ -21,6 +21,7 @@ interface Reply {
   discord_user_id: string;
   discord_username: string;
   discord_avatar: string;
+  discord_roles?: string;
   content: string;
   created_at: string;
 }
@@ -215,6 +216,13 @@ export default function DiscordComments() {
                           <span className={styles.replyDate}>{formatDate(reply.created_at)}</span>
                         </div>
                         <div className={styles.replyContent}>{reply.content}</div>
+                        {reply.discord_roles && (
+                          <div className={styles.replyFooter}>
+                            <span className={styles.discordRoles}>
+                              🎭 {reply.discord_roles}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -230,6 +230,18 @@
   white-space: pre-wrap;
 }
 
+.replyFooter {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.discordRoles {
+  font-size: 0.8em;
+  color: var(--ifm-color-content-secondary);
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .discordComments {
     padding: 1rem;

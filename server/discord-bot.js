@@ -115,6 +115,13 @@ class DiscordBot {
       const exists = await db.replyExists(message.id);
       if (exists) return;
 
+      // Get user's Discord roles
+      const member = await message.guild.members.fetch(message.author.id);
+      const roles = member.roles.cache
+        .filter(role => role.name !== '@everyone')
+        .map(role => role.name)
+        .join(', ');
+
       // Store the reply
       await db.storeReply(
         commentId,
@@ -122,6 +129,7 @@ class DiscordBot {
         message.author.id,
         message.author.username,
         message.author.displayAvatarURL(),
+        roles,
         message.content
       );
 
