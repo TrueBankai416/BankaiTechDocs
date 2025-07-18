@@ -11,6 +11,9 @@ interface Comment {
   content: string;
   discord_message_id: string;
   discord_channel_id: string;
+  discord_thread_id?: string;
+  thread_deleted?: boolean;
+  thread_tags?: string;
   created_at: string;
   replies: Reply[];
 }
@@ -244,6 +247,15 @@ export default function DiscordComments() {
                 <div className={styles.commentHeader}>
                   <span className={styles.authorName}>{comment.author_name}</span>
                   <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
+                  {comment.thread_tags && (
+                    <div className={styles.threadTags}>
+                      {comment.thread_tags.split(', ').map((tag, index) => (
+                        <span key={index} className={`${styles.threadTag} ${styles[`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`]}`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className={styles.commentContent}>{comment.content}</div>
                 

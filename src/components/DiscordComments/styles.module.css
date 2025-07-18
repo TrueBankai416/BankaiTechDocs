@@ -141,7 +141,7 @@
 .commentHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 0.75rem;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -312,6 +312,59 @@
 .replySubmit:disabled {
   background-color: var(--ifm-color-emphasis-300);
   cursor: not-allowed;
+}
+
+/* Thread Tags */
+.threadTags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.threadTag {
+  background-color: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-content);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 500;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+/* Tag-specific colors */
+.tag-solved {
+  background-color: var(--ifm-color-success-alpha-20);
+  color: var(--ifm-color-success-dark);
+  border-color: var(--ifm-color-success);
+}
+
+.tag-work-in-progress,
+.tag-wip {
+  background-color: var(--ifm-color-warning-alpha-20);
+  color: var(--ifm-color-warning-dark);
+  border-color: var(--ifm-color-warning);
+}
+
+.tag-help-wanted,
+.tag-question {
+  background-color: var(--ifm-color-info-alpha-20);
+  color: var(--ifm-color-info-dark);
+  border-color: var(--ifm-color-info);
+}
+
+.tag-urgent,
+.tag-important {
+  background-color: var(--ifm-color-danger-alpha-20);
+  color: var(--ifm-color-danger-dark);
+  border-color: var(--ifm-color-danger);
+}
+
+.tag-closed,
+.tag-archived {
+  background-color: var(--ifm-color-secondary-alpha-20);
+  color: var(--ifm-color-secondary-dark);
+  border-color: var(--ifm-color-secondary);
 }
 
 @media (max-width: 768px) {

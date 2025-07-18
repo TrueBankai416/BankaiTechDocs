@@ -29,6 +29,19 @@ db.serialize(() => {
       console.error('Error adding discord_thread_id column:', err);
     }
   });
+  
+  // Add thread status and tags columns
+  db.run(`ALTER TABLE comments ADD COLUMN thread_deleted BOOLEAN DEFAULT FALSE`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding thread_deleted column:', err);
+    }
+  });
+  
+  db.run(`ALTER TABLE comments ADD COLUMN thread_tags TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding thread_tags column:', err);
+    }
+  });
 
   // Replies table - stores Discord replies to comments
   db.run(`
@@ -113,7 +126,8 @@ const dbFunctions = {
     return new Promise((resolve, reject) => {
       db.all(`
         SELECT 
-          c.*,
+          c.id, c.page_url, c.page_title, c.author_name, c.content, c.discord_message_id, c.discord_channel_id,
+          c.discord_thread_id, c.thread_deleted, c.thread_tags, c.created_at,
           r.id as reply_id,
           r.discord_message_id as reply_discord_id,
           r.discord_user_id,
@@ -124,7 +138,7 @@ const dbFunctions = {
           r.created_at as reply_created_at
         FROM comments c
         LEFT JOIN replies r ON c.id = r.comment_id
-        WHERE c.page_url = ?
+        WHERE c.page_url = ? AND c.thread_deleted = FALSE
         ORDER BY c.created_at DESC, r.created_at ASC
       `, [pageUrl], (err, rows) => {
         if (err) reject(err);
@@ -142,6 +156,9 @@ const dbFunctions = {
                 content: row.content,
                 discord_message_id: row.discord_message_id,
                 discord_channel_id: row.discord_channel_id,
+                discord_thread_id: row.discord_thread_id,
+                thread_deleted: row.thread_deleted,
+                thread_tags: row.thread_tags,
                 created_at: row.created_at,
                 replies: []
               });
@@ -184,12 +201,44 @@ const dbFunctions = {
     return new Promise((resolve, reject) => {
       db.get(`
         SELECT discord_thread_id FROM comments 
-        WHERE author_name = ? AND page_url = ? AND discord_thread_id IS NOT NULL
+        WHERE author_name = ? AND page_url = ? AND discord_thread_id IS NOT NULL AND thread_deleted = FALSE
         ORDER BY created_at DESC
         LIMIT 1
       `, [authorName, pageUrl], (err, row) => {
         if (err) reject(err);
         else resolve(row ? row.discord_thread_id : null);
+      });
+    });
+  },
+
+  // Update thread status
+  updateThreadStatus: (threadId, isDeleted, tags = null) => {
+    return new Promise((resolve, reject) => {
+      const stmt = db.prepare(`
+        UPDATE comments 
+        SET thread_deleted = ?, thread_tags = ?
+        WHERE discord_thread_id = ?
+      `);
+      
+      stmt.run([isDeleted, tags, threadId], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+      
+      stmt.finalize();
+    });
+  },
+
+  // Get all active threads for monitoring
+  getActiveThreads: () => {
+    return new Promise((resolve, reject) => {
+      db.all(`
+        SELECT DISTINCT discord_thread_id, discord_channel_id
+        FROM comments 
+        WHERE discord_thread_id IS NOT NULL AND thread_deleted = FALSE
+      `, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
       });
     });
   }

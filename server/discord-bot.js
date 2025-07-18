@@ -13,6 +13,7 @@ class DiscordBot {
 
     this.channelId = process.env.DISCORD_CHANNEL_ID;
     this.setupEventListeners();
+    this.setupThreadMonitoring();
   }
 
   setupEventListeners() {
@@ -379,6 +380,78 @@ class DiscordBot {
     }
 
     await this.client.login(token);
+  }
+
+  setupThreadMonitoring() {
+    // Monitor threads every 5 minutes
+    setInterval(async () => {
+      try {
+        await this.checkThreadStatus();
+      } catch (error) {
+        console.error('Error monitoring threads:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  async checkThreadStatus() {
+    try {
+      const activeThreads = await db.getActiveThreads();
+      
+      for (const thread of activeThreads) {
+        try {
+          const channel = await this.client.channels.fetch(thread.discord_channel_id);
+          if (!channel) continue;
+
+          const discordThread = await channel.threads.fetch(thread.discord_thread_id);
+          
+          if (!discordThread) {
+            // Thread was deleted
+            await db.updateThreadStatus(thread.discord_thread_id, true, null);
+            console.log(`Thread ${thread.discord_thread_id} was deleted`);
+          } else {
+            // Thread exists, check for tags
+            const tags = this.extractThreadTags(discordThread);
+            await db.updateThreadStatus(thread.discord_thread_id, false, tags);
+          }
+        } catch (error) {
+          if (error.code === 10003) {
+            // Thread not found (deleted)
+            await db.updateThreadStatus(thread.discord_thread_id, true, null);
+            console.log(`Thread ${thread.discord_thread_id} was deleted`);
+          } else {
+            console.error(`Error checking thread ${thread.discord_thread_id}:`, error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in checkThreadStatus:', error);
+    }
+  }
+
+  extractThreadTags(discordThread) {
+    try {
+      if (!discordThread.appliedTags || discordThread.appliedTags.length === 0) {
+        return null;
+      }
+
+      // Get tag names from the parent channel's available tags
+      const parentChannel = discordThread.parent;
+      if (!parentChannel || !parentChannel.availableTags) {
+        return null;
+      }
+
+      const tagNames = discordThread.appliedTags
+        .map(tagId => {
+          const tag = parentChannel.availableTags.find(t => t.id === tagId);
+          return tag ? tag.name : null;
+        })
+        .filter(Boolean);
+
+      return tagNames.length > 0 ? tagNames.join(', ') : null;
+    } catch (error) {
+      console.error('Error extracting thread tags:', error);
+      return null;
+    }
   }
 
   async stop() {
