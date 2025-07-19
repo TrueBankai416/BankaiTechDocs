@@ -51,11 +51,19 @@ When editing the configuration below, remove all instances of `<>` from the valu
 ::: 
 Paste the Following
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
+# =============================================================================
+# NEXTCLOUD ENHANCED DOCKER-COMPOSE CONFIGURATION
+# =============================================================================
+# Copy this file to .env and customize the values below
+# All values have secure defaults - change passwords for production use!
+
+# =============================================================================
+# NEXTCLOUD CONFIGURATION
+# =============================================================================
 # Nextcloud & MariaDB
 # Directory paths for persistent data storage
 DATA_LOCATION=./nextcloud
 DB_DATA_LOCATION=./mariadb
-PORT=8080
 // highlight-start
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
 TRUSTED_PROXIES=<IP address of your Reverse Proxy>
@@ -65,8 +73,21 @@ OVERWRITEPROTOCOL=https
 OVERWRITECLIURL=https://cloud.<YourDomain>.com
 REDIS_HOST=redis
 REDIS_PORT=6379
-PHP_MEMORY_LIMIT=512M
-PHP_UPLOAD_LIMIT=100M
+# =============================================================================
+# PERFORMANCE CONFIGURATION
+# =============================================================================
+PHP_MEMORY_LIMIT=1024M
+PHP_UPLOAD_LIMIT=2048M
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+# Main Nextcloud HTTP port
+HTTP_PORT=8080
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
 // highlight-start
 NEXTCLOUD_ADMIN_USER=admin
 NEXTCLOUD_ADMIN_PASSWORD=password
