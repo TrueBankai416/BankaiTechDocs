@@ -57,7 +57,7 @@ export default function DiscordComments() {
   const commentsConfig = siteConfig.customFields?.comments || {};
   const configApiUrl = commentsConfig.discordApiUrl;
 
-  const apiUrl = configApiUrl || (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || 'http://localhost:3001';
+  const apiUrl = configApiUrl || (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || '';
 
   const fetchComments = async () => {
     try {
