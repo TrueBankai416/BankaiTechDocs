@@ -1,8 +1,55 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
-// Database setup
-const dbPath = path.join(__dirname, 'comments.db');
+// Database setup with fallback for read-only environments
+function getWritableDatabasePath() {
+  // Check if DATABASE_PATH is set in environment
+  if (process.env.DATABASE_PATH) {
+    const customPath = process.env.DATABASE_PATH;
+    const dir = path.dirname(customPath);
+    
+    // Ensure directory exists
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      return customPath;
+    } catch (error) {
+      console.warn(`Could not use custom DATABASE_PATH ${customPath}:`, error.message);
+    }
+  }
+  
+  // Try current directory first
+  const localPath = path.join(__dirname, 'comments.db');
+  try {
+    // Test if we can write to current directory
+    const testFile = path.join(__dirname, '.write-test');
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    return localPath;
+  } catch (error) {
+    console.warn(`Cannot write to current directory (${__dirname}), falling back to /tmp:`, error.message);
+  }
+  
+  // Fallback to /tmp directory
+  const tmpPath = path.join('/tmp', 'discord-comments', 'comments.db');
+  const tmpDir = path.dirname(tmpPath);
+  
+  try {
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
+    }
+    return tmpPath;
+  } catch (error) {
+    console.error('Could not create database directory in /tmp:', error);
+    // Final fallback - try current directory anyway
+    return localPath;
+  }
+}
+
+const dbPath = getWritableDatabasePath();
+console.log(`Using database path: ${dbPath}`);
 const db = new sqlite3.Database(dbPath);
 
 // Initialize database schema
