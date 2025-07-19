@@ -1,0 +1,24 @@
+[Unit]
+Description=Discord Comments API Server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/path/to/your/BankaiTechDocs/server
+ExecStart=/usr/bin/node api.js
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+
+# Load environment variables from .env file
+EnvironmentFile=/path/to/your/BankaiTechDocs/server/.env
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=discord-comments
+
+[Install]
+WantedBy=multi-user.target

@@ -1,203 +1,207 @@
-# Discord Comments Server
+# Discord Comments API Server
 
-Backend server for bidirectional Discord comments integration with Docusaurus.
+This server enables Discord integration for comments on your Docusaurus documentation site. Comments posted on your website sync to a Discord channel, and replies from Discord users sync back to the website.
 
 ## Features
 
-- **Discord Bot Integration**: Full Discord bot with message listening
-- **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-- **Database Storage**: SQLite database for comment/reply relationships
-- **REST API**: Express.js API for frontend communication
-- **Real-time Updates**: Automatic polling and thread management
+- ✅ Post comments from website to Discord
+- ✅ Sync Discord replies back to website  
+- ✅ Thread support for organized discussions
+- ✅ Moderation capabilities
+- ✅ SQLite database for comment storage
+- ✅ Configurable context levels
 
-## Setup
+## Prerequisites
 
-### 1. Create Discord Bot
+- Node.js 16+ installed
+- A Discord server where you have admin permissions
+- Discord bot token (see setup below)
+
+## Discord Bot Setup
+
+### 1. Create Discord Application & Bot
 
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   - Message Content Intent
-   - Server Members Intent (optional)
+2. Click "New Application" and name it (e.g., "Documentation Bot")
+3. Go to "Bot" section and click "Add Bot"
+4. Copy the bot token (you'll need this for `.env`)
+5. Enable these bot permissions:
+   - Send Messages
+   - Read Message History
+   - Create Public Threads
+   - Send Messages in Threads
+   - Manage Threads
 
-### 2. Bot Permissions
+### 2. Add Bot to Your Server
 
-Your bot needs these permissions:
-- Read Messages
-- Send Messages
-- Create Public Threads
-- Send Messages in Threads
-- Read Message History
-- Use Slash Commands (optional)
+1. Go to "OAuth2 > URL Generator" in Discord Developer Portal
+2. Select scopes: `bot`
+3. Select bot permissions (as listed above)
+4. Use generated URL to invite bot to your server
 
-### 3. Invite Bot to Server
+### 3. Get Channel ID
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. Enable Developer Mode in Discord (User Settings > Advanced > Developer Mode)
+2. Right-click the channel where you want comments posted
+3. Select "Copy ID"
 
-### 4. Environment Configuration
+## Installation & Setup
 
-Copy `.env.example` to `.env` and configure:
-
-```env
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
-PORT=3001
-```
-
-### 5. Install Dependencies
+### 1. Install Dependencies
 
 ```bash
+cd server
 npm install
 ```
 
-### 6. Run Server
+### 2. Environment Configuration
+
+Copy the example environment file and configure it:
 
 ```bash
-# Development
-npm run dev
+cp .env.example .env
+```
 
-# Production
+Edit `.env` with your Discord configuration:
+
+```env
+# Discord Bot Configuration
+DISCORD_BOT_TOKEN=your_bot_token_here
+DISCORD_CHANNEL_ID=your_channel_id_here
+
+# API Configuration  
+PORT=3001
+
+# Discord Context Configuration
+DISCORD_CONTEXT_LEVEL=full
+DISCORD_CREATE_THREADS=true
+DISCORD_THREAD_DURATION=1440
+DISCORD_SITE_NAME=Your Documentation Site
+```
+
+### 3. Development Mode
+
+For testing and development:
+
+```bash
+npm run dev
+```
+
+The server will start on `http://localhost:3001` and auto-restart on file changes.
+
+### 4. Production Setup
+
+#### Option A: Direct Node.js
+
+```bash
 npm start
 ```
 
+#### Option B: Systemd Service (Recommended)
+
+1. **Update service file paths**:
+```bash
+# Edit the service file to match your installation path
+sudo nano discord-comments.service
+```
+
+2. **Install service**:
+```bash
+sudo cp discord-comments.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable discord-comments
+sudo systemctl start discord-comments
+```
+
+3. **Check service status**:
+```bash
+sudo systemctl status discord-comments
+```
+
+## Nginx Integration
+
+Add this to your nginx site configuration to proxy API requests:
+
+```nginx
+# Add before the main location / block
+location /api/ {
+    proxy_pass http://127.0.0.1:3001;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_set_header Connection "";
+    proxy_buffering off;
+}
+```
+
+Then reload nginx:
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## Configuration Options
+
+### Context Levels
+
+- **minimal**: Just page title and URL
+- **basic**: Title, URL, and basic page info  
+- **full**: Complete context with breadcrumbs and section info
+- **custom**: Use individual DISCORD_SHOW_* settings
+
+### Thread Settings
+
+- `DISCORD_CREATE_THREADS`: Create threads for each comment
+- `DISCORD_THREAD_DURATION`: Thread auto-archive time (minutes)
+- `DISCORD_SITE_NAME`: Display name for your site
+
 ## API Endpoints
 
-### POST `/api/comments`
-Send a new comment to Discord
-
-**Body:**
-```json
-{
-  "pageUrl": "https://example.com/page",
-  "pageTitle": "Page Title",
-  "authorName": "John Doe",
-  "content": "Comment content"
-}
-```
-
-### GET `/api/comments/:pageUrl`
-Get comments and replies for a specific page
-
-**Response:**
-```json
-{
-  "success": true,
-  "comments": [
-    {
-      "id": 1,
-      "author_name": "John Doe",
-      "content": "Original comment",
-      "created_at": "2023-01-01T12:00:00Z",
-      "replies": [
-        {
-          "id": 1,
-          "discord_username": "discord_user",
-          "discord_avatar": "https://cdn.discordapp.com/...",
-          "content": "Discord reply",
-          "created_at": "2023-01-01T12:05:00Z"
-        }
-      ]
-    }
-  ]
-}
-```
-
-### GET `/api/health`
-Health check endpoint
-
-## How It Works
-
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel
-3. **Thread Creation**: Bot creates a thread for organized replies
-4. **Discord Replies**: Users reply in Discord thread or to the message
-5. **Database Storage**: Bot stores replies in SQLite database
-6. **Website Display**: Frontend polls API and displays Discord replies
-
-## Database Schema
-
-### Comments Table
-```sql
-CREATE TABLE comments (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  page_url TEXT NOT NULL,
-  page_title TEXT NOT NULL,
-  author_name TEXT NOT NULL,
-  content TEXT NOT NULL,
-  discord_message_id TEXT UNIQUE,
-  discord_channel_id TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Replies Table
-```sql
-CREATE TABLE replies (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  comment_id INTEGER NOT NULL,
-  discord_message_id TEXT UNIQUE,
-  discord_user_id TEXT NOT NULL,
-  discord_username TEXT NOT NULL,
-  discord_avatar TEXT,
-  content TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (comment_id) REFERENCES comments (id)
-);
-```
-
-## Deployment
-
-### Production Considerations
-
-1. **Database**: Consider using PostgreSQL for production
-2. **Environment**: Set proper environment variables
-3. **Process Management**: Use PM2 or similar for process management
-4. **Security**: Implement rate limiting and input validation
-5. **Monitoring**: Add logging and monitoring
-
-### Docker Deployment (Optional)
-
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3001
-CMD ["npm", "start"]
-```
+- `GET /api/health` - Health check
+- `GET /api/comments/:pageUrl` - Get comments for a page
+- `POST /api/comments` - Send new comment to Discord
+- `POST /api/replies` - Reply to a comment
+- `POST /api/auth/mod` - Moderator authentication
+- `DELETE /api/comments/:id` - Delete comment (mod only)
 
 ## Troubleshooting
 
 ### Bot Not Responding
-- Check bot token is correct
-- Verify bot has necessary permissions
-- Check channel ID is correct
-- Ensure bot is in the server
+
+1. Check bot token is correct in `.env`
+2. Verify bot has required permissions
+3. Check server logs: `sudo journalctl -u discord-comments -f`
+
+### CSP Errors
+
+If you see Content Security Policy errors, ensure you're using the nginx proxy instead of direct localhost connections.
 
 ### Database Issues
-- Check file permissions for SQLite database
-- Verify database path is accessible
-- Check for disk space issues
 
-### API Connection Issues
-- Verify server is running on correct port
-- Check CORS configuration
-- Verify API URL in frontend configuration
+The SQLite database is automatically created at `comments.db`. If you need to reset:
 
-## Contributing
+```bash
+rm comments.db
+# Restart the server to recreate
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make changes
-4. Test thoroughly
-5. Submit pull request
+## Logs
 
-## License
+View service logs:
+```bash
+sudo journalctl -u discord-comments -f
+```
 
-MIT License
+## Security Notes
+
+- The moderation password is set in `.env` as `MOD_PASSWORD`
+- API tokens are stored in session storage (client-side)
+- Use HTTPS in production
+- Regularly update dependencies
+
+## Support
+
+For issues or questions about the Discord integration, check the troubleshooting documentation or create an issue in the repository.
