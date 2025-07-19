@@ -72,6 +72,10 @@ DISCORD_CHANNEL_ID=your_channel_id_here
 # API Configuration  
 PORT=3001
 
+# Database Configuration (optional)
+# If not set, will try current directory, then fallback to /tmp
+# DATABASE_PATH=/path/to/your/comments.db
+
 # Discord Context Configuration
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_CREATE_THREADS=true
@@ -99,13 +103,25 @@ npm start
 
 #### Option B: Systemd Service (Recommended)
 
-1. **Update service file paths**:
+1. **Create writable database directory**:
+```bash
+sudo mkdir -p /var/lib/discord-comments
+sudo chown your-service-user:your-service-user /var/lib/discord-comments
+```
+
+2. **Update service file paths**:
 ```bash
 # Edit the service file to match your installation path
 sudo nano discord-comments.service
 ```
 
-2. **Install service**:
+3. **Update .env for production**:
+```bash
+# Add to your .env file
+DATABASE_PATH=/var/lib/discord-comments/comments.db
+```
+
+4. **Install service**:
 ```bash
 sudo cp discord-comments.service /etc/systemd/system/
 sudo systemctl daemon-reload
@@ -113,9 +129,36 @@ sudo systemctl enable discord-comments
 sudo systemctl start discord-comments
 ```
 
-3. **Check service status**:
+5. **Check service status**:
 ```bash
 sudo systemctl status discord-comments
+```
+
+#### Option C: Docker (Easy Deployment)
+
+For containerized deployment with persistent database:
+
+```bash
+# Copy environment file
+cp .env.example .env
+# Edit .env with your Discord configuration
+
+# Start with Docker Compose (recommended)
+docker-compose up -d
+
+# Or build and run manually
+docker build -t discord-comments .
+docker run -d \
+  --name discord-comments \
+  -p 3001:3001 \
+  -v discord_comments_data:/app/data \
+  --env-file .env \
+  discord-comments
+```
+
+Check container logs:
+```bash
+docker logs discord-comments -f
 ```
 
 ## Nginx Integration
@@ -181,12 +224,40 @@ If you see Content Security Policy errors, ensure you're using the nginx proxy i
 
 ### Database Issues
 
-The SQLite database is automatically created at `comments.db`. If you need to reset:
+The SQLite database location is determined automatically:
 
+1. **Custom path**: Set `DATABASE_PATH` environment variable
+2. **Development**: Uses `server/comments.db` if directory is writable
+3. **Production**: Falls back to `/tmp/discord-comments/comments.db` for read-only deployments
+
+**Database Location Debug:**
+Check server logs on startup to see which path is being used:
 ```bash
-rm comments.db
-# Restart the server to recreate
+sudo journalctl -u discord-comments -f | grep "Using database path"
 ```
+
+**Reset Database:**
+```bash
+# Find current database location from logs, then:
+rm /path/to/comments.db
+# Restart the server to recreate
+sudo systemctl restart discord-comments
+```
+
+### "SQLITE_READONLY" Error
+
+If you see "attempt to write a readonly database" errors:
+
+1. **Quick Fix**: The server will automatically detect this and fallback to `/tmp`
+2. **Persistent Fix**: Set `DATABASE_PATH` to a writable location:
+   ```bash
+   # In your .env file
+   DATABASE_PATH=/var/lib/discord-comments/comments.db
+   
+   # Create the directory with proper permissions
+   sudo mkdir -p /var/lib/discord-comments
+   sudo chown your-service-user:your-service-user /var/lib/discord-comments
+   ```
 
 ## Logs
 
