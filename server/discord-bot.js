@@ -110,11 +110,26 @@ class DiscordBot {
     }
   }
 
+  hasMentions(content) {
+    // Check for Discord mentions:
+    // <@userid> or <@!userid> - user mentions
+    // <@&roleid> - role mentions  
+    // <#channelid> - channel mentions
+    const mentionRegex = /<@[!&]?\d+>|<#\d+>/;
+    return mentionRegex.test(content);
+  }
+
   async storeReply(commentId, message) {
     try {
       // Check if reply already exists
       const exists = await db.replyExists(message.id);
       if (exists) return;
+
+      // Skip messages with mentions - don't store them at all
+      if (this.hasMentions(message.content)) {
+        console.log(`Skipping reply with mentions from ${message.author.username} for comment ${commentId}`);
+        return;
+      }
 
       // Get user's Discord roles
       const member = await message.guild.members.fetch(message.author.id);
