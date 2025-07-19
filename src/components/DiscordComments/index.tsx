@@ -147,7 +147,16 @@ export default function DiscordComments() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString + (dateString.includes('Z') ? '' : 'Z')); // Ensure UTC interpretation
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'numeric', 
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZoneName: 'short'
+    });
   };
 
   const toggleReplyForm = (replyId: number) => {
