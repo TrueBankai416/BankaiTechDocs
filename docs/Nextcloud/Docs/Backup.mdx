@@ -1,0 +1,665 @@
+---
+title: Backup & Recovery
+sidebar_position: 6
+tags:
+   - Docker
+   - Docker Compose
+   - Backup
+   - Recovery
+   - Nextcloud
+   - MariaDB
+   - Best Practices
+keywords: [Docker, Backup, Recovery, MariaDB, Nextcloud, Data Protection]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Nextcloud Backup & Recovery Guide**
+
+Backing up your Nextcloud instance is crucial for data protection and disaster recovery. This guide covers comprehensive backup strategies for both Docker-based and host installations, with a focus on MariaDB database backups.
+
+:::warning[Critical]
+**Never skip backups!** Data loss can happen due to hardware failure, human error, corrupted updates, or security incidents. Regular backups are your insurance policy.
+:::
+
+## **Why Backup Your Nextcloud?**
+
+- **Data Protection**: Protect against hardware failures, corrupted files, and accidental deletions
+- **Security**: Recover from ransomware attacks or security breaches
+- **Updates**: Safely rollback if an update causes issues
+- **Migration**: Move your Nextcloud instance to new hardware
+- **Peace of Mind**: Sleep better knowing your data is safe
+
+## **What Needs to Be Backed Up**
+
+A complete Nextcloud backup includes:
+
+1. **Database** (MariaDB/MySQL/PostgreSQL)
+2. **Nextcloud Files** (user data, config, apps)
+3. **Configuration Files** (including Docker Compose files)
+4. **External Storage** (if applicable)
+
+## **Docker-Based Backup Strategies**
+
+### ***Prerequisites***
+
+Before starting, ensure you have sufficient storage space and appropriate permissions:
+
+```bash
+# Check available disk space
+df -h
+
+# Create backup directory
+sudo mkdir -p /backup/nextcloud
+sudo chown -R $USER:$USER /backup/nextcloud
+```
+
+### ***Method 1: Complete Docker Backup Script***
+
+Create a comprehensive backup script for Docker installations:
+
+<Tabs
+  defaultValue="script"
+  values={[
+    {label: 'Backup Script', value: 'script'},
+    {label: 'Configuration', value: 'config'},
+    {label: 'Usage', value: 'usage'},
+  ]}>
+  <TabItem value="script">
+
+```bash title="nextcloud-backup.sh"
+#!/bin/bash
+
+# Nextcloud Docker Backup Script
+# Make sure to modify the variables below for your setup
+
+# Configuration
+BACKUP_DIR="/backup/nextcloud"
+NEXTCLOUD_DIR="/var/docker/nextcloud"
+CONTAINER_NAME="nextcloud"
+DB_CONTAINER_NAME="mariadb"
+DB_NAME="nextcloud"
+DB_USER="nextcloud"
+DB_PASSWORD="YOUR_PASSWORD_FROM_ENV"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_NAME="nextcloud_backup_${DATE}"
+RETENTION_DAYS=30
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}Starting Nextcloud backup: ${BACKUP_NAME}${NC}"
+
+# Create backup directory
+mkdir -p "${BACKUP_DIR}/${BACKUP_NAME}"
+
+# Step 1: Enable maintenance mode
+echo -e "${YELLOW}Enabling maintenance mode...${NC}"
+docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --on
+
+# Step 2: Backup database
+echo -e "${YELLOW}Backing up MariaDB database...${NC}"
+docker exec ${DB_CONTAINER_NAME} mysqldump -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} > "${BACKUP_DIR}/${BACKUP_NAME}/database.sql"
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}Database backup completed successfully${NC}"
+else
+    echo -e "${RED}Database backup failed!${NC}"
+    docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+    exit 1
+fi
+
+# Step 3: Backup Nextcloud data directory
+echo -e "${YELLOW}Backing up Nextcloud data directory...${NC}"
+tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/nextcloud_data.tar.gz" -C "${NEXTCLOUD_DIR}" .
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}Data directory backup completed successfully${NC}"
+else
+    echo -e "${RED}Data directory backup failed!${NC}"
+    docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+    exit 1
+fi
+
+# Step 4: Backup Docker Compose files
+echo -e "${YELLOW}Backing up Docker Compose configuration...${NC}"
+cp "${NEXTCLOUD_DIR}/docker-compose.yaml" "${BACKUP_DIR}/${BACKUP_NAME}/"
+cp "${NEXTCLOUD_DIR}/.env" "${BACKUP_DIR}/${BACKUP_NAME}/"
+
+# Step 5: Create backup info file
+echo -e "${YELLOW}Creating backup info file...${NC}"
+cat > "${BACKUP_DIR}/${BACKUP_NAME}/backup_info.txt" << EOF
+Nextcloud Backup Information
+============================
+Backup Date: $(date)
+Backup Name: ${BACKUP_NAME}
+Nextcloud Container: ${CONTAINER_NAME}
+Database Container: ${DB_CONTAINER_NAME}
+Database Name: ${DB_NAME}
+Nextcloud Directory: ${NEXTCLOUD_DIR}
+
+Files Included:
+- database.sql (MariaDB dump)
+- nextcloud_data.tar.gz (Nextcloud data directory)
+- docker-compose.yaml (Docker Compose configuration)
+- .env (Environment variables)
+- backup_info.txt (This file)
+
+To restore this backup, see the recovery section in the documentation.
+EOF
+
+# Step 6: Disable maintenance mode
+echo -e "${YELLOW}Disabling maintenance mode...${NC}"
+docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+
+# Step 7: Create compressed archive of entire backup
+echo -e "${YELLOW}Creating compressed backup archive...${NC}"
+cd "${BACKUP_DIR}"
+tar -czf "${BACKUP_NAME}.tar.gz" "${BACKUP_NAME}/"
+rm -rf "${BACKUP_NAME}/"
+
+# Step 8: Cleanup old backups
+echo -e "${YELLOW}Cleaning up old backups (older than ${RETENTION_DAYS} days)...${NC}"
+find "${BACKUP_DIR}" -name "nextcloud_backup_*.tar.gz" -mtime +${RETENTION_DAYS} -delete
+
+# Step 9: Calculate backup size
+BACKUP_SIZE=$(du -h "${BACKUP_DIR}/${BACKUP_NAME}.tar.gz" | cut -f1)
+echo -e "${GREEN}Backup completed successfully!${NC}"
+echo -e "${GREEN}Backup location: ${BACKUP_DIR}/${BACKUP_NAME}.tar.gz${NC}"
+echo -e "${GREEN}Backup size: ${BACKUP_SIZE}${NC}"
+
+# Optional: Send notification (uncomment and configure)
+# echo "Nextcloud backup completed: ${BACKUP_NAME} (${BACKUP_SIZE})" | mail -s "Nextcloud Backup Success" admin@yourdomain.com
+```
+
+  </TabItem>
+  <TabItem value="config">
+
+**Before using the script, modify these variables:**
+
+```bash
+# Update these variables in the script
+BACKUP_DIR="/backup/nextcloud"           # Where to store backups
+NEXTCLOUD_DIR="/var/docker/nextcloud"    # Your Nextcloud Docker directory
+CONTAINER_NAME="nextcloud"               # Your Nextcloud container name
+DB_CONTAINER_NAME="mariadb"              # Your database container name
+DB_PASSWORD="YOUR_PASSWORD_FROM_ENV"     # Your database password from .env file
+```
+
+**Make the script executable:**
+
+```bash
+chmod +x nextcloud-backup.sh
+```
+
+  </TabItem>
+  <TabItem value="usage">
+
+**Run the backup script:**
+
+```bash
+# Run manually
+./nextcloud-backup.sh
+
+# Run with sudo if needed for Docker permissions
+sudo ./nextcloud-backup.sh
+
+# Test the script first
+./nextcloud-backup.sh --dry-run  # (if you add dry-run functionality)
+```
+
+**Automate with cron:**
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * /path/to/nextcloud-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+
+# Add weekly backup on Sundays at 1 AM
+0 1 * * 0 /path/to/nextcloud-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+```
+
+  </TabItem>
+</Tabs>
+
+### ***Method 2: Individual Component Backup***
+
+For more granular control, you can backup components individually:
+
+#### Database Backup
+
+```bash
+# Create database backup
+docker exec mariadb mysqldump -u nextcloud -pYOUR_PASSWORD nextcloud > nextcloud_db_$(date +%Y%m%d).sql
+
+# Compress the backup
+gzip nextcloud_db_$(date +%Y%m%d).sql
+
+# Alternative: Direct compressed backup
+docker exec mariadb mysqldump -u nextcloud -pYOUR_PASSWORD nextcloud | gzip > nextcloud_db_$(date +%Y%m%d).sql.gz
+```
+
+#### Data Directory Backup
+
+```bash
+# Stop containers for consistent backup
+docker compose down
+
+# Backup data directory
+tar -czf nextcloud_data_$(date +%Y%m%d).tar.gz -C /var/docker/nextcloud .
+
+# Start containers
+docker compose up -d
+```
+
+#### Configuration Backup
+
+```bash
+# Backup Docker configuration
+cp /var/docker/nextcloud/docker-compose.yaml /backup/
+cp /var/docker/nextcloud/.env /backup/
+
+# Backup Nextcloud config
+cp /var/docker/nextcloud/nextcloud/config/config.php /backup/
+```
+
+## **Host Installation Backup Strategies**
+
+### ***Method 1: Complete Host Backup Script***
+
+For traditional server installations:
+
+```bash title="nextcloud-host-backup.sh"
+#!/bin/bash
+
+# Nextcloud Host Installation Backup Script
+
+# Configuration
+BACKUP_DIR="/backup/nextcloud"
+NEXTCLOUD_DIR="/var/www/nextcloud"
+NEXTCLOUD_DATA_DIR="/var/nextcloud/data"
+DB_NAME="nextcloud"
+DB_USER="nextcloud"
+DB_PASSWORD="YOUR_DB_PASSWORD"
+WEB_USER="www-data"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_NAME="nextcloud_host_backup_${DATE}"
+
+echo "Starting Nextcloud host backup: ${BACKUP_NAME}"
+
+# Create backup directory
+mkdir -p "${BACKUP_DIR}/${BACKUP_NAME}"
+
+# Enable maintenance mode
+sudo -u ${WEB_USER} php ${NEXTCLOUD_DIR}/occ maintenance:mode --on
+
+# Backup database
+echo "Backing up database..."
+mysqldump -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} > "${BACKUP_DIR}/${BACKUP_NAME}/database.sql"
+
+# Backup Nextcloud installation
+echo "Backing up Nextcloud installation..."
+tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/nextcloud_install.tar.gz" -C $(dirname ${NEXTCLOUD_DIR}) $(basename ${NEXTCLOUD_DIR})
+
+# Backup data directory (if separate)
+if [ "${NEXTCLOUD_DATA_DIR}" != "${NEXTCLOUD_DIR}/data" ]; then
+    echo "Backing up data directory..."
+    tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/nextcloud_data.tar.gz" -C $(dirname ${NEXTCLOUD_DATA_DIR}) $(basename ${NEXTCLOUD_DATA_DIR})
+fi
+
+# Backup web server configuration
+echo "Backing up web server configuration..."
+if [ -d "/etc/nginx" ]; then
+    tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/nginx_config.tar.gz" -C /etc nginx
+fi
+if [ -d "/etc/apache2" ]; then
+    tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/apache_config.tar.gz" -C /etc apache2
+fi
+
+# Disable maintenance mode
+sudo -u ${WEB_USER} php ${NEXTCLOUD_DIR}/occ maintenance:mode --off
+
+# Create backup archive
+cd "${BACKUP_DIR}"
+tar -czf "${BACKUP_NAME}.tar.gz" "${BACKUP_NAME}/"
+rm -rf "${BACKUP_NAME}/"
+
+echo "Backup completed: ${BACKUP_DIR}/${BACKUP_NAME}.tar.gz"
+```
+
+### ***Method 2: Rsync-based Backup***
+
+For incremental backups with rsync:
+
+```bash
+#!/bin/bash
+
+# Incremental backup with rsync
+BACKUP_DIR="/backup/nextcloud"
+NEXTCLOUD_DIR="/var/www/nextcloud"
+NEXTCLOUD_DATA_DIR="/var/nextcloud/data"
+
+# Create incremental backup
+rsync -av --delete "${NEXTCLOUD_DIR}/" "${BACKUP_DIR}/current/nextcloud/"
+rsync -av --delete "${NEXTCLOUD_DATA_DIR}/" "${BACKUP_DIR}/current/data/"
+
+# Create daily snapshot
+cp -al "${BACKUP_DIR}/current" "${BACKUP_DIR}/daily.$(date +%Y%m%d)"
+
+# Cleanup old snapshots (keep 30 days)
+find "${BACKUP_DIR}" -maxdepth 1 -name "daily.*" -mtime +30 -exec rm -rf {} \;
+```
+
+## **Recovery Procedures**
+
+### ***Docker Recovery***
+
+<Tabs
+  defaultValue="full"
+  values={[
+    {label: 'Full Recovery', value: 'full'},
+    {label: 'Database Only', value: 'database'},
+    {label: 'Files Only', value: 'files'},
+  ]}>
+  <TabItem value="full">
+
+**Complete system recovery from backup:**
+
+```bash
+# 1. Stop existing containers
+cd /var/docker/nextcloud
+docker compose down
+
+# 2. Remove existing data (CAUTION!)
+sudo rm -rf nextcloud/ mariadb/
+
+# 3. Extract backup
+cd /backup/nextcloud
+tar -xzf nextcloud_backup_YYYYMMDD_HHMMSS.tar.gz
+cd nextcloud_backup_YYYYMMDD_HHMMSS
+
+# 4. Restore configuration files
+cp docker-compose.yaml /var/docker/nextcloud/
+cp .env /var/docker/nextcloud/
+
+# 5. Extract data
+cd /var/docker/nextcloud
+tar -xzf /backup/nextcloud/nextcloud_backup_YYYYMMDD_HHMMSS/nextcloud_data.tar.gz
+
+# 6. Start database container first
+docker compose up -d mariadb
+sleep 30
+
+# 7. Restore database
+docker exec -i mariadb mysql -u nextcloud -pYOUR_PASSWORD nextcloud < /backup/nextcloud/nextcloud_backup_YYYYMMDD_HHMMSS/database.sql
+
+# 8. Start all containers
+docker compose up -d
+
+# 9. Verify restoration
+docker exec -u 33 nextcloud php occ status
+```
+
+  </TabItem>
+  <TabItem value="database">
+
+**Database-only recovery:**
+
+```bash
+# 1. Enable maintenance mode
+docker exec -u 33 nextcloud php occ maintenance:mode --on
+
+# 2. Restore database
+docker exec -i mariadb mysql -u nextcloud -pYOUR_PASSWORD nextcloud < database_backup.sql
+
+# 3. Run Nextcloud upgrade/repair
+docker exec -u 33 nextcloud php occ upgrade
+docker exec -u 33 nextcloud php occ db:add-missing-indices
+docker exec -u 33 nextcloud php occ db:add-missing-columns
+
+# 4. Disable maintenance mode
+docker exec -u 33 nextcloud php occ maintenance:mode --off
+```
+
+  </TabItem>
+  <TabItem value="files">
+
+**Files-only recovery:**
+
+```bash
+# 1. Stop containers
+docker compose down
+
+# 2. Restore files
+tar -xzf nextcloud_data_backup.tar.gz -C /var/docker/nextcloud/
+
+# 3. Fix permissions
+sudo chown -R 33:33 /var/docker/nextcloud/nextcloud/
+
+# 4. Start containers
+docker compose up -d
+
+# 5. Rescan files
+docker exec -u 33 nextcloud php occ files:scan --all
+```
+
+  </TabItem>
+</Tabs>
+
+### ***Host Installation Recovery***
+
+```bash
+# 1. Stop web server
+sudo systemctl stop nginx  # or apache2
+
+# 2. Enable maintenance mode (if possible)
+sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --on
+
+# 3. Restore database
+mysql -u nextcloud -pYOUR_PASSWORD nextcloud < database_backup.sql
+
+# 4. Restore files
+tar -xzf nextcloud_install_backup.tar.gz -C /var/www/
+tar -xzf nextcloud_data_backup.tar.gz -C /var/nextcloud/
+
+# 5. Fix permissions
+sudo chown -R www-data:www-data /var/www/nextcloud/
+sudo chown -R www-data:www-data /var/nextcloud/data/
+
+# 6. Start web server
+sudo systemctl start nginx
+
+# 7. Disable maintenance mode
+sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
+```
+
+## **Best Practices**
+
+### ***Backup Strategy***
+
+1. **3-2-1 Rule**: 3 copies of data, 2 different media types, 1 offsite
+2. **Regular Schedule**: Daily incremental, weekly full backups
+3. **Test Restores**: Regularly test your backup restoration process
+4. **Monitor Backups**: Set up alerts for backup failures
+5. **Document Process**: Keep recovery procedures documented and accessible
+
+### ***Security Considerations***
+
+```bash
+# Encrypt backups
+gpg --symmetric --cipher-algo AES256 nextcloud_backup.tar.gz
+
+# Secure backup storage permissions
+chmod 600 /backup/nextcloud/*
+chown backup-user:backup-group /backup/nextcloud/*
+
+# Use dedicated backup user
+useradd -r -s /bin/false nextcloud-backup
+```
+
+### ***Storage Considerations***
+
+- **Local Backups**: Fast recovery, but vulnerable to local disasters
+- **Remote Backups**: Slower recovery, but protected from local disasters
+- **Cloud Storage**: Consider services like AWS S3, Google Cloud, or Backblaze B2
+
+```bash
+# Example: Upload to cloud storage
+aws s3 cp nextcloud_backup_${DATE}.tar.gz s3://your-backup-bucket/nextcloud/
+
+# Example: Remote backup with rsync
+rsync -avz --delete /backup/nextcloud/ user@backup-server:/backups/nextcloud/
+```
+
+## **Automated Backup Solutions**
+
+### ***Using Cron for Automation***
+
+```bash
+# Edit crontab
+crontab -e
+
+# Daily backup at 2 AM
+0 2 * * * /usr/local/bin/nextcloud-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+
+# Weekly full backup on Sundays at 1 AM
+0 1 * * 0 /usr/local/bin/nextcloud-full-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+
+# Monthly backup cleanup (keep 3 months)
+0 3 1 * * find /backup/nextcloud -name "*.tar.gz" -mtime +90 -delete
+```
+
+### ***Backup Monitoring Script***
+
+```bash title="backup-monitor.sh"
+#!/bin/bash
+
+# Monitor backup completion and size
+BACKUP_DIR="/backup/nextcloud"
+EXPECTED_MIN_SIZE="100M"  # Adjust based on your data size
+NOTIFICATION_EMAIL="admin@yourdomain.com"
+
+# Check if today's backup exists
+TODAY=$(date +%Y%m%d)
+BACKUP_FILE=$(find ${BACKUP_DIR} -name "*${TODAY}*.tar.gz" -type f | head -1)
+
+if [ -z "${BACKUP_FILE}" ]; then
+    echo "ERROR: No backup found for today (${TODAY})" | mail -s "Nextcloud Backup Missing" ${NOTIFICATION_EMAIL}
+    exit 1
+fi
+
+# Check backup size
+BACKUP_SIZE=$(du -h "${BACKUP_FILE}" | cut -f1)
+BACKUP_SIZE_BYTES=$(du -b "${BACKUP_FILE}" | cut -f1)
+MIN_SIZE_BYTES=$(echo ${EXPECTED_MIN_SIZE} | numfmt --from=iec)
+
+if [ ${BACKUP_SIZE_BYTES} -lt ${MIN_SIZE_BYTES} ]; then
+    echo "WARNING: Backup size (${BACKUP_SIZE}) is smaller than expected (${EXPECTED_MIN_SIZE})" | mail -s "Nextcloud Backup Size Warning" ${NOTIFICATION_EMAIL}
+fi
+
+echo "Backup successful: ${BACKUP_FILE} (${BACKUP_SIZE})"
+```
+
+## **Troubleshooting**
+
+### ***Common Backup Issues***
+
+**Database Connection Errors:**
+```bash
+# Test database connection
+docker exec mariadb mysql -u nextcloud -pYOUR_PASSWORD -e "SELECT 1;"
+
+# Check container status
+docker ps
+docker logs mariadb
+```
+
+**Permission Issues:**
+```bash
+# Fix Nextcloud permissions
+docker exec nextcloud chown -R 33:33 /var/www/html
+
+# Fix backup directory permissions
+sudo chown -R $USER:$USER /backup/nextcloud
+```
+
+**Disk Space Issues:**
+```bash
+# Check disk space
+df -h /backup
+
+# Clean old backups
+find /backup/nextcloud -name "*.tar.gz" -mtime +30 -delete
+
+# Compress existing backups
+gzip /backup/nextcloud/*.sql
+```
+
+### ***Recovery Issues***
+
+**Database Import Errors:**
+```bash
+# Check database encoding
+docker exec mariadb mysql -u nextcloud -pYOUR_PASSWORD -e "SHOW VARIABLES LIKE 'character_set%';"
+
+# Import with specific charset
+docker exec -i mariadb mysql -u nextcloud -pYOUR_PASSWORD --default-character-set=utf8mb4 nextcloud < database.sql
+```
+
+**File Permission Errors:**
+```bash
+# Reset Nextcloud permissions (Docker)
+docker exec nextcloud chown -R 33:33 /var/www/html
+docker exec nextcloud chmod -R 755 /var/www/html
+
+# Reset Nextcloud permissions (Host)
+sudo chown -R www-data:www-data /var/www/nextcloud
+sudo chmod -R 755 /var/www/nextcloud
+```
+
+## **Testing Your Backups**
+
+### ***Backup Verification Checklist***
+
+1. **File Integrity**:
+   ```bash
+   # Test backup archive
+   tar -tzf nextcloud_backup.tar.gz > /dev/null && echo "Archive OK" || echo "Archive CORRUPTED"
+   
+   # Test database dump
+   mysql -u nextcloud -pYOUR_PASSWORD --execute="SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'; SOURCE database.sql;" 2>/dev/null && echo "Database OK" || echo "Database CORRUPTED"
+   ```
+
+2. **Restoration Test**:
+   - Set up a test environment
+   - Restore from backup
+   - Verify all functionality works
+   - Test user login and file access
+
+3. **Regular Testing Schedule**:
+   - Monthly: Quick verification tests
+   - Quarterly: Full restoration tests
+   - Annually: Disaster recovery simulation
+
+## **Conclusion**
+
+A robust backup strategy is essential for any Nextcloud installation. Whether you're running Docker containers or a host installation, regular automated backups combined with tested recovery procedures will protect your valuable data.
+
+Remember to:
+- Test your backups regularly
+- Keep multiple backup copies
+- Store backups in different locations
+- Document your recovery procedures
+- Monitor backup completion and file integrity
+
+For additional help with backup and recovery procedures, visit our [Troubleshooting section](./Troubleshooting/) or leave a comment below.
+
+<BuyMeACoffeeButton />
