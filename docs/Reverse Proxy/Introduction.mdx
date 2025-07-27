@@ -29,36 +29,23 @@ Reverse proxies are deployed for various reasons, with key purposes including:
 The following diagram illustrates how a reverse proxy handles requests for a service with a domain:
 
 ```mermaid
+graph LR
+    A[Client] -->|HTTPS| B[Reverse Proxy]
+    B -->|HTTP| C[Backend Service]
+    C -->|Response| B
+    B -->|HTTPS| A
+```
+
+**Detailed Network Flow:**
+
+```mermaid
 graph TD
-    A[Client Browser<br/>203.0.113.45] -->|1. HTTPS Request<br/>app.example.com:443| B[Reverse Proxy<br/>198.51.100.10<br/>Ports 80, 443]
-    B -->|2. Forward<br/>192.168.1.100:3000| C[Web App<br/>192.168.1.100:3000]
-    C -->|3. Response| B
-    B -->|4. HTTPS Response| A
-    
-    subgraph Internet
-        A
-        F[DNS Server]
-    end
-    
-    subgraph "Private Network 192.168.1.0/24"
-        B
-        C
-        D[API Server<br/>192.168.1.101:3001]
-        E[Database Interface<br/>192.168.1.102:8081]
-    end
-    
-    B -.->|api.example.com| D
-    B -.->|db.example.com| E
-    
-    A -.->|DNS Query| F
-    F -.->|Returns IP| A
-    
-    style A fill:#e1f5fe
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#f3e5f5
-    style E fill:#f3e5f5
-    style F fill:#e8f5e8
+    Client -->|1. DNS Query| DNS[DNS Server]
+    DNS -->|2. Returns 198.51.100.10| Client
+    Client -->|3. HTTPS app.example.com:443| Proxy[Reverse Proxy<br/>198.51.100.10]
+    Proxy -->|4. HTTP 192.168.1.100:3000| Backend[Backend Service<br/>192.168.1.100:3000]
+    Backend -->|5. Response| Proxy
+    Proxy -->|6. HTTPS Response| Client
 ```
 
 **Domain to Service Mapping:**
