@@ -24,6 +24,57 @@ Reverse proxies are deployed for various reasons, with key purposes including:
 - **Caching:** Storing copies of static and dynamic content to speed up request processing and reduce backend load.
 - **SSL Termination:** Managing SSL encryption/decryption, which offloads processing tasks from backend servers and centralizes certificate management.
 
+## ***Network Flow Diagram***
+
+The following diagram illustrates how a reverse proxy handles requests for a service with a domain:
+
+```mermaid
+graph TD
+    A[Client Browser<br/>Public IP: 203.0.113.45] -->|1. HTTPS Request<br/>https://app.example.com:443<br/>DNS resolves to 198.51.100.10| B[Reverse Proxy Server<br/>Nginx/Caddy/Apache<br/>Public IP: 198.51.100.10<br/>Ports 80, 443]
+    B -->|2. Forward Request<br/>http://192.168.1.100:3000| C[Backend Service 1<br/>Web Application<br/>IP: 192.168.1.100<br/>Port 3000]
+    C -->|3. HTTP Response<br/>192.168.1.100:3000 → 198.51.100.10:443| B
+    B -->|4. HTTPS Response<br/>SSL Terminated<br/>198.51.100.10:443 → 203.0.113.45| A
+    
+    subgraph "Internet"
+        A
+        F[DNS Server<br/>app.example.com → 198.51.100.10<br/>api.example.com → 198.51.100.10]
+    end
+    
+    subgraph "Server Infrastructure - Private Network 192.168.1.0/24"
+        B
+        C
+        D[Backend Service 2<br/>API Server<br/>IP: 192.168.1.101<br/>Port 3001]
+        E[Backend Service 3<br/>Database Interface<br/>IP: 192.168.1.102<br/>Port 8081]
+    end
+    
+    B -.->|Load Balance<br/>http://192.168.1.101:3001<br/>api.example.com requests| D
+    B -.->|Load Balance<br/>http://192.168.1.102:8081<br/>db.example.com requests| E
+    
+    A -.->|DNS Query<br/>app.example.com| F
+    F -.->|DNS Response<br/>198.51.100.10| A
+    
+    style A fill:#e1f5fe
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#f3e5f5
+    style E fill:#f3e5f5
+    style F fill:#e8f5e8
+```
+
+**Flow Explanation:**
+1. **DNS Resolution**: The client performs a DNS query for `app.example.com` which resolves to the reverse proxy's public IP `198.51.100.10`
+2. **Client Request**: The client (IP: `203.0.113.45`) sends an HTTPS request to `https://app.example.com:443`
+3. **Reverse Proxy Reception**: The reverse proxy server (public IP: `198.51.100.10`) receives the request on port 443
+4. **Backend Forwarding**: The proxy forwards the request internally to the appropriate backend service (e.g., `http://192.168.1.100:3000`)
+5. **Response Delivery**: The backend service responds, and the reverse proxy sends the HTTPS response back to the client with SSL termination
+
+**Key Network Benefits:**
+- **Single Public IP**: Multiple services accessible through one public IP address (`198.51.100.10`)
+- **Private Backend Network**: Backend services operate securely on private IPs (`192.168.1.x`)
+- **Domain-Based Routing**: Different subdomains route to different backend services
+- **SSL Termination**: HTTPS encryption/decryption handled at the proxy level
+- **Load Balancing**: Traffic distributed across multiple backend instances
+
 ## ***Types of Reverse Proxies and Comparison***
 
 ### *Nginx*
