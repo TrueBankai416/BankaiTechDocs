@@ -42,7 +42,7 @@ graph LR
 
 ```mermaid
 graph TD
-    Client -->|1. DNS Query| DNS[DNS Server]
+    Client -->|DNS Query| DNS[DNS Server]
     DNS -->|2. Returns 198.51.100.10| Client
     Client -->|3. HTTPS app.example.com:443| Proxy[Reverse Proxy<br/>Public: 198.51.100.10<br/>Private: 10.0.1.10]
     Proxy -->|4. HTTP 192.168.1.100:3000| Backend[Backend Service<br/>192.168.1.100:3000]
