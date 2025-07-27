@@ -30,28 +30,28 @@ The following diagram illustrates how a reverse proxy handles requests for a ser
 
 ```mermaid
 graph TD
-    A[Client Browser<br/>Public IP: 203.0.113.45] -->|1. HTTPS Request<br/>https://app.example.com:443<br/>DNS resolves to 198.51.100.10| B[Reverse Proxy Server<br/>Nginx/Caddy/Apache<br/>Public IP: 198.51.100.10<br/>Ports 80, 443]
-    B -->|2. Forward Request<br/>http://192.168.1.100:3000| C[Backend Service 1<br/>Web Application<br/>IP: 192.168.1.100<br/>Port 3000]
-    C -->|3. HTTP Response<br/>192.168.1.100:3000 → 198.51.100.10:443| B
-    B -->|4. HTTPS Response<br/>SSL Terminated<br/>198.51.100.10:443 → 203.0.113.45| A
+    A[Client Browser<br/>203.0.113.45] -->|1. HTTPS Request<br/>app.example.com:443| B[Reverse Proxy<br/>198.51.100.10<br/>Ports 80, 443]
+    B -->|2. Forward<br/>192.168.1.100:3000| C[Web App<br/>192.168.1.100:3000]
+    C -->|3. Response| B
+    B -->|4. HTTPS Response| A
     
-    subgraph "Internet"
+    subgraph Internet
         A
-        F[DNS Server<br/>app.example.com → 198.51.100.10<br/>api.example.com → 198.51.100.10]
+        F[DNS Server]
     end
     
-    subgraph "Server Infrastructure - Private Network 192.168.1.0/24"
+    subgraph "Private Network 192.168.1.0/24"
         B
         C
-        D[Backend Service 2<br/>API Server<br/>IP: 192.168.1.101<br/>Port 3001]
-        E[Backend Service 3<br/>Database Interface<br/>IP: 192.168.1.102<br/>Port 8081]
+        D[API Server<br/>192.168.1.101:3001]
+        E[Database Interface<br/>192.168.1.102:8081]
     end
     
-    B -.->|Load Balance<br/>http://192.168.1.101:3001<br/>api.example.com requests| D
-    B -.->|Load Balance<br/>http://192.168.1.102:8081<br/>db.example.com requests| E
+    B -.->|api.example.com| D
+    B -.->|db.example.com| E
     
-    A -.->|DNS Query<br/>app.example.com| F
-    F -.->|DNS Response<br/>198.51.100.10| A
+    A -.->|DNS Query| F
+    F -.->|Returns IP| A
     
     style A fill:#e1f5fe
     style B fill:#fff3e0
@@ -60,6 +60,16 @@ graph TD
     style E fill:#f3e5f5
     style F fill:#e8f5e8
 ```
+
+**Domain to Service Mapping:**
+- `app.example.com` → Web Application (192.168.1.100:3000)
+- `api.example.com` → API Server (192.168.1.101:3001)  
+- `db.example.com` → Database Interface (192.168.1.102:8081)
+
+**IP Address Details:**
+- **Public IP**: 198.51.100.10 (Reverse Proxy Server)
+- **Private Network**: 192.168.1.0/24
+- **Client IP**: 203.0.113.45 (Example client)
 
 **Flow Explanation:**
 1. **DNS Resolution**: The client performs a DNS query for `app.example.com` which resolves to the reverse proxy's public IP `198.51.100.10`
