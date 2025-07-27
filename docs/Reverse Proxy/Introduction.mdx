@@ -30,11 +30,13 @@ The following diagram illustrates how a reverse proxy handles requests for a ser
 
 ```mermaid
 graph LR
-    A[Client] -->|HTTPS| B[Reverse Proxy]
-    B -->|HTTP| C[Backend Service]
-    C -->|Response| B
-    B -->|HTTPS| A
+    A[Client] --> B[Reverse Proxy]
+    B --> C[Backend Service]
+    C --> B
+    B --> A
 ```
+
+**Flow:** Client ↔ [HTTPS] ↔ Reverse Proxy ↔ [HTTP] ↔ Backend Service
 
 **Detailed Network Flow:**
 
