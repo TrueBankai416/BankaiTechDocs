@@ -44,10 +44,34 @@ graph LR
 graph TD
     Client -->|1. DNS Query| DNS[DNS Server]
     DNS -->|2. Returns 198.51.100.10| Client
-    Client -->|3. HTTPS app.example.com:443| Proxy[Reverse Proxy<br/>198.51.100.10]
+    Client -->|3. HTTPS app.example.com:443| Proxy[Reverse Proxy<br/>Public: 198.51.100.10<br/>Private: 10.0.1.10]
     Proxy -->|4. HTTP 192.168.1.100:3000| Backend[Backend Service<br/>192.168.1.100:3000]
     Backend -->|5. Response| Proxy
     Proxy -->|6. HTTPS Response| Client
+```
+
+**Network Architecture:**
+
+```mermaid
+graph TB
+    subgraph "Internet"
+        Client[Client<br/>203.0.113.45]
+    end
+    
+    subgraph "DMZ Network 10.0.1.0/24"
+        Proxy[Reverse Proxy<br/>Public: 198.51.100.10<br/>Private: 10.0.1.10]
+    end
+    
+    subgraph "Backend Network 192.168.1.0/24"
+        App[Web App<br/>192.168.1.100:3000]
+        API[API Server<br/>192.168.1.101:3001]
+        DB[Database Interface<br/>192.168.1.102:8081]
+    end
+    
+    Client --> Proxy
+    Proxy --> App
+    Proxy --> API
+    Proxy --> DB
 ```
 
 **Domain to Service Mapping:**
@@ -55,9 +79,10 @@ graph TD
 - `api.example.com` → API Server (192.168.1.101:3001)  
 - `db.example.com` → Database Interface (192.168.1.102:8081)
 
-**IP Address Details:**
-- **Public IP**: 198.51.100.10 (Reverse Proxy Server)
-- **Private Network**: 192.168.1.0/24
+**Network Segmentation:**
+- **Public Interface**: 198.51.100.10 (Internet-facing)
+- **DMZ Network**: 10.0.1.0/24 (Reverse proxy location)
+- **Backend Network**: 192.168.1.0/24 (Internal services)
 - **Client IP**: 203.0.113.45 (Example client)
 
 **Flow Explanation:**
