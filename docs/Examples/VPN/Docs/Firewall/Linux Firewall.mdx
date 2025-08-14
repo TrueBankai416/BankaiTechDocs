@@ -50,8 +50,6 @@ sudo ufw allow out 53
 # Option 2: Allow specific VPN server subnets only (more secure - recommended)
 # Replace with your VPN provider's server subnets
 sudo ufw allow out proto udp to 185.203.219.0/24 port 1194
-sudo ufw allow out proto udp to 89.187.160.0/24 port 1194
-sudo ufw allow out proto udp to 194.127.199.0/24 port 1194
 ```
 
 ### Enable UFW
@@ -76,12 +74,9 @@ Anywhere                   DENY        <PUBLIC_IP>
 192.168.1.0/24             ALLOW       Anywhere                  
 
 Anywhere                   ALLOW OUT   Anywhere on tun0           # OpenVPN TUN out
-1194/udp                   ALLOW OUT   Anywhere                   # OpenVPN
 53/udp                     ALLOW OUT   Anywhere                   # DNS
 192.168.1.0/24             ALLOW OUT   Anywhere                  
 185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
-89.187.160.0/24 1194/udp   ALLOW OUT   Anywhere                   # NordVPN servers
-194.127.199.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
 53/tcp                     ALLOW OUT   Anywhere                   # DNS
 ```
 
