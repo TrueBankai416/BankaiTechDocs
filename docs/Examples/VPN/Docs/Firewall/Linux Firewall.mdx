@@ -49,9 +49,9 @@ sudo ufw allow out 53/udp
 sudo ufw allow out 53/tcp
 
 # Allow specific VPN server subnets (example for NordVPN - replace with your VPN provider's servers)
-sudo ufw allow out to 185.203.219.0/24 proto udp port 1194
-sudo ufw allow out to 89.187.160.0/24 proto udp port 1194
-sudo ufw allow out to 194.127.199.0/24 proto udp port 1194
+sudo ufw allow out proto udp to 185.203.219.0/24 port 1194
+sudo ufw allow out proto udp to 89.187.160.0/24 port 1194
+sudo ufw allow out proto udp to 194.127.199.0/24 port 1194
 ```
 
 ### Enable UFW
