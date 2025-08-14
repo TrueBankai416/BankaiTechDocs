@@ -24,34 +24,34 @@ sudo ufw default deny outgoing
 ### Allow VPN Traffic
 ```bash
 # Allow traffic on VPN tunnel interface
-sudo ufw allow in on tun0
-sudo ufw allow out on tun0
+sudo ufw allow in on tun0 comment 'OpenVPN TUN in'
+sudo ufw allow out on tun0 comment 'OpenVPN TUN out'
 
 # Allow SSH access (inbound)
-sudo ufw allow in 22/tcp
+sudo ufw allow in 22/tcp comment 'SSH access'
 
 # Allow local network traffic
-sudo ufw allow in from 192.168.1.0/24
-sudo ufw allow out to 192.168.1.0/24
+sudo ufw allow in from 192.168.1.0/24 comment 'Local network'
+sudo ufw allow out to 192.168.1.0/24 comment 'Local network'
 
 # Block inbound traffic from your public IP
-sudo ufw deny from <PUBLIC_IP>
+sudo ufw deny from <PUBLIC_IP> comment 'Block public IP'
 # Block outbound traffic to your public IP  
-sudo ufw deny to <PUBLIC_IP>
+sudo ufw deny to <PUBLIC_IP> comment 'Block public IP'
 ```
 
 ### Allow VPN Server Connections
 ```bash
 # Allow DNS queries (both TCP and UDP)
-sudo ufw allow out 53/udp
-sudo ufw allow out 53/tcp
+sudo ufw allow out 53/udp comment 'DNS'
+sudo ufw allow out 53/tcp comment 'DNS'
 
 # Option 1: Allow OpenVPN to any destination (less secure but simpler)
-# sudo ufw allow out 1194/udp
+# sudo ufw allow out 1194/udp comment 'OpenVPN'
 
 # Option 2: Allow specific VPN server subnets only (more secure - recommended)
 # Replace with your VPN provider's server subnets
-sudo ufw allow out proto udp to 185.203.219.0/24 port 1194
+sudo ufw allow out proto udp to 185.203.219.0/24 port 1194 comment 'NordVPN server'
 ```
 
 ### Enable UFW
