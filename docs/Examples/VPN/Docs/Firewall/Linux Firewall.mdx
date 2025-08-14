@@ -41,14 +41,14 @@ sudo ufw deny to <PUBLIC_IP>
 
 ### Allow VPN Server Connections
 ```bash
-# Allow OpenVPN connection
-sudo ufw allow out 1194/udp
-
 # Allow DNS queries
-sudo ufw allow out 53/udp
-sudo ufw allow out 53/tcp
+sudo ufw allow out 53
 
-# Allow specific VPN server subnets (example for NordVPN - replace with your VPN provider's servers)
+# Option 1: Allow OpenVPN to any destination (less secure but simpler)
+# sudo ufw allow out 1194/udp
+
+# Option 2: Allow specific VPN server subnets only (more secure - recommended)
+# Replace with your VPN provider's server subnets
 sudo ufw allow out proto udp to 185.203.219.0/24 port 1194
 sudo ufw allow out proto udp to 89.187.160.0/24 port 1194
 sudo ufw allow out proto udp to 194.127.199.0/24 port 1194
