@@ -15,16 +15,20 @@ Status: active
 
 To                         Action      From
 --                         ------      ----
+Anywhere on tun0           ALLOW       Anywhere                   # OpenVPN TUN in
+22                         ALLOW       Anywhere                  
 Anywhere                   DENY        <PUBLIC_IP>             
 <PUBLIC_IP>                DENY        Anywhere                  
-22                         ALLOW       Anywhere                  
-Anywhere on tun0           ALLOW       Anywhere                  
 192.168.1.0/24             ALLOW       Anywhere                  
-Anywhere                   ALLOW       192.168.1.0/24            
 
-Anywhere                   ALLOW OUT   Anywhere on tun0          
-1194                       ALLOW OUT   Anywhere                  
-53                         ALLOW OUT   Anywhere
+Anywhere                   ALLOW OUT   Anywhere on tun0           # OpenVPN TUN out
+1194/udp                   ALLOW OUT   Anywhere                   # OpenVPN
+53/udp                     ALLOW OUT   Anywhere                   # DNS
+192.168.1.0/24             ALLOW OUT   Anywhere                  
+185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
+89.187.160.0/24 1194/udp   ALLOW OUT   Anywhere                   # NordVPN servers
+194.127.199.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
+53/tcp                     ALLOW OUT   Anywhere                   # DNS
 ```
 :::danger
 Make sure you change the default policies
