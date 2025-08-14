@@ -31,7 +31,7 @@ sudo ufw allow out on tun0
 sudo ufw allow in 22/tcp
 
 # Allow local network traffic
-sudo ufw allow from 192.168.1.0/24
+sudo ufw allow in from 192.168.1.0/24
 sudo ufw allow out to 192.168.1.0/24
 
 # Block traffic to/from your public IP (replace <PUBLIC_IP> with your actual public IP)
@@ -49,14 +49,16 @@ sudo ufw allow out 53/udp
 sudo ufw allow out 53/tcp
 
 # Allow specific VPN server subnets (example for NordVPN - replace with your VPN provider's servers)
-sudo ufw allow out to 185.203.219.0/24 port 1194 proto udp
-sudo ufw allow out to 89.187.160.0/24 port 1194 proto udp
-sudo ufw allow out to 194.127.199.0/24 port 1194 proto udp
+sudo ufw allow out to 185.203.219.0/24 proto udp port 1194
+sudo ufw allow out to 89.187.160.0/24 proto udp port 1194
+sudo ufw allow out to 194.127.199.0/24 proto udp port 1194
 ```
 
 ### Enable UFW
 ```bash
 sudo ufw enable
+# Or if UFW is already enabled, reload the rules:
+# sudo ufw reload
 ```
 
 ## Current UFW Status Example
