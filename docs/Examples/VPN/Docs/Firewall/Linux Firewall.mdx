@@ -34,15 +34,17 @@ sudo ufw allow in 22/tcp
 sudo ufw allow in from 192.168.1.0/24
 sudo ufw allow out to 192.168.1.0/24
 
-# Block traffic to/from your public IP (replace <PUBLIC_IP> with your actual public IP)
+# Block inbound traffic from your public IP
 sudo ufw deny from <PUBLIC_IP>
+# Block outbound traffic to your public IP  
 sudo ufw deny to <PUBLIC_IP>
 ```
 
 ### Allow VPN Server Connections
 ```bash
-# Allow DNS queries
-sudo ufw allow out 53
+# Allow DNS queries (both TCP and UDP)
+sudo ufw allow out 53/udp
+sudo ufw allow out 53/tcp
 
 # Option 1: Allow OpenVPN to any destination (less secure but simpler)
 # sudo ufw allow out 1194/udp
@@ -76,7 +78,7 @@ Anywhere                   DENY        <PUBLIC_IP>
 Anywhere                   ALLOW OUT   Anywhere on tun0           # OpenVPN TUN out
 53/udp                     ALLOW OUT   Anywhere                   # DNS
 192.168.1.0/24             ALLOW OUT   Anywhere                  
-185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
+185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN server
 53/tcp                     ALLOW OUT   Anywhere                   # DNS
 ```
 
