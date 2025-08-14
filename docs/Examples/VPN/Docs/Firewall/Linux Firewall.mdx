@@ -31,7 +31,7 @@ sudo ufw allow out on tun0 comment 'OpenVPN TUN out'
 sudo ufw allow in 22/tcp comment 'SSH access'
 
 # Allow local network traffic
-sudo ufw allow in from 192.168.1.0/24 comment 'Local network'
+sudo ufw allow to 192.168.1.0/24 comment 'Local network'
 sudo ufw allow out to 192.168.1.0/24 comment 'Local network'
 
 # Block inbound traffic from your public IP
