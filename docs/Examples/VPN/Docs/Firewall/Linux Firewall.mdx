@@ -9,6 +9,62 @@ last_update:
 ---
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+## UFW Commands to Create VPN Firewall Rules
+
+:::info
+**Note:** VPN server IP addresses and subnets may differ depending on your VPN provider. Replace the example IP ranges with your actual VPN server addresses.
+:::
+
+### Set Default Policies
+```bash
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+```
+
+### Allow VPN Traffic
+```bash
+# Allow traffic on VPN tunnel interface
+sudo ufw allow in on tun0 comment 'OpenVPN TUN in'
+sudo ufw allow out on tun0 comment 'OpenVPN TUN out'
+
+# Allow SSH access (inbound)
+sudo ufw allow in 22/tcp comment 'SSH access'
+
+# Allow local network traffic
+sudo ufw allow to 192.168.1.0/24 comment 'Local network'
+sudo ufw allow out to 192.168.1.0/24 comment 'Local network'
+
+# Block inbound traffic from your public IP
+sudo ufw deny from <PUBLIC_IP> comment 'Block public IP'
+# Block outbound traffic to your public IP  
+sudo ufw deny to <PUBLIC_IP> comment 'Block public IP'
+```
+
+### Allow VPN Server Connections
+```bash
+# Allow DNS queries (both TCP and UDP)
+sudo ufw allow out 53/udp comment 'DNS'
+sudo ufw allow out 53/tcp comment 'DNS'
+
+# Allow specific VPN server subnets (replace with your VPN provider's server subnets)
+sudo ufw allow out proto udp to 185.203.219.0/24 port 1194 comment 'NordVPN server'
+```
+
+:::tip Viewing Comments
+To see the comments in your UFW status output, use:
+- `sudo ufw status numbered` - shows rules with numbers and comments
+- `sudo ufw status verbose` - shows detailed status with comments
+:::
+
+### Enable UFW
+```bash
+sudo ufw enable
+# Or if UFW is already enabled, reload the rules:
+# sudo ufw reload
+```
+
+## Current UFW Status Example
+
 ```bash
 root@MediaManagement:~# ufw status
 Status: active
@@ -22,22 +78,10 @@ Anywhere                   DENY        <PUBLIC_IP>
 192.168.1.0/24             ALLOW       Anywhere                  
 
 Anywhere                   ALLOW OUT   Anywhere on tun0           # OpenVPN TUN out
-1194/udp                   ALLOW OUT   Anywhere                   # OpenVPN
 53/udp                     ALLOW OUT   Anywhere                   # DNS
 192.168.1.0/24             ALLOW OUT   Anywhere                  
-185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
-89.187.160.0/24 1194/udp   ALLOW OUT   Anywhere                   # NordVPN servers
-194.127.199.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN servers
+185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN server
 53/tcp                     ALLOW OUT   Anywhere                   # DNS
 ```
-:::danger
-Make sure you change the default policies
-```bash
-sudo ufw default deny incoming
-```
-```bash
-sudo ufw default deny outgoing
-```
-:::
 
 <BuyMeACoffeeButton />
