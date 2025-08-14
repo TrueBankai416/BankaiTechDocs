@@ -9,6 +9,58 @@ last_update:
 ---
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+## UFW Commands to Create VPN Firewall Rules
+
+:::info
+**Note:** VPN server IP addresses and subnets may differ depending on your VPN provider. Replace the example IP ranges with your actual VPN server addresses.
+:::
+
+### Set Default Policies
+```bash
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+```
+
+### Allow VPN Traffic
+```bash
+# Allow traffic on VPN tunnel interface
+sudo ufw allow in on tun0
+sudo ufw allow out on tun0
+
+# Allow SSH access
+sudo ufw allow 22
+
+# Allow local network traffic
+sudo ufw allow from 192.168.1.0/24
+sudo ufw allow out to 192.168.1.0/24
+
+# Block your public IP (replace <PUBLIC_IP> with your actual public IP)
+sudo ufw deny from <PUBLIC_IP>
+sudo ufw deny to <PUBLIC_IP>
+```
+
+### Allow VPN Server Connections
+```bash
+# Allow OpenVPN connection
+sudo ufw allow out 1194/udp
+
+# Allow DNS queries
+sudo ufw allow out 53/udp
+sudo ufw allow out 53/tcp
+
+# Allow specific VPN server subnets (example for NordVPN - replace with your VPN provider's servers)
+sudo ufw allow out to 185.203.219.0/24 port 1194 proto udp
+sudo ufw allow out to 89.187.160.0/24 port 1194 proto udp
+sudo ufw allow out to 194.127.199.0/24 port 1194 proto udp
+```
+
+### Enable UFW
+```bash
+sudo ufw enable
+```
+
+## Current UFW Status Example
+
 ```bash
 root@MediaManagement:~# ufw status
 Status: active
