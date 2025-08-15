@@ -1,0 +1,1040 @@
+---
+title: CIFS/SMB Setup and Configuration
+tags:
+   - Proxmox
+   - Storage
+   - CIFS
+   - SMB
+   - Samba
+   - Network Storage
+   - Windows
+
+keywords: [Proxmox, CIFS, SMB, Samba, Network Storage, Windows Share, Remote Storage, Mount]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **CIFS/SMB Setup and Configuration for Proxmox**
+
+Common Internet File System (CIFS) and Server Message Block (SMB) are network file sharing protocols that enable clients to access files and services on remote servers. This guide provides comprehensive instructions for setting up CIFS/SMB with Proxmox, covering both server and client configuration.
+
+## **What is CIFS/SMB?**
+
+CIFS/SMB is a network file sharing protocol suite that allows applications to read and write files and request services from server programs in a computer network. Originally developed by Microsoft, it's now widely supported across different operating systems.
+
+### **Benefits of CIFS/SMB**
+
+- ✅ **Cross-Platform**: Excellent Windows compatibility, good Linux support
+- ✅ **Built-in Authentication**: Integrated with Active Directory and domain authentication
+- ✅ **Feature Rich**: Advanced features like file locking, permissions, and metadata
+- ✅ **Mature Protocol**: Well-established with extensive enterprise support
+- ✅ **Encryption**: Modern SMB versions support encryption
+- ✅ **Wide Adoption**: Supported by most NAS devices and storage systems
+
+### **Limitations of CIFS/SMB**
+
+- ❌ **Performance Overhead**: Higher protocol overhead compared to NFS
+- ❌ **Complexity**: More complex configuration than simpler protocols
+- ❌ **Windows Dependency**: Best performance and features with Windows servers
+- ❌ **Version Compatibility**: Different SMB versions have varying capabilities
+
+## **SMB/CIFS Versions Comparison**
+
+<Tabs
+  defaultValue="smb3"
+  values={[
+    {label: 'SMB 3.x (Recommended)', value: 'smb3'},
+    {label: 'SMB 2.x', value: 'smb2'},
+    {label: 'SMB 1.x (Legacy)', value: 'smb1'},
+    {label: 'Comparison', value: 'comparison'},
+  ]}>
+
+<TabItem value="smb3">
+**SMB 3.x (Modern - Recommended)**
+- **Security**: End-to-end encryption, secure negotiation
+- **Performance**: Improved throughput, multichannel support
+- **Features**: Scale-out file servers, transparent failover
+- **Resilience**: Continuous availability, automatic recovery
+- **Compatibility**: Windows 8+, Windows Server 2012+, modern Linux
+- **Recommendation**: Use for all new deployments
+</TabItem>
+
+<TabItem value="smb2">
+**SMB 2.x (Intermediate)**
+- **Performance**: Better than SMB 1.x, supports larger reads/writes
+- **Features**: Compound requests, improved caching
+- **Security**: Better security than SMB 1.x
+- **Compatibility**: Windows Vista+, Windows Server 2008+
+- **Limitations**: No encryption, limited resilience features
+</TabItem>
+
+<TabItem value="smb1">
+**SMB 1.x (Legacy - Deprecated)**
+- **Status**: Deprecated and insecure
+- **Security**: Multiple known vulnerabilities
+- **Performance**: Poor performance, limited scalability
+- **Recommendation**: Avoid for new deployments
+- **Legacy Support**: Only use if required for very old systems
+</TabItem>
+
+<TabItem value="comparison">
+**Feature Comparison**
+
+| Feature | SMB 1.x | SMB 2.x | SMB 3.x |
+|---------|---------|---------|---------|
+| Security | Poor | Good | Excellent |
+| Performance | Low | Medium | High |
+| Encryption | No | No | Yes |
+| Multichannel | No | No | Yes |
+| Resilience | No | Limited | Yes |
+| Recommendation | Avoid | Legacy | Use |
+</TabItem>
+</Tabs>
+
+## **Architecture Overview**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Proxmox Cluster                             │
+│                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │ Proxmox     │    │ Proxmox     │    │ Proxmox     │     │
+│  │ Node 1      │    │ Node 2      │    │ Node 3      │     │
+│  │             │    │             │    │             │     │
+│  │ CIFS Client │    │ CIFS Client │    │ CIFS Client │     │
+│  │ /mnt/pve/   │    │ /mnt/pve/   │    │ /mnt/pve/   │     │
+│  │ └─smb-share │    │ └─smb-share │    │ └─smb-share │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+│         │                   │                   │          │
+└─────────┼───────────────────┼───────────────────┼──────────┘
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │   Network Switch  │
+                    └─────────┬─────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │ SMB/CIFS Server   │
+                    │                   │
+                    │ ┌───────────────┐ │
+                    │ │ Samba/SMB     │ │
+                    │ │ Service       │ │
+                    │ │ (Port 445)    │ │
+                    │ └───────────────┘ │
+                    │                   │
+                    │ ┌───────────────┐ │
+                    │ │ Shared Dirs   │ │
+                    │ │ /srv/samba/   │ │
+                    │ │ ├─data        │ │
+                    │ │ ├─vm          │ │
+                    │ │ └─backup      │ │
+                    │ └───────────────┘ │
+                    └───────────────────┘
+```
+
+## **SMB/CIFS Server Configuration**
+
+### **1. Install Samba Server**
+
+<Tabs
+  defaultValue="ubuntu"
+  values={[
+    {label: 'Ubuntu/Debian', value: 'ubuntu'},
+    {label: 'CentOS/RHEL', value: 'centos'},
+    {label: 'Windows Server', value: 'windows'},
+  ]}>
+
+<TabItem value="ubuntu">
+```bash
+# Update package list
+sudo apt update
+
+# Install Samba server
+sudo apt install samba samba-common-bin
+
+# Install additional utilities
+sudo apt install cifs-utils
+
+# Start and enable Samba services
+sudo systemctl start smbd
+sudo systemctl enable smbd
+sudo systemctl start nmbd
+sudo systemctl enable nmbd
+
+# Check service status
+sudo systemctl status smbd
+sudo systemctl status nmbd
+```
+</TabItem>
+
+<TabItem value="centos">
+```bash
+# Install Samba server
+sudo yum install samba samba-client samba-common
+
+# Install CIFS utilities
+sudo yum install cifs-utils
+
+# Start and enable Samba services
+sudo systemctl start smb
+sudo systemctl enable smb
+sudo systemctl start nmb
+sudo systemctl enable nmb
+
+# Check service status
+sudo systemctl status smb
+sudo systemctl status nmb
+```
+</TabItem>
+
+<TabItem value="windows">
+**Windows Server SMB Setup**
+
+1. **Enable File and Printer Sharing**
+   - Open Server Manager
+   - Add Roles and Features
+   - Select "File and Storage Services"
+   - Enable "File Server" role
+
+2. **Create Shared Folders**
+   - Open File Explorer
+   - Right-click folder → Properties → Sharing
+   - Click "Advanced Sharing"
+   - Configure share name and permissions
+
+3. **Configure SMB Settings**
+   - Open PowerShell as Administrator
+   - Run: `Set-SmbServerConfiguration -EnableSMB1Protocol $false`
+   - Run: `Set-SmbServerConfiguration -EnableSMB2Protocol $true`
+</TabItem>
+</Tabs>
+
+### **2. Create Shared Directories**
+
+```bash
+# Create directories for SMB shares
+sudo mkdir -p /srv/samba/{data,vm,backup,iso,templates}
+
+# Create a dedicated samba group
+sudo groupadd smbgroup
+
+# Create samba user
+sudo useradd -M -d /srv/samba -s /usr/sbin/nologin -G smbgroup smbuser
+
+# Set ownership and permissions
+sudo chown -R smbuser:smbgroup /srv/samba/
+sudo chmod -R 755 /srv/samba/
+
+# Set SELinux context (if SELinux is enabled)
+sudo setsebool -P samba_enable_home_dirs on
+sudo setsebool -P samba_export_all_rw on
+```
+
+### **3. Configure Samba**
+
+```bash
+# Backup original Samba configuration
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.backup.$(date +%Y%m%d)
+
+# Create new Samba configuration
+sudo tee /etc/samba/smb.conf > /dev/null << 'EOF'
+# Samba Configuration for Proxmox Storage
+
+[global]
+    # Server identification
+    workgroup = WORKGROUP
+    server string = Proxmox Storage Server
+    netbios name = PROXMOX-STORAGE
+    
+    # Protocol versions
+    server min protocol = SMB2
+    server max protocol = SMB3
+    client min protocol = SMB2
+    client max protocol = SMB3
+    
+    # Security settings
+    security = user
+    map to guest = bad user
+    guest account = nobody
+    
+    # Performance and reliability
+    socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=131072 SO_SNDBUF=131072
+    read raw = yes
+    write raw = yes
+    max xmit = 65535
+    dead time = 15
+    getwd cache = yes
+    
+    # Logging
+    log file = /var/log/samba/log.%m
+    max log size = 1000
+    log level = 1
+    
+    # Character set
+    unix charset = UTF-8
+    dos charset = CP850
+    
+    # Disable printing
+    load printers = no
+    printing = bsd
+    printcap name = /dev/null
+    disable spoolss = yes
+
+# Data share - read/write access
+[data]
+    comment = Data Storage
+    path = /srv/samba/data
+    browseable = yes
+    writable = yes
+    guest ok = no
+    valid users = @smbgroup
+    create mask = 0664
+    directory mask = 0775
+    force group = smbgroup
+
+# VM storage - high performance
+[vm]
+    comment = VM Storage
+    path = /srv/samba/vm
+    browseable = yes
+    writable = yes
+    guest ok = no
+    valid users = @smbgroup
+    create mask = 0664
+    directory mask = 0775
+    force group = smbgroup
+    # Performance optimizations for VM storage
+    strict allocate = yes
+    allocation roundup size = 1048576
+
+# Backup storage
+[backup]
+    comment = Backup Storage
+    path = /srv/samba/backup
+    browseable = yes
+    writable = yes
+    guest ok = no
+    valid users = @smbgroup
+    create mask = 0664
+    directory mask = 0775
+    force group = smbgroup
+
+# ISO storage - read-only
+[iso]
+    comment = ISO Images
+    path = /srv/samba/iso
+    browseable = yes
+    writable = no
+    guest ok = yes
+    read only = yes
+
+# Template storage
+[templates]
+    comment = VM Templates
+    path = /srv/samba/templates
+    browseable = yes
+    writable = yes
+    guest ok = no
+    valid users = @smbgroup
+    create mask = 0664
+    directory mask = 0775
+    force group = smbgroup
+EOF
+```
+
+### **4. Create Samba Users**
+
+```bash
+# Add system user to samba group
+sudo usermod -a -G smbgroup $USER
+
+# Create Samba user (this will prompt for password)
+sudo smbpasswd -a smbuser
+
+# Enable the Samba user
+sudo smbpasswd -e smbuser
+
+# Verify Samba users
+sudo pdbedit -L -v
+```
+
+### **5. Configure Firewall**
+
+```bash
+# For Ubuntu/Debian with ufw
+sudo ufw allow samba
+
+# Or manually allow SMB ports
+sudo ufw allow 139/tcp
+sudo ufw allow 445/tcp
+sudo ufw allow 137/udp
+sudo ufw allow 138/udp
+
+# For CentOS/RHEL with firewalld
+sudo firewall-cmd --permanent --add-service=samba
+sudo firewall-cmd --reload
+
+# Check firewall status
+sudo ufw status
+# or
+sudo firewall-cmd --list-all
+```
+
+### **6. Test Samba Configuration**
+
+```bash
+# Test Samba configuration syntax
+sudo testparm
+
+# Restart Samba services
+sudo systemctl restart smbd nmbd
+
+# Check service status
+sudo systemctl status smbd nmbd
+
+# Test local access
+smbclient -L localhost -U smbuser
+
+# List shares
+smbclient -L //localhost -U smbuser
+```
+
+## **Proxmox CIFS Client Configuration**
+
+### **1. Install CIFS Client**
+
+```bash
+# Install CIFS utilities
+apt update
+apt install cifs-utils
+
+# Verify installation
+mount.cifs --version
+```
+
+### **2. Create Credentials File**
+
+```bash
+# Create secure credentials file
+sudo mkdir -p /etc/cifs-credentials
+
+# Create credentials file for each share/user
+sudo tee /etc/cifs-credentials/smbuser > /dev/null << 'EOF'
+username=smbuser
+password=your_password_here
+domain=WORKGROUP
+EOF
+
+# Secure the credentials file
+sudo chmod 600 /etc/cifs-credentials/smbuser
+sudo chown root:root /etc/cifs-credentials/smbuser
+```
+
+### **3. Create Mount Points**
+
+```bash
+# Create mount point directories
+mkdir -p /mnt/pve/smb-{data,vm,backup,iso,templates}
+
+# Verify directories
+ls -la /mnt/pve/ | grep smb
+```
+
+### **4. Test Manual Mount**
+
+```bash
+# Test manual mount with SMB3
+mount -t cifs //192.168.1.100/data /mnt/pve/smb-data \
+  -o credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8
+
+# Test manual mount with SMB2
+mount -t cifs //192.168.1.100/data /mnt/pve/smb-data \
+  -o credentials=/etc/cifs-credentials/smbuser,vers=2.0,iocharset=utf8
+
+# Verify mount
+df -h | grep cifs
+ls /mnt/pve/smb-data/
+
+# Test write access
+touch /mnt/pve/smb-data/test-file
+ls -la /mnt/pve/smb-data/test-file
+rm /mnt/pve/smb-data/test-file
+
+# Unmount for configuration
+umount /mnt/pve/smb-data
+```
+
+### **5. Configure Persistent Mounts**
+
+```bash
+# Backup current fstab
+cp /etc/fstab /etc/fstab.backup.$(date +%Y%m%d)
+
+# Add CIFS mounts to fstab
+cat >> /etc/fstab << 'EOF'
+
+# CIFS/SMB Mounts for Proxmox Storage
+//192.168.1.100/data      /mnt/pve/smb-data      cifs    credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8,file_mode=0664,dir_mode=0775,uid=root,gid=root,_netdev 0 0
+//192.168.1.100/vm        /mnt/pve/smb-vm        cifs    credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8,file_mode=0664,dir_mode=0775,uid=root,gid=root,_netdev,cache=strict 0 0
+//192.168.1.100/backup    /mnt/pve/smb-backup    cifs    credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8,file_mode=0664,dir_mode=0775,uid=root,gid=root,_netdev 0 0
+//192.168.1.100/iso       /mnt/pve/smb-iso       cifs    credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8,ro,_netdev 0 0
+//192.168.1.100/templates /mnt/pve/smb-templates cifs    credentials=/etc/cifs-credentials/smbuser,vers=3.0,iocharset=utf8,file_mode=0664,dir_mode=0775,uid=root,gid=root,_netdev 0 0
+EOF
+```
+
+### **6. CIFS Mount Options Explained**
+
+```bash
+# Essential CIFS mount options:
+
+# Authentication
+credentials=/path/file   # Credentials file location
+username=user           # Username for authentication
+password=pass           # Password (insecure, use credentials file)
+domain=DOMAIN          # Windows domain
+
+# Protocol Version
+vers=3.0               # SMB 3.0 (recommended)
+vers=2.1               # SMB 2.1
+vers=2.0               # SMB 2.0
+vers=1.0               # SMB 1.0 (deprecated)
+
+# Character Encoding
+iocharset=utf8         # Character set for filenames
+unicode                # Enable Unicode support
+
+# File Permissions
+file_mode=0664         # Default file permissions
+dir_mode=0775          # Default directory permissions
+uid=1000               # User ID for files
+gid=1000               # Group ID for files
+forceuid               # Force all files to specified uid
+forcegid               # Force all files to specified gid
+
+# Performance Options
+cache=strict           # Strict caching (better for VMs)
+cache=loose            # Loose caching (better performance)
+cache=none             # No caching
+rsize=65536           # Read buffer size
+wsize=65536           # Write buffer size
+
+# Network Options
+_netdev               # Network device (wait for network)
+soft                  # Soft mount (return errors on timeout)
+hard                  # Hard mount (retry indefinitely)
+```
+
+### **7. Mount CIFS Shares**
+
+```bash
+# Mount all CIFS shares
+mount -a
+
+# Verify all mounts
+df -h | grep cifs
+mount | grep cifs
+
+# Test each mount point
+ls /mnt/pve/smb-data/
+ls /mnt/pve/smb-vm/
+ls /mnt/pve/smb-backup/
+```
+
+## **Proxmox Storage Configuration**
+
+### **1. Add CIFS Storage via Web Interface**
+
+1. **Access Proxmox Web Interface**
+   - Navigate to your Proxmox web interface
+   - Go to **Datacenter** → **Storage**
+
+2. **Add CIFS Storage**
+   - Click **Add** → **CIFS**
+   - Configure the following:
+     - **ID**: `smb-data` (unique identifier)
+     - **Server**: `192.168.1.100`
+     - **Share**: `data`
+     - **Username**: `smbuser`
+     - **Password**: `your_password`
+     - **Content**: Select appropriate content types
+     - **Nodes**: Select which nodes can access this storage
+
+3. **Advanced Options**
+   - **SMB Version**: Select `3.0` (recommended)
+   - **Options**: Add custom mount options if needed
+
+### **2. Add CIFS Storage via Command Line**
+
+```bash
+# Backup current storage configuration
+cp /etc/pve/storage.cfg /etc/pve/storage.cfg.backup.$(date +%Y%m%d)
+
+# Add CIFS storage definitions
+cat >> /etc/pve/storage.cfg << 'EOF'
+
+# CIFS/SMB Storage Definitions
+cifs: smb-data
+        server 192.168.1.100
+        share data
+        path /mnt/pve/smb-data
+        username smbuser
+        password your_password_here
+        content images,vztmpl
+        smbversion 3
+        options file_mode=0664,dir_mode=0775
+
+cifs: smb-vm
+        server 192.168.1.100
+        share vm
+        path /mnt/pve/smb-vm
+        username smbuser
+        password your_password_here
+        content images
+        smbversion 3
+        options file_mode=0664,dir_mode=0775,cache=strict
+
+cifs: smb-backup
+        server 192.168.1.100
+        share backup
+        path /mnt/pve/smb-backup
+        username smbuser
+        password your_password_here
+        content backup
+        smbversion 3
+
+cifs: smb-iso
+        server 192.168.1.100
+        share iso
+        path /mnt/pve/smb-iso
+        username smbuser
+        password your_password_here
+        content iso
+        smbversion 3
+
+cifs: smb-templates
+        server 192.168.1.100
+        share templates
+        path /mnt/pve/smb-templates
+        username smbuser
+        password your_password_here
+        content vztmpl
+        smbversion 3
+EOF
+```
+
+### **3. Verify Storage Configuration**
+
+```bash
+# Check storage status
+pvesm status
+
+# List all storage
+pvesm list
+
+# Test storage access
+pvesm path smb-data:100/vm-100-disk-0.qcow2
+
+# Check storage capacity
+pvesm status smb-data
+```
+
+## **Performance Optimization**
+
+### **1. SMB Server Tuning**
+
+```bash
+# Optimize Samba server performance
+# Edit /etc/samba/smb.conf and add/modify:
+
+[global]
+    # Performance optimizations
+    socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=131072 SO_SNDBUF=131072
+    read raw = yes
+    write raw = yes
+    max xmit = 65535
+    
+    # Async I/O
+    aio read size = 16384
+    aio write size = 16384
+    aio write behind = true
+    
+    # Oplocks for better caching
+    oplocks = yes
+    level2 oplocks = yes
+    kernel oplocks = no
+    
+    # Memory mapping
+    use mmap = yes
+    
+    # Disable unnecessary features
+    load printers = no
+    disable spoolss = yes
+
+# Restart Samba after changes
+sudo systemctl restart smbd
+```
+
+### **2. Client-Side Optimization**
+
+```bash
+# Optimize CIFS client mount options
+# Add to /etc/fstab mount options:
+# cache=strict,rsize=65536,wsize=65536,actimeo=1
+
+# Example optimized fstab entry:
+# //192.168.1.100/vm /mnt/pve/smb-vm cifs credentials=/etc/cifs-credentials/smbuser,vers=3.0,cache=strict,rsize=65536,wsize=65536,actimeo=1,_netdev 0 0
+```
+
+### **3. Network Optimization**
+
+```bash
+# Enable jumbo frames (if supported)
+# On SMB server
+sudo ip link set dev eth0 mtu 9000
+
+# On Proxmox clients
+ip link set dev eth0 mtu 9000
+
+# Add to /etc/network/interfaces for persistence:
+# auto eth0
+# iface eth0 inet static
+#     address 192.168.1.10/24
+#     gateway 192.168.1.1
+#     mtu 9000
+```
+
+### **4. Kernel Tuning**
+
+```bash
+# Optimize kernel parameters for CIFS
+cat >> /etc/sysctl.conf << 'EOF'
+
+# CIFS Performance Tuning
+net.core.rmem_default = 262144
+net.core.rmem_max = 16777216
+net.core.wmem_default = 262144
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 65536 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+EOF
+
+# Apply settings
+sysctl -p
+```
+
+## **Security Configuration**
+
+### **1. SMB Encryption**
+
+```bash
+# Enable SMB encryption in /etc/samba/smb.conf
+[global]
+    # Force SMB encryption
+    smb encrypt = required
+    
+    # Or allow but don't require
+    # smb encrypt = desired
+
+# For specific shares
+[data]
+    smb encrypt = required
+```
+
+### **2. Access Control**
+
+```bash
+# Restrict access by IP in /etc/samba/smb.conf
+[global]
+    hosts allow = 192.168.1.0/24 127.0.0.1
+    hosts deny = ALL
+
+# Per-share access control
+[data]
+    hosts allow = 192.168.1.10 192.168.1.11 192.168.1.12
+```
+
+### **3. User and Group Management**
+
+```bash
+# Create dedicated groups for different access levels
+sudo groupadd smb-readonly
+sudo groupadd smb-readwrite
+sudo groupadd smb-admin
+
+# Add users to appropriate groups
+sudo usermod -a -G smb-readwrite smbuser
+
+# Configure share permissions
+[data]
+    valid users = @smb-readwrite, @smb-admin
+    read list = @smb-readonly
+    write list = @smb-readwrite, @smb-admin
+    admin users = @smb-admin
+```
+
+## **Troubleshooting**
+
+### **Common Issues and Solutions**
+
+<Tabs
+  defaultValue="mount-issues"
+  values={[
+    {label: 'Mount Issues', value: 'mount-issues'},
+    {label: 'Authentication Problems', value: 'auth'},
+    {label: 'Performance Issues', value: 'performance'},
+    {label: 'Permission Problems', value: 'permissions'},
+  ]}>
+
+<TabItem value="mount-issues">
+**Mount Failures**
+
+```bash
+# Test SMB server connectivity
+smbclient -L //192.168.1.100 -U smbuser
+
+# Test network connectivity
+ping 192.168.1.100
+telnet 192.168.1.100 445
+
+# Check SMB services
+sudo systemctl status smbd nmbd
+
+# Debug mount issues
+mount -t cifs //192.168.1.100/data /mnt/pve/smb-data -v \
+  -o credentials=/etc/cifs-credentials/smbuser,vers=3.0
+
+# Check system logs
+journalctl -u smbd
+tail -f /var/log/samba/log.smbd
+```
+</TabItem>
+
+<TabItem value="auth">
+**Authentication Issues**
+
+```bash
+# Test user authentication
+smbclient //192.168.1.100/data -U smbuser
+
+# Check Samba user database
+sudo pdbedit -L -v
+
+# Reset Samba user password
+sudo smbpasswd smbuser
+
+# Check credentials file
+sudo cat /etc/cifs-credentials/smbuser
+sudo ls -la /etc/cifs-credentials/
+
+# Test with different SMB versions
+mount -t cifs //192.168.1.100/data /mnt/test -o username=smbuser,vers=2.0
+```
+</TabItem>
+
+<TabItem value="performance">
+**Performance Problems**
+
+```bash
+# Check SMB statistics
+smbstatus
+sudo smbstatus -p
+
+# Monitor network utilization
+iftop -i eth0
+iostat -x 1
+
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/smb-data/test bs=1M count=100
+rm /mnt/pve/smb-data/test
+
+# Check mount options
+mount | grep cifs
+```
+</TabItem>
+
+<TabItem value="permissions">
+**Permission Problems**
+
+```bash
+# Check share permissions
+sudo testparm -s
+
+# Verify directory permissions on server
+ls -la /srv/samba/data/
+
+# Check user mapping
+id smbuser
+getent group smbgroup
+
+# Test file creation
+touch /mnt/pve/smb-data/test
+ls -la /mnt/pve/smb-data/test
+```
+</TabItem>
+</Tabs>
+
+### **Diagnostic Commands**
+
+```bash
+# CIFS client diagnostics
+mount | grep cifs
+df -h | grep cifs
+cat /proc/fs/cifs/Stats
+
+# SMB server diagnostics
+sudo testparm
+smbstatus
+sudo smbstatus -S
+
+# Network diagnostics
+ss -tuln | grep 445
+netstat -an | grep 445
+nmap -p 445 192.168.1.100
+
+# System logs
+journalctl -f | grep -i smb
+tail -f /var/log/samba/log.smbd
+```
+
+## **Monitoring and Maintenance**
+
+### **1. SMB Health Monitoring**
+
+```bash
+# Create SMB monitoring script
+cat > /usr/local/bin/smb-monitor.sh << 'EOF'
+#!/bin/bash
+
+LOG_FILE="/var/log/smb-monitor.log"
+
+# Function to check SMB mount health
+check_smb_mount() {
+    local mount_point="$1"
+    local name="$2"
+    
+    if mountpoint -q "$mount_point"; then
+        if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
+            echo "$(date): ✓ $name is healthy"
+            return 0
+        else
+            echo "$(date): ✗ $name is unresponsive"
+            return 1
+        fi
+    else
+        echo "$(date): ✗ $name is not mounted"
+        return 1
+    fi
+}
+
+# Check all SMB mounts
+for mount in data vm backup iso templates; do
+    check_smb_mount "/mnt/pve/smb-$mount" "smb-$mount"
+done >> "$LOG_FILE"
+
+# Log SMB server status (if local)
+if systemctl is-active --quiet smbd; then
+    echo "$(date): SMB Server Status:" >> "$LOG_FILE"
+    smbstatus -b >> "$LOG_FILE" 2>&1
+fi
+EOF
+
+chmod +x /usr/local/bin/smb-monitor.sh
+
+# Add to crontab
+echo "*/5 * * * * /usr/local/bin/smb-monitor.sh" | crontab -
+```
+
+### **2. Automated Remount Script**
+
+```bash
+# Create automatic remount script
+cat > /usr/local/bin/smb-remount.sh << 'EOF'
+#!/bin/bash
+
+LOG_FILE="/var/log/smb-remount.log"
+
+remount_smb() {
+    local mount_point="$1"
+    local name="$2"
+    
+    echo "$(date): Attempting to remount $name" >> "$LOG_FILE"
+    
+    # Try to unmount first
+    umount "$mount_point" 2>/dev/null
+    
+    # Wait a moment
+    sleep 2
+    
+    # Remount
+    if mount "$mount_point"; then
+        echo "$(date): ✓ Successfully remounted $name" >> "$LOG_FILE"
+        return 0
+    else
+        echo "$(date): ✗ Failed to remount $name" >> "$LOG_FILE"
+        return 1
+    fi
+}
+
+# Check and remount failed SMB mounts
+for mount in data vm backup iso templates; do
+    mount_point="/mnt/pve/smb-$mount"
+    if ! mountpoint -q "$mount_point" || ! timeout 5 ls "$mount_point" >/dev/null 2>&1; then
+        remount_smb "$mount_point" "smb-$mount"
+    fi
+done
+EOF
+
+chmod +x /usr/local/bin/smb-remount.sh
+```
+
+### **3. Log Rotation**
+
+```bash
+# Configure log rotation for SMB logs
+cat > /etc/logrotate.d/smb-custom << 'EOF'
+/var/log/smb-monitor.log
+/var/log/smb-remount.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 root root
+}
+EOF
+```
+
+## **Best Practices**
+
+### **1. Security Best Practices**
+
+- **Use SMB 3.0+**: Always use modern SMB versions with encryption
+- **Strong Authentication**: Implement strong passwords and consider domain authentication
+- **Network Segmentation**: Isolate SMB traffic using VLANs
+- **Access Control**: Use IP restrictions and user-based access controls
+- **Regular Updates**: Keep Samba and client software updated
+
+### **2. Performance Best Practices**
+
+- **Dedicated Networks**: Use dedicated gigabit or 10GbE networks for storage
+- **Optimize Mount Options**: Use appropriate caching and buffer sizes
+- **Server Tuning**: Optimize Samba server configuration for your workload
+- **Monitor Performance**: Regular monitoring of throughput and latency
+- **Load Distribution**: Distribute load across multiple SMB servers
+
+### **3. Reliability Best Practices**
+
+- **Redundancy**: Implement server and network redundancy
+- **Monitoring**: Comprehensive monitoring and alerting
+- **Backup Strategies**: Regular backups of SMB server configuration and data
+- **Documentation**: Maintain detailed documentation of configurations
+- **Testing**: Regular testing of failover and recovery procedures
+
+CIFS/SMB provides excellent compatibility and feature richness for Proxmox storage, especially in mixed Windows/Linux environments. When properly configured with modern SMB versions, it offers good performance and robust security features suitable for enterprise virtualization deployments.
+
+<BuyMeACoffeeButton />
