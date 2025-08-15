@@ -1,0 +1,8 @@
+{
+  "label": "Storage",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Comprehensive guide to Proxmox storage including NFS, CIFS/SMB, and SSHFS setup and configuration for network-attached storage solutions."
+  }
+}

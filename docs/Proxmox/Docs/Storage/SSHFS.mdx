@@ -1,0 +1,816 @@
+---
+title: SSHFS Setup and Configuration
+tags:
+   - Proxmox
+   - Storage
+   - SSHFS
+   - SSH
+   - Network Storage
+   - Remote Storage
+
+keywords: [Proxmox, SSHFS, SSH, Remote Storage, Network Storage, File System, Mount]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **SSHFS Setup and Configuration for Proxmox**
+
+SSHFS (SSH File System) allows you to mount remote directories over SSH, providing a secure and reliable method for accessing network storage. This guide provides comprehensive instructions for setting up SSHFS with Proxmox, including server configuration, client setup, and best practices.
+
+## **What is SSHFS?**
+
+SSHFS is a filesystem client that uses the SSH File Transfer Protocol (SFTP) to mount remote directories as local filesystems. It leverages existing SSH infrastructure, making it an excellent choice for secure remote storage access.
+
+### **Benefits of SSHFS**
+
+- ✅ **High Security**: Uses SSH encryption and authentication
+- ✅ **Simple Setup**: Leverages existing SSH infrastructure
+- ✅ **Automatic Reconnection**: Built-in reconnection on network issues
+- ✅ **No Server Configuration**: Minimal server-side setup required
+- ✅ **Cross-Platform**: Works on Linux, macOS, and Windows
+- ✅ **Reliable**: Mature and stable technology
+
+### **Limitations of SSHFS**
+
+- ❌ **Performance Overhead**: Higher CPU usage than NFS
+- ❌ **SSH Dependency**: Requires SSH service availability
+- ❌ **Single Connection**: Limited concurrent access optimization
+- ❌ **Caching Limitations**: Less sophisticated caching than other protocols
+
+## **Architecture Overview**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Proxmox Host                             │
+│                                                             │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐                 │
+│  │   VM1   │    │   VM2   │    │   LXC   │                 │
+│  │         │    │         │    │         │                 │
+│  └─────────┘    └─────────┘    └─────────┘                 │
+│       │              │              │                      │
+│       └──────────────┼──────────────┘                      │
+│                      │                                      │
+│              ┌───────┴───────┐                              │
+│              │ SSHFS Mounts  │                              │
+│              │ /mnt/pve/     │                              │
+│              │ ├─sshfs-data  │                              │
+│              │ ├─sshfs-backup│                              │
+│              │ └─sshfs-media │                              │
+│              └───────┬───────┘                              │
+│                      │                                      │
+│              ┌───────┴───────┐                              │
+│              │ SSH Client    │                              │
+│              │ (Port 22)     │                              │
+│              └───────────────┘                              │
+└─────────────────────────────────────────────────────────────┘
+                      │
+                      │ SSH Connection
+                      │ (Encrypted)
+                      │
+┌─────────────────────┴─────────────────────────────────────┐
+│                 Remote Server                             │
+│                                                           │
+│              ┌───────────────┐                            │
+│              │ SSH Server    │                            │
+│              │ (Port 22)     │                            │
+│              └───────┬───────┘                            │
+│                      │                                    │
+│              ┌───────┴───────┐                            │
+│              │ File System   │                            │
+│              │ /media/server/│                            │
+│              │ ├─Processing/ │                            │
+│              │ ├─Backups1/   │                            │
+│              │ └─Media/      │                            │
+│              └───────────────┘                            │
+└───────────────────────────────────────────────────────────┘
+```
+
+## **Prerequisites**
+
+### **Server Requirements**
+
+- SSH server running and accessible
+- User account with appropriate permissions
+- Sufficient storage space
+- Network connectivity to Proxmox host
+
+### **Proxmox Requirements**
+
+- SSHFS package installed
+- Network connectivity to storage server
+- Sufficient local resources for SSHFS operations
+
+## **Server Side Configuration**
+
+### **1. SSH Server Setup**
+
+<Tabs
+  defaultValue="ubuntu"
+  values={[
+    {label: 'Ubuntu/Debian', value: 'ubuntu'},
+    {label: 'CentOS/RHEL', value: 'centos'},
+    {label: 'Generic Linux', value: 'generic'},
+  ]}>
+
+<TabItem value="ubuntu">
+```bash
+# Install SSH server (if not already installed)
+sudo apt update
+sudo apt install openssh-server
+
+# Start and enable SSH service
+sudo systemctl start ssh
+sudo systemctl enable ssh
+
+# Check SSH service status
+sudo systemctl status ssh
+```
+</TabItem>
+
+<TabItem value="centos">
+```bash
+# Install SSH server (if not already installed)
+sudo yum install openssh-server
+
+# Start and enable SSH service
+sudo systemctl start sshd
+sudo systemctl enable sshd
+
+# Check SSH service status
+sudo systemctl status sshd
+```
+</TabItem>
+
+<TabItem value="generic">
+```bash
+# Check if SSH is running
+ps aux | grep sshd
+
+# If not running, start SSH service
+sudo service ssh start
+# or
+sudo systemctl start ssh
+
+# Enable SSH to start on boot
+sudo systemctl enable ssh
+```
+</TabItem>
+</Tabs>
+
+### **2. User Account Configuration**
+
+```bash
+# Create dedicated user for SSHFS (optional but recommended)
+sudo useradd -m -s /bin/bash sshfs-user
+
+# Set password for the user
+sudo passwd sshfs-user
+
+# Add user to appropriate groups for file access
+sudo usermod -a -G users sshfs-user
+
+# Verify user can access target directories
+sudo -u sshfs-user ls -la /media/server/Processing/
+sudo -u sshfs-user ls -la /media/server/Backups1/
+```
+
+### **3. Directory Permissions**
+
+```bash
+# Ensure proper permissions on shared directories
+sudo chown -R sshfs-user:users /media/server/Processing/
+sudo chown -R sshfs-user:users /media/server/Backups1/
+
+# Set appropriate permissions
+sudo chmod -R 755 /media/server/Processing/
+sudo chmod -R 755 /media/server/Backups1/
+
+# Verify permissions
+ls -la /media/server/
+```
+
+### **4. SSH Security Hardening (Optional)**
+
+```bash
+# Edit SSH configuration
+sudo nano /etc/ssh/sshd_config
+
+# Recommended security settings:
+# Port 22                          # Change if needed
+# PermitRootLogin no              # Disable root login
+# PasswordAuthentication yes      # Enable for initial setup
+# PubkeyAuthentication yes        # Enable key-based auth
+# MaxAuthTries 3                  # Limit authentication attempts
+# ClientAliveInterval 300         # Keep connections alive
+# ClientAliveCountMax 2           # Connection timeout
+
+# Restart SSH service after changes
+sudo systemctl restart ssh
+```
+
+## **Proxmox Side Configuration**
+
+### **1. Install SSHFS**
+
+```bash
+# Update package list
+apt update
+
+# Install SSHFS
+apt install sshfs
+
+# Verify installation
+sshfs --version
+```
+
+### **2. SSH Key Authentication Setup**
+
+```bash
+# Generate SSH key pair (recommended for security and automation)
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_sshfs
+
+# Copy public key to remote server
+ssh-copy-id -i ~/.ssh/id_rsa_sshfs.pub sshfs-user@192.168.1.100
+
+# Test key-based authentication
+ssh -i ~/.ssh/id_rsa_sshfs sshfs-user@192.168.1.100 "echo 'SSH key authentication successful'"
+```
+
+### **3. Create Mount Points**
+
+```bash
+# Create mount point directories
+mkdir -p /mnt/pve/sshfs-{data,backup,media,downloads,movies,tv,books}
+
+# Verify directories were created
+ls -la /mnt/pve/ | grep sshfs
+```
+
+### **4. Manual SSHFS Mount Testing**
+
+```bash
+# Test manual mount with password authentication
+sshfs sshfs-user@192.168.1.100:/media/server/Processing/Downloads /mnt/pve/sshfs-downloads
+
+# Test manual mount with key authentication
+sshfs sshfs-user@192.168.1.100:/media/server/Processing/Downloads /mnt/pve/sshfs-downloads \
+  -o IdentityFile=/root/.ssh/id_rsa_sshfs
+
+# Verify mount
+ls /mnt/pve/sshfs-downloads/
+df -h | grep sshfs
+
+# Unmount for testing
+fusermount -u /mnt/pve/sshfs-downloads
+```
+
+## **Automated SSHFS Mount Configuration**
+
+### **1. Create Mount Script**
+
+```bash
+# Create comprehensive mount script
+cat > /usr/local/bin/mount-sshfs.sh << 'EOF'
+#!/bin/bash
+
+# SSHFS Mount Script for Proxmox
+# Configuration
+SERVER_USER="sshfs-user"
+SERVER_IP="192.168.1.100"
+SSH_KEY="/root/.ssh/id_rsa_sshfs"
+
+# SSHFS options for reliability and performance
+SSHFS_OPTS="allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=10,IdentityFile=$SSH_KEY,cache=yes,kernel_cache,compression=yes"
+
+# Logging
+LOG_FILE="/var/log/sshfs-mount.log"
+exec 1> >(tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "$(date): Starting SSHFS mount script"
+
+# Function to mount SSHFS share
+mount_sshfs() {
+    local name="$1"
+    local remote_path="$2"
+    local local_path="/mnt/pve/sshfs-$name"
+    
+    echo "$(date): Mounting $name..."
+    
+    # Check if already mounted
+    if mountpoint -q "$local_path"; then
+        echo "$(date): ✓ $name already mounted"
+        return 0
+    fi
+    
+    # Ensure mount point exists
+    mkdir -p "$local_path"
+    
+    # Attempt to mount
+    if sshfs "$SERVER_USER@$SERVER_IP:$remote_path" "$local_path" -o $SSHFS_OPTS; then
+        echo "$(date): ✓ $name mounted successfully"
+        return 0
+    else
+        echo "$(date): ✗ Failed to mount $name"
+        return 1
+    fi
+}
+
+# Function to check SSH connectivity
+check_ssh_connectivity() {
+    echo "$(date): Checking SSH connectivity..."
+    if ssh -i "$SSH_KEY" -o ConnectTimeout=10 "$SERVER_USER@$SERVER_IP" "echo 'SSH connection successful'" >/dev/null 2>&1; then
+        echo "$(date): ✓ SSH connectivity verified"
+        return 0
+    else
+        echo "$(date): ✗ SSH connectivity failed"
+        return 1
+    fi
+}
+
+# Main execution
+if check_ssh_connectivity; then
+    # Mount all shares
+    mount_sshfs "data" "/media/server/Processing/Data"
+    mount_sshfs "backup" "/media/server/Backups1/Backup"
+    mount_sshfs "downloads" "/media/server/Processing/Downloads"
+    mount_sshfs "movies" "/media/server/Processing/Tdarr/Movies"
+    mount_sshfs "tv" "/media/server/Processing/Tdarr/TV"
+    mount_sshfs "books" "/media/server/Processing/Books"
+    mount_sshfs "transcode_cache" "/media/server/Processing/Tdarr/transcode_cache"
+    
+    echo "$(date): SSHFS mounting process completed"
+else
+    echo "$(date): Skipping mounts due to SSH connectivity issues"
+    exit 1
+fi
+EOF
+
+# Make script executable
+chmod +x /usr/local/bin/mount-sshfs.sh
+```
+
+### **2. Create Unmount Script**
+
+```bash
+# Create unmount script for maintenance
+cat > /usr/local/bin/unmount-sshfs.sh << 'EOF'
+#!/bin/bash
+
+# SSHFS Unmount Script for Proxmox
+LOG_FILE="/var/log/sshfs-mount.log"
+exec 1> >(tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "$(date): Starting SSHFS unmount script"
+
+# Function to unmount SSHFS share
+unmount_sshfs() {
+    local name="$1"
+    local local_path="/mnt/pve/sshfs-$name"
+    
+    echo "$(date): Unmounting $name..."
+    
+    if mountpoint -q "$local_path"; then
+        if fusermount -u "$local_path"; then
+            echo "$(date): ✓ $name unmounted successfully"
+        else
+            echo "$(date): ✗ Failed to unmount $name"
+            # Force unmount if regular unmount fails
+            umount -f "$local_path" 2>/dev/null
+        fi
+    else
+        echo "$(date): ✓ $name not mounted"
+    fi
+}
+
+# Unmount all shares
+unmount_sshfs "data"
+unmount_sshfs "backup"
+unmount_sshfs "downloads"
+unmount_sshfs "movies"
+unmount_sshfs "tv"
+unmount_sshfs "books"
+unmount_sshfs "transcode_cache"
+
+echo "$(date): SSHFS unmounting process completed"
+EOF
+
+# Make script executable
+chmod +x /usr/local/bin/unmount-sshfs.sh
+```
+
+### **3. Test Mount Scripts**
+
+```bash
+# Test mount script
+/usr/local/bin/mount-sshfs.sh
+
+# Verify mounts
+df -h | grep sshfs
+ls /mnt/pve/sshfs-downloads/
+
+# Check log file
+tail -f /var/log/sshfs-mount.log
+
+# Test unmount script
+/usr/local/bin/unmount-sshfs.sh
+```
+
+## **Persistent Mount Configuration**
+
+### **1. Using /etc/fstab**
+
+```bash
+# Backup current fstab
+cp /etc/fstab /etc/fstab.backup.$(date +%Y%m%d)
+
+# Add SSHFS entries to fstab
+cat >> /etc/fstab << 'EOF'
+
+# SSHFS Mounts
+sshfs-user@192.168.1.100:/media/server/Processing/Data /mnt/pve/sshfs-data fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Backups1/Backup /mnt/pve/sshfs-backup fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Processing/Downloads /mnt/pve/sshfs-downloads fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Processing/Tdarr/Movies /mnt/pve/sshfs-movies fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Processing/Tdarr/TV /mnt/pve/sshfs-tv fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Processing/Books /mnt/pve/sshfs-books fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+sshfs-user@192.168.1.100:/media/server/Processing/Tdarr/transcode_cache /mnt/pve/sshfs-transcode_cache fuse.sshfs allow_other,default_permissions,reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,IdentityFile=/root/.ssh/id_rsa_sshfs,_netdev,noauto 0 0
+EOF
+```
+
+### **2. Systemd Service for Auto-mounting**
+
+```bash
+# Create systemd service for SSHFS mounting
+cat > /etc/systemd/system/sshfs-mounts.service << 'EOF'
+[Unit]
+Description=SSHFS Mounts for Proxmox
+After=network-online.target
+Wants=network-online.target
+Requires=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/mount-sshfs.sh
+ExecStop=/usr/local/bin/unmount-sshfs.sh
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+systemctl daemon-reload
+systemctl enable sshfs-mounts.service
+systemctl start sshfs-mounts.service
+
+# Check service status
+systemctl status sshfs-mounts.service
+```
+
+## **Proxmox Storage Configuration**
+
+### **1. Add Directory Storage**
+
+```bash
+# Backup current storage configuration
+cp /etc/pve/storage.cfg /etc/pve/storage.cfg.backup.$(date +%Y%m%d)
+
+# Add SSHFS storage entries
+cat >> /etc/pve/storage.cfg << 'EOF'
+
+# SSHFS Storage Definitions
+dir: sshfs-data
+        path /mnt/pve/sshfs-data
+        content images,vztmpl,backup
+        prune-backups keep-all=1
+        shared 0
+
+dir: sshfs-backup
+        path /mnt/pve/sshfs-backup
+        content backup
+        prune-backups keep-all=1
+        shared 0
+
+dir: sshfs-downloads
+        path /mnt/pve/sshfs-downloads
+        content images
+        prune-backups keep-all=1
+        shared 0
+
+dir: sshfs-movies
+        path /mnt/pve/sshfs-movies
+        content images
+        prune-backups keep-all=1
+        shared 0
+
+dir: sshfs-tv
+        path /mnt/pve/sshfs-tv
+        content images
+        prune-backups keep-all=1
+        shared 0
+
+dir: sshfs-books
+        path /mnt/pve/sshfs-books
+        content images
+        prune-backups keep-all=1
+        shared 0
+EOF
+```
+
+### **2. Verify Storage Configuration**
+
+```bash
+# Check storage configuration
+pvesm status
+
+# List available storage
+pvesm list
+
+# Test storage access
+pvesm path sshfs-data:100/vm-100-disk-0.qcow2
+```
+
+## **SSHFS Mount Options Explained**
+
+### **Essential Options**
+
+```bash
+# Basic SSHFS mount options
+allow_other              # Allow other users to access the mount
+default_permissions      # Use default file permissions
+reconnect               # Automatically reconnect on connection loss
+IdentityFile=/path/key  # SSH private key for authentication
+_netdev                 # Network device (for fstab)
+```
+
+### **Performance Options**
+
+```bash
+# Performance optimization options
+cache=yes               # Enable caching
+kernel_cache           # Use kernel-level caching
+compression=yes        # Enable compression
+big_writes             # Allow large write operations
+max_read=65536         # Maximum read size
+max_write=65536        # Maximum write size
+```
+
+### **Reliability Options**
+
+```bash
+# Connection reliability options
+ServerAliveInterval=15     # Send keepalive every 15 seconds
+ServerAliveCountMax=3      # Maximum failed keepalives
+ConnectTimeout=10          # Connection timeout in seconds
+BatchMode=yes             # Non-interactive mode
+StrictHostKeyChecking=no  # Skip host key verification (use carefully)
+```
+
+## **Troubleshooting**
+
+### **Common Issues and Solutions**
+
+<Tabs
+  defaultValue="connection"
+  values={[
+    {label: 'Connection Issues', value: 'connection'},
+    {label: 'Permission Problems', value: 'permissions'},
+    {label: 'Performance Issues', value: 'performance'},
+    {label: 'Mount Failures', value: 'mount'},
+  ]}>
+
+<TabItem value="connection">
+**Connection Problems**
+
+```bash
+# Test SSH connectivity
+ssh -i /root/.ssh/id_rsa_sshfs sshfs-user@192.168.1.100
+
+# Check SSH service on server
+sudo systemctl status ssh
+
+# Verify network connectivity
+ping 192.168.1.100
+telnet 192.168.1.100 22
+
+# Check SSH logs
+tail -f /var/log/auth.log
+
+# Debug SSHFS connection
+sshfs -d sshfs-user@192.168.1.100:/path /mnt/point
+```
+</TabItem>
+
+<TabItem value="permissions">
+**Permission Issues**
+
+```bash
+# Check file permissions on server
+ls -la /media/server/Processing/
+
+# Verify user permissions
+sudo -u sshfs-user ls /media/server/Processing/
+
+# Check mount permissions
+ls -la /mnt/pve/sshfs-downloads/
+
+# Fix ownership issues
+sudo chown -R sshfs-user:users /media/server/Processing/
+```
+</TabItem>
+
+<TabItem value="performance">
+**Performance Problems**
+
+```bash
+# Monitor SSHFS performance
+iostat -x 1
+
+# Check network utilization
+iftop -i eth0
+
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/sshfs-data/test bs=1M count=100
+rm /mnt/pve/sshfs-data/test
+
+# Optimize mount options
+# Add: cache=yes,kernel_cache,compression=yes
+```
+</TabItem>
+
+<TabItem value="mount">
+**Mount Failures**
+
+```bash
+# Check if mount point exists
+ls -la /mnt/pve/sshfs-downloads/
+
+# Verify SSHFS is installed
+which sshfs
+sshfs --version
+
+# Check for existing mounts
+mount | grep sshfs
+df -h | grep sshfs
+
+# Force unmount if needed
+fusermount -u /mnt/pve/sshfs-downloads
+umount -f /mnt/pve/sshfs-downloads
+
+# Check system logs
+journalctl -u sshfs-mounts.service
+tail -f /var/log/sshfs-mount.log
+```
+</TabItem>
+</Tabs>
+
+### **Diagnostic Commands**
+
+```bash
+# Check SSHFS mounts
+mount | grep sshfs
+df -h | grep sshfs
+
+# Monitor SSHFS processes
+ps aux | grep sshfs
+
+# Check network connections
+netstat -an | grep :22
+
+# View system logs
+journalctl -f | grep sshfs
+tail -f /var/log/syslog | grep sshfs
+
+# Test file operations
+touch /mnt/pve/sshfs-downloads/test
+ls -la /mnt/pve/sshfs-downloads/test
+rm /mnt/pve/sshfs-downloads/test
+```
+
+## **Best Practices**
+
+### **Security Best Practices**
+
+1. **Use SSH Keys**: Always prefer key-based authentication over passwords
+2. **Restrict SSH Access**: Limit SSH access to specific users and IPs
+3. **Regular Updates**: Keep SSH server and client updated
+4. **Monitor Access**: Log and monitor SSH access attempts
+5. **Network Segmentation**: Use dedicated networks for storage traffic
+
+### **Performance Best Practices**
+
+1. **Optimize Mount Options**: Use appropriate caching and compression options
+2. **Network Optimization**: Use dedicated gigabit or 10GbE networks
+3. **Concurrent Connections**: Limit concurrent SSHFS connections
+4. **Regular Monitoring**: Monitor performance and adjust as needed
+5. **Capacity Planning**: Plan for storage growth and network capacity
+
+### **Reliability Best Practices**
+
+1. **Automatic Reconnection**: Configure automatic reconnection options
+2. **Health Monitoring**: Implement monitoring and alerting
+3. **Backup Strategies**: Maintain backups of critical data
+4. **Documentation**: Document configurations and procedures
+5. **Testing**: Regular testing of mount and unmount procedures
+
+## **Integration with LXC Containers**
+
+### **Container Access to SSHFS Mounts**
+
+```bash
+# SSHFS mounts are automatically available to containers
+# No additional configuration needed in containers
+
+# Verify access from container
+pct enter 100
+ls /mnt/pve/sshfs-downloads/
+exit
+
+# Add bind mounts to container configuration if needed
+# Edit container configuration
+nano /etc/pve/lxc/100.conf
+
+# Add bind mount entries
+mp0: /mnt/pve/sshfs-downloads,mp=/mnt/downloads
+mp1: /mnt/pve/sshfs-movies,mp=/mnt/movies
+```
+
+## **Monitoring and Maintenance**
+
+### **Automated Health Checks**
+
+```bash
+# Create health check script
+cat > /usr/local/bin/sshfs-health-check.sh << 'EOF'
+#!/bin/bash
+
+LOG_FILE="/var/log/sshfs-health.log"
+ALERT_EMAIL="admin@example.com"
+
+check_mount() {
+    local mount_point="$1"
+    local name="$2"
+    
+    if mountpoint -q "$mount_point"; then
+        if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
+            echo "$(date): ✓ $name is healthy"
+            return 0
+        else
+            echo "$(date): ✗ $name is unresponsive"
+            return 1
+        fi
+    else
+        echo "$(date): ✗ $name is not mounted"
+        return 1
+    fi
+}
+
+# Check all mounts
+failed_mounts=0
+for mount in data backup downloads movies tv books; do
+    if ! check_mount "/mnt/pve/sshfs-$mount" "$mount"; then
+        ((failed_mounts++))
+    fi
+done >> "$LOG_FILE"
+
+# Send alert if any mounts failed
+if [ $failed_mounts -gt 0 ]; then
+    echo "SSHFS Health Check: $failed_mounts mount(s) failed" | \
+        mail -s "SSHFS Alert" "$ALERT_EMAIL"
+fi
+EOF
+
+chmod +x /usr/local/bin/sshfs-health-check.sh
+
+# Add to crontab for regular checks
+echo "*/5 * * * * /usr/local/bin/sshfs-health-check.sh" | crontab -
+```
+
+### **Log Rotation**
+
+```bash
+# Configure log rotation for SSHFS logs
+cat > /etc/logrotate.d/sshfs << 'EOF'
+/var/log/sshfs-mount.log
+/var/log/sshfs-health.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 root root
+}
+EOF
+```
+
+SSHFS provides a secure, reliable, and relatively simple solution for network storage in Proxmox environments. While it may not offer the raw performance of NFS, its security features and ease of setup make it an excellent choice for many use cases, particularly in environments where SSH infrastructure is already established.
+
+<BuyMeACoffeeButton />
