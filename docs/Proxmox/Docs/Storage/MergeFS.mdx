@@ -1,0 +1,945 @@
+---
+title: MergeFS Setup and Configuration
+tags:
+   - Proxmox
+   - Storage
+   - MergeFS
+   - Union Filesystem
+   - Storage Pool
+   - FUSE
+   - Drive Pooling
+
+keywords: [Proxmox, MergeFS, Union Filesystem, Storage Pool, Drive Pooling, FUSE, Multiple Drives, Storage Management]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **MergeFS Setup and Configuration for Proxmox**
+
+MergeFS is a union filesystem that allows you to combine multiple drives, directories, or mount points into a single logical filesystem. This guide provides comprehensive instructions for setting up and configuring MergeFS with Proxmox, enabling efficient storage pooling and management.
+
+## **What is MergeFS?**
+
+MergeFS is a FUSE-based union filesystem that transparently overlays multiple directories (branches) to create a single unified view. Unlike traditional RAID solutions, MergeFS preserves individual drive integrity while providing a pooled storage experience.
+
+### **Benefits of MergeFS**
+
+- ✅ **Drive Independence**: Each drive maintains its own filesystem and can be accessed independently
+- ✅ **No Data Loss Risk**: If one drive fails, only data on that specific drive is affected
+- ✅ **Flexible Expansion**: Add or remove drives without rebuilding the entire array
+- ✅ **Mixed Drive Sizes**: Combine drives of different sizes and speeds
+- ✅ **Real-time Changes**: Add or remove branches while the filesystem is mounted
+- ✅ **Policy-based File Placement**: Control where new files are created based on various policies
+- ✅ **No Parity Overhead**: Full capacity utilization without parity calculations
+
+### **Limitations of MergeFS**
+
+- ❌ **No Built-in Redundancy**: Provides no protection against drive failure
+- ❌ **FUSE Overhead**: Slight performance overhead due to FUSE layer
+- ❌ **Single Point of Failure**: The MergeFS mount point itself can be a bottleneck
+- ❌ **Complex Recovery**: File recovery requires knowledge of which drive contains specific files
+
+## **MergeFS vs Other Storage Solutions**
+
+<Tabs
+  defaultValue="mergefs"
+  values={[
+    {label: 'MergeFS', value: 'mergefs'},
+    {label: 'RAID 0', value: 'raid0'},
+    {label: 'RAID 5/6', value: 'raid56'},
+    {label: 'LVM', value: 'lvm'},
+  ]}>
+
+<TabItem value="mergefs">
+**MergeFS (Union Filesystem)**
+- **Data Safety**: Individual drive failure affects only that drive's data
+- **Expansion**: Easy addition/removal of drives
+- **Performance**: Good read performance, write performance varies by policy
+- **Complexity**: Simple setup, flexible configuration
+- **Use Case**: Media storage, backup aggregation, mixed-size drives
+- **Recovery**: Files remain accessible on individual drives
+</TabItem>
+
+<TabItem value="raid0">
+**RAID 0 (Striping)**
+- **Data Safety**: Any drive failure destroys entire array
+- **Expansion**: Difficult, usually requires rebuild
+- **Performance**: Excellent read/write performance
+- **Complexity**: Simple concept, hardware/software dependent
+- **Use Case**: High-performance temporary storage
+- **Recovery**: Complete data loss on any drive failure
+</TabItem>
+
+<TabItem value="raid56">
+**RAID 5/6 (Parity)**
+- **Data Safety**: Survives 1 (RAID 5) or 2 (RAID 6) drive failures
+- **Expansion**: Complex, often requires rebuild
+- **Performance**: Good read, slower write due to parity
+- **Complexity**: More complex setup and management
+- **Use Case**: Critical data requiring redundancy
+- **Recovery**: Automatic rebuild with hot spares
+</TabItem>
+
+<TabItem value="lvm">
+**LVM (Logical Volume Manager)**
+- **Data Safety**: Depends on underlying storage configuration
+- **Expansion**: Good expansion capabilities
+- **Performance**: Minimal overhead
+- **Complexity**: Moderate complexity
+- **Use Case**: Flexible volume management
+- **Recovery**: Depends on configuration
+</TabItem>
+</Tabs>
+
+## **Architecture Overview**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MergeFS Architecture                     │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │              MergeFS Mount Point                        │ │
+│  │                /mnt/storage                             │ │
+│  │                                                         │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐      │ │
+│  │  │ file1   │ │ file2   │ │ file3   │ │ file4   │      │ │
+│  │  │ file5   │ │ file6   │ │ file7   │ │ file8   │      │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘      │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                              │                               │
+│                    ┌─────────┼─────────┐                     │
+│                    │         │         │                     │
+│  ┌─────────────────▼──┐ ┌────▼────┐ ┌──▼─────────────────┐   │
+│  │    Branch 1        │ │Branch 2 │ │    Branch 3        │   │
+│  │   /mnt/disk1       │ │/mnt/disk2│ │   /mnt/disk3       │   │
+│  │                    │ │         │ │                    │   │
+│  │ ┌─────────┐        │ │┌────────┐│ │ ┌─────────┐        │   │
+│  │ │ file1   │        │ ││ file2  ││ │ │ file3   │        │   │
+│  │ │ file5   │        │ ││ file6  ││ │ │ file4   │        │   │
+│  │ └─────────┘        │ │└────────┘│ │ │ file7   │        │   │
+│  │                    │ │         │ │ │ file8   │        │   │
+│  │ Filesystem: ext4   │ │ FS: xfs │ │ │ └─────────┘        │   │
+│  │ Size: 2TB          │ │Size: 4TB│ │ │ Filesystem: btrfs  │   │
+│  │ Free: 500GB        │ │Free: 1TB│ │ │ Size: 8TB          │   │
+│  └────────────────────┘ └─────────┘ │ │ Free: 6TB          │   │
+│                                     │ └────────────────────┘   │
+│                                     │                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## **Installation and Setup**
+
+### **1. Install MergeFS**
+
+<Tabs
+  defaultValue="ubuntu"
+  values={[
+    {label: 'Ubuntu/Debian', value: 'ubuntu'},
+    {label: 'CentOS/RHEL', value: 'centos'},
+    {label: 'From Source', value: 'source'},
+  ]}>
+
+<TabItem value="ubuntu">
+```bash
+# Update package list
+sudo apt update
+
+# Install MergeFS from official repository
+sudo apt install mergerfs
+
+# Verify installation
+mergerfs --version
+
+# Install additional utilities
+sudo apt install fuse3 attr
+
+# Ensure FUSE module is loaded
+sudo modprobe fuse
+echo 'fuse' | sudo tee -a /etc/modules
+```
+</TabItem>
+
+<TabItem value="centos">
+```bash
+# Install EPEL repository (if not already installed)
+sudo yum install epel-release
+
+# Install MergeFS
+sudo yum install mergerfs
+
+# Alternative: Install from GitHub releases
+# Download latest release from: https://github.com/trapexit/mergerfs/releases
+wget https://github.com/trapexit/mergerfs/releases/download/2.35.1/mergerfs-2.35.1-1.el8.x86_64.rpm
+sudo rpm -i mergerfs-2.35.1-1.el8.x86_64.rpm
+
+# Install FUSE utilities
+sudo yum install fuse fuse-libs attr
+
+# Load FUSE module
+sudo modprobe fuse
+echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
+```
+</TabItem>
+
+<TabItem value="source">
+```bash
+# Install build dependencies
+sudo apt install build-essential git pandoc
+
+# Clone MergeFS repository
+git clone https://github.com/trapexit/mergerfs.git
+cd mergerfs
+
+# Build MergeFS
+make
+
+# Install MergeFS
+sudo make install
+
+# Verify installation
+mergerfs --version
+
+# Install FUSE if not already installed
+sudo apt install fuse3
+```
+</TabItem>
+</Tabs>
+
+### **2. Prepare Storage Drives**
+
+```bash
+# List available drives
+lsblk -f
+
+# Example output:
+# NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+# sda                                                      
+# ├─sda1 ext4         a1b2c3d4-e5f6-7890-abcd-ef1234567890 
+# sdb                                                      
+# ├─sdb1 xfs          b2c3d4e5-f6g7-8901-bcde-f23456789012 
+# sdc                                                      
+# ├─sdc1 btrfs        c3d4e5f6-g7h8-9012-cdef-345678901234 
+
+# Create mount points for individual drives
+sudo mkdir -p /mnt/disk{1,2,3,4}
+
+# Create mount point for MergeFS pool
+sudo mkdir -p /mnt/storage
+
+# Format drives if needed (DESTRUCTIVE - only for new drives)
+# sudo mkfs.ext4 -L "disk1" /dev/sda1
+# sudo mkfs.xfs -L "disk2" /dev/sdb1
+# sudo mkfs.btrfs -L "disk3" /dev/sdc1
+```
+
+### **3. Mount Individual Drives**
+
+```bash
+# Get UUIDs of your drives
+sudo blkid
+
+# Create fstab entries for individual drives
+sudo tee -a /etc/fstab << 'EOF'
+
+# Individual drives for MergeFS pool
+UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890 /mnt/disk1 ext4  defaults,noatime 0 2
+UUID=b2c3d4e5-f6g7-8901-bcde-f23456789012 /mnt/disk2 xfs   defaults,noatime 0 2
+UUID=c3d4e5f6-g7h8-9012-cdef-345678901234 /mnt/disk3 btrfs defaults,noatime 0 2
+EOF
+
+# Mount all drives
+sudo mount -a
+
+# Verify mounts
+df -h | grep "/mnt/disk"
+```
+
+### **4. Basic MergeFS Configuration**
+
+```bash
+# Test basic MergeFS mount
+sudo mergerfs /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage
+
+# Verify the mount
+df -h | grep mergerfs
+ls -la /mnt/storage/
+
+# Test write access
+sudo touch /mnt/storage/test-file
+ls -la /mnt/storage/test-file
+
+# Check which drive the file was created on
+find /mnt/disk* -name "test-file" -exec ls -la {} \;
+
+# Clean up test
+sudo rm /mnt/storage/test-file
+
+# Unmount for proper configuration
+sudo umount /mnt/storage
+```
+
+## **Advanced MergeFS Configuration**
+
+### **1. MergeFS Policies**
+
+MergeFS uses policies to determine where files are created, accessed, and managed. Understanding these policies is crucial for optimal performance.
+
+<Tabs
+  defaultValue="creation"
+  values={[
+    {label: 'Creation Policies', value: 'creation'},
+    {label: 'Action Policies', value: 'action'},
+    {label: 'Search Policies', value: 'search'},
+  ]}>
+
+<TabItem value="creation">
+**File Creation Policies**
+
+| Policy | Description | Use Case |
+|--------|-------------|----------|
+| `epmfs` | Existing path, most free space | Balanced distribution |
+| `mfs` | Most free space | Even space utilization |
+| `lfs` | Least free space | Fill drives sequentially |
+| `lus` | Least used space | Balance by usage |
+| `ff` | First found | Simple, predictable |
+| `epff` | Existing path, first found | Preserve directory structure |
+| `rand` | Random | Even distribution |
+
+**Recommended Creation Policies:**
+- **Media Storage**: `mfs` - Distributes large files evenly
+- **General Purpose**: `epmfs` - Balances existing structure with space
+- **Sequential Fill**: `lfs` - Fills drives one by one
+</TabItem>
+
+<TabItem value="action">
+**Action Policies (chmod, chown, etc.)**
+
+| Policy | Description | Use Case |
+|--------|-------------|----------|
+| `all` | Apply to all copies | Ensure consistency |
+| `epall` | Existing path, all | Maintain directory structure |
+| `ff` | First found | Quick operations |
+
+**Recommended Action Policies:**
+- **Default**: `epall` - Maintains consistency while respecting structure
+- **Performance**: `ff` - Faster operations on large datasets
+</TabItem>
+
+<TabItem value="search">
+**Search Policies (readdir, getattr)**
+
+| Policy | Description | Use Case |
+|--------|-------------|----------|
+| `ff` | First found | Fastest access |
+| `epff` | Existing path, first found | Preserve structure |
+| `all` | Search all branches | Complete file listing |
+
+**Recommended Search Policies:**
+- **Performance**: `ff` - Fastest file access
+- **Completeness**: `all` - Ensure all files are visible
+</TabItem>
+</Tabs>
+
+### **2. Optimized MergeFS Mount Options**
+
+```bash
+# Create optimized MergeFS configuration
+sudo tee -a /etc/fstab << 'EOF'
+
+# MergeFS storage pool with optimized settings
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=500G,fsname=mergerfs-pool,category.create=mfs,category.action=epall,category.search=ff 0 0
+EOF
+
+# Mount the MergeFS pool
+sudo mount /mnt/storage
+
+# Verify mount with options
+mount | grep mergerfs
+```
+
+### **3. MergeFS Mount Options Explained**
+
+```bash
+# Essential MergeFS mount options:
+
+# Basic Options
+defaults                    # Use default mount options
+nonempty                   # Allow mounting over non-empty directory
+allow_other                # Allow other users to access the mount
+use_ino                    # Use inode values from underlying filesystems
+
+# Performance Options
+cache.files=off            # Disable file caching (recommended for large files)
+dropcacheonclose=true      # Drop caches when files are closed
+moveonenospc=true          # Move files when source drive is full
+
+# Space Management
+minfreespace=500G          # Reserve 500GB free space per drive
+minfreespace=50%           # Reserve 50% free space per drive (alternative)
+
+# Policies
+category.create=mfs        # Create files on drive with most free space
+category.action=epall      # Apply actions to existing path, all copies
+category.search=ff         # Search first found for fastest access
+
+# Identification
+fsname=mergerfs-pool       # Custom filesystem name for identification
+
+# Advanced Options
+func.getattr=newest        # Use newest file attributes
+func.access=ff             # Use first found for access checks
+func.open=ff               # Use first found for file opening
+func.readdir=epall         # Read directory from existing path, all branches
+```
+
+### **4. Drive Space Management**
+
+```bash
+# Create script to monitor drive space and MergeFS health
+sudo tee /usr/local/bin/mergerfs-status.sh << 'EOF'
+#!/bin/bash
+
+echo "=== MergeFS Pool Status ==="
+echo "Pool Mount: /mnt/storage"
+echo "Branches: /mnt/disk1:/mnt/disk2:/mnt/disk3"
+echo ""
+
+echo "=== Individual Drive Status ==="
+for disk in /mnt/disk{1,2,3}; do
+    if mountpoint -q "$disk"; then
+        echo "Drive: $disk"
+        df -h "$disk" | tail -n 1
+        echo "Files: $(find "$disk" -type f | wc -l)"
+        echo "Directories: $(find "$disk" -type d | wc -l)"
+        echo ""
+    else
+        echo "Drive: $disk - NOT MOUNTED"
+        echo ""
+    fi
+done
+
+echo "=== MergeFS Pool Status ==="
+if mountpoint -q /mnt/storage; then
+    df -h /mnt/storage | tail -n 1
+    echo "Total Files: $(find /mnt/storage -type f | wc -l)"
+    echo "Total Directories: $(find /mnt/storage -type d | wc -l)"
+else
+    echo "MergeFS Pool: NOT MOUNTED"
+fi
+
+echo ""
+echo "=== Drive Health Check ==="
+for device in sda sdb sdc; do
+    if [ -e "/dev/$device" ]; then
+        echo "Device: /dev/$device"
+        smartctl -H "/dev/$device" 2>/dev/null | grep -E "(SMART overall-health|SMART Health Status)" || echo "SMART not available"
+        echo ""
+    fi
+done
+EOF
+
+# Make script executable
+sudo chmod +x /usr/local/bin/mergerfs-status.sh
+
+# Run status check
+sudo /usr/local/bin/mergerfs-status.sh
+```
+
+## **Minimum Free Space Configuration**
+
+### **1. Setting Minimum Free Space Thresholds**
+
+The `minfreespace` option is crucial for preventing drives from becoming completely full, which can cause performance issues and system instability.
+
+```bash
+# Different ways to set minimum free space:
+
+# Fixed size (recommended for mixed drive sizes)
+minfreespace=500G          # Leave 500GB free on each drive
+minfreespace=1T            # Leave 1TB free on each drive
+minfreespace=100G          # Leave 100GB free on each drive
+
+# Percentage-based (good for similar-sized drives)
+minfreespace=10%           # Leave 10% free space on each drive
+minfreespace=5%            # Leave 5% free space on each drive
+
+# Bytes (for precise control)
+minfreespace=536870912000  # Leave 500GB free (in bytes)
+```
+
+### **2. Recommended Free Space Settings**
+
+<Tabs
+  defaultValue="media"
+  values={[
+    {label: 'Media Storage', value: 'media'},
+    {label: 'VM Storage', value: 'vm'},
+    {label: 'General Purpose', value: 'general'},
+    {label: 'Backup Storage', value: 'backup'},
+  ]}>
+
+<TabItem value="media">
+**Media Storage Configuration**
+```bash
+# For media files (movies, music, photos)
+# Large files, infrequent writes, high read performance needed
+
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/media mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=500G,\
+category.create=mfs,category.action=epall,category.search=ff,\
+func.readdir=epall 0 0
+
+# Explanation:
+# - minfreespace=500G: Prevents drives from filling completely
+# - category.create=mfs: Distributes large media files evenly
+# - cache.files=off: Better for large sequential reads
+```
+</TabItem>
+
+<TabItem value="vm">
+**VM Storage Configuration**
+```bash
+# For virtual machine storage
+# Random I/O, performance critical, space efficiency important
+
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/vm-storage mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=partial,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=1T,\
+category.create=lfs,category.action=epall,category.search=ff,\
+func.open=ff 0 0
+
+# Explanation:
+# - minfreespace=1T: Larger buffer for VM expansion
+# - category.create=lfs: Fill drives sequentially for better VM performance
+# - cache.files=partial: Some caching for better random I/O
+```
+</TabItem>
+
+<TabItem value="general">
+**General Purpose Configuration**
+```bash
+# For mixed workloads
+# Balance of performance and space utilization
+
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/general mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=10%,\
+category.create=epmfs,category.action=epall,category.search=ff 0 0
+
+# Explanation:
+# - minfreespace=10%: Percentage-based for mixed drive sizes
+# - category.create=epmfs: Balance existing structure with free space
+```
+</TabItem>
+
+<TabItem value="backup">
+**Backup Storage Configuration**
+```bash
+# For backup storage
+# Write-heavy, space efficiency critical, some redundancy acceptable
+
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/backup mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=50G,\
+category.create=lfs,category.action=epall,category.search=ff 0 0
+
+# Explanation:
+# - minfreespace=50G: Smaller buffer to maximize storage utilization
+# - category.create=lfs: Fill drives sequentially for backup efficiency
+```
+</TabItem>
+</Tabs>
+
+### **3. Dynamic Free Space Management**
+
+```bash
+# Create script for dynamic free space management
+sudo tee /usr/local/bin/mergerfs-balance.sh << 'EOF'
+#!/bin/bash
+
+# Configuration
+POOL_PATH="/mnt/storage"
+DRIVES=("/mnt/disk1" "/mnt/disk2" "/mnt/disk3")
+MIN_FREE_GB=500
+BALANCE_THRESHOLD_GB=1000
+
+echo "=== MergeFS Balance Check ==="
+echo "Minimum free space required: ${MIN_FREE_GB}GB per drive"
+echo "Balance threshold: ${BALANCE_THRESHOLD_GB}GB difference"
+echo ""
+
+# Check free space on each drive
+declare -a free_space
+for i in "${!DRIVES[@]}"; do
+    drive="${DRIVES[$i]}"
+    if mountpoint -q "$drive"; then
+        free_gb=$(df -BG "$drive" | tail -n 1 | awk '{print $4}' | sed 's/G//')
+        free_space[$i]=$free_gb
+        echo "Drive $drive: ${free_gb}GB free"
+        
+        if [ "$free_gb" -lt "$MIN_FREE_GB" ]; then
+            echo "  WARNING: Drive $drive below minimum free space threshold!"
+        fi
+    else
+        echo "Drive $drive: NOT MOUNTED"
+        free_space[$i]=0
+    fi
+done
+
+# Find drives with significant space differences
+max_free=0
+min_free=999999
+for space in "${free_space[@]}"; do
+    if [ "$space" -gt "$max_free" ]; then
+        max_free=$space
+    fi
+    if [ "$space" -lt "$min_free" ] && [ "$space" -gt 0 ]; then
+        min_free=$space
+    fi
+done
+
+difference=$((max_free - min_free))
+echo ""
+echo "Space difference between drives: ${difference}GB"
+
+if [ "$difference" -gt "$BALANCE_THRESHOLD_GB" ]; then
+    echo "WARNING: Drives are unbalanced (difference > ${BALANCE_THRESHOLD_GB}GB)"
+    echo "Consider rebalancing files or adjusting creation policy"
+else
+    echo "Drives are reasonably balanced"
+fi
+
+echo ""
+echo "=== Pool Summary ==="
+if mountpoint -q "$POOL_PATH"; then
+    df -h "$POOL_PATH" | tail -n 1
+else
+    echo "MergeFS pool not mounted"
+fi
+EOF
+
+# Make script executable
+sudo chmod +x /usr/local/bin/mergerfs-balance.sh
+
+# Create cron job to run balance check daily
+echo "0 6 * * * root /usr/local/bin/mergerfs-balance.sh >> /var/log/mergerfs-balance.log 2>&1" | sudo tee -a /etc/crontab
+```
+
+## **Performance Optimization**
+
+### **1. I/O Scheduler Optimization**
+
+```bash
+# Check current I/O schedulers
+for disk in sda sdb sdc; do
+    echo "Disk $disk: $(cat /sys/block/$disk/queue/scheduler)"
+done
+
+# Set optimal I/O scheduler for storage drives
+# For SSDs: use 'noop' or 'deadline'
+# For HDDs: use 'cfq' or 'deadline'
+
+# Temporary change (until reboot)
+echo deadline | sudo tee /sys/block/sda/queue/scheduler
+echo deadline | sudo tee /sys/block/sdb/queue/scheduler
+echo deadline | sudo tee /sys/block/sdc/queue/scheduler
+
+# Permanent change via kernel parameters
+sudo tee -a /etc/default/grub << 'EOF'
+# Add to GRUB_CMDLINE_LINUX_DEFAULT
+elevator=deadline
+EOF
+
+# Update GRUB
+sudo update-grub
+```
+
+### **2. Filesystem Mount Optimizations**
+
+```bash
+# Optimize individual drive mount options for better performance
+sudo sed -i 's/defaults,noatime/defaults,noatime,nobarrier,commit=60/' /etc/fstab
+
+# Example optimized fstab entries:
+# UUID=... /mnt/disk1 ext4  defaults,noatime,nobarrier,commit=60 0 2
+# UUID=... /mnt/disk2 xfs   defaults,noatime,nobarrier,logbufs=8 0 2
+# UUID=... /mnt/disk3 btrfs defaults,noatime,compress=lzo,space_cache=v2 0 2
+
+# Remount with new options
+sudo mount -o remount /mnt/disk1
+sudo mount -o remount /mnt/disk2
+sudo mount -o remount /mnt/disk3
+```
+
+### **3. System-level Optimizations**
+
+```bash
+# Increase file descriptor limits
+echo "* soft nofile 65536" | sudo tee -a /etc/security/limits.conf
+echo "* hard nofile 65536" | sudo tee -a /etc/security/limits.conf
+
+# Optimize kernel parameters for storage
+sudo tee -a /etc/sysctl.conf << 'EOF'
+
+# MergeFS and storage optimizations
+vm.dirty_ratio = 15
+vm.dirty_background_ratio = 5
+vm.dirty_expire_centisecs = 12000
+vm.dirty_writeback_centisecs = 1500
+vm.vfs_cache_pressure = 50
+fs.file-max = 2097152
+EOF
+
+# Apply sysctl changes
+sudo sysctl -p
+```
+
+## **Monitoring and Maintenance**
+
+### **1. MergeFS Health Monitoring**
+
+```bash
+# Create comprehensive monitoring script
+sudo tee /usr/local/bin/mergerfs-monitor.sh << 'EOF'
+#!/bin/bash
+
+LOG_FILE="/var/log/mergerfs-monitor.log"
+POOL_PATH="/mnt/storage"
+DRIVES=("/mnt/disk1" "/mnt/disk2" "/mnt/disk3")
+
+# Function to log with timestamp
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+# Check if MergeFS pool is mounted
+if ! mountpoint -q "$POOL_PATH"; then
+    log_message "ERROR: MergeFS pool not mounted at $POOL_PATH"
+    exit 1
+fi
+
+# Check individual drives
+for drive in "${DRIVES[@]}"; do
+    if ! mountpoint -q "$drive"; then
+        log_message "ERROR: Drive $drive not mounted"
+        continue
+    fi
+    
+    # Check free space
+    free_space=$(df -BG "$drive" | tail -n 1 | awk '{print $4}' | sed 's/G//')
+    if [ "$free_space" -lt 100 ]; then
+        log_message "WARNING: Drive $drive has only ${free_space}GB free"
+    fi
+    
+    # Check for I/O errors
+    if dmesg | tail -n 100 | grep -i "error.*$(basename $drive)" > /dev/null; then
+        log_message "WARNING: I/O errors detected on $drive"
+    fi
+done
+
+# Check MergeFS process
+if ! pgrep mergerfs > /dev/null; then
+    log_message "ERROR: MergeFS process not running"
+fi
+
+# Performance check - test write speed
+test_file="$POOL_PATH/.mergerfs-test-$(date +%s)"
+if dd if=/dev/zero of="$test_file" bs=1M count=100 oflag=direct 2>/dev/null; then
+    rm -f "$test_file"
+    log_message "INFO: Write test successful"
+else
+    log_message "ERROR: Write test failed"
+fi
+
+log_message "INFO: Health check completed"
+EOF
+
+# Make script executable
+sudo chmod +x /usr/local/bin/mergerfs-monitor.sh
+
+# Add to cron for regular monitoring
+echo "*/15 * * * * root /usr/local/bin/mergerfs-monitor.sh" | sudo tee -a /etc/crontab
+```
+
+### **2. Automated Maintenance Tasks**
+
+```bash
+# Create maintenance script
+sudo tee /usr/local/bin/mergerfs-maintenance.sh << 'EOF'
+#!/bin/bash
+
+POOL_PATH="/mnt/storage"
+DRIVES=("/mnt/disk1" "/mnt/disk2" "/mnt/disk3")
+LOG_FILE="/var/log/mergerfs-maintenance.log"
+
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+log_message "Starting MergeFS maintenance"
+
+# Clean up any stale file handles
+sync
+
+# Check and repair filesystems (only if unmounted)
+for drive in "${DRIVES[@]}"; do
+    device=$(findmnt -n -o SOURCE "$drive")
+    if [ -n "$device" ]; then
+        log_message "Checking filesystem on $device ($drive)"
+        # Note: This requires unmounting first in production
+        # fsck -f "$device"
+    fi
+done
+
+# Update file database for faster searches
+if command -v updatedb > /dev/null; then
+    log_message "Updating file database"
+    updatedb --localpaths="$POOL_PATH" --output="/var/lib/mlocate/mergerfs.db"
+fi
+
+# Clean up temporary files older than 7 days
+find "$POOL_PATH" -name "*.tmp" -mtime +7 -delete 2>/dev/null
+find "$POOL_PATH" -name ".DS_Store" -delete 2>/dev/null
+
+# Generate usage report
+log_message "=== Storage Usage Report ==="
+df -h "${DRIVES[@]}" "$POOL_PATH" | tee -a "$LOG_FILE"
+
+log_message "Maintenance completed"
+EOF
+
+# Make script executable
+sudo chmod +x /usr/local/bin/mergerfs-maintenance.sh
+
+# Schedule weekly maintenance
+echo "0 2 * * 0 root /usr/local/bin/mergerfs-maintenance.sh" | sudo tee -a /etc/crontab
+```
+
+## **Troubleshooting Common Issues**
+
+### **1. Mount Issues**
+
+```bash
+# Check if MergeFS is properly installed
+mergerfs --version
+
+# Check FUSE module
+lsmod | grep fuse
+sudo modprobe fuse
+
+# Check mount permissions
+ls -la /mnt/storage/
+sudo chmod 755 /mnt/storage
+
+# Debug mount issues
+sudo mergerfs -f -o debug /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage
+
+# Check system logs
+sudo journalctl -u mergerfs
+dmesg | grep -i mergerfs
+```
+
+### **2. Performance Issues**
+
+```bash
+# Test individual drive performance
+for drive in /mnt/disk{1,2,3}; do
+    echo "Testing $drive:"
+    dd if=/dev/zero of="$drive/test-file" bs=1M count=1000 oflag=direct
+    dd if="$drive/test-file" of=/dev/null bs=1M iflag=direct
+    rm "$drive/test-file"
+    echo ""
+done
+
+# Test MergeFS pool performance
+echo "Testing MergeFS pool:"
+dd if=/dev/zero of="/mnt/storage/test-file" bs=1M count=1000 oflag=direct
+dd if="/mnt/storage/test-file" of=/dev/null bs=1M iflag=direct
+rm "/mnt/storage/test-file"
+
+# Check I/O statistics
+iostat -x 1 5
+```
+
+### **3. Space Management Issues**
+
+```bash
+# Find which drive contains specific files
+find /mnt/disk* -name "filename" -exec ls -la {} \;
+
+# Move files between drives manually
+mv /mnt/disk1/large-file /mnt/disk3/
+ln -s /mnt/disk3/large-file /mnt/disk1/large-file
+
+# Check for duplicate files across drives
+fdupes -r /mnt/disk1 /mnt/disk2 /mnt/disk3
+```
+
+## **Integration with Proxmox**
+
+### **1. Adding MergeFS Storage to Proxmox**
+
+```bash
+# Add MergeFS pool as Proxmox storage
+pvesm add dir mergerfs-pool --path /mnt/storage --content images,vztmpl,backup,iso
+
+# Configure storage options
+pvesm set mergerfs-pool --nodes proxmox-node1,proxmox-node2 --shared 0
+
+# Verify storage configuration
+pvesm status
+pvesm list mergerfs-pool
+```
+
+### **2. VM Storage Configuration**
+
+```bash
+# Create VM with storage on MergeFS pool
+qm create 100 --name test-vm --memory 2048 --cores 2 \
+  --scsi0 mergerfs-pool:32 --boot c --bootdisk scsi0 \
+  --ostype l26 --net0 virtio,bridge=vmbr0
+
+# Move existing VM to MergeFS storage
+qm move_disk 100 scsi0 mergerfs-pool --format qcow2
+```
+
+### **3. Backup Integration**
+
+```bash
+# Configure backup to use MergeFS storage
+pvesm add dir mergerfs-backup --path /mnt/storage/backup --content backup
+
+# Create backup job using MergeFS storage
+vzdump --storage mergerfs-backup --mode snapshot --compress gzip 100
+```
+
+## **Best Practices and Recommendations**
+
+### **1. Drive Selection and Setup**
+
+- **Use similar-speed drives** for consistent performance
+- **Mix drive sizes freely** - MergeFS handles different capacities well
+- **Consider drive failure patterns** - avoid drives from the same batch
+- **Use enterprise drives** for 24/7 operation
+- **Implement external backup** - MergeFS provides no redundancy
+
+### **2. Configuration Recommendations**
+
+- **Start with conservative settings** and tune based on usage
+- **Monitor drive space regularly** to prevent full drives
+- **Use appropriate creation policies** for your workload
+- **Set reasonable minimum free space** (500GB-1TB recommended)
+- **Enable move-on-no-space** for automatic file relocation
+
+### **3. Maintenance Schedule**
+
+- **Daily**: Monitor drive health and space usage
+- **Weekly**: Run filesystem checks and cleanup
+- **Monthly**: Review performance metrics and optimize
+- **Quarterly**: Test backup and recovery procedures
+
+<BuyMeACoffeeButton />
