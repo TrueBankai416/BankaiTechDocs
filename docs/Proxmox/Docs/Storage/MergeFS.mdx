@@ -741,9 +741,9 @@ for drive in "${DRIVES[@]}"; do
     fi
 done
 
-# Check MergeFS process
+# Check mergerfs process
 if ! pgrep mergerfs > /dev/null; then
-    log_message "ERROR: MergeFS process not running"
+    log_message "ERROR: mergerfs process not running"
 fi
 
 # Performance check - test write speed
@@ -780,7 +780,7 @@ log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
 }
 
-log_message "Starting MergeFS maintenance"
+log_message "Starting mergerfs maintenance"
 
 # Clean up any stale file handles
 sync
@@ -855,8 +855,8 @@ for drive in /mnt/disk{1,2,3}; do
     echo ""
 done
 
-# Test MergeFS pool performance
-echo "Testing MergeFS pool:"
+# Test mergerfs pool performance
+echo "Testing mergerfs pool:"
 dd if=/dev/zero of="/mnt/storage/test-file" bs=1M count=1000 oflag=direct
 dd if="/mnt/storage/test-file" of=/dev/null bs=1M iflag=direct
 rm "/mnt/storage/test-file"
@@ -881,10 +881,10 @@ fdupes -r /mnt/disk1 /mnt/disk2 /mnt/disk3
 
 ## **Integration with Proxmox**
 
-### **1. Adding MergeFS Storage to Proxmox**
+### **1. Adding mergerfs Storage to Proxmox**
 
 ```bash
-# Add MergeFS pool as Proxmox storage
+# Add mergerfs pool as Proxmox storage
 pvesm add dir mergerfs-pool --path /mnt/storage --content images,vztmpl,backup,iso
 
 # Configure storage options
@@ -898,22 +898,22 @@ pvesm list mergerfs-pool
 ### **2. VM Storage Configuration**
 
 ```bash
-# Create VM with storage on MergeFS pool
+# Create VM with storage on mergerfs pool
 qm create 100 --name test-vm --memory 2048 --cores 2 \
   --scsi0 mergerfs-pool:32 --boot c --bootdisk scsi0 \
   --ostype l26 --net0 virtio,bridge=vmbr0
 
-# Move existing VM to MergeFS storage
+# Move existing VM to mergerfs storage
 qm move_disk 100 scsi0 mergerfs-pool --format qcow2
 ```
 
 ### **3. Backup Integration**
 
 ```bash
-# Configure backup to use MergeFS storage
+# Configure backup to use mergerfs storage
 pvesm add dir mergerfs-backup --path /mnt/storage/backup --content backup
 
-# Create backup job using MergeFS storage
+# Create backup job using mergerfs storage
 vzdump --storage mergerfs-backup --mode snapshot --compress gzip 100
 ```
 
@@ -922,10 +922,10 @@ vzdump --storage mergerfs-backup --mode snapshot --compress gzip 100
 ### **1. Drive Selection and Setup**
 
 - **Use similar-speed drives** for consistent performance
-- **Mix drive sizes freely** - MergeFS handles different capacities well
+- **Mix drive sizes freely** - mergerfs handles different capacities well
 - **Consider drive failure patterns** - avoid drives from the same batch
 - **Use enterprise drives** for 24/7 operation
-- **Implement external backup** - MergeFS provides no redundancy
+- **Implement external backup** - mergerfs provides no redundancy
 
 ### **2. Configuration Recommendations**
 
