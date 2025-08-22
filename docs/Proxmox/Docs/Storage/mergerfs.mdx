@@ -45,15 +45,15 @@ mergerfs is a FUSE-based union filesystem that transparently overlays multiple d
 ## **mergerfs vs Other Storage Solutions**
 
 <Tabs
-  defaultValue="mergefs"
+  defaultValue="mergerfs"
   values={[
-    {label: 'mergerfs', value: 'mergefs'},
+    {label: 'mergerfs', value: 'mergerfs'},
     {label: 'RAID 0', value: 'raid0'},
     {label: 'RAID 5/6', value: 'raid56'},
     {label: 'LVM', value: 'lvm'},
   ]}>
 
-<TabItem value="mergefs">
+<TabItem value="mergerfs">
 **mergerfs (Union Filesystem)**
 - **Data Safety**: Individual drive failure affects only that drive's data
 - **Expansion**: Easy addition/removal of drives
@@ -153,12 +153,15 @@ sudo apt install mergerfs
 # Verify installation
 mergerfs --version
 
-# Install additional utilities
-sudo apt install fuse3 attr
+# Install additional utilities and dependencies
+sudo apt install fuse3 attr smartmontools
 
 # Ensure FUSE module is loaded
 sudo modprobe fuse
 echo 'fuse' | sudo tee -a /etc/modules
+
+# Configure FUSE to allow other users (required for allow_other option)
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 ```
 </TabItem>
 
@@ -175,12 +178,15 @@ sudo yum install mergerfs
 wget https://github.com/trapexit/mergerfs/releases/download/2.35.1/mergerfs-2.35.1-1.el8.x86_64.rpm
 sudo rpm -i mergerfs-2.35.1-1.el8.x86_64.rpm
 
-# Install FUSE utilities
-sudo yum install fuse fuse-libs attr
+# Install FUSE utilities and dependencies
+sudo yum install fuse fuse-libs attr smartmontools
 
 # Load FUSE module
 sudo modprobe fuse
 echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
+
+# Configure FUSE to allow other users (required for allow_other option)
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 ```
 </TabItem>
 
@@ -202,8 +208,11 @@ sudo make install
 # Verify installation
 mergerfs --version
 
-# Install FUSE if not already installed
-sudo apt install fuse3
+# Install FUSE and dependencies if not already installed
+sudo apt install fuse3 smartmontools
+
+# Configure FUSE to allow other users (required for allow_other option)
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 ```
 </TabItem>
 </Tabs>
