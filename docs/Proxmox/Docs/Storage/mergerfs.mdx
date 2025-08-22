@@ -1,15 +1,15 @@
 ---
-title: MergeFS Setup and Configuration
+title: mergerfs Setup and Configuration
 tags:
    - Proxmox
    - Storage
-   - MergeFS
+   - mergerfs
    - Union Filesystem
    - Storage Pool
    - FUSE
    - Drive Pooling
 
-keywords: [Proxmox, MergeFS, Union Filesystem, Storage Pool, Drive Pooling, FUSE, Multiple Drives, Storage Management]
+keywords: [Proxmox, mergerfs, Union Filesystem, Storage Pool, Drive Pooling, FUSE, Multiple Drives, Storage Management]
 last_update:
   author: BankaiTech
 ---
@@ -17,15 +17,15 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-# **MergeFS Setup and Configuration for Proxmox**
+# **mergerfs Setup and Configuration for Proxmox**
 
-MergeFS is a union filesystem that allows you to combine multiple drives, directories, or mount points into a single logical filesystem. This guide provides comprehensive instructions for setting up and configuring MergeFS with Proxmox, enabling efficient storage pooling and management.
+mergerfs is a union filesystem that allows you to combine multiple drives, directories, or mount points into a single logical filesystem. This guide provides comprehensive instructions for setting up and configuring mergerfs with Proxmox, enabling efficient storage pooling and management.
 
-## **What is MergeFS?**
+## **What is mergerfs?**
 
-MergeFS is a FUSE-based union filesystem that transparently overlays multiple directories (branches) to create a single unified view. Unlike traditional RAID solutions, MergeFS preserves individual drive integrity while providing a pooled storage experience.
+mergerfs is a FUSE-based union filesystem that transparently overlays multiple directories (branches) to create a single unified view. Unlike traditional RAID solutions, mergerfs preserves individual drive integrity while providing a pooled storage experience.
 
-### **Benefits of MergeFS**
+### **Benefits of mergerfs**
 
 - ✅ **Drive Independence**: Each drive maintains its own filesystem and can be accessed independently
 - ✅ **No Data Loss Risk**: If one drive fails, only data on that specific drive is affected
@@ -35,26 +35,26 @@ MergeFS is a FUSE-based union filesystem that transparently overlays multiple di
 - ✅ **Policy-based File Placement**: Control where new files are created based on various policies
 - ✅ **No Parity Overhead**: Full capacity utilization without parity calculations
 
-### **Limitations of MergeFS**
+### **Limitations of mergerfs**
 
 - ❌ **No Built-in Redundancy**: Provides no protection against drive failure
 - ❌ **FUSE Overhead**: Slight performance overhead due to FUSE layer
-- ❌ **Single Point of Failure**: The MergeFS mount point itself can be a bottleneck
+- ❌ **Single Point of Failure**: The mergerfs mount point itself can be a bottleneck
 - ❌ **Complex Recovery**: File recovery requires knowledge of which drive contains specific files
 
-## **MergeFS vs Other Storage Solutions**
+## **mergerfs vs Other Storage Solutions**
 
 <Tabs
   defaultValue="mergefs"
   values={[
-    {label: 'MergeFS', value: 'mergefs'},
+    {label: 'mergerfs', value: 'mergefs'},
     {label: 'RAID 0', value: 'raid0'},
     {label: 'RAID 5/6', value: 'raid56'},
     {label: 'LVM', value: 'lvm'},
   ]}>
 
 <TabItem value="mergefs">
-**MergeFS (Union Filesystem)**
+**mergerfs (Union Filesystem)**
 - **Data Safety**: Individual drive failure affects only that drive's data
 - **Expansion**: Easy addition/removal of drives
 - **Performance**: Good read performance, write performance varies by policy
@@ -98,10 +98,10 @@ MergeFS is a FUSE-based union filesystem that transparently overlays multiple di
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    MergeFS Architecture                     │
+│                    mergerfs Architecture                   │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │              MergeFS Mount Point                        │ │
+│  │              mergerfs Mount Point                       │ │
 │  │                /mnt/storage                             │ │
 │  │                                                         │ │
 │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐      │ │
@@ -132,7 +132,7 @@ MergeFS is a FUSE-based union filesystem that transparently overlays multiple di
 
 ## **Installation and Setup**
 
-### **1. Install MergeFS**
+### **1. Install mergerfs**
 
 <Tabs
   defaultValue="ubuntu"
@@ -147,7 +147,7 @@ MergeFS is a FUSE-based union filesystem that transparently overlays multiple di
 # Update package list
 sudo apt update
 
-# Install MergeFS from official repository
+# Install mergerfs from official repository
 sudo apt install mergerfs
 
 # Verify installation
@@ -167,7 +167,7 @@ echo 'fuse' | sudo tee -a /etc/modules
 # Install EPEL repository (if not already installed)
 sudo yum install epel-release
 
-# Install MergeFS
+# Install mergerfs
 sudo yum install mergerfs
 
 # Alternative: Install from GitHub releases
@@ -189,14 +189,14 @@ echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
 # Install build dependencies
 sudo apt install build-essential git pandoc
 
-# Clone MergeFS repository
+# Clone mergerfs repository
 git clone https://github.com/trapexit/mergerfs.git
 cd mergerfs
 
-# Build MergeFS
+# Build mergerfs
 make
 
-# Install MergeFS
+# Install mergerfs
 sudo make install
 
 # Verify installation
@@ -224,9 +224,9 @@ lsblk -f
 # ├─sdc1 btrfs        c3d4e5f6-g7h8-9012-cdef-345678901234 
 
 # Create mount points for individual drives
-sudo mkdir -p /mnt/disk{1,2,3,4}
+sudo mkdir -p /mnt/disk{1,2,3}
 
-# Create mount point for MergeFS pool
+# Create mount point for mergerfs pool
 sudo mkdir -p /mnt/storage
 
 # Format drives if needed (DESTRUCTIVE - only for new drives)
@@ -244,7 +244,7 @@ sudo blkid
 # Create fstab entries for individual drives
 sudo tee -a /etc/fstab << 'EOF'
 
-# Individual drives for MergeFS pool
+# Individual drives for mergerfs pool
 UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890 /mnt/disk1 ext4  defaults,noatime 0 2
 UUID=b2c3d4e5-f6g7-8901-bcde-f23456789012 /mnt/disk2 xfs   defaults,noatime 0 2
 UUID=c3d4e5f6-g7h8-9012-cdef-345678901234 /mnt/disk3 btrfs defaults,noatime 0 2
@@ -257,10 +257,10 @@ sudo mount -a
 df -h | grep "/mnt/disk"
 ```
 
-### **4. Basic MergeFS Configuration**
+### **4. Basic mergerfs Configuration**
 
 ```bash
-# Test basic MergeFS mount
+# Test basic mergerfs mount
 sudo mergerfs /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage
 
 # Verify the mount
@@ -281,11 +281,11 @@ sudo rm /mnt/storage/test-file
 sudo umount /mnt/storage
 ```
 
-## **Advanced MergeFS Configuration**
+## **Advanced mergerfs Configuration**
 
-### **1. MergeFS Policies**
+### **1. mergerfs Policies**
 
-MergeFS uses policies to determine where files are created, accessed, and managed. Understanding these policies is crucial for optimal performance.
+mergerfs uses policies to determine where files are created, accessed, and managed. Understanding these policies is crucial for optimal performance.
 
 <Tabs
   defaultValue="creation"
@@ -343,27 +343,27 @@ MergeFS uses policies to determine where files are created, accessed, and manage
 </TabItem>
 </Tabs>
 
-### **2. Optimized MergeFS Mount Options**
+### **2. Optimized mergerfs Mount Options**
 
 ```bash
-# Create optimized MergeFS configuration
+# Create optimized mergerfs configuration
 sudo tee -a /etc/fstab << 'EOF'
 
-# MergeFS storage pool with optimized settings
+# mergerfs storage pool with optimized settings
 /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=500G,fsname=mergerfs-pool,category.create=mfs,category.action=epall,category.search=ff 0 0
 EOF
 
-# Mount the MergeFS pool
+# Mount the mergerfs pool
 sudo mount /mnt/storage
 
 # Verify mount with options
 mount | grep mergerfs
 ```
 
-### **3. MergeFS Mount Options Explained**
+### **3. mergerfs Mount Options Explained**
 
 ```bash
-# Essential MergeFS mount options:
+# Essential mergerfs mount options:
 
 # Basic Options
 defaults                    # Use default mount options
@@ -398,11 +398,11 @@ func.readdir=epall         # Read directory from existing path, all branches
 ### **4. Drive Space Management**
 
 ```bash
-# Create script to monitor drive space and MergeFS health
+# Create script to monitor drive space and mergerfs health
 sudo tee /usr/local/bin/mergerfs-status.sh << 'EOF'
 #!/bin/bash
 
-echo "=== MergeFS Pool Status ==="
+echo "=== mergerfs Pool Status ==="
 echo "Pool Mount: /mnt/storage"
 echo "Branches: /mnt/disk1:/mnt/disk2:/mnt/disk3"
 echo ""
@@ -421,13 +421,13 @@ for disk in /mnt/disk{1,2,3}; do
     fi
 done
 
-echo "=== MergeFS Pool Status ==="
+echo "=== mergerfs Pool Status ==="
 if mountpoint -q /mnt/storage; then
     df -h /mnt/storage | tail -n 1
     echo "Total Files: $(find /mnt/storage -type f | wc -l)"
     echo "Total Directories: $(find /mnt/storage -type d | wc -l)"
 else
-    echo "MergeFS Pool: NOT MOUNTED"
+    echo "mergerfs Pool: NOT MOUNTED"
 fi
 
 echo ""
@@ -567,7 +567,7 @@ DRIVES=("/mnt/disk1" "/mnt/disk2" "/mnt/disk3")
 MIN_FREE_GB=500
 BALANCE_THRESHOLD_GB=1000
 
-echo "=== MergeFS Balance Check ==="
+echo "=== mergerfs Balance Check ==="
 echo "Minimum free space required: ${MIN_FREE_GB}GB per drive"
 echo "Balance threshold: ${BALANCE_THRESHOLD_GB}GB difference"
 echo ""
@@ -618,7 +618,7 @@ echo "=== Pool Summary ==="
 if mountpoint -q "$POOL_PATH"; then
     df -h "$POOL_PATH" | tail -n 1
 else
-    echo "MergeFS pool not mounted"
+    echo "mergerfs pool not mounted"
 fi
 EOF
 
@@ -685,7 +685,7 @@ echo "* hard nofile 65536" | sudo tee -a /etc/security/limits.conf
 # Optimize kernel parameters for storage
 sudo tee -a /etc/sysctl.conf << 'EOF'
 
-# MergeFS and storage optimizations
+# mergerfs and storage optimizations
 vm.dirty_ratio = 15
 vm.dirty_background_ratio = 5
 vm.dirty_expire_centisecs = 12000
@@ -700,7 +700,7 @@ sudo sysctl -p
 
 ## **Monitoring and Maintenance**
 
-### **1. MergeFS Health Monitoring**
+### **1. mergerfs Health Monitoring**
 
 ```bash
 # Create comprehensive monitoring script
@@ -716,9 +716,9 @@ log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
 }
 
-# Check if MergeFS pool is mounted
+# Check if mergerfs pool is mounted
 if ! mountpoint -q "$POOL_PATH"; then
-    log_message "ERROR: MergeFS pool not mounted at $POOL_PATH"
+    log_message "ERROR: mergerfs pool not mounted at $POOL_PATH"
     exit 1
 fi
 
@@ -824,7 +824,7 @@ echo "0 2 * * 0 root /usr/local/bin/mergerfs-maintenance.sh" | sudo tee -a /etc/
 ### **1. Mount Issues**
 
 ```bash
-# Check if MergeFS is properly installed
+# Check if mergerfs is properly installed
 mergerfs --version
 
 # Check FUSE module
