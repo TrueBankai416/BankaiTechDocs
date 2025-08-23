@@ -97,6 +97,8 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
+    depends_on:
+      - flaresolverr
     environment:
       - PUID=1000
       - PGID=1000
@@ -109,6 +111,19 @@ services:
         max-file: "3"
     ports:
       - 9696:9696
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    hostname: flaresolverr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=America/New_York
+    ports:
+      - 8191:8191
     restart: unless-stopped
 
   jellyseerr:
@@ -180,5 +195,10 @@ services:
 - You can comment out either service if you only need one download method
 - Configure at least one download client in each *Arr application's settings
 - Both clients share the same `/downloads` folder for temporary storage
+
+### Flaresolverr
+- Included to handle indexers that use CloudFlare protection
+- Configure in Prowlarr settings: `http://flaresolverr:8191`
+- Can be removed if you don't use indexers requiring CloudFlare bypass
 
 <BuyMeACoffeeButton />
