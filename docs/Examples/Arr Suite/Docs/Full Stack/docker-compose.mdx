@@ -20,14 +20,13 @@ services:
     hostname: radarr
     depends_on:
       - prowlarr
-      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./radarr:/config
-      - /media/merged:/media
+      - /media/merged/movies:/movies
       - /downloads:/downloads
     logging:
       options:
@@ -42,14 +41,13 @@ services:
     container_name: readarr
     depends_on:
       - prowlarr
-      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./readarr:/config
-      - /media/merged:/media
+      - /media/merged/books:/books
       - /downloads:/downloads
     ports:
       - 8787:8787
@@ -61,14 +59,13 @@ services:
     hostname: sonarr
     depends_on:
       - prowlarr
-      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./sonarr:/config
-      - /media/merged:/media
+      - /media/merged/tv:/tv
       - /downloads:/downloads
     logging:
       options:
@@ -84,14 +81,13 @@ services:
     hostname: lidarr
     depends_on:
       - prowlarr
-      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./lidarr:/config
-      - /media/merged:/media
+      - /media/merged/music:/music
       - /downloads:/downloads
     ports:
       - 8686:8686
@@ -167,5 +163,22 @@ services:
       - 6881:6881/udp
     restart: unless-stopped
 ```
+
+## Configuration Notes
+
+### Volume Mappings
+- Each *Arr application is mapped to its specific media type subfolder within the mergerfs mount
+- This matches the default library paths expected by the LinuxServer.io images
+- Ensure your mergerfs mount point `/media/merged` contains the appropriate subfolders:
+  - `/media/merged/movies` for Radarr
+  - `/media/merged/tv` for Sonarr  
+  - `/media/merged/music` for Lidarr
+  - `/media/merged/books` for Readarr
+
+### Download Clients
+- Both SABnzbd (Usenet) and qBittorrent (torrents) are included as examples
+- You can comment out either service if you only need one download method
+- Configure at least one download client in each *Arr application's settings
+- Both clients share the same `/downloads` folder for temporary storage
 
 <BuyMeACoffeeButton />
