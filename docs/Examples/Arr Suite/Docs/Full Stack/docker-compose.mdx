@@ -2,9 +2,7 @@
 title: docker-compose.yaml
 tags:
     - Arr Suite
-    - mergerfs
-    - Usenet
-keywords: [Arr Suite, mergerfs, Usenet, Docker]
+keywords: [Arr Suite]
 last_update:
   author: BankaiTech
 ---
@@ -26,8 +24,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./radarr:/config
-      - /media/merged/movies:/movies
-      - /downloads:/downloads
+      - /media/merged:/media #optional
     logging:
       options:
         max-size: "10m"
@@ -47,8 +44,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./readarr:/config
-      - /media/merged/books:/books
-      - /downloads:/downloads
+      - /media/merged:/media #optional
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -65,8 +61,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./sonarr:/config
-      - /media/merged/tv:/tv
-      - /downloads:/downloads
+      - /media/merged:/media #optional
     logging:
       options:
         max-size: "10m"
@@ -86,9 +81,8 @@ services:
       - PGID=1000
       - TZ=America/New_York
     volumes:
-      - ./lidarr:/config
-      - /media/merged/music:/music
-      - /downloads:/downloads
+      - ./lidarr/config:/config
+      - /media/merged:/merged #optional
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -97,8 +91,6 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
-    depends_on:
-      - flaresolverr
     environment:
       - PUID=1000
       - PGID=1000
@@ -111,19 +103,6 @@ services:
         max-file: "3"
     ports:
       - 9696:9696
-    restart: unless-stopped
-
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    hostname: flaresolverr
-    environment:
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-      - TZ=America/New_York
-    ports:
-      - 8191:8191
     restart: unless-stopped
 
   jellyseerr:
@@ -142,63 +121,6 @@ services:
         max-size: "10m"
         max-file: "3"
     restart: unless-stopped
-
-  # Usenet client for NZB downloads
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzbd
-    hostname: sabnzbd
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-    volumes:
-      - ./sabnzbd:/config
-      - /downloads:/downloads
-    ports:
-      - 8080:8080
-    restart: unless-stopped
-
-  # Optional: qBittorrent for torrent downloads
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    hostname: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-      - WEBUI_PORT=8081
-    volumes:
-      - ./qbittorrent:/config
-      - /downloads:/downloads
-    ports:
-      - 8081:8081
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
 ```
-
-## Configuration Notes
-
-### Volume Mappings
-- Each *Arr application is mapped to its specific media type subfolder within the mergerfs mount
-- This matches the default library paths expected by the LinuxServer.io images
-- Ensure your mergerfs mount point `/media/merged` contains the appropriate subfolders:
-  - `/media/merged/movies` for Radarr
-  - `/media/merged/tv` for Sonarr  
-  - `/media/merged/music` for Lidarr
-  - `/media/merged/books` for Readarr
-
-### Download Clients
-- Both SABnzbd (Usenet) and qBittorrent (torrents) are included as examples
-- You can comment out either service if you only need one download method
-- Configure at least one download client in each *Arr application's settings
-- Both clients share the same `/downloads` folder for temporary storage
-
-### Flaresolverr
-- Included to handle indexers that use CloudFlare protection
-- Configure in Prowlarr settings: `http://flaresolverr:8191`
-- Can be removed if you don't use indexers requiring CloudFlare bypass
 
 <BuyMeACoffeeButton />
