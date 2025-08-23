@@ -95,14 +95,9 @@ This creates `src/theme/Footer/index.tsx`. Modify it to include your floating bu
 ```tsx
 import React from 'react'
 import Footer from '@theme-original/Footer'
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import YourFloatingWidget from '@site/src/components/YourFloatingWidget'
 
 export default function FooterWrapper(props) {
-  const {
-    siteConfig: { customFields },
-  } = useDocusaurusContext()
-
   return (
     <>
       <YourFloatingWidget />
