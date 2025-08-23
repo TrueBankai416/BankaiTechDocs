@@ -62,8 +62,8 @@ flowchart TD
     classDef finalFlow fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
     
     class A,B requestFlow
-    class C,D,E,F,L arrSuite
-    class G,H,I,J,K downloadFlow
+    class C,D,E,F,K arrSuite
+    class G,H,I,J,L downloadFlow
     class M,N,O,R,S,T,U storageFlow
     class P,Q finalFlow
 ```
@@ -117,8 +117,7 @@ flowchart TD
 ```
 /downloads/          # Temporary download location
 ├── complete/        # Completed downloads
-├── incomplete/      # In-progress downloads
-└── watch/          # Watch folders for manual additions
+└── incomplete/      # In-progress downloads
 
 /media/merged/       # mergerfs mount point
 ├── movies/         # Jellyfin Movies library
