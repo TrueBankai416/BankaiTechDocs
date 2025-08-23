@@ -64,8 +64,8 @@ flowchart TD
     class A,B requestFlow
     class C,D,E,F,K arrSuite
     class G,H,I,J,L downloadFlow
-    class M,N,O,R,S,T,U storageFlow
-    class P,Q finalFlow
+    class M,O,R,S,T,U storageFlow
+    class N,P,Q finalFlow
 ```
 
 ## Workflow Components
@@ -157,12 +157,18 @@ UUID=your-disk3-uuid /mnt/disk3 ext4 defaults,noatime 0 2
 
 ### Docker Integration
 
-Ensure your *Arr containers mount the mergerfs pool:
+Ensure your *Arr containers mount the mergerfs pool with specific media type paths:
 
 ```yaml
+# Example for Radarr
 volumes:
-  - /media/merged:/media  # mergerfs mount point
-  - /downloads:/downloads # temporary download location
+  - /media/merged/movies:/movies  # mergerfs movies library
+  - /downloads:/downloads         # temporary download location
+
+# Example for Sonarr  
+volumes:
+  - /media/merged/tv:/tv          # mergerfs TV library
+  - /downloads:/downloads         # temporary download location
 ```
 
 ## Additional Considerations
