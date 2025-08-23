@@ -2,7 +2,9 @@
 title: docker-compose.yaml
 tags:
     - Arr Suite
-keywords: [Arr Suite]
+    - mergerfs
+    - Usenet
+keywords: [Arr Suite, mergerfs, Usenet, Docker]
 last_update:
   author: BankaiTech
 ---
@@ -18,13 +20,15 @@ services:
     hostname: radarr
     depends_on:
       - prowlarr
+      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./radarr:/config
-      - /media/merged:/media #optional
+      - /media/merged:/media
+      - /downloads:/downloads
     logging:
       options:
         max-size: "10m"
@@ -38,13 +42,15 @@ services:
     container_name: readarr
     depends_on:
       - prowlarr
+      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./readarr:/config
-      - /media/merged:/media #optional
+      - /media/merged:/media
+      - /downloads:/downloads
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -55,13 +61,15 @@ services:
     hostname: sonarr
     depends_on:
       - prowlarr
+      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./sonarr:/config
-      - /media/merged:/media #optional
+      - /media/merged:/media
+      - /downloads:/downloads
     logging:
       options:
         max-size: "10m"
@@ -76,13 +84,15 @@ services:
     hostname: lidarr
     depends_on:
       - prowlarr
+      - sabnzbd
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
-      - ./lidarr/config:/config
-      - /media/merged:/merged #optional
+      - ./lidarr:/config
+      - /media/merged:/media
+      - /downloads:/downloads
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -120,6 +130,41 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    restart: unless-stopped
+
+  # Usenet client for NZB downloads
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    hostname: sabnzbd
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./sabnzbd:/config
+      - /downloads:/downloads
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  # Optional: qBittorrent for torrent downloads
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    hostname: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8081
+    volumes:
+      - ./qbittorrent:/config
+      - /downloads:/downloads
+    ports:
+      - 8081:8081
+      - 6881:6881
+      - 6881:6881/udp
     restart: unless-stopped
 ```
 
