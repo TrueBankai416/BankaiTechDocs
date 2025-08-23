@@ -7,9 +7,10 @@ tags:
    - CIFS
    - SMB
    - SSHFS
+   - mergerfs
    - Network Storage
 
-keywords: [Proxmox, Storage, NFS, CIFS, SMB, SSHFS, Network Storage, Remote Storage]
+keywords: [Proxmox, Storage, NFS, CIFS, SMB, SSHFS, mergerfs, Network Storage, Remote Storage, Union Filesystem]
 last_update:
   author: BankaiTech
 ---
@@ -19,7 +20,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Proxmox Storage: Complete Guide to Network Storage Solutions**
 
-Proxmox VE provides extensive support for various storage backends, enabling administrators to integrate network-attached storage (NAS) solutions seamlessly into their virtualized infrastructure. This guide covers the three most common network storage protocols: NFS, CIFS/SMB, and SSHFS.
+Proxmox VE provides extensive support for various storage backends, enabling administrators to integrate network-attached storage (NAS) solutions and union filesystems seamlessly into their virtualized infrastructure. This guide covers the most common network storage protocols: NFS, CIFS/SMB, SSHFS, and mergerfs for storage pooling.
 
 ## **What is Network Storage in Proxmox?**
 
@@ -39,6 +40,7 @@ Network storage allows Proxmox hosts to access remote storage resources over the
     {label: 'NFS', value: 'nfs'},
     {label: 'CIFS/SMB', value: 'cifs'},
     {label: 'SSHFS', value: 'sshfs'},
+    {label: 'mergerfs', value: 'mergerfs'},
   ]}>
 
 <TabItem value="nfs">
@@ -67,6 +69,15 @@ Network storage allows Proxmox hosts to access remote storage resources over the
 - **Use Cases**: Secure remote storage, temporary mounts, development environments
 - **Performance**: Moderate performance, excellent reliability
 </TabItem>
+
+<TabItem value="mergerfs">
+**mergerfs (Union Filesystem)**
+- **Best For**: Storage pooling, combining multiple drives, media storage
+- **Pros**: Drive independence, flexible expansion, no parity overhead, mixed drive sizes
+- **Cons**: No built-in redundancy, FUSE overhead, requires external backup
+- **Use Cases**: Media servers, backup aggregation, storage pools, mixed-size drive arrays
+- **Performance**: Good read performance, configurable write policies
+</TabItem>
 </Tabs>
 
 ## **Storage Architecture Overview**
@@ -84,7 +95,8 @@ Network storage allows Proxmox hosts to access remote storage resources over the
 │  │ /mnt/pve/   │    │ /mnt/pve/   │    │ /mnt/pve/   │     │
 │  │ ├─nfs-share │    │ ├─nfs-share │    │ ├─nfs-share │     │
 │  │ ├─smb-share │    │ ├─smb-share │    │ ├─smb-share │     │
-│  │ └─ssh-share │    │ └─ssh-share │    │ └─ssh-share │     │
+│  │ ├─ssh-share │    │ ├─ssh-share │    │ ├─ssh-share │     │
+│  │ └─mergerfs  │    │ └─mergerfs  │    │ └─mergerfs  │     │
 │  └─────────────┘    └─────────────┘    └─────────────┘     │
 │         │                   │                   │          │
 └─────────┼───────────────────┼───────────────────┼──────────┘
@@ -101,6 +113,7 @@ Network storage allows Proxmox hosts to access remote storage resources over the
                     │ NFS Service       │
                     │ SMB/CIFS Service  │
                     │ SSH Service       │
+                    │ mergerfs Pool     │
                     └───────────────────┘
 ```
 
