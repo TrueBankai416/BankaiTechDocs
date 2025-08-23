@@ -115,15 +115,20 @@ flowchart TD
 ## Folder Structure
 
 ```
-/downloads/          # Temporary download location
-├── complete/        # Completed downloads
-└── incomplete/      # In-progress downloads
-
-/media/merged/       # mergerfs mount point
-├── movies/         # Jellyfin Movies library
-├── tv/             # Jellyfin TV Shows library
-├── music/          # Jellyfin Music library (if using Lidarr)
-└── books/          # Jellyfin Books library (if using Readarr)
+/media/merged/         # mergerfs mount point
+├── movies/            # Jellyfin Movies library
+├── tv/                # Jellyfin TV Shows library
+├── music/             # Jellyfin Music library (if using Lidarr)
+├── books/             # Jellyfin Books library (if using Readarr)
+├── downloads/         # Download location (bind mount)
+    └── Torrent/       # qBittorrent download location
+        ├── temp/      # Temp download location
+        ├── radarr/ 
+        └── tv-sonarr/
+    └── Usenet/        # Usenet download location
+        └── temp/      # Usenet temp download location
+├── cache/             # Tdarr cache location (bind mount)
+    └── tdarr_cache/
 
 /mnt/               # Individual drive mount points
 ├── disk1/          # First storage drive
@@ -153,6 +158,15 @@ UUID=your-disk3-uuid /mnt/disk3 ext4 defaults,noatime 0 2
 
 # Mount mergerfs pool (add to /etc/fstab for persistence)
 /mnt/disk1:/mnt/disk2:/mnt/disk3 /media/merged mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=50G,fsname=mergerfs-pool,category.create=mfs 0 0
+
+# Use bind mounts for these directories so media doesnt get added on this drive
+# Bind mount downloads from Processing drive
+sudo mkdir -p /media/merged/downloads
+sudo mount --bind /media/server/Processing/downloads /media/merged/downloads
+
+# Keep Tdarr cache separate
+sudo mkdir -p /media/merged/cache
+sudo mount --bind /media/server/Processing/Tdarr /media/merged/cache
 ```
 
 ### Docker Integration
@@ -163,12 +177,10 @@ Ensure your *Arr containers mount the mergerfs pool with specific media type pat
 # Example for Radarr
 volumes:
   - /media/merged/movies:/movies  # mergerfs movies library
-  - /downloads:/downloads         # temporary download location
 
 # Example for Sonarr  
 volumes:
   - /media/merged/tv:/tv          # mergerfs TV library
-  - /downloads:/downloads         # temporary download location
 ```
 
 ## Additional Considerations
