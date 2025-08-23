@@ -214,6 +214,24 @@ const sidebars: SidebarsConfig = {
          'GitHub/Docs/Repository Management',
         ],
       },
+      {  
+        type: 'category',
+        label: 'Networking',
+        link: { type: 'doc', id: 'Networking/Introduction' },
+        items: [
+         {
+           type: 'category',
+           label: 'Storage',
+           link: { type: 'doc', id: 'Networking/Storage/Introduction' },
+           items: [
+             'Networking/Storage/NFS',
+             'Networking/Storage/CIFS-SMB',
+             'Networking/Storage/SSHFS',
+             'Networking/Storage/mergerfs',
+           ],
+         },
+        ],
+      },
   ],
 
 
