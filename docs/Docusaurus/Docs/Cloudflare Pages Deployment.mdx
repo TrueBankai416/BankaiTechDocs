@@ -1,0 +1,382 @@
+---
+title: Hosting on Cloudflare Pages from GitHub
+tags:
+   - Docusaurus
+   - Cloudflare
+   - GitHub
+   - Deployment
+   - Hosting
+keywords: [Docusaurus, Cloudflare Pages, GitHub, Deployment, Hosting, Static Site]
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Hosting Docusaurus on Cloudflare Pages from GitHub**
+
+Cloudflare Pages is a powerful platform for hosting static sites with global CDN distribution, automatic HTTPS, and seamless GitHub integration. This guide will walk you through deploying your Docusaurus site to Cloudflare Pages directly from your GitHub repository.
+
+## **Prerequisites**
+
+Before starting, ensure you have:
+
+- A Docusaurus site ready for deployment
+- A GitHub repository containing your Docusaurus project
+- A Cloudflare account (free tier available)
+- Your site properly configured and tested locally
+
+:::tip[GitHub Setup]
+If you haven't connected your Docusaurus site to GitHub yet, check out our [Connecting to GitHub](./Connecting%20to%20GitHub.mdx) guide first.
+:::
+
+## **Step 1: Prepare Your Repository**
+
+### ***Verify Build Configuration***
+
+Ensure your `package.json` has the correct build script:
+
+```json title="package.json"
+{
+  "scripts": {
+    "build": "docusaurus build",
+    "serve": "docusaurus serve"
+  }
+}
+```
+
+### ***Test Local Build***
+
+Before deploying, test your build locally:
+
+```bash
+npm run build
+npm run serve
+```
+
+This ensures your site builds correctly and all links work properly.
+
+### ***Configure Base URL (if needed)***
+
+<Tabs groupId="config-type">
+  <TabItem value="js" label="JavaScript">
+
+```js title="docusaurus.config.js"
+const config = {
+  title: 'My Site',
+  tagline: 'Dinosaurs are cool',
+  url: 'https://your-site.pages.dev', // Your Cloudflare Pages URL
+  baseUrl: '/', // Usually '/' for custom domains
+  // ... rest of config
+};
+```
+
+  </TabItem>
+  <TabItem value="ts" label="TypeScript">
+
+```ts title="docusaurus.config.ts"
+const config: Config = {
+  title: 'My Site',
+  tagline: 'Dinosaurs are cool',
+  url: 'https://your-site.pages.dev', // Your Cloudflare Pages URL
+  baseUrl: '/', // Usually '/' for custom domains
+  // ... rest of config
+};
+```
+
+  </TabItem>
+</Tabs>
+
+## **Step 2: Create a Cloudflare Pages Project**
+
+### ***Access Cloudflare Dashboard***
+
+1. Log in to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to **Pages** in the left sidebar
+3. Click **Create a project**
+
+### ***Connect to GitHub***
+
+1. Select **Connect to Git**
+2. Choose **GitHub** as your Git provider
+3. Authorize Cloudflare to access your GitHub account
+4. Select your repository from the list
+
+:::note[Repository Access]
+You can choose to give Cloudflare access to all repositories or select specific ones for better security.
+:::
+
+## **Step 3: Configure Build Settings**
+
+### ***Project Configuration***
+
+When setting up your project, configure the following:
+
+| Setting | Value |
+|---------|-------|
+| **Project name** | Choose a unique name (this will be part of your `.pages.dev` URL) |
+| **Production branch** | `main` or `master` (your default branch) |
+| **Build command** | `npm run build` |
+| **Build output directory** | `build` |
+| **Root directory** | `/` (unless your Docusaurus site is in a subdirectory) |
+
+### ***Environment Variables***
+
+If your site requires environment variables, add them in the **Environment variables** section:
+
+```bash
+NODE_VERSION=18
+NPM_VERSION=8
+```
+
+:::tip[Node.js Version]
+Cloudflare Pages supports Node.js versions 12.18.0, 14.15.0, 16.13.0, and 18.12.0. It's recommended to use Node.js 18 for the best compatibility with modern Docusaurus versions.
+:::
+
+## **Step 4: Deploy Your Site**
+
+### ***Initial Deployment***
+
+1. Click **Save and Deploy**
+2. Cloudflare will automatically trigger the first build
+3. Monitor the build process in the deployment logs
+4. Once complete, your site will be available at `https://your-project-name.pages.dev`
+
+### ***Build Process Overview***
+
+The build process includes:
+
+1. **Environment Setup**: Installing Node.js and npm
+2. **Dependency Installation**: Running `npm install`
+3. **Build Execution**: Running your build command
+4. **Asset Optimization**: Cloudflare optimizes static assets
+5. **Global Distribution**: Deploying to Cloudflare's global network
+
+## **Step 5: Configure Custom Domain (Optional)**
+
+### ***Add Custom Domain***
+
+1. In your Pages project, go to **Custom domains**
+2. Click **Set up a custom domain**
+3. Enter your domain name (e.g., `docs.yourdomain.com`)
+4. Follow the DNS configuration instructions
+
+### ***DNS Configuration***
+
+Add a CNAME record to your domain's DNS:
+
+```
+Type: CNAME
+Name: docs (or your subdomain)
+Target: your-project-name.pages.dev
+```
+
+:::warning[Domain Verification]
+It may take up to 24 hours for DNS changes to propagate globally. Cloudflare will automatically provision SSL certificates once the domain is verified.
+:::
+
+## **Step 6: Automatic Deployments**
+
+### ***Branch Deployments***
+
+Cloudflare Pages automatically:
+
+- Deploys your production branch to your main domain
+- Creates preview deployments for pull requests
+- Provides unique URLs for each deployment
+
+### ***Preview Deployments***
+
+Every pull request gets its own preview URL:
+- Format: `https://branch-name.your-project-name.pages.dev`
+- Perfect for reviewing changes before merging
+- Automatically updated when you push new commits
+
+## **Advanced Configuration**
+
+### ***Build Optimization***
+
+Create a `_headers` file in your `static` directory for custom headers:
+
+```text title="static/_headers"
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+```
+
+### ***Redirects***
+
+Create a `_redirects` file in your `static` directory:
+
+```text title="static/_redirects"
+/old-page /new-page 301
+/docs/* /documentation/:splat 301
+```
+
+### ***Functions (Advanced)***
+
+For dynamic functionality, you can add Cloudflare Pages Functions:
+
+```js title="functions/api/hello.js"
+export async function onRequest(context) {
+  return new Response("Hello, World!");
+}
+```
+
+## **Troubleshooting**
+
+### ***Common Build Issues***
+
+**Build fails with "Command not found"**
+```bash
+# Ensure your package.json has the correct scripts
+{
+  "scripts": {
+    "build": "docusaurus build"
+  }
+}
+```
+
+**Out of memory errors**
+```bash
+# Add to your build command
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
+```
+
+**Missing dependencies**
+```bash
+# Ensure all dependencies are in package.json, not just devDependencies
+npm install --save @docusaurus/core @docusaurus/preset-classic
+```
+
+### ***Deployment Issues***
+
+**Site shows 404 errors**
+- Check that your `baseUrl` is set correctly in `docusaurus.config.js`
+- Verify the build output directory is set to `build`
+
+**Assets not loading**
+- Ensure your `url` field matches your actual domain
+- Check for mixed content issues (HTTP vs HTTPS)
+
+**Build takes too long**
+- Consider reducing bundle size
+- Optimize images and assets
+- Use Cloudflare's image optimization features
+
+### ***Performance Optimization***
+
+**Enable Cloudflare Features**
+1. **Auto Minify**: Automatically minifies HTML, CSS, and JS
+2. **Brotli Compression**: Better compression than gzip
+3. **Image Optimization**: Automatic image format conversion and resizing
+4. **Caching**: Aggressive caching with instant purging
+
+## **Monitoring and Analytics**
+
+### ***Cloudflare Analytics***
+
+Monitor your site's performance:
+- Page views and unique visitors
+- Bandwidth usage
+- Geographic distribution of visitors
+- Performance metrics
+
+### ***Integration with External Analytics***
+
+Add Google Analytics or other tracking:
+
+<Tabs groupId="config-type">
+  <TabItem value="js" label="JavaScript">
+
+```js title="docusaurus.config.js"
+const config = {
+  // ... other config
+  themeConfig: {
+    // ... other theme config
+    gtag: {
+      trackingID: 'G-XXXXXXXXXX',
+      anonymizeIP: true,
+    },
+  },
+};
+```
+
+  </TabItem>
+  <TabItem value="ts" label="TypeScript">
+
+```ts title="docusaurus.config.ts"
+const config: Config = {
+  // ... other config
+  themeConfig: {
+    // ... other theme config
+    gtag: {
+      trackingID: 'G-XXXXXXXXXX',
+      anonymizeIP: true,
+    },
+  } satisfies Preset.ThemeConfig,
+};
+```
+
+  </TabItem>
+</Tabs>
+
+## **Best Practices**
+
+### ***Repository Organization***
+- Keep your repository clean and organized
+- Use `.gitignore` to exclude build artifacts and node_modules
+- Tag releases for better version management
+
+### ***Build Optimization***
+- Use `npm ci` instead of `npm install` for faster, reliable builds
+- Consider using a lockfile (`package-lock.json` or `yarn.lock`)
+- Optimize images and assets before committing
+
+### ***Security***
+- Regularly update dependencies
+- Use environment variables for sensitive data
+- Enable security headers through `_headers` file
+
+### ***Performance***
+- Minimize bundle size
+- Use lazy loading for images
+- Leverage Cloudflare's optimization features
+
+## **Comparison with Other Platforms**
+
+| Feature | Cloudflare Pages | Netlify | Vercel | GitHub Pages |
+|---------|------------------|---------|---------|--------------|
+| **Free Tier** | Generous | Limited | Limited | Unlimited |
+| **Build Time** | Fast | Fast | Fast | Slow |
+| **Global CDN** | ✅ | ✅ | ✅ | ✅ |
+| **Custom Domains** | ✅ | ✅ | ✅ | ✅ |
+| **Functions** | ✅ | ✅ | ✅ | ❌ |
+| **Analytics** | Built-in | Add-on | Add-on | External |
+| **DDoS Protection** | ✅ | Limited | Limited | ✅ |
+
+## **Conclusion**
+
+Cloudflare Pages provides an excellent hosting solution for Docusaurus sites with:
+
+- **Zero configuration** deployment from GitHub
+- **Global CDN** with excellent performance
+- **Automatic HTTPS** and security features
+- **Preview deployments** for every pull request
+- **Generous free tier** for most use cases
+
+The integration with GitHub makes it perfect for documentation sites that need frequent updates and collaborative editing.
+
+## **Additional Resources**
+
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
+- [Docusaurus Deployment Guide](https://docusaurus.io/docs/deployment)
+- [GitHub Actions for Advanced Workflows](https://docs.github.com/en/actions)
+- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/platform/functions/)
+
+<BuyMeACoffeeButton />
