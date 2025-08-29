@@ -51,11 +51,19 @@ When editing the configuration below, remove all instances of `<>` from the valu
 ::: 
 Paste the Following
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
+# =============================================================================
+# NEXTCLOUD ENHANCED DOCKER-COMPOSE CONFIGURATION
+# =============================================================================
+# Copy this file to .env and customize the values below
+# All values have secure defaults - change passwords for production use!
+
+# =============================================================================
+# NEXTCLOUD CONFIGURATION
+# =============================================================================
 # Nextcloud & MariaDB
 # Directory paths for persistent data storage
 DATA_LOCATION=./nextcloud
 DB_DATA_LOCATION=./mariadb
-PORT=8080
 // highlight-start
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
 TRUSTED_PROXIES=<IP address of your Reverse Proxy>
@@ -65,15 +73,28 @@ OVERWRITEPROTOCOL=https
 OVERWRITECLIURL=https://cloud.<YourDomain>.com
 REDIS_HOST=redis
 REDIS_PORT=6379
-PHP_MEMORY_LIMIT=512M
-PHP_UPLOAD_LIMIT=100M
+# =============================================================================
+# PERFORMANCE CONFIGURATION
+# =============================================================================
+PHP_MEMORY_LIMIT=1024M
+PHP_UPLOAD_LIMIT=2048M
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+# Main Nextcloud HTTP port
+HTTP_PORT=8080
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
 // highlight-start
 NEXTCLOUD_ADMIN_USER=admin
 NEXTCLOUD_ADMIN_PASSWORD=password
 MYSQL_PASSWORD=CHANGEME
 MYSQL_ROOT_PASSWORD=CHANGEME
-MARIADB_AUTO_UPGRADE=true
 // highlight-end
+MARIADB_AUTO_UPGRADE=true
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 MYSQL_HOST=mariadb
@@ -102,33 +123,121 @@ services:
     image: mariadb:10.11
     container_name: mariadb
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    command: >
+      --transaction-isolation=READ-COMMITTED
+      --log-bin=binlog
+      --binlog-format=ROW
+      --log_bin_trust_function_creators=true
+      --innodb-file-per-table=1
+      --skip-innodb-read-only-compressed
+      --innodb-buffer-pool-size=1G
+      --innodb-log-file-size=256M
+      --innodb-flush-log-at-trx-commit=1
+      --innodb-flush-method=O_DIRECT
+      --max-connections=200
+      --thread-cache-size=50
+      --query-cache-type=1
+      --query-cache-size=256M
+      --sort-buffer-size=2M
+      --read-buffer-size=2M
+      --read-rnd-buffer-size=8M
+      --myisam-sort-buffer-size=128M
+      --table-open-cache=2000
+      --tmp-table-size=256M
+      --max-heap-table-size=256M
+      --slow-query-log=1
+      --slow-query-log-file=/var/log/mysql/slow.log
+      --long-query-time=2
     volumes:
-      - ${DB_DATA_LOCATION}:/var/lib/mysql
+      - ${DB_DATA_LOCATION:-db_data}:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_unicode_ci
     env_file:
       - .env
     networks:
       - nextcloud
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   nextcloud:
     image: nextcloud:production
     container_name: nextcloud
     restart: always
     ports:
-      - ${PORT}:80
+      - "${PORT:-8080}:80"
     links:
       - mariadb
       - redis
     volumes:
-      - ${DATA_LOCATION}:/var/www/html
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # Enhanced environment variables for better performance
+      - PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT:-1024M}
+      - PHP_UPLOAD_LIMIT=${PHP_UPLOAD_LIMIT:-2048M}
+      - PHP_MAX_EXECUTION_TIME=3600
+      - PHP_MAX_INPUT_TIME=3600
+      - NEXTCLOUD_INIT_HTACCESS=1
+      - APACHE_DISABLE_REWRITE_IP=1
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+      - APACHE_LOG_DIR=/var/log/apache2
     env_file:
       - .env
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - nextcloud
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     container_name: redis
     image: redis:latest
+    command: >
+      redis-server
+      --save 60 1
+      --loglevel warning
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 300
+      --timeout 300
    // highlight-start
     volumes:           # Optional
       - type: tmpfs    # Optional
@@ -136,11 +245,30 @@ services:
         tmpfs:         # Optional
           size: 1073741824 # 1GB "Optional"
     // highlight-end
+      - /etc/localtime:/etc/localtime:ro
     expose:
       - 6379
-    command: redis-server --save 60 1 --loglevel warning
     networks:
       - nextcloud
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
 
   watchtower:
@@ -169,7 +297,8 @@ the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/ru
 :::
 <p>After its done pulling the docker images you can open up a web browser.</p>
 :::note
-Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](https://docs.bankai-tech.com/Examples/Reverse%20Proxies/Nginx/#nextcloud).
+Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](/Examples/Reverse%20Proxies/Docs/Nginx/#nextcloud).
+ - Additional Documentation: [Reverse Proxies](/Reverse%20Proxy/Introduction) 
 :::
 <p>
 <>Connect to nextcloud by typing in your configured `domain`</>

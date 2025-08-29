@@ -14,22 +14,34 @@ name: prowlarr
 
 services:
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
-    environtment:
+    environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./prowlarr:/config
+    ports:
+      - "${PROWLARR_PORT:-9696}:9696"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - 9696:9696
-    restart: unless-stopped
 ```
 
 <BuyMeACoffeeButton />

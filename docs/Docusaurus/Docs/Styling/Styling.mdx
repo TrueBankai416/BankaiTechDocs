@@ -5,6 +5,8 @@ tags:
    - Styling
    - CSS
 keywords: [Docusaurus, Styling, CSS, Customization, Theme]
+last_update:
+  author: BankaiTech
 ---
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
@@ -70,10 +72,74 @@ For more advanced styling needs, Docusaurus offers:
 2. **Custom CSS Modules**: Creating scoped styles for components
 3. **Custom Plugins**: Extending functionality with styling options
 
+## **Advanced Styling Topics**
+
+Now that you understand the basics, explore these advanced styling features:
+
+### **Interactive Components**
+- **[Tabs](./Tabs)** - Create interactive tabbed content for organizing related information
+- **[Collapsible Content](./Collapsible-Content)** - Use details elements and accordions for progressive disclosure
+- **[Advanced Components](./Advanced-Components)** - Master admonitions, callouts, and custom interactive elements
+
+### **Content Enhancement**
+- **[Codeblocks & Syntax Highlighting](./Codeblocks)** - Perfect your code presentation with highlighting, line numbers, and titles
+- **[Charts & Visual Elements](./Charts-Visual)** - Add diagrams, flowcharts, and visual elements using Mermaid and other tools
+
+### **Navigation & Layout**
+- **[Sidebar Styling](./Sidebar)** - Customize your documentation's navigation structure and appearance
+
+## **Quick Reference**
+
+Here are some commonly used styling patterns:
+
+### **Color Variables**
+```css
+:root {
+  /* Primary colors */
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-light: #33925d;
+  
+  /* Background colors */
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #f8f9fa;
+  
+  /* Text colors */
+  --ifm-font-color-base: #1c1e21;
+  --ifm-color-emphasis-300: #d0d7de;
+}
+```
+
+### **Common Component Overrides**
+```css
+/* Code blocks */
+.prism-code {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Admonitions */
+.theme-admonition {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+}
+
+/* Tables */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+```
+
 ## **Next Steps**
 
-- Check out [Sidebar Styling](./Sidebar) to learn how to customize your documentation's navigation
-- Explore the [official Docusaurus styling documentation](https://docusaurus.io/docs/styling-layout)
+Start with the topics most relevant to your documentation needs:
+
+1. **For interactive content**: Begin with [Tabs](./Tabs) and [Collapsible Content](./Collapsible-Content)
+2. **For code-heavy docs**: Focus on [Codeblocks & Syntax Highlighting](./Codeblocks)
+3. **For visual documentation**: Explore [Charts & Visual Elements](./Charts-Visual)
+4. **For enhanced messaging**: Learn about [Advanced Components](./Advanced-Components)
+5. **For navigation**: Customize your [Sidebar Styling](./Sidebar)
 
 ## **Resources**
 

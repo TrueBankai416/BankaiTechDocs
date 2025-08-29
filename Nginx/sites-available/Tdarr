@@ -1,0 +1,93 @@
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+server {
+    listen 80;
+    server_name tdarr.bankai-tech.com;
+    # Redirect to https version of website
+    return 301 https://tdarr.bankai-tech.com;
+    # Logging
+    access_log /var/log/nginx/Tdarr_access.log;
+    error_log /var/log/nginx/Tdarr_error.log;
+}
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name tdarr.bankai-tech.com;
+    # Load TLS Certs
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/ssl/certs/origin_ca_rsa_root.pem;
+    # proxy_ssl_verify on;
+    # ssl_stapling off;
+    # ssl_stapling_verify off;
+    # Logging
+    access_log /var/log/nginx/Tdarr_access.log;
+    error_log /var/log/nginx/Tdarr_error.log;
+    # Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
+    # Allow upload of large files
+    client_max_body_size 10G;
+    # Cache
+    proxy_cache_key $scheme$proxy_host$request_uri;
+    add_header X-Cache-Status $upstream_cache_status;
+    client_header_buffer_size 50m;
+    client_body_buffer_size 50m;
+    client_body_timeout 300s;
+    # Connect to backend server
+    location / {
+        set $upstream_tdarr http://192.168.9.151:8265;
+        proxy_pass $upstream_tdarr;
+        
+        # Authentication configuration (modern API with snippet)
+        include /etc/nginx/snippets/authelia-authrequest.conf;
+        
+        # Basic proxy headers (from enhanced-proxy but websocket-compatible)
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+        
+        # WebSocket support for socket.io (must not conflict with Connection header)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        
+        # Security headers
+        proxy_hide_header X-Powered-By;
+        proxy_hide_header Server;
+        
+        # Performance and reliability  
+        proxy_redirect http:// $scheme://;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        
+        # Timeouts and retries
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        
+        # Buffer configuration
+        client_body_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_buffer_size 128k;
+        proxy_busy_buffers_size 256k;
+        
+        # Tdarr-specific settings for media transcoding
+        proxy_cache_bypass $cookie_session;
+        proxy_no_cache $cookie_session;
+        
+        # Real IP configuration for this network
+        set_real_ip_from 192.168.9.0/24;
+        real_ip_header X-Forwarded-For;
+        real_ip_recursive on;
+    }
+    # Include Authelia location block
+    include /etc/nginx/snippets/authelia-location.conf;
+}

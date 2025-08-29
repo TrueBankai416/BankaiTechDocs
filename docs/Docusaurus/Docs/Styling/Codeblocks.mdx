@@ -1,0 +1,582 @@
+---
+title: Codeblocks & Syntax Highlighting
+tags:
+   - Docusaurus
+   - Styling
+   - Code
+   - Syntax Highlighting
+keywords: [Docusaurus, Code blocks, Syntax highlighting, Prism, Programming]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Codeblocks & Syntax Highlighting**
+
+Docusaurus provides powerful code block functionality with syntax highlighting, line numbers, and many customization options. This guide covers everything you need to know about working with code in your documentation.
+
+## **Basic Code Blocks**
+
+### **Inline Code**
+
+For short code snippets within text, use backticks:
+
+```jsx
+Use the `npm install` command to install packages.
+```
+
+Result: Use the `npm install` command to install packages.
+
+### **Basic Code Blocks**
+
+For multi-line code, use triple backticks with language specification:
+
+````
+```javascript
+function hello() {
+  console.log("Hello, World!");
+}
+```
+````
+
+**Result:**
+
+```javascript
+function hello() {
+  console.log("Hello, World!");
+}
+```
+
+## **Supported Languages**
+
+Docusaurus supports syntax highlighting for many languages through Prism.js:
+
+### **Popular Languages**
+
+````
+```bash
+echo "Shell/Bash commands"
+ls -la
+```
+
+```python
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("World"))
+```
+
+```typescript
+interface User {
+  name: string;
+  age: number;
+}
+
+const user: User = {
+  name: "John",
+  age: 30
+};
+```
+
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+```
+
+```sql
+SELECT users.name, posts.title 
+FROM users 
+INNER JOIN posts ON users.id = posts.user_id 
+WHERE users.active = true;
+```
+
+```docker
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+````
+
+**Results:**
+
+```bash
+echo "Shell/Bash commands"
+ls -la
+```
+
+```python
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("World"))
+```
+
+```typescript
+interface User {
+  name: string;
+  age: number;
+}
+
+const user: User = {
+  name: "John",
+  age: 30
+};
+```
+
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+```
+
+```sql
+SELECT users.name, posts.title 
+FROM users 
+INNER JOIN posts ON users.id = posts.user_id 
+WHERE users.active = true;
+```
+
+```docker
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## **Advanced Code Block Features**
+
+### **Line Numbers**
+
+Add line numbers to your code blocks using `showLineNumbers`:
+
+````
+```javascript showLineNumbers
+function calculateSum(a, b) {
+  // Add two numbers together
+  const result = a + b;
+  return result;
+}
+
+const sum = calculateSum(5, 3);
+console.log(`The sum is: ${sum}`);
+```
+````
+
+**Result:**
+
+```javascript showLineNumbers
+function calculateSum(a, b) {
+  // Add two numbers together
+  const result = a + b;
+  return result;
+}
+
+const sum = calculateSum(5, 3);
+console.log(`The sum is: ${sum}`);
+```
+
+### **Line Highlighting**
+
+Highlight specific lines to draw attention using comments (recommended approach):
+
+````
+```javascript showLineNumbers
+function processData(data) {
+  // highlight-next-line
+  const cleaned = data.filter(item => item !== null); // Important filtering
+  // highlight-start
+  const processed = cleaned.map(item => {
+    return {
+      id: item.id,
+      value: item.value * 2
+    };
+  });
+  // highlight-end
+  return processed;
+}
+```
+````
+
+**Result:**
+
+```javascript showLineNumbers
+function processData(data) {
+  // highlight-next-line
+  const cleaned = data.filter(item => item !== null); // Important filtering
+  // highlight-start
+  const processed = cleaned.map(item => {
+    return {
+      id: item.id,
+      value: item.value * 2
+    };
+  });
+  // highlight-end
+  return processed;
+}
+```
+
+### **Alternative: Range-based Highlighting**
+
+You can also use the range syntax (though comment-based is preferred):
+
+````
+```javascript {2,4-8} showLineNumbers
+function processData(data) {
+  const cleaned = data.filter(item => item !== null);
+  const processed = cleaned.map(item => {
+    return {
+      id: item.id,
+      value: item.value * 2
+    };
+  });
+  return processed;
+}
+```
+````
+
+### **Code Block Titles**
+
+Add descriptive titles to your code blocks:
+
+````
+```javascript title="src/utils/calculator.js" showLineNumbers
+export function add(a, b) {
+  return a + b;
+}
+
+export function multiply(a, b) {
+  return a * b;
+}
+```
+````
+
+**Result:**
+
+```javascript title="src/utils/calculator.js" showLineNumbers
+export function add(a, b) {
+  return a + b;
+}
+
+export function multiply(a, b) {
+  return a * b;
+}
+```
+
+### **Custom Line Number Start**
+
+Start line numbering from a specific number with highlighting:
+
+````
+```python showLineNumbers
+# Starting from line 45 of a larger file
+def process_user_data(user_data):
+    # highlight-start
+    """Process and validate user data."""
+    if not user_data:
+        raise ValueError("User data cannot be empty")
+    # highlight-end
+    
+    return {
+        'id': user_data.get('id'),
+        'name': user_data.get('name', '').strip(),
+        'email': user_data.get('email', '').lower()
+    }
+```
+````
+
+## **Code Block Styling**
+
+### **Custom CSS for Code Blocks**
+
+Customize the appearance of your code blocks in `src/css/custom.css`:
+
+```css
+/* Code block container */
+.prism-code {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Line numbers */
+.token-line .token-line-number {
+  color: var(--ifm-color-emphasis-500);
+  font-size: 0.9em;
+}
+
+/* Highlighted lines */
+.docusaurus-highlight-code-line {
+  background-color: rgba(0, 123, 255, 0.1);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+  border-left: 3px solid var(--ifm-color-primary);
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .docusaurus-highlight-code-line {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+/* Code block titles */
+.prism-code[title] {
+  margin-top: 0;
+}
+
+.prism-code[title]::before {
+  content: attr(title);
+  display: block;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+```
+
+### **Syntax Theme Customization**
+
+You can customize the syntax highlighting theme by configuring Prism in `docusaurus.config.ts`:
+
+```typescript title="docusaurus.config.ts"
+module.exports = {
+  themeConfig: {
+    prism: {
+      theme: require('prism-react-renderer/themes/github'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
+      // Add additional languages
+      additionalLanguages: ['ruby', 'csharp', 'php'],
+    },
+  },
+};
+```
+
+## **Interactive Code Examples**
+
+### **Live Code Editor**
+
+For React components, you can create live, editable code examples:
+
+````
+```jsx live
+function App() {
+    const handleClick = () => {
+        const response = window.confirm("Do you love my Documentation?");
+        if (response) {
+            alert("Awesome! Please support me!");
+        } else {
+            alert("Im sorry to hear that, Please give me feedback on how I can improve!");
+        }
+    };
+
+    return (
+        <div>
+            <button onClick={handleClick}>Click Me</button>
+        </div>
+    );
+}
+```
+````
+
+**Result:**
+
+```jsx live
+function App() {
+    const handleClick = () => {
+        const response = window.confirm("Do you love my Documentation?");
+        if (response) {
+            alert("Awesome! Please support me!");
+        } else {
+            alert("Im sorry to hear that, Please give me feedback on how I can improve!");
+        }
+    };
+
+    return (
+        <div>
+            <button onClick={handleClick}>Click Me</button>
+        </div>
+    );
+}
+```
+
+### **Code with Output**
+
+Show command output alongside commands:
+
+````
+```bash
+npm --version
+```
+
+```
+8.19.2
+```
+````
+
+**Result:**
+
+```bash
+npm --version
+```
+
+```
+8.19.2
+```
+
+## **Best Practices**
+
+### **Language Selection**
+
+- Always specify the language for proper syntax highlighting
+- Use common language identifiers (`js` vs `javascript`, `sh` vs `bash`)
+- For configuration files, use specific formats (`yaml`, `json`, `toml`)
+
+### **Code Organization**
+
+```
+<!-- Good: Descriptive title and proper language -->
+```yaml title="docker-compose.yml"
+version: '3.8'
+services:
+  web:
+    image: nginx
+```
+
+<!-- Avoid: No language or unclear purpose -->
+```
+version: '3.8'
+services:
+  web:
+    image: nginx
+```
+```
+
+### **Line Highlighting Guidelines**
+
+- Highlight the most important lines
+- Use highlighting sparingly to maintain readability
+- Combine with comments to explain highlighted sections
+
+### **File Structure Examples**
+
+Show complete file structures when helpful:
+
+```bash title="Project Structure"
+my-project/
+├── src/
+│   ├── components/
+│   │   └── Header.jsx
+│   ├── pages/
+│   │   └── Home.jsx
+│   └── index.js
+├── public/
+│   └── index.html
+└── package.json
+```
+
+## **Common Use Cases**
+
+### **Installation Commands**
+
+```bash title="Install Dependencies"
+# Install Node.js dependencies
+npm install
+
+# Install global tools
+npm install -g @docusaurus/init
+
+# Start development server
+npm start
+```
+
+### **Configuration Files**
+
+```yaml title="docker-compose.yml" showLineNumbers
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      # highlight-start
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./html:/usr/share/nginx/html
+      - ./logs:/var/log/nginx
+      # highlight-end
+    restart: unless-stopped
+```
+
+### **API Examples**
+
+```javascript title="API Client Example" showLineNumbers
+const apiClient = {
+  baseURL: 'https://api.example.com',
+  
+  async get(endpoint) {
+    const response = await fetch(`${this.baseURL}${endpoint}`);
+    return response.json();
+  },
+  
+  async post(endpoint, data) {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  }
+};
+
+// Usage
+const users = await apiClient.get('/users');
+const newUser = await apiClient.post('/users', { name: 'John' });
+```
+
+## **Troubleshooting**
+
+### **Common Issues**
+
+1. **No syntax highlighting**: Check that the language is supported and spelled correctly
+2. **Line numbers not showing**: Ensure `showLineNumbers` is added to the code block
+3. **Highlighting not working**: Use comment-based highlighting (`// highlight-next-line`, `// highlight-start`, `// highlight-end`)
+
+### **Adding New Languages**
+
+If you need syntax highlighting for a language not supported by default:
+
+```typescript title="docusaurus.config.ts"
+module.exports = {
+  themeConfig: {
+    prism: {
+      additionalLanguages: ['powershell', 'rust', 'kotlin'],
+    },
+  },
+};
+```
+
+## **Resources**
+
+- [Docusaurus Code Blocks Documentation](https://docusaurus.io/docs/markdown-features/code-blocks)
+- [Prism.js Supported Languages](https://prismjs.com/#supported-languages)
+- [Prism React Renderer Themes](https://github.com/FormidableLabs/prism-react-renderer/tree/master/src/themes)
+- [MDX Documentation](https://mdxjs.com/) - For understanding MDX syntax with code blocks
+
+<BuyMeACoffeeButton />

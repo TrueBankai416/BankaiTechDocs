@@ -1,0 +1,132 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    
+    # Rate limiting
+    limit_req zone=general burst=20 nodelay;
+    limit_conn conn_limit_per_ip 10;
+    
+    # Security headers
+    include /etc/nginx/snippets/security-headers.conf;
+    
+    root /var/www/html;
+    index index.php index.html index.htm;
+    
+    # Hide nginx version and server info
+    server_tokens off;
+    
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    # Deny access to backup files
+    location ~* \.(bak|backup|old|orig|tmp)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    # Deny access to configuration files
+    location ~* \.(conf|config|cfg|ini)$ {
+        deny all;
+        access_log off;
+        log_not_found off; 
+    }
+    
+    location / {
+        try_files $uri $uri/ =404;
+        auth_basic "Restricted Content";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+    
+    # PHP configuration with security enhancements
+    location ~ \.php$ {
+        # Security check - only allow if file exists
+        try_files $uri =404;
+        
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        
+        # Security headers for PHP
+        fastcgi_param HTTP_PROXY "";
+        fastcgi_param SERVER_NAME $host;
+    }
+    
+    # Prevent access to sensitive files
+    location ~* \.(sql|log|htaccess|htpasswd)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}
+server {
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    server_name _;
+    
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    
+    # Rate limiting
+    limit_req zone=general burst=20 nodelay;
+    limit_conn conn_limit_per_ip 10;
+    
+    # Security headers
+    include /etc/nginx/snippets/security-headers.conf;
+    
+    root /var/www/html;
+    index index.php index.html index.htm;
+    
+    # Hide nginx version and server info
+    server_tokens off;
+    
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    # Deny access to backup files
+    location ~* \.(bak|backup|old|orig|tmp)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    # Deny access to configuration files
+    location ~* \.(conf|config|cfg|ini)$ {
+        deny all;
+        access_log off;
+        log_not_found off; 
+    }
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    # PHP configuration with security enhancements
+    location ~ \.php$ {
+        # Security check - only allow if file exists
+        try_files $uri =404;
+        
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        
+        # Security headers for PHP
+        fastcgi_param HTTP_PROXY "";
+        fastcgi_param SERVER_NAME $host;
+    }
+    
+    # Prevent access to sensitive files
+    location ~* \.(sql|log|htaccess|htpasswd)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}

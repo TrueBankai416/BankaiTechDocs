@@ -1,0 +1,263 @@
+---
+title: Proxmox Storage Introduction
+tags:
+   - Proxmox
+   - Storage
+   - NFS
+   - CIFS
+   - SMB
+   - SSHFS
+   - mergerfs
+   - Network Storage
+
+keywords: [Proxmox, Storage, NFS, CIFS, SMB, SSHFS, mergerfs, Network Storage, Remote Storage, Union Filesystem]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxmox Storage: Complete Guide to Network Storage Solutions**
+
+Proxmox VE provides extensive support for various storage backends, enabling administrators to integrate network-attached storage (NAS) solutions and union filesystems seamlessly into their virtualized infrastructure. This guide covers the most common network storage protocols: NFS, CIFS/SMB, SSHFS, and mergerfs for storage pooling.
+
+## **What is Network Storage in Proxmox?**
+
+Network storage allows Proxmox hosts to access remote storage resources over the network, providing:
+
+- **Centralized Storage Management**: Single point of storage administration
+- **Shared Storage Access**: Multiple Proxmox nodes can access the same storage
+- **Scalability**: Easy expansion of storage capacity
+- **Data Protection**: Centralized backup and redundancy solutions
+- **Cost Efficiency**: Leverage existing NAS infrastructure
+
+## **Storage Protocol Comparison**
+
+<Tabs
+  defaultValue="nfs"
+  values={[
+    {label: 'NFS', value: 'nfs'},
+    {label: 'CIFS/SMB', value: 'cifs'},
+    {label: 'SSHFS', value: 'sshfs'},
+    {label: 'mergerfs', value: 'mergerfs'},
+  ]}>
+
+<TabItem value="nfs">
+**Network File System (NFS)**
+- **Best For**: Linux-centric environments, high performance requirements
+- **Pros**: Excellent performance, native Linux support, mature protocol
+- **Cons**: Limited Windows compatibility, requires proper network security
+- **Use Cases**: VM storage, container volumes, shared data directories
+- **Performance**: High throughput, low latency
+</TabItem>
+
+<TabItem value="cifs">
+**Common Internet File System (CIFS/SMB)**
+- **Best For**: Mixed Windows/Linux environments, existing SMB infrastructure
+- **Pros**: Excellent Windows compatibility, built-in authentication, wide support
+- **Cons**: Higher overhead than NFS, more complex configuration
+- **Use Cases**: File sharing, backup storage, mixed-OS environments
+- **Performance**: Good performance with modern SMB versions (3.0+)
+</TabItem>
+
+<TabItem value="sshfs">
+**SSH File System (SSHFS)**
+- **Best For**: Secure connections, simple setup, existing SSH infrastructure
+- **Pros**: Uses SSH (very secure), simple setup, automatic reconnection
+- **Cons**: Higher CPU overhead, dependent on SSH service
+- **Use Cases**: Secure remote storage, temporary mounts, development environments
+- **Performance**: Moderate performance, excellent reliability
+</TabItem>
+
+<TabItem value="mergerfs">
+**mergerfs (Union Filesystem)**
+- **Best For**: Storage pooling, combining multiple drives, media storage
+- **Pros**: Drive independence, flexible expansion, no parity overhead, mixed drive sizes
+- **Cons**: No built-in redundancy, FUSE overhead, requires external backup
+- **Use Cases**: Media servers, backup aggregation, storage pools, mixed-size drive arrays
+- **Performance**: Good read performance, configurable write policies
+</TabItem>
+</Tabs>
+
+## **Storage Architecture Overview**
+
+### **Network Storage Integration**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Proxmox Cluster                          │
+│                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │ Proxmox     │    │ Proxmox     │    │ Proxmox     │     │
+│  │ Node 1      │    │ Node 2      │    │ Node 3      │     │
+│  │             │    │             │    │             │     │
+│  │ /mnt/pve/   │    │ /mnt/pve/   │    │ /mnt/pve/   │     │
+│  │ ├─nfs-share │    │ ├─nfs-share │    │ ├─nfs-share │     │
+│  │ ├─smb-share │    │ ├─smb-share │    │ ├─smb-share │     │
+│  │ ├─ssh-share │    │ ├─ssh-share │    │ ├─ssh-share │     │
+│  │ └─mergerfs  │    │ └─mergerfs  │    │ └─mergerfs  │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+│         │                   │                   │          │
+└─────────┼───────────────────┼───────────────────┼──────────┘
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │   Network Switch  │
+                    └─────────┬─────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │   NAS Server      │
+                    │                   │
+                    │ NFS Service       │
+                    │ SMB/CIFS Service  │
+                    │ SSH Service       │
+                    │ mergerfs Pool     │
+                    └───────────────────┘
+```
+
+## **Storage Types and Use Cases**
+
+### **VM Disk Images**
+
+Different storage protocols are suitable for various VM storage scenarios:
+
+- **NFS**: Ideal for high-performance VM storage with live migration support
+- **CIFS/SMB**: Good for general-purpose VM storage in mixed environments
+- **SSHFS**: Suitable for development VMs and non-critical workloads
+
+### **Container Volumes**
+
+LXC containers can leverage network storage for:
+
+- **Persistent Data**: Application data that survives container restarts
+- **Shared Volumes**: Data shared between multiple containers
+- **Backup Storage**: Centralized backup destinations
+
+### **ISO and Template Storage**
+
+Network storage can host:
+
+- **ISO Images**: Installation media for VMs
+- **VM Templates**: Pre-configured VM images
+- **Container Templates**: LXC container templates
+- **Backup Files**: VM and container backups
+
+## **Performance Considerations**
+
+### **Network Bandwidth**
+
+- **Gigabit Ethernet**: Sufficient for most workloads (125 MB/s theoretical)
+- **10 Gigabit Ethernet**: Recommended for high-performance storage (1.25 GB/s theoretical)
+- **Bonded Interfaces**: Aggregate multiple connections for increased bandwidth
+
+### **Latency Factors**
+
+- **Network Distance**: Physical distance affects latency
+- **Switch Quality**: Enterprise switches provide lower latency
+- **Protocol Overhead**: Different protocols have varying overhead
+- **Concurrent Access**: Multiple simultaneous connections impact performance
+
+### **Optimization Strategies**
+
+1. **Dedicated Storage Network**: Separate storage traffic from management/VM traffic
+2. **Jumbo Frames**: Enable 9000-byte MTU for reduced packet overhead
+3. **Protocol Tuning**: Optimize mount options for specific workloads
+4. **Caching**: Use local caching where appropriate
+5. **Load Balancing**: Distribute storage load across multiple servers
+
+## **Security Considerations**
+
+### **Network Security**
+
+- **VLAN Isolation**: Separate storage traffic using VLANs
+- **Firewall Rules**: Restrict access to storage services
+- **VPN Tunnels**: Encrypt traffic over untrusted networks
+- **Access Control**: Implement proper authentication and authorization
+
+### **Protocol-Specific Security**
+
+<Tabs
+  defaultValue="nfs-security"
+  values={[
+    {label: 'NFS Security', value: 'nfs-security'},
+    {label: 'CIFS Security', value: 'cifs-security'},
+    {label: 'SSHFS Security', value: 'sshfs-security'},
+  ]}>
+
+<TabItem value="nfs-security">
+**NFS Security Measures**
+- Use NFSv4 with Kerberos authentication
+- Implement proper export restrictions
+- Configure secure RPC authentication
+- Use firewalls to restrict NFS port access
+- Consider NFSv4.1+ with pNFS for better security
+</TabItem>
+
+<TabItem value="cifs-security">
+**CIFS/SMB Security Measures**
+- Use SMB3+ with encryption
+- Implement strong authentication (Active Directory integration)
+- Configure proper share permissions
+- Use signing and encryption features
+- Regular security updates for SMB services
+</TabItem>
+
+<TabItem value="sshfs-security">
+**SSHFS Security Measures**
+- Use SSH key-based authentication
+- Implement proper SSH hardening
+- Configure SSH connection limits
+- Use strong encryption algorithms
+- Regular SSH service updates
+</TabItem>
+</Tabs>
+
+## **High Availability and Redundancy**
+
+### **Storage Redundancy**
+
+- **RAID Arrays**: Hardware-level redundancy on storage servers
+- **Replication**: Real-time or scheduled data replication
+- **Clustering**: Storage server clustering for failover
+- **Backup Strategies**: Regular backups to separate storage systems
+
+### **Network Redundancy**
+
+- **Multiple Network Paths**: Redundant network connections
+- **Link Aggregation**: Bonded interfaces for failover
+- **Multipath I/O**: Multiple paths to storage targets
+- **Geographic Distribution**: Storage across multiple locations
+
+## **Monitoring and Maintenance**
+
+### **Performance Monitoring**
+
+- **Bandwidth Utilization**: Monitor network storage traffic
+- **Latency Metrics**: Track response times for storage operations
+- **Error Rates**: Monitor for network and storage errors
+- **Capacity Planning**: Track storage usage and growth
+
+### **Maintenance Tasks**
+
+- **Regular Updates**: Keep storage services updated
+- **Performance Tuning**: Optimize configurations based on usage patterns
+- **Capacity Management**: Monitor and expand storage as needed
+- **Backup Verification**: Regularly test backup and restore procedures
+
+## **Getting Started**
+
+To implement network storage in your Proxmox environment:
+
+1. **Assess Requirements**: Determine storage capacity, performance, and availability needs
+2. **Choose Protocol**: Select the most appropriate storage protocol for your environment
+3. **Plan Network Architecture**: Design storage network topology
+4. **Configure Storage Server**: Set up NAS server with chosen protocols
+5. **Mount Storage**: Configure Proxmox to access network storage
+6. **Test Performance**: Validate storage performance and reliability
+7. **Implement Monitoring**: Set up monitoring and alerting
+
+The following sections provide detailed setup and configuration guides for each storage protocol, enabling you to implement robust network storage solutions for your Proxmox infrastructure.
+
+<BuyMeACoffeeButton />

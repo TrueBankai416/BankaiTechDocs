@@ -1,0 +1,650 @@
+---
+title: Proxmox Firewall Configuration
+tags:
+   - Proxmox
+   - Firewall
+   - Security
+   - iptables
+   - Network Security
+   - Access Control
+
+keywords: [Proxmox, Firewall, Security, iptables, Network Security, Access Control, Security Groups]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxmox Firewall Configuration: Complete Security Guide**
+
+Proxmox VE includes a comprehensive, built-in firewall system that provides multi-level security for your virtualized infrastructure. The firewall operates at three levels: Datacenter, Node, and VM/Container, allowing for granular control over network traffic and robust security policies.
+
+## **Proxmox Firewall Architecture**
+
+The Proxmox firewall is built on top of Linux iptables and provides a hierarchical security model:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Datacenter Level                        │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ Global rules, aliases, security groups, options    │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                              │                              │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                    Node Level                      │    │
+│  │  ┌─────────────────────────────────────────────┐    │    │
+│  │  │ Host-specific rules and configurations     │    │    │
+│  │  └─────────────────────────────────────────────┘    │    │
+│  │                        │                            │    │
+│  │  ┌─────────────────────────────────────────────┐    │    │
+│  │  │              VM/Container Level             │    │    │
+│  │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐        │    │    │
+│  │  │  │   VM1   │ │   VM2   │ │   LXC   │        │    │    │
+│  │  │  │ Rules   │ │ Rules   │ │ Rules   │        │    │    │
+│  │  │  └─────────┘ └─────────┘ └─────────┘        │    │    │
+│  │  └─────────────────────────────────────────────┘    │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### **Firewall Levels Explained**
+
+<Tabs
+  defaultValue="datacenter"
+  values={[
+    {label: 'Datacenter Level', value: 'datacenter'},
+    {label: 'Node Level', value: 'node'},
+    {label: 'VM/Container Level', value: 'vm'},
+  ]}>
+
+<TabItem value="datacenter">
+**Datacenter Firewall**
+- **Global scope**: Applies to all nodes and VMs in the cluster
+- **Shared resources**: Aliases, security groups, and macros
+- **Consistent policies**: Ensures uniform security across the environment
+- **Management interface**: Centralized configuration and monitoring
+- **Best for**: Organization-wide security policies and standards
+</TabItem>
+
+<TabItem value="node">
+**Node-Level Firewall**
+- **Host protection**: Secures the Proxmox host itself
+- **Management access**: Controls access to web interface and SSH
+- **Service protection**: Protects node services and daemons
+- **Local policies**: Node-specific security requirements
+- **Best for**: Protecting the hypervisor and management services
+</TabItem>
+
+<TabItem value="vm">
+**VM/Container Firewall**
+- **Individual control**: Separate rules for each VM or container
+- **Service-specific**: Tailored to the application or service running
+- **Micro-segmentation**: Granular network access control
+- **Inheritance**: Can inherit from datacenter security groups
+- **Best for**: Application-specific security policies
+</TabItem>
+</Tabs>
+
+## **Enabling the Proxmox Firewall**
+
+### **Datacenter Level Activation**
+
+**Via Web Interface:**
+1. Navigate to **Datacenter → Firewall → Options**
+2. Click **Edit**
+3. Enable **Firewall**
+4. Configure default policies:
+   - **Input Policy**: DROP (recommended)
+   - **Output Policy**: ACCEPT
+   - **Forward Policy**: ACCEPT
+
+**Via Command Line:**
+```bash
+# Enable datacenter firewall
+pvesh set /cluster/firewall/options --enable 1
+
+# Set default policies
+pvesh set /cluster/firewall/options --policy_in DROP
+pvesh set /cluster/firewall/options --policy_out ACCEPT
+```
+
+### **Node Level Activation**
+
+**Via Web Interface:**
+1. Navigate to **Node → Firewall → Options**
+2. Click **Edit**
+3. Enable **Firewall**
+4. Configure node-specific policies
+
+**Via Command Line:**
+```bash
+# Enable node firewall
+pvesh set /nodes/{node}/firewall/options --enable 1
+
+# Configure policies
+pvesh set /nodes/{node}/firewall/options --policy_in DROP
+```
+
+### **VM/Container Level Activation**
+
+**Via Web Interface:**
+1. Navigate to **VM/Container → Firewall → Options**
+2. Click **Edit**
+3. Enable **Firewall**
+4. Configure VM-specific settings
+
+## **Firewall Rules Configuration**
+
+### **Rule Structure and Components**
+
+Each firewall rule consists of:
+
+| Component | Description | Example |
+|-----------|-------------|---------|
+| **Action** | What to do with matching traffic | ACCEPT, DROP, REJECT |
+| **Direction** | Traffic direction | IN, OUT |
+| **Source** | Traffic source | IP, subnet, alias, security group |
+| **Destination** | Traffic destination | IP, subnet, alias, security group |
+| **Protocol** | Network protocol | TCP, UDP, ICMP |
+| **Port** | Destination port(s) | 22, 80, 443, 8000:9000 |
+| **Interface** | Network interface | net0, net1, vmbr0 |
+
+### **Creating Firewall Rules**
+
+**Basic Rule Examples:**
+
+<Tabs
+  defaultValue="webui"
+  values={[
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+    {label: 'Configuration File', value: 'config'},
+  ]}>
+
+<TabItem value="webui">
+**Via Proxmox Web Interface:**
+
+1. Navigate to the appropriate level (Datacenter/Node/VM)
+2. Go to **Firewall → Rules**
+3. Click **Add** to create a new rule
+4. Configure rule parameters:
+   ```
+   Direction: IN
+   Action: ACCEPT
+   Protocol: TCP
+   Source: 192.168.1.0/24
+   Destination: VM_IP
+   Dest. port: 22
+   Comment: Allow SSH from LAN
+   ```
+</TabItem>
+
+<TabItem value="cli">
+**Via Command Line:**
+
+```bash
+# Add rule to VM firewall
+pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
+    --action ACCEPT \
+    --direction in \
+    --protocol tcp \
+    --source 192.168.1.0/24 \
+    --dport 22 \
+    --comment "Allow SSH from LAN"
+
+# Add rule to node firewall  
+pvesh create /nodes/{node}/firewall/rules \
+    --action ACCEPT \
+    --direction in \
+    --protocol tcp \
+    --source 192.168.1.0/24 \
+    --dport 8006 \
+    --comment "Allow web interface access"
+```
+</TabItem>
+
+<TabItem value="config">
+**Configuration File Format:**
+
+Node firewall: `/etc/pve/nodes/{node}/host.fw`
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH access
+IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24 # Web interface
+IN ACCEPT -p icmp # Allow ping
+```
+
+VM firewall: `/etc/pve/firewall/{vmid}.fw`
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]  
+IN ACCEPT -p tcp --dport 80 # HTTP
+IN ACCEPT -p tcp --dport 443 # HTTPS
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
+```
+</TabItem>
+</Tabs>
+
+## **Security Groups**
+
+Security groups allow you to define reusable sets of firewall rules that can be applied to multiple VMs or containers.
+
+### **Creating Security Groups**
+
+**Web Interface Method:**
+1. Navigate to **Datacenter → Firewall → Security Groups**
+2. Click **Add** to create a new group
+3. Define group name (e.g., "webserver", "database")
+4. Add rules to the group
+
+**Example Security Groups:**
+
+<Tabs
+  defaultValue="webserver"
+  values={[
+    {label: 'Web Server', value: 'webserver'},
+    {label: 'Database Server', value: 'database'},
+    {label: 'SSH Management', value: 'ssh'},
+  ]}>
+
+<TabItem value="webserver">
+**Web Server Security Group:**
+```
+Group Name: webserver
+
+Rules:
+- IN ACCEPT -p tcp --dport 80 # HTTP
+- IN ACCEPT -p tcp --dport 443 # HTTPS  
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
+- IN ACCEPT -p icmp # Ping
+```
+</TabItem>
+
+<TabItem value="database">
+**Database Server Security Group:**
+```
+Group Name: database
+
+Rules:
+- IN ACCEPT -p tcp --dport 3306 -s +webserver # MySQL from web servers
+- IN ACCEPT -p tcp --dport 5432 -s +webserver # PostgreSQL from web servers
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
+- IN REJECT # Reject all other traffic
+```
+</TabItem>
+
+<TabItem value="ssh">
+**SSH Management Security Group:**
+```
+Group Name: ssh-mgmt
+
+Rules:
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from management network
+- IN ACCEPT -p tcp --dport 22 -s 10.0.1.0/24 # SSH from admin network
+- IN DROP -p tcp --dport 22 # Drop all other SSH attempts
+```
+</TabItem>
+</Tabs>
+
+### **Applying Security Groups**
+
+**To VMs/Containers:**
+```bash
+# Apply security group to VM
+pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
+    --action GROUP \
+    --group webserver \
+    --direction in
+```
+
+**In VM firewall configuration:**
+```
+[RULES]
+GROUP webserver -i net0 # Apply webserver group to net0 interface
+IN ACCEPT -p tcp --dport 8080 # Additional custom rule
+```
+
+## **Aliases and IP Sets**
+
+### **Creating IP Aliases**
+
+Aliases provide human-readable names for IP addresses and networks:
+
+**Via Web Interface:**
+1. Navigate to **Datacenter → Firewall → Alias**
+2. Click **Add**
+3. Configure:
+   ```
+   Name: MANAGEMENT_NET
+   IP/CIDR: 192.168.1.0/24
+   Comment: Management network range
+   ```
+
+**Common Alias Examples:**
+```
+MANAGEMENT_NET: 192.168.1.0/24
+DMZ_NET: 10.0.10.0/24
+BACKUP_SERVER: 192.168.1.100
+WEB_SERVERS: 10.0.20.0/24
+DATABASE_SERVERS: 10.0.30.0/24
+```
+
+### **Using Aliases in Rules**
+
+```bash
+# Use alias in firewall rule
+IN ACCEPT -p tcp --dport 22 -s MANAGEMENT_NET
+IN ACCEPT -p tcp --dport 3306 -s WEB_SERVERS
+OUT ACCEPT -p tcp --dport 443 -d BACKUP_SERVER
+```
+
+## **Advanced Firewall Configurations**
+
+### **Application-Specific Rules**
+
+**Web Server Configuration:**
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+log_level_in: info
+
+[RULES]
+# Web traffic
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+
+# Management
+IN ACCEPT -p tcp --dport 22 -s MANAGEMENT_NET
+
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s MONITORING_NET
+
+# Load balancer health checks
+IN ACCEPT -p tcp --dport 80 -s LOADBALANCER_NET
+
+# Block common attack ports
+IN DROP -p tcp --dport 23 # Telnet
+IN DROP -p tcp --dport 135 # RPC
+IN DROP -p tcp --dport 445 # SMB
+```
+
+**Database Server Configuration:**
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+# Database access
+IN ACCEPT -p tcp --dport 3306 -s WEB_SERVERS # MySQL
+IN ACCEPT -p tcp --dport 5432 -s WEB_SERVERS # PostgreSQL
+
+# Backup access
+IN ACCEPT -p tcp --dport 3306 -s BACKUP_SERVER
+OUT ACCEPT -p tcp --dport 443 -d BACKUP_SERVER
+
+# Management
+IN ACCEPT -p tcp --dport 22 -s MANAGEMENT_NET
+
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s MONITORING_NET
+
+# Deny all other database access
+IN REJECT -p tcp --dport 3306
+IN REJECT -p tcp --dport 5432
+```
+
+### **Multi-Tier Application Security**
+
+**DMZ Web Servers:**
+```
+[RULES]
+# Public access
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+
+# Backend database access
+OUT ACCEPT -p tcp --dport 3306 -d DATABASE_SERVERS
+
+# Management access only from internal
+IN ACCEPT -p tcp --dport 22 -s MANAGEMENT_NET
+IN DROP -p tcp --dport 22 # Block SSH from everywhere else
+```
+
+**Internal Application Servers:**
+```
+[RULES]
+# Access from DMZ web servers
+IN ACCEPT -p tcp --dport 8080 -s DMZ_NET
+
+# Database access
+OUT ACCEPT -p tcp --dport 3306 -d DATABASE_SERVERS
+
+# Management
+IN ACCEPT -p tcp --dport 22 -s MANAGEMENT_NET
+
+# Block direct internet access
+OUT DROP -d 0.0.0.0/0
+OUT ACCEPT -d 192.168.0.0/16 # Allow internal networks
+OUT ACCEPT -d 10.0.0.0/8 # Allow private networks
+```
+
+## **Logging and Monitoring**
+
+### **Firewall Logging Configuration**
+
+**Enable logging at different levels:**
+
+**Datacenter Level:**
+```
+[OPTIONS]
+enable: 1
+log_level_in: info
+log_level_out: info
+```
+
+**Node Level:**
+```
+pvesh set /nodes/{node}/firewall/options --log_level_in info
+```
+
+**VM Level:**
+```
+[OPTIONS]
+enable: 1
+log_level_in: info
+policy_in: DROP
+
+[RULES]
+IN ACCEPT -p tcp --dport 22 --log info
+```
+
+### **Viewing Firewall Logs**
+
+**Via Web Interface:**
+1. Navigate to **Node → System → Syslog**
+2. Filter for firewall entries
+
+**Via Command Line:**
+```bash
+# View firewall logs
+journalctl -u pve-firewall
+
+# Real-time firewall log monitoring
+tail -f /var/log/daemon.log | grep pve-firewall
+
+# Search for specific IP
+grep "192.168.1.100" /var/log/daemon.log | grep pve-firewall
+
+# View blocked connections
+grep "DROP" /var/log/daemon.log | grep pve-firewall
+```
+
+### **Log Analysis Examples**
+
+**Common log entries:**
+```bash
+# Successful connection
+pve-firewall: ACCEPT: IN=vmbr0 OUT= SRC=192.168.1.10 DST=192.168.1.100 PROTO=TCP DPT=80
+
+# Blocked connection
+pve-firewall: DROP: IN=vmbr0 OUT= SRC=203.0.113.1 DST=192.168.1.100 PROTO=TCP DPT=22
+
+# Rate limited
+pve-firewall: LIMIT: IN=vmbr0 OUT= SRC=192.168.1.5 DST=192.168.1.100 PROTO=ICMP
+```
+
+## **Common Firewall Configurations**
+
+### **Basic Home Lab Setup**
+
+```
+# Datacenter firewall - basic policies
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+# Node firewall - Proxmox host protection
+[RULES]
+IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24 # Web interface
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH
+IN ACCEPT -p icmp # Ping
+IN ACCEPT -p tcp --dport 5900:5999 -s 192.168.1.0/24 # VNC console
+
+# VM firewall examples
+[RULES]
+IN ACCEPT -p tcp --dport 80 # HTTP
+IN ACCEPT -p tcp --dport 443 # HTTPS
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
+```
+
+### **Enterprise Production Setup**
+
+```
+# Multi-zone security with strict policies
+
+# Management Zone
+[ALIAS]
+MGMT_NET: 192.168.1.0/24
+ADMIN_HOSTS: 192.168.1.10,192.168.1.11
+
+# DMZ Zone  
+[ALIAS]
+DMZ_NET: 10.0.10.0/24
+WEB_SERVERS: 10.0.10.10,10.0.10.11
+
+# Production Zone
+[ALIAS]
+PROD_NET: 10.0.20.0/24
+APP_SERVERS: 10.0.20.0/24
+DB_SERVERS: 10.0.30.0/24
+
+# Security Groups
+[GROUP webserver]
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+
+[GROUP database]
+IN ACCEPT -p tcp --dport 3306 -s APP_SERVERS
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+IN REJECT # Reject all other traffic
+```
+
+## **Troubleshooting Firewall Issues**
+
+### **Common Problems and Solutions**
+
+**Connection Blocked Unexpectedly:**
+```bash
+# Check if firewall is enabled
+pvesh get /cluster/firewall/options
+
+# Check rule order (rules are processed top to bottom)
+pvesh get /nodes/{node}/qemu/{vmid}/firewall/rules
+
+# Check logs for dropped packets
+grep "DROP" /var/log/daemon.log | grep -i "destination_ip"
+```
+
+**Rules Not Taking Effect:**
+```bash
+# Restart firewall service
+systemctl restart pve-firewall
+
+# Check firewall status
+systemctl status pve-firewall
+
+# Verify iptables rules
+iptables -L -n -v
+```
+
+**Performance Issues:**
+```bash
+# Check for excessive logging
+grep -c "pve-firewall" /var/log/daemon.log
+
+# Optimize rule order (place most common rules first)
+# Use security groups instead of duplicate rules
+# Minimize logging on high-traffic rules
+```
+
+### **Debugging Commands**
+
+```bash
+# Show active firewall rules
+cat /var/lib/pve-firewall/pvefw-logger.cfg
+
+# Check compiled iptables rules
+iptables-save | grep pve
+
+# Test connectivity with specific source
+telnet destination_ip destination_port
+
+# Monitor real-time firewall activity
+tcpdump -i any host specific_ip
+```
+
+## **Best Practices**
+
+### **Security Best Practices**
+
+1. **Default Deny Policy**: Set default policy to DROP for input traffic
+2. **Principle of Least Privilege**: Only allow necessary traffic
+3. **Regular Audits**: Review and update firewall rules regularly
+4. **Logging**: Enable appropriate logging for security monitoring
+5. **Documentation**: Document all firewall rules and their purposes
+
+### **Management Best Practices**
+
+1. **Use Security Groups**: Create reusable rule sets
+2. **Meaningful Names**: Use descriptive aliases and comments
+3. **Rule Organization**: Order rules by frequency of use
+4. **Testing**: Test firewall changes in staging environments
+5. **Backup**: Backup firewall configurations regularly
+
+### **Performance Best Practices**
+
+1. **Minimize Rules**: Use the fewest rules necessary
+2. **Optimize Order**: Place most frequently matched rules first
+3. **Limit Logging**: Log only what's necessary for security
+4. **Use Groups**: Leverage security groups for efficiency
+5. **Monitor Performance**: Watch for firewall-related performance issues
+
+The Proxmox firewall provides enterprise-grade security capabilities that, when properly configured, create a robust defense system for your virtualized infrastructure.
+
+<BuyMeACoffeeButton />

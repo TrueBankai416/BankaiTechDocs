@@ -1,0 +1,619 @@
+---
+title: Tor Transparent Proxy - Complete Setup Guide with lnxrouter
+tags:
+   - Networking
+   - Tor
+   - Privacy
+   - Anonymity
+   - Transparent Proxy
+   - lnxrouter
+keywords: [tor, transparent proxy, lnxrouter, anonymity, privacy, onion router, iptables]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Tor Transparent Proxy: Complete Setup Guide with lnxrouter**
+
+A Tor transparent proxy routes all network traffic through the Tor network automatically, providing anonymity without requiring individual application configuration. This guide covers setting up Tor transparent proxying with lnxrouter, troubleshooting common issues, and best practices for maintaining privacy and security.
+
+## **What is Tor Transparent Proxying?**
+
+Tor transparent proxying intercepts network traffic at the system level and routes it through the Tor network without requiring applications to be configured individually. Combined with lnxrouter, you can create WiFi hotspots that automatically route all connected devices through Tor.
+
+### **Key Components**
+- **Tor**: The Onion Router network for anonymous communication
+- **TransPort**: Tor's transparent proxy port (typically 9040)
+- **DNSPort**: Tor's DNS resolution port (typically 9053)  
+- **lnxrouter**: WiFi hotspot creation with transparent proxy support
+- **iptables**: Traffic redirection rules
+
+### **Benefits**
+- **Automatic anonymity**: All traffic routed through Tor without app configuration
+- **Network-wide protection**: Entire WiFi network protected
+- **Simple client setup**: Devices just connect to WiFi normally
+- **Privacy by default**: No risk of applications bypassing Tor
+
+### **Limitations**
+- **Performance impact**: Tor adds latency and reduces bandwidth
+- **Not suitable for all traffic**: Some protocols may not work properly
+- **DNS leaks possible**: Requires proper configuration to prevent
+- **Exit node risks**: Traffic visible to exit nodes (use HTTPS)
+
+## **Prerequisites and Installation**
+
+### **System Requirements**
+- Linux system with root access
+- WiFi adapter capable of AP mode
+- Internet connection (preferably not metered)
+- At least 1GB RAM (Tor can be memory intensive)
+
+### **Install Dependencies**
+
+#### **Ubuntu/Debian**
+```bash
+# Update package list
+sudo apt update
+
+# Install Tor
+sudo apt install -y tor
+
+# Install lnxrouter dependencies (if not already installed)
+sudo apt install -y bash procps iproute2 dnsmasq iptables hostapd iw wireless-tools haveged
+
+# Download lnxrouter if not already installed
+curl -L https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter -o lnxrouter
+chmod +x lnxrouter
+sudo mv lnxrouter /usr/local/bin/
+```
+
+#### **Red Hat/CentOS/Fedora**
+```bash
+# Install Tor
+sudo dnf install -y tor  # Fedora
+sudo yum install -y tor  # RHEL/CentOS (requires EPEL)
+
+# Install lnxrouter dependencies
+sudo dnf install -y bash procps-ng iproute dnsmasq iptables hostapd iw wireless-tools haveged
+```
+
+#### **Arch Linux**
+```bash
+# Install packages
+sudo pacman -S tor bash procps-ng iproute2 dnsmasq iptables hostapd iw wireless_tools haveged
+
+# Download lnxrouter
+curl -L https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter -o lnxrouter
+chmod +x lnxrouter
+sudo mv lnxrouter /usr/local/bin/
+```
+
+## **Tor Configuration**
+
+### **Basic Tor Setup**
+
+Create or edit the Tor configuration file:
+
+```bash
+sudo nano /etc/tor/torrc
+```
+
+#### **Essential Configuration**
+```conf
+# Basic Tor settings
+Log notice file /var/log/tor/notices.log
+DataDirectory /var/lib/tor
+
+# SOCKS proxy (for applications that support it)
+SocksPort 9050
+SocksPolicy accept 127.0.0.1
+SocksPolicy accept 192.168.0.0/16
+
+# Transparent proxy configuration
+TransPort 192.168.55.1:9040
+TransListenAddress 192.168.55.1
+
+# DNS for transparent proxying
+DNSPort 192.168.55.1:9053
+DNSListenAddress 192.168.55.1
+
+# Prevent DNS leaks
+AutomapHostsOnResolve 1
+AutomapHostsSuffixes .onion,.exit
+```
+
+#### **Advanced Security Options**
+```conf
+# Additional privacy settings
+AvoidDiskWrites 1
+ExitPolicy reject *:*          # Don't act as exit node
+RelayBandwidthRate 0           # Don't act as relay
+RelayBandwidthBurst 0
+
+# Geographic restrictions (optional)
+ExitNodes {us},{ca},{gb}       # Prefer US, Canada, UK exits
+StrictNodes 1                  # Enforce node restrictions
+
+# Performance tuning
+CircuitBuildTimeout 10         # Faster circuit building
+NewCircuitPeriod 30           # New circuit every 30 seconds
+MaxCircuitDirtiness 600       # Circuits last 10 minutes
+```
+
+### **IP Address Configuration**
+
+**Important**: The IP addresses in your torrc must match your lnxrouter gateway IP:
+
+```bash
+# If using lnxrouter with -g 192.168.55.1
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+
+# If using lnxrouter with -g 10.0.50.1
+TransPort 10.0.50.1:9040
+DNSPort 10.0.50.1:9053
+```
+
+### **Start and Enable Tor**
+```bash
+# Start Tor service
+sudo systemctl start tor
+sudo systemctl enable tor
+
+# Check status
+sudo systemctl status tor
+
+# Check logs for errors
+sudo journalctl -u tor -f
+```
+
+## **lnxrouter Tor Integration**
+
+### **Basic Tor Transparent Proxy Hotspot**
+
+```bash
+# Create Tor-enabled WiFi hotspot
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "SecurePass123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+#### **Parameter Explanation**
+- `--ap wlan0 "TorHotspot"`: Create AP on wlan0 with SSID "TorHotspot"
+- `-p "SecurePass123"`: WiFi password
+- `--tp 9040`: Redirect TCP traffic to Tor's TransPort
+- `--dns 9053`: Use Tor's DNS port for DNS resolution
+- `-g 192.168.55.1`: Gateway IP (must match torrc configuration)
+
+### **Advanced Tor Hotspot Configuration**
+
+```bash
+# Advanced Tor hotspot with additional security
+sudo lnxrouter --ap wlan0 "SecureTorAP" -p "VerySecurePass2024" \
+    --tp 9040 --dns 9053 -g 192.168.55.1 \
+    --ban-priv --isolate-clients --hidden \
+    -c 11 --country US
+```
+
+#### **Security Options Explained**
+- `--ban-priv`: Block access to private/local networks (prevents local network access)
+- `--isolate-clients`: Prevent connected devices from communicating with each other
+- `--hidden`: Hide SSID (don't broadcast network name)
+- `-c 11`: Use WiFi channel 11 (less congested)
+- `--country US`: Set regulatory domain
+
+### **Multiple Tor Networks**
+
+You can create multiple Tor networks with different configurations:
+
+```bash
+# Public Tor network (less restrictive)
+sudo lnxrouter --daemon --ap wlan0 "PublicTor" -p "public123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1 --isolate-clients
+
+# Private Tor network (maximum security)
+sudo lnxrouter --daemon --ap wlan1 "PrivateTor" -p "private456" \
+    --tp 9040 --dns 9053 -g 192.168.56.1 --ban-priv --isolate-clients --hidden
+```
+
+**Note**: Multiple networks require different gateway IPs and corresponding torrc entries.
+
+## **Troubleshooting Common Issues**
+
+### **Problem: Connected but No Internet Access**
+
+This is the most common issue. Here's the systematic troubleshooting approach:
+
+#### **Step 1: Verify Tor Service**
+```bash
+# Check if Tor is running
+sudo systemctl status tor
+
+# Check Tor logs for errors
+sudo journalctl -u tor -n 50
+
+# Test Tor SOCKS proxy
+curl --socks5 127.0.0.1:9050 http://httpbin.org/ip
+```
+
+#### **Step 2: Check Tor Ports**
+```bash
+# Verify Tor is listening on transparent proxy ports
+sudo netstat -tlnp | grep :9040
+sudo netstat -tlnp | grep :9053
+
+# Should show something like:
+# tcp 0 0 192.168.55.1:9040 0.0.0.0:* LISTEN 1234/tor
+# tcp 0 0 192.168.55.1:9053 0.0.0.0:* LISTEN 1234/tor
+```
+
+#### **Step 3: Test DNS Resolution**
+```bash
+# Test DNS through Tor
+dig @192.168.55.1 -p 9053 google.com
+
+# Test from client device
+nslookup google.com 192.168.55.1
+```
+
+#### **Step 4: Check iptables Rules**
+```bash
+# View NAT rules created by lnxrouter
+sudo iptables -t nat -L -n -v
+
+# Look for rules redirecting to ports 9040 and 9053
+# Should see REDIRECT rules for your network range
+```
+
+#### **Step 5: Manual iptables Setup (if needed)**
+
+If lnxrouter's automatic rules aren't working:
+
+```bash
+# Create custom iptables rules for Tor transparent proxy
+sudo iptables -t nat -A OUTPUT -d 192.168.55.0/24 -p tcp --dport 53 -j REDIRECT --to-ports 9053
+sudo iptables -t nat -A OUTPUT -d 192.168.55.0/24 -p udp --dport 53 -j REDIRECT --to-ports 9053
+sudo iptables -t nat -A OUTPUT -d 192.168.55.0/24 -p tcp --syn -j REDIRECT --to-ports 9040
+
+# Block non-Tor traffic (optional security measure)
+sudo iptables -A OUTPUT -d 192.168.55.0/24 -p tcp --dport 9040 -j ACCEPT
+sudo iptables -A OUTPUT -d 192.168.55.0/24 -p tcp --dport 9053 -j ACCEPT
+sudo iptables -A OUTPUT -d 192.168.55.0/24 -j DROP
+```
+
+### **Problem: Tor Service Fails to Start**
+
+#### **Check Configuration Syntax**
+```bash
+# Test torrc configuration
+sudo tor --verify-config
+
+# Common errors:
+# - Invalid IP addresses
+# - Port conflicts
+# - Permission issues
+```
+
+#### **Fix Common Configuration Issues**
+```bash
+# Ensure Tor user owns data directory
+sudo chown -R debian-tor:debian-tor /var/lib/tor
+sudo chmod 700 /var/lib/tor
+
+# Check log file permissions
+sudo mkdir -p /var/log/tor
+sudo chown debian-tor:debian-tor /var/log/tor
+sudo chmod 750 /var/log/tor
+```
+
+#### **Port Conflicts**
+```bash
+# Check if ports are already in use
+sudo netstat -tlnp | grep :9040
+sudo netstat -tlnp | grep :9053
+
+# Kill conflicting processes if necessary
+sudo fuser -k 9040/tcp
+sudo fuser -k 9053/tcp
+```
+
+### **Problem: DNS Leaks**
+
+#### **Test for DNS Leaks**
+```bash
+# From client device, check DNS resolution
+nslookup google.com
+
+# Should return your gateway IP as DNS server
+# Server:    192.168.55.1
+# Address:   192.168.55.1#53
+```
+
+#### **Fix DNS Leaks**
+```bash
+# Ensure DHCP provides correct DNS server
+# In lnxrouter, this is handled by --dns parameter
+
+# Force DNS through Tor with iptables
+sudo iptables -t nat -A PREROUTING -i wlan0 -p udp --dport 53 -j REDIRECT --to-port 9053
+sudo iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 53 -j REDIRECT --to-port 9053
+```
+
+### **Problem: Slow Performance**
+
+#### **Optimize Tor Configuration**
+```bash
+# Add to /etc/tor/torrc for better performance
+CircuitBuildTimeout 10
+LearnCircuitBuildTimeout 0
+MaxCircuitDirtiness 600
+NewCircuitPeriod 30
+NumEntryGuards 8
+```
+
+#### **System Optimization**
+```bash
+# Increase system limits for Tor
+echo "debian-tor soft nofile 32768" | sudo tee -a /etc/security/limits.conf
+echo "debian-tor hard nofile 65536" | sudo tee -a /etc/security/limits.conf
+
+# Restart Tor after changes
+sudo systemctl restart tor
+```
+
+### **Problem: Certain Websites Don't Work**
+
+#### **Exit Node Issues**
+```bash
+# Get new Tor circuit
+sudo systemctl reload tor
+
+# Or manually through control port
+echo -e 'AUTHENTICATE ""\r\nSIGNAL NEWNYM\r\nQUIT' | nc 127.0.0.1 9051
+```
+
+#### **Protocol Issues**
+Some protocols may not work through Tor transparent proxy:
+- **FTP**: Often blocked or problematic
+- **SMTP**: May be blocked by exit nodes
+- **P2P**: Not recommended through Tor
+- **Real-time applications**: High latency may cause issues
+
+## **Security Best Practices**
+
+### **Network Isolation**
+```bash
+# Create isolated Tor network
+sudo lnxrouter --ap wlan0 "IsolatedTor" -p "secure123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1 \
+    --ban-priv --isolate-clients --catch-dns
+```
+
+### **Firewall Configuration**
+```bash
+# Block access to local services
+sudo iptables -A FORWARD -i wlan0 -d 192.168.0.0/16 -j DROP
+sudo iptables -A FORWARD -i wlan0 -d 172.16.0.0/12 -j DROP
+sudo iptables -A FORWARD -i wlan0 -d 10.0.0.0/8 -j DROP
+
+# Allow only Tor ports
+sudo iptables -A INPUT -i wlan0 -p tcp --dport 9040 -j ACCEPT
+sudo iptables -A INPUT -i wlan0 -p tcp --dport 9053 -j ACCEPT
+sudo iptables -A INPUT -i wlan0 -p udp --dport 9053 -j ACCEPT
+```
+
+### **Monitoring and Logging**
+```bash
+# Monitor Tor connections
+sudo journalctl -u tor -f
+
+# Monitor client connections
+sudo lnxrouter --list-clients wlan0
+
+# Check bandwidth usage
+sudo iftop -i wlan0
+```
+
+### **Regular Security Updates**
+```bash
+# Keep Tor updated
+sudo apt update && sudo apt upgrade tor
+
+# Update lnxrouter
+curl -L https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter -o lnxrouter
+chmod +x lnxrouter
+sudo mv lnxrouter /usr/local/bin/
+```
+
+## **Complete Working Examples**
+
+### **Example 1: Basic Tor Hotspot**
+This example creates a simple Tor hotspot for anonymous browsing:
+
+```bash
+# 1. Configure Tor
+sudo tee /etc/tor/torrc << EOF
+Log notice file /var/log/tor/notices.log
+DataDirectory /var/lib/tor
+SocksPort 9050
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+AutomapHostsOnResolve 1
+EOF
+
+# 2. Start Tor
+sudo systemctl restart tor
+sudo systemctl status tor
+
+# 3. Create hotspot
+sudo lnxrouter --ap wlan0 "BasicTor" -p "password123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+
+# 4. Test connection
+# Connect device to "BasicTor" network
+# Visit https://check.torproject.org/
+```
+
+### **Example 2: Secure Tor Hotspot**
+This example creates a more secure, isolated Tor hotspot:
+
+```bash
+# 1. Enhanced Tor configuration
+sudo tee /etc/tor/torrc << EOF
+Log notice file /var/log/tor/notices.log
+DataDirectory /var/lib/tor
+SocksPort 9050
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+AutomapHostsOnResolve 1
+ExitPolicy reject *:*
+RelayBandwidthRate 0
+AvoidDiskWrites 1
+CircuitBuildTimeout 10
+NewCircuitPeriod 30
+EOF
+
+# 2. Start Tor
+sudo systemctl restart tor
+
+# 3. Create secure hotspot
+sudo lnxrouter --ap wlan0 "SecureTor" -p "VerySecure2024!" \
+    --tp 9040 --dns 9053 -g 192.168.55.1 \
+    --ban-priv --isolate-clients --hidden
+
+# 4. Additional security (optional)
+sudo iptables -A FORWARD -i wlan0 -d 192.168.0.0/16 -j DROP
+sudo iptables -A FORWARD -i wlan0 -d 172.16.0.0/12 -j DROP
+sudo iptables -A FORWARD -i wlan0 -d 10.0.0.0/8 -j DROP
+```
+
+### **Example 3: Multi-Network Tor Setup**
+This example creates multiple Tor networks for different purposes:
+
+```bash
+# 1. Configure Tor for multiple networks
+sudo tee /etc/tor/torrc << EOF
+Log notice file /var/log/tor/notices.log
+DataDirectory /var/lib/tor
+SocksPort 9050
+
+# Network 1: General use
+SocksPort 9051
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+
+# Network 2: High security
+SocksPort 9052  
+TransPort 192.168.56.1:9041
+DNSPort 192.168.56.1:9054
+
+AutomapHostsOnResolve 1
+EOF
+
+# 2. Start Tor
+sudo systemctl restart tor
+
+# 3. Create general Tor network
+sudo lnxrouter --daemon --ap wlan0 "PublicTor" -p "public123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1 --isolate-clients
+
+# 4. Create high-security Tor network (requires second WiFi adapter)
+sudo lnxrouter --daemon --ap wlan1 "PrivateTor" -p "private456" \
+    --tp 9041 --dns 9054 -g 192.168.56.1 \
+    --ban-priv --isolate-clients --hidden
+```
+
+## **Testing and Verification**
+
+### **Connection Testing**
+```bash
+# Test basic connectivity
+ping -c 3 8.8.8.8
+
+# Test DNS resolution
+nslookup google.com
+
+# Test Tor connectivity
+curl http://httpbin.org/ip
+```
+
+### **Anonymity Testing**
+Visit these websites from connected devices:
+- **https://check.torproject.org/** - Verifies Tor usage
+- **https://www.whatismyipaddress.com/** - Shows your public IP
+- **https://ipleak.net/** - Comprehensive leak testing
+- **https://dnsleaktest.com/** - DNS leak testing
+
+### **Performance Testing**
+```bash
+# Bandwidth test
+speedtest-cli
+
+# Latency test
+ping -c 10 8.8.8.8
+
+# Tor circuit information (if control port enabled)
+echo -e 'AUTHENTICATE ""\r\nGETINFO circuit-status\r\nQUIT' | nc 127.0.0.1 9051
+```
+
+## **Maintenance and Updates**
+
+### **Regular Maintenance Tasks**
+```bash
+# Clean Tor cache
+sudo systemctl stop tor
+sudo rm -rf /var/lib/tor/cached-*
+sudo systemctl start tor
+
+# Rotate logs
+sudo logrotate /etc/logrotate.d/tor
+
+# Update software
+sudo apt update && sudo apt upgrade tor
+```
+
+### **Monitoring Scripts**
+
+Create a monitoring script to check Tor status:
+
+```bash
+# Create monitoring script
+sudo tee /usr/local/bin/tor-monitor.sh << 'EOF'
+#!/bin/bash
+# Tor Transparent Proxy Monitor
+
+echo "=== Tor Status ==="
+systemctl status tor --no-pager -l
+
+echo -e "\n=== Tor Ports ==="
+netstat -tlnp | grep -E ':(9040|9053)'
+
+echo -e "\n=== Connected Clients ==="
+lnxrouter --list-clients 2>/dev/null || echo "No lnxrouter instances found"
+
+echo -e "\n=== Test Tor Connection ==="
+curl -s --socks5 127.0.0.1:9050 http://httpbin.org/ip | jq -r '.origin' || echo "Connection test failed"
+
+echo -e "\n=== Recent Tor Logs ==="
+journalctl -u tor -n 5 --no-pager
+EOF
+
+sudo chmod +x /usr/local/bin/tor-monitor.sh
+
+# Run monitor
+sudo /usr/local/bin/tor-monitor.sh
+```
+
+## **Conclusion**
+
+Tor transparent proxying with lnxrouter provides a powerful way to create anonymous WiFi hotspots. While setup can be complex, following this guide should help you avoid common pitfalls and create a working transparent proxy system.
+
+**Key takeaways:**
+- Ensure Tor service is running before starting lnxrouter
+- Match IP addresses between torrc and lnxrouter gateway
+- Test thoroughly to verify anonymity and prevent leaks
+- Monitor performance and security regularly
+- Keep software updated for security
+
+**Remember**: Tor provides anonymity, not security. Always use HTTPS and follow good security practices. Tor transparent proxying is not suitable for all use cases - consider your specific needs and threat model.
+
+<BuyMeACoffeeButton />

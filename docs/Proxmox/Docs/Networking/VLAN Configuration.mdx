@@ -1,0 +1,596 @@
+---
+title: Proxmox VLAN Configuration
+tags:
+   - Proxmox
+   - VLAN
+   - Network Segmentation
+   - 802.1Q
+   - Networking
+   - Virtual LAN
+
+keywords: [Proxmox, VLAN, 802.1Q, Network Segmentation, Virtual LAN, Tagging, Trunking]
+last_update:
+  author: BankaiTech
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Proxmox VLAN Configuration: Complete Network Segmentation Guide**
+
+Virtual Local Area Networks (VLANs) provide network segmentation at the data link layer, enabling you to create multiple isolated networks over a single physical infrastructure. Proxmox VE offers comprehensive VLAN support through 802.1Q tagging, allowing for sophisticated network topologies and enhanced security through network isolation.
+
+## **Understanding VLANs in Proxmox**
+
+### **What are VLANs?**
+
+VLANs are a method of creating logically separate networks within the same physical network infrastructure. They operate by adding VLAN tags (IEEE 802.1Q) to Ethernet frames, allowing network switches and devices to separate traffic into different broadcast domains.
+
+### **Benefits of VLANs**
+
+<Tabs
+  defaultValue="segmentation"
+  values={[
+    {label: 'Network Segmentation', value: 'segmentation'},
+    {label: 'Security', value: 'security'},
+    {label: 'Performance', value: 'performance'},
+    {label: 'Management', value: 'management'},
+  ]}>
+
+<TabItem value="segmentation">
+**Network Segmentation Benefits**
+- **Logical separation**: Isolate different types of traffic
+- **Broadcast domain control**: Reduce network congestion
+- **Flexible topology**: Create complex network structures
+- **Resource optimization**: Efficient use of physical infrastructure
+- **Scalability**: Easy expansion without additional hardware
+</TabItem>
+
+<TabItem value="security">
+**Security Benefits**  
+- **Traffic isolation**: Prevent unauthorized access between networks
+- **Reduced attack surface**: Limit lateral movement
+- **Compliance**: Meet regulatory segmentation requirements
+- **Micro-segmentation**: Granular access control
+- **DMZ implementation**: Isolated public-facing services
+</TabItem>
+
+<TabItem value="performance">
+**Performance Benefits**
+- **Reduced collisions**: Smaller broadcast domains
+- **Quality of Service**: Prioritize traffic by VLAN
+- **Bandwidth optimization**: Dedicated bandwidth per VLAN
+- **Network efficiency**: Reduced unnecessary traffic
+- **Load distribution**: Balance traffic across VLANs
+</TabItem>
+
+<TabItem value="management">
+**Management Benefits**
+- **Centralized control**: Manage multiple networks from one location
+- **Easy reconfiguration**: Software-based network changes
+- **Consistent policies**: Apply uniform rules across VLANs
+- **Simplified troubleshooting**: Isolated problem domains
+- **Cost effective**: Reduce physical infrastructure needs
+</TabItem>
+</Tabs>
+
+### **VLAN Architecture in Proxmox**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Physical Switch                         │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │            Trunk Port (Tagged)                     │    │
+│  │    VLAN 10, 20, 30, 40 → Proxmox Host            │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                    Proxmox Host                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                VLAN-Aware Bridge                   │    │
+│  │                   (vmbr0)                          │    │
+│  └─────────────────────────────────────────────────────┘    │
+│       │           │           │           │                 │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐             │
+│  │   VM1   │ │   VM2   │ │   VM3   │ │   LXC   │             │
+│  │VLAN 10  │ │VLAN 20  │ │VLAN 30  │ │VLAN 40  │             │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## **VLAN Configuration Methods**
+
+Proxmox supports multiple approaches to VLAN configuration:
+
+### **1. VLAN-Aware Bridge Method (Recommended)**
+
+The VLAN-aware bridge method allows a single bridge to handle multiple VLANs with tagging managed at the VM/container level.
+
+**Advantages:**
+- Single bridge configuration
+- Dynamic VLAN assignment
+- Simplified management
+- Better performance
+- Native Proxmox integration
+
+### **2. Traditional VLAN Interface Method**
+
+Creating separate VLAN interfaces for each VLAN and connecting them to different bridges.
+
+**Advantages:**
+- Explicit VLAN separation
+- Compatible with older configurations
+- Fine-grained control
+- Legacy system support
+
+### **3. Bridge per VLAN Method**
+
+Creating separate bridges for each VLAN with dedicated VLAN interfaces.
+
+**Advantages:**
+- Complete isolation
+- Simplified firewall rules
+- Clear network topology
+- Maximum security
+
+## **VLAN-Aware Bridge Configuration**
+
+### **Creating VLAN-Aware Bridge**
+
+**Via Web Interface:**
+
+1. Navigate to **Node → System → Network**
+2. Click **Create → Linux Bridge**
+3. Configure bridge settings:
+   ```
+   Name: vmbr0
+   IPv4/CIDR: 192.168.1.100/24 (management IP)
+   Bridge ports: enp0s3
+   VLAN aware: ✓ (checked)
+   Bridge VIDS: 2-4094 (or specific VLANs like 10,20,30,40)
+   Comment: VLAN-aware bridge for VMs
+   ```
+
+**Via Command Line:**
+
+```bash
+# Edit network interfaces file
+nano /etc/network/interfaces
+
+# Add VLAN-aware bridge configuration
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+
+# Apply configuration
+ifreload -a
+```
+
+### **Configuring VMs for VLANs**
+
+**Via Web Interface:**
+
+1. Navigate to **VM → Hardware → Network Device**
+2. Edit network device
+3. Set **VLAN Tag**: (e.g., 10, 20, 30)
+4. Bridge: vmbr0
+
+**Via Configuration File:**
+
+```bash
+# Edit VM configuration
+nano /etc/pve/qemu-server/{vmid}.conf
+
+# Add or modify network interface with VLAN tag
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=10
+
+# Multiple interfaces with different VLANs
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=10
+net1: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=20
+```
+
+### **Container VLAN Configuration**
+
+**For LXC Containers:**
+
+```bash
+# Edit container configuration
+nano /etc/pve/lxc/{ctid}.conf
+
+# Add network interface with VLAN tag
+net0: name=eth0,bridge=vmbr0,hwaddr=XX:XX:XX:XX:XX:XX,ip=dhcp,tag=30
+```
+
+## **Traditional VLAN Interface Configuration**
+
+### **Creating VLAN Interfaces**
+
+**Method 1: Using VLAN Interfaces**
+
+```bash
+# Edit network interfaces file
+nano /etc/network/interfaces
+
+# Create VLAN interfaces
+auto enp0s3.10
+iface enp0s3.10 inet manual
+    vlan-raw-device enp0s3
+
+auto enp0s3.20
+iface enp0s3.20 inet manual
+    vlan-raw-device enp0s3
+
+auto enp0s3.30
+iface enp0s3.30 inet manual
+    vlan-raw-device enp0s3
+
+# Create bridges for each VLAN
+auto vmbr10
+iface vmbr10 inet static
+    address 192.168.10.1/24
+    bridge-ports enp0s3.10
+    bridge-stp off
+    bridge-fd 0
+
+auto vmbr20
+iface vmbr20 inet static
+    address 192.168.20.1/24
+    bridge-ports enp0s3.20
+    bridge-stp off
+    bridge-fd 0
+
+auto vmbr30
+iface vmbr30 inet static
+    address 192.168.30.1/24
+    bridge-ports enp0s3.30
+    bridge-stp off
+    bridge-fd 0
+```
+
+### **VM Configuration with Traditional VLANs**
+
+```bash
+# VM configuration for traditional VLAN setup
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr10  # VLAN 10
+net1: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr20  # VLAN 20
+```
+
+## **Common VLAN Scenarios**
+
+### **Enterprise Network Segmentation**
+
+**VLAN Planning:**
+
+| VLAN ID | Purpose | Network | Description |
+|---------|---------|---------|-------------|
+| 10 | Management | 192.168.10.0/24 | Infrastructure management |
+| 20 | Production | 192.168.20.0/24 | Production servers |
+| 30 | Development | 192.168.30.0/24 | Development/testing |
+| 40 | DMZ | 192.168.40.0/24 | Public-facing services |
+| 50 | Storage | 192.168.50.0/24 | Storage network |
+| 60 | Backup | 192.168.60.0/24 | Backup operations |
+
+**Configuration Example:**
+
+```bash
+# VLAN-aware bridge configuration
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.10.100/24  # Management VLAN IP
+    gateway 192.168.10.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 10,20,30,40,50,60
+
+# VM configurations
+# Web server in DMZ (VLAN 40)
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=40
+
+# Database server in Production (VLAN 20)  
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=20
+
+# Development server (VLAN 30)
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=30
+```
+
+### **Multi-Tenant Environment**
+
+**VLAN Planning for Service Provider:**
+
+| VLAN ID | Tenant | Network | Purpose |
+|---------|--------|---------|---------|
+| 100-199 | Customer A | 10.100.x.0/24 | Customer A networks |
+| 200-299 | Customer B | 10.200.x.0/24 | Customer B networks |
+| 300-399 | Customer C | 10.300.x.0/24 | Customer C networks |
+| 999 | Management | 192.168.1.0/24 | Provider management |
+
+**Configuration:**
+
+```bash
+# Multi-tenant VLAN-aware bridge
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 100-399,999
+
+# Customer A VMs (VLAN 100-199)
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=100
+
+# Customer B VMs (VLAN 200-299)
+net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=200
+```
+
+### **Home Lab Segmentation**
+
+**VLAN Planning for Home Lab:**
+
+| VLAN ID | Purpose | Network | Description |
+|---------|---------|---------|-------------|
+| 10 | Management | 192.168.10.0/24 | Proxmox and infrastructure |
+| 20 | Servers | 192.168.20.0/24 | Production-like services |
+| 30 | Lab | 192.168.30.0/24 | Testing and experiments |
+| 40 | IoT | 192.168.40.0/24 | Internet of Things devices |
+| 50 | Guest | 192.168.50.0/24 | Guest network isolation |
+
+## **Advanced VLAN Configurations**
+
+### **VLAN Trunking with Multiple Bridges**
+
+```bash
+# Multiple VLAN-aware bridges for different purposes
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    bridge-ports enp0s3
+    bridge-vlan-aware yes
+    bridge-vids 10,20,30  # Management and production VLANs
+
+auto vmbr1  
+iface vmbr1 inet manual
+    bridge-ports enp0s8
+    bridge-vlan-aware yes
+    bridge-vids 40,50,60  # Storage and backup VLANs
+```
+
+### **VLAN with Network Bonding**
+
+```bash
+# Bond configuration with VLAN support
+auto bond0
+iface bond0 inet manual
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode 802.3ad
+    bond-lacp-rate fast
+
+# VLAN-aware bridge on bond
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    bridge-ports bond0
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 2-4094
+```
+
+### **Mixed VLAN Environment**
+
+```bash
+# Combination of VLAN-aware and traditional approaches
+# VLAN-aware bridge for most VMs
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    bridge-ports enp0s3
+    bridge-vlan-aware yes
+    bridge-vids 10,20,30
+
+# Dedicated bridge for critical VLAN
+auto enp0s8.100
+iface enp0s8.100 inet manual
+    vlan-raw-device enp0s8
+
+auto vmbr100
+iface vmbr100 inet static
+    address 192.168.100.1/24
+    bridge-ports enp0s8.100
+    bridge-stp off
+    bridge-fd 0
+```
+
+## **VLAN Security Considerations**
+
+### **Firewall Rules for VLANs**
+
+**VLAN-Specific Security Groups:**
+
+```bash
+# Create security groups for different VLANs
+[GROUP mgmt-vlan]
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24  # SSH from management
+IN ACCEPT -p tcp --dport 443 -s 192.168.1.0/24 # HTTPS from management
+IN DROP # Drop everything else
+
+[GROUP dmz-vlan]
+IN ACCEPT -p tcp --dport 80     # HTTP from anywhere
+IN ACCEPT -p tcp --dport 443    # HTTPS from anywhere  
+IN ACCEPT -p tcp --dport 22 -s 192.168.10.0/24 # SSH from management only
+OUT ACCEPT -p tcp --dport 3306 -d 192.168.20.0/24 # Database access
+OUT DROP # Block everything else outbound
+
+[GROUP prod-vlan]
+IN ACCEPT -p tcp --dport 8080 -s 192.168.40.0/24 # App access from DMZ
+IN ACCEPT -p tcp --dport 22 -s 192.168.10.0/24   # SSH from management
+OUT ACCEPT -p tcp --dport 3306 -d 192.168.20.0/24 # Database access
+IN DROP # Drop all other inbound
+```
+
+### **Inter-VLAN Routing Control**
+
+**Controlled routing between VLANs:**
+
+```bash
+# Allow specific inter-VLAN communication
+# DMZ to Production database access
+iptables -A FORWARD -s 192.168.40.0/24 -d 192.168.20.100 -p tcp --dport 3306 -j ACCEPT
+
+# Management to all VLANs
+iptables -A FORWARD -s 192.168.10.0/24 -j ACCEPT
+
+# Block all other inter-VLAN traffic
+iptables -A FORWARD -s 192.168.0.0/16 -d 192.168.0.0/16 -j DROP
+```
+
+### **VLAN Access Control**
+
+**MAC address filtering per VLAN:**
+
+```bash
+# VM configuration with MAC restrictions
+net0: virtio=02:01:02:03:04:05,bridge=vmbr0,tag=10
+
+# Bridge configuration with MAC filtering
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    bridge-ports enp0s3
+    bridge-vlan-aware yes
+    bridge-vids 10,20,30
+    bridge-ageing 300
+    bridge-learning yes
+```
+
+## **VLAN Monitoring and Troubleshooting**
+
+### **Monitoring VLAN Traffic**
+
+**View VLAN interfaces:**
+
+```bash
+# Show all VLAN interfaces
+ip link show type vlan
+
+# Show bridge VLAN information
+bridge vlan show
+
+# Monitor VLAN traffic
+tcpdump -i enp0s3 vlan
+
+# Monitor specific VLAN
+tcpdump -i enp0s3 vlan 10
+
+# Show bridge forwarding database
+bridge fdb show
+```
+
+### **VLAN Troubleshooting Commands**
+
+**Verify VLAN configuration:**
+
+```bash
+# Check if VLAN module is loaded
+lsmod | grep 8021q
+
+# Load VLAN module if needed
+modprobe 8021q
+
+# Verify bridge VLAN awareness
+cat /sys/class/net/vmbr0/bridge/vlan_filtering
+
+# Check VLAN interfaces
+cat /proc/net/vlan/config
+
+# Test VLAN connectivity
+ping -I enp0s3.10 192.168.10.1
+```
+
+### **Common VLAN Issues**
+
+**Problem: VMs not communicating within VLAN**
+
+```bash
+# Check VLAN tag configuration
+grep "tag=" /etc/pve/qemu-server/*.conf
+
+# Verify bridge VLAN settings
+bridge vlan show dev vmbr0
+
+# Check if switch port is configured for trunking
+```
+
+**Problem: Inter-VLAN communication not working**
+
+```bash
+# Check routing table
+ip route show
+
+# Verify firewall rules
+iptables -L FORWARD -n -v
+
+# Check if IP forwarding is enabled
+cat /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv4/ip_forward
+```
+
+**Problem: VLAN tags not preserved**
+
+```bash
+# Verify VLAN-aware setting
+grep "bridge-vlan-aware" /etc/network/interfaces
+
+# Check physical switch configuration
+# Ensure trunk port configuration on switch
+```
+
+## **Best Practices for VLAN Configuration**
+
+### **Design Best Practices**
+
+1. **Plan VLAN numbering scheme** before implementation
+2. **Use meaningful VLAN IDs** (10=mgmt, 20=prod, 30=dev, etc.)
+3. **Document VLAN purposes** and IP schemes
+4. **Reserve VLAN ranges** for different purposes
+5. **Consider future expansion** in VLAN planning
+
+### **Configuration Best Practices**
+
+1. **Use VLAN-aware bridges** for new deployments
+2. **Consistent naming conventions** across all nodes
+3. **Test VLAN connectivity** before production deployment
+4. **Backup configurations** before making changes
+5. **Monitor VLAN performance** and utilization
+
+### **Security Best Practices**
+
+1. **Implement inter-VLAN filtering** with firewalls
+2. **Use separate VLANs** for different security zones
+3. **Limit VLAN spanning** across untrusted networks
+4. **Regular security audits** of VLAN access
+5. **Monitor VLAN traffic** for anomalies
+
+### **Management Best Practices**
+
+1. **Centralized VLAN management** across cluster
+2. **Consistent VLAN policies** on all nodes
+3. **Regular VLAN cleanup** of unused configurations
+4. **Documentation updates** when making changes
+5. **Staff training** on VLAN concepts and troubleshooting
+
+VLANs provide powerful network segmentation capabilities in Proxmox environments, enabling secure, scalable, and efficient network architectures for any size deployment.
+
+<BuyMeACoffeeButton />

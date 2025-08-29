@@ -23,8 +23,21 @@ const config: Config = {
     // Mendable API key for AI-powered search functionality
     // Get your key at https://mendable.ai
     mendableAnonKey: process.env.MENDABLE_KEY,
+    
+    // Comment System Configuration
+    comments: {
+      enableGiscus: true,          // Enable/disable Giscus comments
+      enableDiscord: true,         // Enable/disable Discord comments
+      discordApiUrl: undefined,    // Will use environment variable or default
+    },
   },
 
+    // Adds Diagram support via Mermaid
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
+  
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
   // Set the /<baseUrl>/ pathname under which your site is servedd
@@ -101,21 +114,6 @@ const config: Config = {
      
     ],
 
-  scripts: [
-    {
-      src: 'https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js',
-      'data-name': 'BMC-Widget',
-      'data-cfasync': 'false',
-      'data-id': 'BankaiTech',
-      'data-description': 'Support me on Buy me a coffee!',
-      'data-message': '',
-      'data-color': '#5F7FFF',
-      'data-position': 'Right',
-      'data-x_margin': '18',
-      'data-y_margin': '18',
-      async: true,
-    },
-  ],
 
   themeConfig: {
    // Adds bar to top of the Page
@@ -126,6 +124,19 @@ const config: Config = {
       backgroundColor: '#fafbfc',
       textColor: '#091E42',
       isCloseable: true,
+    },
+
+    // Mermaid configuration
+    mermaid: {
+      theme: {
+        light: 'neutral',
+        dark: 'dark',
+      },
+      options: {
+        fontFamily: 'inherit',
+        fontSize: 16,
+        theme: 'neutral',
+      },
     },
    // Declare some <meta> tags
     metadata: [
@@ -246,7 +257,7 @@ const config: Config = {
     prism: {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
-      additionalLanguages: ['dax', 'csharp', 'powerquery', 'powershell', 'yaml', 'nginx', 'editorconfig', 'typescript', 'javascript', 'systemd', 'ini', 'bash', 'apacheconf'],
+      additionalLanguages: ['dax', 'csharp', 'powerquery', 'powershell', 'yaml', 'nginx', 'editorconfig', 'typescript', 'javascript', 'systemd', 'ini', 'bash', 'apacheconf', 'docker'],
     },
 
   } satisfies Preset.ThemeConfig,

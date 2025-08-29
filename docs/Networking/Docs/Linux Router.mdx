@@ -1,0 +1,1947 @@
+---
+title: Linux Router (lnxrouter) - Turn Your Laptop into a WiFi Hotspot
+tags:
+   - Networking
+   - WiFi
+   - Hotspot
+   - Router
+   - Internet Sharing
+   - Access Point
+keywords: [lnxrouter, linux-router, WiFi hotspot, access point, internet sharing, router, networking, NAT]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Linux Router (lnxrouter): Complete Guide to WiFi Hotspot Creation**
+
+Linux Router (lnxrouter) is a powerful command-line tool that allows you to turn your Linux laptop or desktop into a WiFi hotspot and router in a single command. It wraps complex networking tools like iptables, dnsmasq, and hostapd to provide Internet sharing, WiFi access point creation, and advanced networking features with minimal configuration.
+
+## **What is lnxrouter?**
+
+lnxrouter is a bash script that sets up Linux as a router, enabling you to:
+- **Share Internet connection** from any interface to another
+- **Create WiFi hotspots** to share your wired or wireless connection
+- **Provide NAT routing** for virtual machines and containers
+- **Set up transparent proxies** for advanced networking scenarios
+- **Manage multiple network instances** simultaneously
+
+It's essentially a modern, feature-rich successor to the original `create_ap` tool with enhanced capabilities.
+
+## **Why Use lnxrouter?**
+
+### **Common Use Cases**
+
+1. **Internet Sharing**
+   - Share your laptop's wired Internet connection via WiFi
+   - Share your WiFi connection through another WiFi adapter
+   - Provide Internet to devices that don't support your network's security protocols
+
+2. **Travel and Remote Work**
+   - Create a personal hotspot in hotels with wired-only Internet
+   - Share a single hotel WiFi connection among multiple devices
+   - Bypass device limits on public WiFi networks
+
+3. **Development and Testing**
+   - Provide isolated networks for testing
+   - Route traffic through development proxies
+   - Create controlled network environments for applications
+
+4. **Legacy Device Support**
+   - Connect older devices that don't support modern WiFi security
+   - Bridge different network protocols and standards
+   - Provide connectivity to IoT devices with limited network capabilities
+
+5. **Privacy and Security**
+   - Create isolated networks for guest devices
+   - Route traffic through VPNs or Tor (with proper configuration)
+   - Monitor and control network traffic
+
+## **Installation**
+
+### **Download and Setup**
+
+lnxrouter is distributed as a single bash script. No package installation required:
+
+```bash
+# Download the script
+curl -L https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter -o lnxrouter
+
+# Make it executable
+chmod +x lnxrouter
+
+# Move to system PATH (optional)
+sudo mv lnxrouter /usr/local/bin/
+```
+
+### **Dependencies**
+
+Install required dependencies based on your Linux distribution:
+
+#### **Ubuntu/Debian**
+```bash
+sudo apt update
+sudo apt install -y bash procps iproute2 dnsmasq iptables hostapd iw wireless-tools haveged
+```
+
+#### **Red Hat/CentOS/Fedora**
+```bash
+# RHEL/CentOS
+sudo yum install -y bash procps-ng iproute dnsmasq iptables hostapd iw wireless-tools haveged
+
+# Fedora
+sudo dnf install -y bash procps-ng iproute dnsmasq iptables hostapd iw wireless-tools haveged
+```
+
+#### **Arch Linux**
+```bash
+sudo pacman -S bash procps-ng iproute2 dnsmasq iptables hostapd iw wireless_tools haveged
+```
+
+### **Dependency Breakdown**
+
+| Package | Purpose | Required For |
+|---------|---------|--------------|
+| `bash` | Script execution | All features |
+| `procps`/`procps-ng` | Process management | All features |
+| `iproute2` | Network interface management | All features |
+| `dnsmasq` | DHCP and DNS server | All features |
+| `iptables` | Firewall and NAT | All features |
+| `hostapd` | WiFi access point creation | WiFi hotspot only |
+| `iw` | Modern wireless tools | WiFi hotspot only |
+| `wireless-tools` (`iwconfig`) | Legacy wireless tools | Fallback for older adapters |
+| `haveged` | Entropy generation | WiFi security (optional) |
+
+## **Important: Interface Names**
+
+⚠️ **Before You Start**: Throughout this guide, we use `wlan0` as an example WiFi interface name. **You must replace `wlan0` with your actual WiFi interface name.**
+
+**Find your WiFi interface name:**
+```bash
+# List all network interfaces
+ip link show
+
+# List only WiFi interfaces
+iwconfig 2>/dev/null | grep -E '^[a-z]' | cut -d' ' -f1
+
+# Common interface names:
+# - wlan0, wlan1, wlan2 (traditional naming)
+# - wlp2s0, wlp3s0 (newer systemd naming)
+# - wlo1, wlo2 (Dell/some manufacturers)
+```
+
+**Example interface name substitution:**
+- If your interface is `wlp2s0`, change `--ap wlan0` to `--ap wlp2s0`
+- If your interface is `wlo1`, change `--ap wlan0` to `--ap wlo1`
+
+## **Basic Usage**
+
+### **Create a WiFi Hotspot**
+
+**Share your current Internet connection via WiFi:**
+
+```bash
+# Basic WiFi hotspot (replace wlan0 with YOUR interface name)
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123"
+
+# With custom settings (replace wlan0 with YOUR interface name)
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "MyPassword123" -c 6 --country US
+```
+
+### **Share Internet Between Interfaces**
+
+**Provide Internet from eth0 to eth1:**
+
+```bash
+sudo lnxrouter -i eth1
+```
+
+**Share WiFi connection through Ethernet:**
+
+```bash
+sudo lnxrouter -i eth0 -o wlan0
+```
+
+### **Create LAN Without Internet**
+
+**For local networking only:**
+
+```bash
+# Ethernet LAN
+sudo lnxrouter -n -i eth1
+
+# WiFi LAN
+sudo lnxrouter -n --ap wlan0 "LocalNetwork" -p "password123"
+```
+
+## **Advanced Configuration**
+
+### **WiFi Hotspot Options**
+
+```bash
+# Advanced WiFi hotspot with all options
+sudo lnxrouter --ap wlan1 "MyAdvancedHotspot" \
+    -p "SecurePassword123" \
+    -c 11 \
+    --country US \
+    --freq-band 2.4 \
+    -w 2 \
+    --hidden \
+    --isolate-clients \
+    --mac-filter
+```
+
+#### **WiFi Parameters Explained**
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--ap <interface> <SSID>` | Create AP on interface with SSID | `--ap wlan0 "MyHotspot"` |
+| `-p, --password` | WPA password (8+ characters) | `-p "MyPassword123"` |
+| `-c <channel>` | WiFi channel (1-14 for 2.4GHz) | `-c 6` |
+| `--country <code>` | Two-letter country code | `--country US` |
+| `--freq-band <GHz>` | Frequency band (2.4 or 5) | `--freq-band 5` |
+| `-w <version>` | WPA version (1, 2, or 1+2) | `-w 2` |
+| `--hidden` | Hide SSID (don't broadcast) | |
+| `--isolate-clients` | Prevent client-to-client communication | |
+| `--mac-filter` | Enable MAC address filtering | |
+
+### **Network Configuration**
+
+```bash
+# Custom IP addressing
+sudo lnxrouter -i eth1 -g 10.0.50.1
+
+# IPv6 support
+sudo lnxrouter -i eth1 -6 --p6 fd00:50::
+
+# Custom DNS servers
+sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+### **Multiple Hotspots and Instance Management**
+
+**Can you create multiple hotspots at the same time?** Yes! lnxrouter supports running multiple instances simultaneously to create different networks.
+
+#### **Requirements for Multiple Hotspots**
+- **Multiple WiFi adapters** (each hotspot needs its own WiFi interface)
+- **Different IP ranges** for each network (use `-g` option)
+- **Different SSIDs and passwords**
+
+#### **Creating Multiple Hotspots**
+
+```bash
+# Hotspot 1: Guest network on wlan0
+sudo lnxrouter --daemon --ap wlan0 "GuestWiFi" -p "guestpass123" \
+    -g 192.168.10.1 --ban-priv --isolate-clients
+
+# Hotspot 2: Work network on wlan1  
+sudo lnxrouter --daemon --ap wlan1 "WorkWiFi" -p "workpass456" \
+    -g 192.168.20.1 --isolate-clients
+
+# Hotspot 3: IoT network on wlan2
+sudo lnxrouter --daemon --ap wlan2 "IoTNetwork" -p "iotpass789" \
+    -g 192.168.30.1 --ban-priv --isolate-clients --hidden
+```
+
+#### **Different Network Types Simultaneously**
+
+```bash
+# WiFi hotspot on wlan0
+sudo lnxrouter --daemon --ap wlan0 "PublicWiFi" -p "password123" -g 192.168.100.1
+
+# Ethernet sharing on eth1
+sudo lnxrouter --daemon -i eth1 -g 192.168.200.1
+
+# Sandbox network with Tor on wlan1
+sudo lnxrouter --daemon --ap wlan1 "TorNetwork" -p "torpass" \
+    -g 192.168.50.1 --tp 9040 --dns 9053 --ban-priv
+```
+
+#### **Instance Management Commands**
+
+```bash
+# Run in background (required for multiple instances)
+sudo lnxrouter --daemon --ap wlan0 "BackgroundAP" -p "password"
+
+# List running instances
+sudo lnxrouter --list-running
+
+# Example output:
+# PID     Interface   Type    SSID
+# 1234    wlan0       AP      GuestWiFi
+# 5678    wlan1       AP      WorkWiFi  
+# 9012    eth1        Bridge  -
+
+# List connected clients for specific instance
+sudo lnxrouter --list-clients wlan0
+sudo lnxrouter --list-clients 1234  # Using PID
+
+# Stop specific instance
+sudo lnxrouter --stop wlan0     # Using interface name
+sudo lnxrouter --stop 1234      # Using PID
+
+# Stop all instances
+sudo lnxrouter --stop all
+```
+
+#### **Best Practices for Multiple Hotspots**
+
+1. **Use Different IP Ranges**
+   ```bash
+   # Good: Non-overlapping ranges
+   -g 192.168.10.1  # Creates 192.168.10.0/24
+   -g 192.168.20.1  # Creates 192.168.20.0/24
+   -g 10.0.50.1     # Creates 10.0.50.0/24
+   ```
+
+2. **Label Your Networks Clearly**
+   ```bash
+   sudo lnxrouter --daemon --ap wlan0 "Home-Guest" -p "guest2024"
+   sudo lnxrouter --daemon --ap wlan1 "Home-IoT" -p "iot2024"
+   ```
+
+3. **Use `--daemon` for Background Running**
+   - Always use `--daemon` when running multiple instances
+   - Allows you to close terminal without stopping networks
+
+4. **Monitor Resource Usage**
+   ```bash
+   # Check system resources with multiple instances
+   sudo lnxrouter --list-running
+   htop  # Monitor CPU/memory usage
+   ```
+
+#### **Common Multiple Hotspot Scenarios**
+
+**Home Network Segmentation:**
+```bash
+# Guest network (isolated)
+sudo lnxrouter --daemon --ap wlan0 "Guest" -p "guest123" \
+    -g 192.168.100.1 --ban-priv --isolate-clients
+
+# IoT devices (isolated, hidden)  
+sudo lnxrouter --daemon --ap wlan1 "IoT" -p "iot123" \
+    -g 192.168.101.1 --ban-priv --isolate-clients --hidden
+
+# Work devices (less restricted)
+sudo lnxrouter --daemon --ap wlan2 "Work" -p "work123" \
+    -g 192.168.102.1 --isolate-clients
+```
+
+**Event/Conference Setup:**
+```bash
+# Public WiFi (heavily restricted)
+sudo lnxrouter --daemon --ap wlan0 "Conference-Public" -p "event2024" \
+    -g 192.168.50.1 --ban-priv --isolate-clients --catch-dns
+
+# Staff WiFi (less restricted)
+sudo lnxrouter --daemon --ap wlan1 "Conference-Staff" -p "staff2024" \
+    -g 192.168.51.1 --isolate-clients
+
+# Speaker/VIP WiFi (full access)
+sudo lnxrouter --daemon --ap wlan2 "Conference-VIP" -p "vip2024" \
+    -g 192.168.52.1
+```
+
+#### **Limitations**
+
+- **One WiFi adapter per hotspot** (you can't create multiple APs on the same adapter)
+- **System resources** - each instance uses CPU/memory
+- **Bandwidth sharing** - all instances share your internet connection
+- **Driver limitations** - some WiFi drivers may not support multiple concurrent APs
+
+## **Network Interface Compatibility**
+
+### **Important Limitations**
+
+**⚠️ Not all network interfaces support Access Point (AP) mode while connected to a network:**
+
+1. **Single WiFi Adapter Limitation**
+   - Most WiFi adapters cannot simultaneously connect to a network AND create an AP
+   - Solution: Use virtual interface creation or multiple adapters
+
+2. **Driver Support**
+   - Some WiFi drivers don't support AP mode at all
+   - Check your adapter's capabilities before attempting
+
+3. **Hardware Constraints**
+   - USB WiFi adapters often have limited AP mode support
+   - Built-in adapters typically have better compatibility
+
+### **Check Interface Capabilities**
+
+```bash
+# Check if interface supports AP mode
+iw list | grep -A 10 "Supported interface modes"
+
+# Check specific interface info
+iw dev wlan0 info
+
+# List available interfaces
+ip link show
+```
+
+### **Virtual Interface Solution**
+
+lnxrouter automatically creates virtual interfaces when needed:
+
+```bash
+# This creates virtual interface x0wlan0 for AP
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Disable virtual interface creation (requires separate adapters)
+sudo lnxrouter --ap wlan1 "MyHotspot" -p "password" --no-virt
+```
+
+## **Common Errors and Troubleshooting**
+
+### **Installation Issues**
+
+#### **"Command not found" Errors**
+
+```bash
+# Missing dependencies
+sudo apt install -y hostapd iw dnsmasq iptables
+
+# Check if tools are available
+which hostapd iw dnsmasq iptables
+```
+
+#### **Permission Denied**
+
+```bash
+# Always run with sudo
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Check script permissions
+chmod +x lnxrouter
+```
+
+### **WiFi Hotspot Issues**
+
+#### **"Device or resource busy"**
+
+**Cause:** Interface is managed by NetworkManager or already in use.
+
+**Solutions:**
+```bash
+# Stop NetworkManager temporarily
+sudo systemctl stop NetworkManager
+
+# Or unmanage the interface
+sudo nmcli dev set wlan0 managed no
+
+# Check if interface is in use
+sudo lsof | grep wlan0
+```
+
+#### **"Your adapter can not be a station and an AP"**
+
+**Cause:** WiFi adapter cannot simultaneously be connected to a network (station mode) and create an access point (AP mode). This is especially common with USB WiFi cards.
+
+**Solutions:**
+```bash
+# Option 1: Use virtual interface (lnxrouter's default behavior)
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+# This automatically creates virtual interface x0wlan0
+
+# Option 2: Disconnect from current WiFi first
+sudo nmcli dev disconnect wlan0
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password"
+
+# Option 3: Use a second WiFi adapter
+sudo lnxrouter --ap wlan1 "MyHotspot" -p "password"  # Different adapter
+
+# Option 4: Share connection through Ethernet
+sudo lnxrouter --ap wlan0 "MyHotspot" -p "password" -o eth0
+```
+
+**USB WiFi Card Limitations:**
+- Most USB WiFi adapters cannot do station + AP simultaneously, even with virtual interfaces
+- **Important**: Even if your adapter specs claim "AP mode support" (like Realtek RTL8812BU/RTL8822BU), it may still fail with this error due to driver limitations
+- The adapter may support AP mode individually but not while connected to another network
+- Consider getting a dedicated USB WiFi adapter for hotspot use, or disconnect from current WiFi first
+- Built-in WiFi adapters often have better dual-mode support
+
+#### **"Operation not supported"**
+
+**Cause:** WiFi adapter doesn't support AP mode.
+
+**Solutions:**
+```bash
+# Check AP mode support
+iw list | grep -A 10 "interface modes"
+
+# Try different driver
+sudo lnxrouter --ap wlan0 "Test" -p "password" --driver hostap
+
+# Use external USB WiFi adapter with AP support
+```
+
+#### **"No such device"**
+
+**Cause:** Interface name incorrect or interface down.
+
+**Solutions:**
+```bash
+# List available interfaces
+ip link show
+iwconfig
+
+# Bring interface up
+sudo ip link set wlan0 up
+
+# Check interface status
+sudo rfkill list
+sudo rfkill unblock wifi
+```
+
+#### **"iw: command not found" (despite being installed)**
+
+**Cause:** The `iw` command may not be in your PATH or installed in a non-standard location.
+
+**Solutions:**
+```bash
+# Check if iw is installed and find its location
+which iw
+whereis iw
+
+# If not in PATH, try full path
+/usr/sbin/iw dev
+/sbin/iw dev
+
+# Add to PATH temporarily (current session only)
+export PATH=$PATH:/usr/sbin:/sbin
+
+# Make PATH change permanent (add to your shell profile)
+echo 'export PATH=$PATH:/usr/sbin:/sbin' >> ~/.bashrc
+source ~/.bashrc  # Reload current session
+
+# Alternative: make permanent for all users
+echo 'export PATH=$PATH:/usr/sbin:/sbin' | sudo tee -a /etc/environment
+
+# Check if you need sudo
+sudo iw dev
+
+# Alternative: use iwconfig instead
+iwconfig  # Shows wireless interfaces
+
+# Install wireless-tools if iwconfig also missing
+sudo apt install wireless-tools  # Ubuntu/Debian
+sudo dnf install wireless-tools  # Fedora
+```
+
+**Common locations for `iw`:**
+- `/usr/sbin/iw` (most common)
+- `/sbin/iw`
+- `/usr/bin/iw`
+
+### **Connection Issues**
+
+#### **Clients Can Connect But No Internet**
+
+**Causes and Solutions:**
+
+1. **IP forwarding disabled:**
+```bash
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+echo 1 | sudo tee /proc/sys/net/ipv6/conf/all/forwarding
+```
+
+2. **Firewall blocking traffic:**
+```bash
+# Check iptables rules
+sudo iptables -L -n
+
+# Temporarily disable firewall
+sudo ufw disable  # Ubuntu
+sudo systemctl stop firewalld  # RHEL/CentOS
+```
+
+3. **Wrong source interface:**
+```bash
+# Specify source interface explicitly
+sudo lnxrouter -i eth1 -o wlan0  # Share wlan0 through eth1
+```
+
+#### **DNS Resolution Problems**
+
+```bash
+# Use public DNS servers
+sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
+
+# Disable local DNS if problematic
+sudo lnxrouter -i eth1 --no-dns --dhcp-dns 1.1.1.1
+```
+
+### **Performance Issues**
+
+#### **Slow Speeds or High Latency**
+
+**Solutions:**
+```bash
+# Use specific channel to avoid interference
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" -c 1
+
+# Use 5GHz band if supported
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" --freq-band 5
+
+# Enable 802.11n for better performance
+sudo lnxrouter --ap wlan0 "FastAP" -p "password" --wifi4
+```
+
+### **System Integration Issues**
+
+#### **Conflicts with NetworkManager**
+
+```bash
+# lnxrouter automatically handles NetworkManager
+# But if issues persist, manually unmanage interface
+sudo nmcli dev set wlan0 managed no
+
+# Re-enable after stopping lnxrouter
+sudo nmcli dev set wlan0 managed yes
+```
+
+#### **Firewall Conflicts**
+
+```bash
+# lnxrouter handles firewalld automatically
+# For other firewalls, ensure traffic forwarding is allowed
+
+# UFW example
+sudo ufw allow in on wlan0
+sudo ufw allow out on eth0
+```
+
+### **Debugging Commands**
+
+```bash
+# Check running instances
+sudo lnxrouter --list-running
+
+# Monitor system logs
+sudo journalctl -f | grep -i "hostapd\|dnsmasq"
+
+# Check network interfaces
+ip addr show
+ip route show
+
+# Test connectivity
+ping 8.8.8.8
+dig google.com
+```
+
+## **Complete Examples**
+
+### **Travel Setup: Hotel WiFi Sharing**
+
+```bash
+# Connect to hotel WiFi normally, then share via hotspot
+sudo lnxrouter --ap wlan0 "HotelShare" -p "MyTravelPassword" -c 6 --hidden
+```
+
+### **Development Environment**
+
+```bash
+# Create isolated network for development
+sudo lnxrouter -n --ap wlan1 "DevNetwork" -p "devpass123" --isolate-clients
+```
+
+### **Guest Network**
+
+```bash
+# Secure guest network with limited access
+sudo lnxrouter --ap wlan0 "GuestWiFi" -p "guestpass" --ban-priv --random-mac
+```
+
+### **Backup Internet Solution**
+
+```bash
+# Share mobile hotspot through Ethernet
+sudo lnxrouter -i eth0 -o wlan0 --dhcp-dns 8.8.8.8
+```
+
+## **Security Considerations**
+
+### **Best Practices**
+
+1. **Use Strong Passwords**
+   - Minimum 12 characters
+   - Mix of letters, numbers, and symbols
+   - Avoid dictionary words
+
+2. **Enable Client Isolation**
+   ```bash
+   sudo lnxrouter --ap wlan0 "SecureAP" -p "StrongPassword123!" --isolate-clients
+   ```
+
+3. **Hide SSID When Possible**
+   ```bash
+   sudo lnxrouter --ap wlan0 "HiddenAP" -p "password" --hidden
+   ```
+
+4. **Use MAC Filtering for Sensitive Networks**
+   ```bash
+   sudo lnxrouter --ap wlan0 "RestrictedAP" -p "password" --mac-filter
+   ```
+
+5. **Monitor Connected Clients**
+   ```bash
+   # Regularly check who's connected
+   sudo lnxrouter --list-clients wlan0
+   ```
+
+### **Privacy Considerations**
+
+- Be aware that you're routing others' traffic
+- Consider legal implications in your jurisdiction
+- Log traffic if required by local regulations
+- Use `--ban-priv` to protect your private network
+
+## **Transparent Proxy Configuration**
+
+lnxrouter supports transparent proxy functionality, which allows you to route all client traffic through a proxy server (such as Tor, custom HTTP proxies, or monitoring tools) without requiring client-side configuration.
+
+### **What is Transparent Proxy?**
+
+A transparent proxy intercepts network traffic automatically without requiring clients to configure proxy settings. All HTTP/HTTPS and DNS traffic from connected clients is redirected to specified proxy ports, making it appear "transparent" to the end users.
+
+### **Common Use Cases**
+
+1. **Privacy and Anonymity**
+   - Route traffic through Tor for enhanced privacy
+   - Use VPN-like functionality at the network level
+
+2. **Content Filtering**
+   - Block malicious websites and content
+   - Implement parental controls
+
+3. **Traffic Monitoring**
+   - Log and analyze network traffic
+   - Monitor bandwidth usage per client
+
+4. **Development and Testing**
+   - Intercept API calls for debugging
+   - Test applications with modified network conditions
+
+### **Basic Transparent Proxy Setup**
+
+```bash
+# Route all traffic through Tor
+sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1
+
+# With IPv6 support
+sudo lnxrouter -i eth1 --tp 9040 --dns 9053 -g 192.168.55.1 -6 --p6 fd00:5:6:7::
+```
+
+### **Tor Integration Example**
+
+**Quick Setup for Tor Transparent Proxy:**
+
+```bash
+# Basic Tor hotspot
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+⚠️ **Important**: This requires proper Tor configuration. For complete setup instructions, troubleshooting, and security considerations, see our **[Tor Transparent Proxy Guide](./Tor%20Transparent%20Proxy.mdx)**.
+
+**Common Issues:**
+- **Connected but no internet**: Usually means Tor service isn't running or configured properly
+- **DNS not working**: Tor DNSPort configuration missing
+- **IP address mismatch**: Tor configuration must match lnxrouter gateway IP
+
+**Understanding the IP Addresses:**
+- `192.168.55.1` is the IP address lnxrouter assigns to itself in the network it creates
+- You can change this with the `-g` option (e.g., `-g 10.0.50.1` or `-g 172.16.100.1`)
+- The `.55.1` part means "IP ending in .55.1" - you can use any valid private IP
+- IPv6 `fd00:5:6:7::` is a private IPv6 prefix - also customizable
+
+**Quick Tor Configuration:**
+```bash
+# 1. Install Tor
+sudo apt install tor  # Ubuntu/Debian
+sudo dnf install tor  # Fedora
+
+# 2. Configure Tor for transparent proxy
+# Replace 192.168.55.1 with your chosen IP (must match -g option later)
+sudo tee -a /etc/tor/torrc << EOF
+TransPort 192.168.55.1:9040
+DNSPort 192.168.55.1:9053
+TransPort [fd00:5:6:7::1]:9040
+DNSPort [fd00:5:6:7::1]:9053
+EOF
+
+# 3. Restart Tor
+sudo systemctl restart tor
+
+# 4. Start lnxrouter (the -g IP must match the IP in torrc above)
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
+    --tp 9040 --dns 9053 \
+    -g 192.168.55.1 \
+    -6 --p6 fd00:5:6:7::
+```
+
+**📖 For comprehensive Tor setup, troubleshooting, and security best practices, see the complete [Tor Transparent Proxy Guide](./Tor%20Transparent%20Proxy.mdx).**
+
+### **Custom Proxy Integration**
+
+**For HTTP/HTTPS proxy (using redsocks):**
+
+**Understanding Proxy Configuration:**
+- `YOUR_PROXY_IP`: The IP address of your proxy server (e.g., `127.0.0.1` for local, `10.0.0.100` for network proxy)
+- `YOUR_PROXY_PORT`: The port your proxy listens on (e.g., `8080`, `3128`, `1080`)
+- `local_ip`: Must match your lnxrouter IP (set with `-g` option)
+
+**Common Proxy Examples:**
+```bash
+# Example 1: Local HTTP proxy (like Squid on port 3128)
+ip = 127.0.0.1;
+port = 3128;
+type = http-connect;
+
+# Example 2: Network SOCKS proxy
+ip = 10.0.0.50;
+port = 1080;
+type = socks5;
+
+# Example 3: Corporate proxy
+ip = proxy.company.com;  # Or IP like 192.168.1.100
+port = 8080;
+type = http-connect;
+```
+
+```bash
+# Install redsocks
+sudo apt install redsocks
+
+# Configure redsocks (example with local Squid proxy)
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.55.1;    # Must match your -g setting
+    local_port = 9040;
+    ip = 127.0.0.1;            # Replace with your proxy IP
+    port = 3128;               # Replace with your proxy port
+    type = http-connect;       # Or socks5, socks4
+}
+EOF
+
+# Start redsocks
+sudo systemctl start redsocks
+
+# Start lnxrouter with transparent proxy
+sudo lnxrouter -i eth1 --tp 9040 --dns 8.8.8.8 -g 192.168.55.1
+```
+
+### **Redsocks with Proxy Authentication**
+
+**Can lnxrouter work with authenticated proxies?** Yes! You can configure redsocks to authenticate with proxy servers that require username/password authentication, making it possible to route all hotspot traffic through authenticated corporate proxies, authenticated SOCKS proxies, or other authenticated proxy services.
+
+#### **Supported Authentication Methods**
+
+Redsocks supports several authentication methods:
+
+1. **HTTP Basic Authentication** - Username/password for HTTP proxies
+2. **SOCKS5 Authentication** - Username/password for SOCKS5 proxies  
+3. **NTLM Authentication** - Windows domain authentication (limited support)
+4. **No Authentication** - For proxies that don't require auth
+
+#### **HTTP Proxy with Basic Authentication**
+
+**Most common scenario for corporate environments:**
+
+```bash
+# Install redsocks
+sudo apt install redsocks
+
+# Configure redsocks with HTTP proxy authentication
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.100.1;      # Must match your -g setting
+    local_port = 9040;
+    ip = proxy.company.com;        # Your proxy server
+    port = 8080;                   # Your proxy port
+    type = http-connect;
+    login = "your_username";       # Replace with your username
+    password = "your_password";    # Replace with your password
+}
+EOF
+
+# Set proper permissions (config contains credentials)
+sudo chmod 600 /etc/redsocks.conf
+sudo chown root:root /etc/redsocks.conf
+
+# Start redsocks
+sudo systemctl start redsocks
+sudo systemctl enable redsocks  # Auto-start at boot
+
+# Create lnxrouter hotspot with authenticated proxy
+sudo lnxrouter --ap wlan0 "CorpWiFi" -p "wifi_password123" \
+    --tp 9040 \
+    --dns 8.8.8.8 \
+    -g 192.168.100.1 \
+    --ban-priv
+```
+
+#### **SOCKS5 Proxy with Authentication**
+
+**For SOCKS5 proxies that require authentication:**
+
+```bash
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.100.1;
+    local_port = 9040;
+    ip = socks.example.com;        # SOCKS5 proxy server
+    port = 1080;                   # SOCKS5 proxy port
+    type = socks5;
+    login = "socks_username";
+    password = "socks_password";
+}
+EOF
+
+# Start services
+sudo systemctl restart redsocks
+sudo lnxrouter --ap wlan0 "SOCKS5WiFi" -p "wifi_pass" \
+    --tp 9040 --dns 8.8.8.8 -g 192.168.100.1
+```
+
+#### **Complete Setup Example**
+
+**Scenario**: Share corporate internet through authenticated proxy
+
+```bash
+# 1. Install redsocks
+sudo apt update
+sudo apt install redsocks
+
+# 2. Configure authenticated proxy
+sudo tee /etc/redsocks.conf << EOF
+base {
+    log_debug = off;
+    log_info = on;
+    log = "file:/var/log/redsocks.log";
+    daemon = on;
+    redirector = iptables;
+}
+
+redsocks {
+    local_ip = 192.168.200.1;
+    local_port = 9040;
+    ip = proxy.mycompany.com;
+    port = 8080;
+    type = http-connect;
+    login = "myusername";
+    password = "mypassword";
+}
+EOF
+
+# 3. Secure the config file
+sudo chmod 600 /etc/redsocks.conf
+sudo chown root:root /etc/redsocks.conf
+
+# 4. Start redsocks
+sudo systemctl start redsocks
+sudo systemctl enable redsocks
+
+# 5. Create authenticated proxy WiFi hotspot
+sudo lnxrouter --ap wlan0 "ProxyWiFi" -p "ProxyPass2024" \
+    --tp 9040 \
+    --dns 8.8.8.8,1.1.1.1 \
+    -g 192.168.200.1 \
+    --ban-priv \
+    --isolate-clients
+
+# 6. Verify everything is working
+sudo lnxrouter --list-running
+sudo systemctl status redsocks
+tail -f /var/log/redsocks.log
+```
+
+#### **Troubleshooting Proxy Authentication**
+
+**Common Issues and Solutions:**
+
+1. **Authentication Failures**
+```bash
+# Check redsocks logs
+sudo tail -f /var/log/redsocks.log
+
+# Test proxy manually
+curl --proxy http://username:password@proxy.company.com:8080 http://httpbin.org/ip
+```
+
+2. **Domain Authentication**
+```bash
+# Try different domain formats
+login = "DOMAIN\\username";     # Windows format
+login = "username@domain.com";  # UPN format  
+login = "domain/username";      # Alternative format
+```
+
+3. **Special Characters in Passwords**
+```bash
+# Escape special characters in redsocks.conf
+password = "pass\\word";        # Backslash
+password = "pass\"word";        # Quote
+```
+
+This comprehensive proxy authentication support makes lnxrouter extremely flexible for corporate environments, authenticated VPNs, and complex networking scenarios where proxy authentication is required.
+
+### **Transparent Proxy Options**
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--tp <port>` | Redirect TCP traffic to port | `--tp 9040` |
+| `--dns <ip:port>` | DNS proxy destination | `--dns 192.168.55.1:9053` |
+| `--catch-dns` | Intercept all DNS queries | `--catch-dns` |
+| `--log-dns` | Log DNS queries | `--log-dns` |
+
+### **Combining Tor and Redsocks**
+
+**Can you use both together?** Yes, but typically you choose one approach:
+
+#### **Option 1: Tor Direct (Recommended for Tor)**
+```bash
+# Use Tor's built-in transparent proxy (TransPort)
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "password" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+#### **Option 2: Redsocks → Tor SOCKS**
+```bash
+# Configure redsocks to use Tor's SOCKS proxy
+sudo tee /etc/redsocks.conf << EOF
+redsocks {
+    local_ip = 192.168.55.1;
+    local_port = 9040;
+    ip = 127.0.0.1;
+    port = 9050;           # Tor's SOCKS port
+    type = socks5;
+}
+EOF
+
+# Start both Tor and redsocks
+sudo systemctl start tor redsocks
+
+# Use redsocks for transparent proxy
+sudo lnxrouter --ap wlan0 "TorHotspot" -p "password" \
+    --tp 9040 --dns 9053 -g 192.168.55.1
+```
+
+#### **Option 3: Chain Proxies**
+```bash
+# Redsocks → HTTP Proxy → Tor
+# Configure redsocks to connect to an HTTP proxy that connects to Tor
+# (Advanced setup for specific enterprise scenarios)
+```
+
+**When to use each:**
+- **Tor Direct**: Simpler, better performance, recommended for most Tor use cases
+- **Redsocks → Tor**: Useful if you need HTTP proxy features or proxy chaining
+- **Separate purposes**: Use Tor for some traffic, different proxy for other traffic
+
+### **Transparent Proxy Limitations**
+
+⚠️ **Important Considerations:**
+
+1. **Not True Anonymity**: Using Tor this way does NOT provide the same anonymity as using the Tor Browser
+2. **DNS Leaks**: Ensure DNS traffic is properly routed through the proxy
+3. **HTTPS Limitations**: Transparent proxies cannot decrypt HTTPS traffic without certificates
+4. **Performance Impact**: Additional latency due to proxy routing
+5. **Single Proxy Chain**: lnxrouter `--tp` option only supports one transparent proxy at a time
+
+## **Sandbox Network Configuration**
+
+Sandbox networks provide isolated, controlled environments where clients can access the Internet but are restricted from accessing your private network resources or communicating with each other.
+
+### **What is a Sandbox Network?**
+
+A sandbox network creates a secure, isolated environment where:
+- Clients can access the Internet normally
+- Clients cannot access your local private network (192.168.x.x, 10.x.x.x, etc.)
+- Clients cannot communicate with each other
+- Your personal information and local services remain protected
+
+### **Sandbox Use Cases**
+
+1. **Guest Networks**
+   - Provide Internet to visitors without exposing your private network
+   - Protect smart home devices and local services
+
+2. **Public WiFi Scenarios**
+   - Share Internet safely in public spaces
+   - Protect against malicious clients
+
+3. **Testing and Development**
+   - Isolate test devices and applications
+   - Create controlled network environments
+
+4. **IoT Device Management**
+   - Isolate smart devices that don't need local network access
+   - Prevent IoT devices from accessing sensitive resources
+
+### **Basic Sandbox Setup**
+
+**Understanding Sandbox IPs:**
+- lnxrouter creates its own private network with IPs like `192.168.xxx.xxx`
+- You can customize the IP range with `-g` option
+- Default behavior: lnxrouter automatically picks an available IP range
+- Example: `-g 192.168.100.1` creates network 192.168.100.0/24 with gateway at .100.1
+
+```bash
+# Create isolated guest network (automatic IP assignment)
+sudo lnxrouter --ap wlan0 "GuestNetwork" -p "guestpass123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac
+
+# Create isolated guest network with custom IP range
+sudo lnxrouter --ap wlan0 "GuestNetwork" -p "guestpass123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    -g 172.16.50.1  # Creates network 172.16.50.0/24
+```
+
+### **Advanced Sandbox Configuration**
+
+```bash
+# Complete sandbox with monitoring and privacy protection
+sudo lnxrouter -i eth1 \
+    --tp 9040 --dns 9053 \
+    --random-mac \
+    --ban-priv \
+    --isolate-clients \
+    --catch-dns --log-dns \
+    --hidden
+```
+
+### **Sandbox Options Explained**
+
+| Option | Purpose | Security Benefit |
+|--------|---------|------------------|
+| `--ban-priv` | Block access to private IP ranges | Protects local network resources |
+| `--isolate-clients` | Prevent client-to-client communication | Stops lateral movement between devices |
+| `--random-mac` | Use random MAC address for the AP | Prevents MAC address tracking |
+| `--catch-dns` | Intercept DNS queries | Prevents DNS bypassing |
+| `--log-dns` | Log DNS requests | Enables monitoring and analysis |
+| `--hidden` | Hide SSID from broadcast | Reduces discoverability |
+
+### **Private Network Ranges Blocked by `--ban-priv`**
+
+When using `--ban-priv`, clients cannot access:
+- `192.168.0.0/16` - Most home networks
+- `10.0.0.0/8` - Enterprise networks
+- `172.16.0.0/12` - Private networks
+- `127.0.0.0/8` - Localhost
+- `169.254.0.0/16` - Link-local addresses
+
+### **Monitoring Sandbox Networks**
+
+```bash
+# Monitor connected clients
+sudo lnxrouter --list-clients wlan0
+
+# Check DNS queries (if --log-dns enabled)
+sudo tail -f /var/log/syslog | grep dnsmasq
+
+# Monitor traffic patterns
+sudo netstat -i  # Interface statistics
+sudo ss -tuln     # Active connections
+```
+
+### **Sandbox Network Examples**
+
+#### **Guest WiFi for Home**
+```bash
+# Secure guest network with complete isolation
+sudo lnxrouter --ap wlan1 "GuestWiFi" -p "Welcome2024!" \
+    --ban-priv \
+    --isolate-clients \
+    --hidden \
+    --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+#### **Public Sharing Point**
+```bash
+# Share Internet publicly while protecting yourself
+sudo lnxrouter --ap wlan0 "PublicInternet" -p "public123" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    --catch-dns --log-dns
+```
+
+#### **Development Testing Network**
+```bash
+# Isolated network for testing applications
+sudo lnxrouter -n --ap wlan0 "TestNet" -p "testpass" \
+    --isolate-clients \
+    --dhcp-dns 192.168.50.1 \
+    -g 192.168.50.1
+```
+
+### **Sandbox Security Best Practices**
+
+1. **Always Use `--ban-priv`** when sharing with untrusted devices
+2. **Enable `--isolate-clients`** to prevent device-to-device attacks
+3. **Use `--random-mac`** to prevent tracking of your access point
+4. **Monitor DNS logs** to detect suspicious activity
+5. **Use strong passwords** even for guest networks
+6. **Regularly check connected clients** with `--list-clients`
+
+### **Advanced Sandbox with Transparent Proxy**
+
+Combine sandbox features with transparent proxy for maximum security:
+
+```bash
+# Ultra-secure sandbox with Tor routing
+sudo lnxrouter --ap wlan0 "SecureGuest" -p "SecurePass2024!" \
+    --ban-priv \
+    --isolate-clients \
+    --random-mac \
+    --tp 9040 --dns 9053 \
+    --catch-dns --log-dns \
+    --hidden \
+    -g 192.168.99.1
+```
+
+This configuration provides:
+- Complete network isolation from your private network
+- All traffic routed through Tor for enhanced privacy
+- Client isolation preventing lateral movement
+- DNS monitoring and logging
+- Hidden network reducing discoverability
+- Random MAC address preventing AP tracking
+
+### **Troubleshooting Sandbox Networks**
+
+#### **Clients Can't Access Internet**
+```bash
+# Check if private network blocking is too restrictive
+sudo lnxrouter --list-clients wlan0
+
+# Temporarily disable --ban-priv to test
+sudo lnxrouter --ap wlan0 "TestNet" -p "test" --isolate-clients
+```
+
+#### **DNS Resolution Issues**
+```bash
+# Use public DNS servers
+sudo lnxrouter --ap wlan0 "TestNet" -p "test" \
+    --ban-priv --isolate-clients \
+    --dhcp-dns 8.8.8.8,1.1.1.1
+```
+
+#### **Transparent Proxy Not Working**
+```bash
+# Check if proxy service is running
+sudo systemctl status tor      # For Tor
+sudo systemctl status redsocks # For redsocks
+
+# Test proxy connectivity
+curl --proxy socks5://127.0.0.1:9050 http://check.torproject.org
+```
+
+## **Automatic Startup at Boot**
+
+**Can you make lnxrouter start automatically at system boot?** Yes! Here are several methods to ensure your hotspot/router setup starts automatically when your system boots.
+
+### **Prerequisites for Boot Startup**
+
+Before setting up automatic startup, ensure you have the required tools installed:
+
+#### **Install rfkill (Required for WiFi Management)**
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y rfkill
+
+# RHEL/CentOS/Fedora  
+sudo dnf install -y util-linux
+# or on older systems: sudo yum install -y util-linux
+
+# Arch Linux
+sudo pacman -S util-linux
+
+# Verify installation
+rfkill --version
+```
+
+**Why rfkill is needed:** rfkill is essential for managing WiFi radio states during boot, especially for resolving interface conflicts and performing WiFi resets when NetworkManager interferes with lnxrouter.
+
+### **Method 1: Systemd Service (Recommended)**
+
+Create a systemd service for automatic startup and management:
+
+#### **Single Hotspot Service**
+
+```bash
+# Create systemd service file (REPLACE wlan0 with YOUR interface name)
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "MyHotspot" -p "MyPassword123" -g 192.168.100.1
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-hotspot.service
+sudo systemctl start lnxrouter-hotspot.service
+
+# Check status
+sudo systemctl status lnxrouter-hotspot.service
+```
+
+#### **Multiple Hotspots with Separate Services**
+
+```bash
+# Guest network service
+sudo tee /etc/systemd/system/lnxrouter-guest.service << EOF
+[Unit]
+Description=lnxrouter Guest Network
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest-WiFi" -p "guest123" -g 192.168.100.1 --ban-priv --isolate-clients
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# IoT network service
+sudo tee /etc/systemd/system/lnxrouter-iot.service << EOF
+[Unit]
+Description=lnxrouter IoT Network
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan1 "IoT-WiFi" -p "iot123" -g 192.168.101.1 --ban-priv --isolate-clients --hidden
+ExecStop=/usr/local/bin/lnxrouter --stop wlan1
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable both services
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-guest.service lnxrouter-iot.service
+sudo systemctl start lnxrouter-guest.service lnxrouter-iot.service
+```
+
+#### **Systemd Service Management**
+
+```bash
+# Check all lnxrouter services
+sudo systemctl status lnxrouter-*
+
+# Start/stop services
+sudo systemctl start lnxrouter-hotspot.service
+sudo systemctl stop lnxrouter-hotspot.service
+
+# Enable/disable automatic startup
+sudo systemctl enable lnxrouter-hotspot.service
+sudo systemctl disable lnxrouter-hotspot.service
+
+# View logs
+sudo journalctl -u lnxrouter-hotspot.service -f
+
+# Restart service
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+### **Method 2: Cron @reboot**
+
+For simpler setups, use cron to start lnxrouter at boot:
+
+```bash
+# Edit root crontab
+sudo crontab -e
+
+# Add line for automatic startup (wait 30 seconds for network)
+@reboot sleep 30 && /usr/local/bin/lnxrouter --daemon --ap wlan0 "MyHotspot" -p "password123" -g 192.168.100.1
+
+# For multiple hotspots
+@reboot sleep 30 && /usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest" -p "guest123" -g 192.168.100.1 --ban-priv
+@reboot sleep 35 && /usr/local/bin/lnxrouter --daemon --ap wlan1 "IoT" -p "iot123" -g 192.168.101.1 --ban-priv --hidden
+```
+
+### **Method 3: Init Script (rc.local)**
+
+Add to system startup script:
+
+```bash
+# Edit rc.local (Ubuntu/Debian)
+sudo nano /etc/rc.local
+
+# Add before 'exit 0'
+# Wait for network interfaces
+sleep 30
+
+# Start lnxrouter
+/usr/local/bin/lnxrouter --daemon --ap wlan0 "AutoHotspot" -p "autopass123" -g 192.168.100.1
+
+exit 0
+```
+
+### **Method 4: Startup Script with Dependencies**
+
+Create a more robust startup script that waits for dependencies:
+
+```bash
+# Create startup script
+sudo tee /usr/local/bin/start-lnxrouter.sh << 'EOF'
+#!/bin/bash
+
+# Wait for network interfaces
+echo "Waiting for network interfaces..."
+while ! ip link show wlan0 >/dev/null 2>&1; do
+    sleep 2
+done
+
+# Wait for NetworkManager to settle
+sleep 10
+
+# Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap wlan0 "AutoHotspot" -p "password123" \
+    -g 192.168.100.1 --ban-priv --isolate-clients
+
+echo "Hotspot started successfully"
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/start-lnxrouter.sh
+
+# Create systemd service for the script
+sudo tee /etc/systemd/system/lnxrouter-auto.service << EOF
+[Unit]
+Description=lnxrouter Auto Hotspot
+After=network.target NetworkManager.service
+Wants=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/start-lnxrouter.sh
+RemainAfterExit=yes
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable the service
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-auto.service
+```
+
+### **Configuration Tips for Boot Startup**
+
+#### **Path Considerations**
+```bash
+# Find lnxrouter location
+which lnxrouter
+whereis lnxrouter
+
+# Use full path in services
+/usr/local/bin/lnxrouter  # If installed to /usr/local/bin
+/usr/bin/lnxrouter        # If installed to /usr/bin
+./lnxrouter               # If using local script
+```
+
+#### **Network Interface Dependencies**
+```bash
+# Check interfaces are available at boot
+ip link show
+
+# Add dependency checking to scripts
+if ! ip link show wlan0 >/dev/null 2>&1; then
+    echo "Error: wlan0 interface not found"
+    exit 1
+fi
+```
+
+#### **Wait for Network Manager**
+```bash
+# In systemd services, add dependencies
+After=network.target NetworkManager.service
+Wants=network.target
+
+# In scripts, add delays
+sleep 30  # Wait for NetworkManager to initialize
+```
+
+### **Troubleshooting Boot Startup**
+
+#### **"Device or resource busy" Error on Autostart**
+
+**This is the most common autostart issue.** The error typically appears as:
+```
+RTNETLINK answers: Device or resource busy
+ERROR: Failed bringing x0wlo1 up
+```
+
+**Root Cause:** NetworkManager is managing the WiFi interface and conflicts with lnxrouter trying to create a virtual interface or configure the adapter.
+
+**Solutions (try in order):**
+
+**Solution 1: Add NetworkManager delay to systemd service**
+```bash
+# Edit your existing service
+sudo systemctl edit lnxrouter-hotspot.service
+
+# Add this content to override the timing:
+[Unit]
+After=network.target NetworkManager.service multi-user.target
+Wants=network.target
+
+[Service]
+ExecStartPre=/bin/sleep 15
+ExecStartPre=/bin/bash -c 'until nmcli dev show wlan0 | grep -q "GENERAL.STATE.*connected\\|disconnected"; do sleep 2; done'
+```
+
+**Solution 2: Unmanage interface before starting lnxrouter**
+```bash
+# Edit your existing service
+sudo systemctl edit lnxrouter-hotspot.service
+
+# Add pre-start commands:
+[Service]
+ExecStartPre=/usr/bin/nmcli dev set wlan0 managed no
+ExecStartPre=/bin/sleep 5
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+```
+
+**Solution 3: Create a wrapper script with proper sequencing**
+```bash
+# Create wrapper script
+sudo tee /usr/local/bin/lnxrouter-autostart.sh << 'EOF'
+#!/bin/bash
+
+INTERFACE="wlan0"
+SSID="MyHotspot"
+PASSWORD="MyPassword123"
+
+# Wait for NetworkManager to settle
+echo "Waiting for NetworkManager to initialize..."
+sleep 20
+
+# Check if interface exists
+if ! ip link show "$INTERFACE" >/dev/null 2>&1; then
+    echo "Error: Interface $INTERFACE not found"
+    exit 1
+fi
+
+# Unmanage interface from NetworkManager
+echo "Unmanaging $INTERFACE from NetworkManager..."
+nmcli dev set "$INTERFACE" managed no
+sleep 3
+
+# Kill any existing hostapd processes that might be using the interface
+pkill -f "hostapd.*$INTERFACE" || true
+sleep 2
+
+# Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap "$INTERFACE" "$SSID" -p "$PASSWORD" -g 192.168.100.1
+
+# Check if it started successfully
+sleep 5
+if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
+    echo "Hotspot started successfully"
+    exit 0
+else
+    echo "Failed to start hotspot, re-enabling NetworkManager management"
+    nmcli dev set "$INTERFACE" managed yes
+    exit 1
+fi
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/lnxrouter-autostart.sh
+
+# Update systemd service to use wrapper
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot
+After=network.target NetworkManager.service multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter-autostart.sh
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and restart
+sudo systemctl daemon-reload
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+**Solution 4: Stop NetworkManager on WiFi interface permanently**
+```bash
+# Create NetworkManager ignore rule
+sudo tee /etc/NetworkManager/conf.d/99-unmanaged-devices.conf << EOF
+[keyfile]
+unmanaged-devices=interface-name:wlan0
+EOF
+
+# Restart NetworkManager
+sudo systemctl restart NetworkManager
+
+# Your original systemd service should now work
+sudo systemctl restart lnxrouter-hotspot.service
+```
+
+**Solution 5: WiFi Radio Reset (Most Effective for Stubborn Interfaces)**
+
+**This solution works when the interface needs a complete hardware reset cycle**, especially common with certain WiFi chipsets that get "stuck" in a conflicted state.
+
+**Note:** rfkill should already be installed if you followed the Prerequisites section above. If not installed:
+
+```bash
+# Create enhanced wrapper script that performs WiFi radio reset
+sudo tee /usr/local/bin/lnxrouter-wifi-reset.sh << 'EOF'
+#!/bin/bash
+
+INTERFACE="wlan0"
+SSID="MyHotspot" 
+PASSWORD="MyPassword123"
+
+echo "Starting WiFi reset sequence..."
+
+# Check if rfkill is available
+if command -v rfkill >/dev/null 2>&1; then
+    echo "Using rfkill for WiFi reset..."
+    
+    # Step 1: Turn off WiFi completely
+    echo "Turning off WiFi..."
+    rfkill block wifi
+    sleep 3
+
+    # Step 2: Airplane mode on (block all wireless)
+    echo "Enabling airplane mode..."
+    rfkill block all
+    sleep 3
+
+    # Step 3: Airplane mode off (unblock all wireless) - this resets the radio hardware
+    echo "Disabling airplane mode..."
+    rfkill unblock all
+    sleep 2
+    
+    # Step 4: IMMEDIATELY block WiFi again (keep WiFi off until lnxrouter is ready)
+    echo "Blocking WiFi again to prevent NetworkManager interference..."
+    rfkill block wifi
+    sleep 3
+else
+    echo "rfkill not found, using NetworkManager reset..."
+    
+    # Alternative: Use NetworkManager to reset WiFi
+    echo "Stopping NetworkManager..."
+    systemctl stop NetworkManager
+    sleep 3
+    
+    echo "Bringing interface down..."
+    ip link set "$INTERFACE" down
+    sleep 2
+    
+    echo "Bringing interface up..."
+    ip link set "$INTERFACE" up
+    sleep 3
+    
+    echo "Starting NetworkManager..."
+    systemctl start NetworkManager
+    sleep 5
+fi
+
+# Wait for interface to come up
+echo "Waiting for $INTERFACE to initialize..."
+timeout=30
+while [ $timeout -gt 0 ] && ! ip link show "$INTERFACE" >/dev/null 2>&1; do
+    sleep 1
+    ((timeout--))
+done
+
+if [ $timeout -eq 0 ]; then
+    echo "Error: $INTERFACE failed to initialize after reset"
+    exit 1
+fi
+
+# Ensure NetworkManager doesn't interfere
+nmcli dev set "$INTERFACE" managed no
+sleep 2
+
+# Step 4: Start lnxrouter
+echo "Starting lnxrouter hotspot..."
+/usr/local/bin/lnxrouter --daemon --ap "$INTERFACE" "$SSID" -p "$PASSWORD" -g 192.168.100.1
+
+# Wait and verify
+sleep 8
+if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
+    echo "Hotspot started successfully"
+    
+    # Step 6: Now we can unblock WiFi since lnxrouter has control
+    if command -v rfkill >/dev/null 2>&1; then
+        echo "Unblocking WiFi now that hotspot is established..."
+        rfkill unblock wifi
+    fi
+    
+    echo "WiFi reset and hotspot creation complete"
+    exit 0
+else
+    echo "Failed to start hotspot after WiFi reset"
+    nmcli dev set "$INTERFACE" managed yes
+    if command -v rfkill >/dev/null 2>&1; then
+        rfkill unblock wifi
+    fi
+    exit 1
+fi
+EOF
+
+# Make executable
+sudo chmod +x /usr/local/bin/lnxrouter-wifi-reset.sh
+
+# Create systemd service using the reset script
+sudo tee /etc/systemd/system/lnxrouter-hotspot.service << EOF
+[Unit]
+Description=lnxrouter WiFi Hotspot with Radio Reset
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter-wifi-reset.sh
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecStopPost=/usr/bin/nmcli dev set wlan0 managed yes
+ExecStopPost=/usr/bin/rfkill unblock wifi
+Restart=on-failure
+RestartSec=15
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and test
+sudo systemctl daemon-reload
+sudo systemctl restart lnxrouter-hotspot.service
+sudo systemctl status lnxrouter-hotspot.service
+```
+
+**When to use WiFi Radio Reset:**
+- Other solutions still show "Device or resource busy" 
+- WiFi interface appears "stuck" or unresponsive
+- Manual process of airplane mode toggle works
+- Certain Intel WiFi chipsets (like CNVi in your case)
+- USB WiFi adapters with problematic drivers
+
+**Quick Debug Commands:**
+```bash
+# Check what's using the interface
+sudo lsof | grep wlan0
+sudo fuser -v /dev/wlan0
+
+# Check NetworkManager status
+nmcli dev status
+nmcli dev show wlan0
+
+# Check for conflicting processes
+ps aux | grep -E "(hostapd|wpa_supplicant|NetworkManager)"
+
+# Check interface state
+ip link show wlan0
+iw dev wlan0 info
+```
+
+#### **Service Won't Start**
+```bash
+# Check service status
+sudo systemctl status lnxrouter-hotspot.service
+
+# View detailed logs
+sudo journalctl -u lnxrouter-hotspot.service -n 50
+
+# Check if interfaces exist
+ip link show
+```
+
+#### **Interface Not Available**
+```bash
+# Check interface names at boot
+dmesg | grep wlan
+ls /sys/class/net/
+
+# Use interface rename rules if needed
+sudo nano /etc/udev/rules.d/70-persistent-net.rules
+```
+
+#### **Permission Issues**
+```bash
+# Ensure service runs as root
+User=root
+
+# Check lnxrouter permissions
+ls -la /usr/local/bin/lnxrouter
+sudo chmod +x /usr/local/bin/lnxrouter
+```
+
+#### **Multiple Failed Restart Attempts**
+```bash
+# Check restart limit
+sudo systemctl show lnxrouter-hotspot.service | grep Restart
+
+# Reset failed state
+sudo systemctl reset-failed lnxrouter-hotspot.service
+
+# Increase restart delay
+sudo systemctl edit lnxrouter-hotspot.service
+# Add:
+[Service]
+RestartSec=30
+StartLimitBurst=3
+StartLimitIntervalSec=300
+```
+
+### **Example: Complete Boot Setup**
+
+**Scenario**: Automatic guest WiFi that starts at boot with monitoring
+
+```bash
+# 1. Create the service
+sudo tee /etc/systemd/system/lnxrouter-guest.service << EOF
+[Unit]
+Description=Guest WiFi Hotspot
+After=network.target NetworkManager.service
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/lnxrouter --daemon --ap wlan0 "Guest-WiFi" -p "Welcome2024!" -g 192.168.200.1 --ban-priv --isolate-clients --log-dns
+ExecStop=/usr/local/bin/lnxrouter --stop wlan0
+ExecReload=/bin/kill -HUP \$MAINPID
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 2. Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable lnxrouter-guest.service
+sudo systemctl start lnxrouter-guest.service
+
+# 3. Verify it's working
+sudo systemctl status lnxrouter-guest.service
+sudo lnxrouter --list-running
+
+# 4. Test reboot
+sudo reboot
+# After reboot, check if it started automatically
+sudo systemctl status lnxrouter-guest.service
+```
+
+### **Best Practices for Boot Startup**
+
+1. **Use systemd services** for reliability and management features
+2. **Add appropriate delays** to wait for network interfaces
+3. **Include error handling** and restart policies
+4. **Use full paths** to executables in scripts
+5. **Test thoroughly** by rebooting and checking logs
+6. **Monitor resource usage** if running multiple instances at boot
+
+## **System Cleanup**
+
+lnxrouter automatically cleans up when stopped, but some changes persist:
+
+**Persistent Changes:**
+- IP forwarding enabled (`/proc/sys/net/ipv4/ip_forward = 1`)
+- IPv6 forwarding enabled
+- WiFi interface unblocked (`rfkill`)
+- WiFi country code setting
+- Some AppArmor policy changes
+
+**Manual Cleanup (if needed):**
+```bash
+# Stop all instances
+sudo lnxrouter --list-running
+sudo lnxrouter --stop all
+
+# Reset IP forwarding (only if you don't need it)
+echo 0 | sudo tee /proc/sys/net/ipv4/ip_forward
+echo 0 | sudo tee /proc/sys/net/ipv6/conf/all/forwarding
+
+# Re-enable NetworkManager management
+sudo nmcli dev set wlan0 managed yes
+```
+
+## **Conclusion**
+
+lnxrouter is a powerful and flexible tool for creating WiFi hotspots and sharing Internet connections on Linux. While it handles most complexities automatically, understanding the underlying concepts and potential limitations—especially regarding network interface compatibility—will help you troubleshoot issues and optimize your setup.
+
+Remember that not all WiFi adapters support simultaneous connection and AP mode, so having a USB WiFi adapter as backup is often helpful for complex scenarios.
+
+**Key Takeaways:**
+- Always run with `sudo` for proper permissions
+- Check WiFi adapter AP mode compatibility before starting
+- Use virtual interfaces when sharing the same WiFi adapter
+- Monitor connected clients and maintain security best practices
+- Understand that some system changes persist after shutdown
+
+<BuyMeACoffeeButton />

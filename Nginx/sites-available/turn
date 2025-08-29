@@ -1,0 +1,15 @@
+server {
+    listen 4444 ssl;
+    listen [::]:4444 ssl;
+    server_name turn.bankai-tech.com;
+    
+    # Load TLS Certs
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    
+    # Use standardized security headers
+    include /etc/nginx/snippets/security-headers.conf;
+    
+    # TURN server typically needs basic proxy or return
+    return 444;  # Drop connections if no specific handling needed
+}

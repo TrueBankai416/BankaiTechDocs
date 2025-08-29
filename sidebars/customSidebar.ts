@@ -204,6 +204,34 @@ const sidebars: SidebarsConfig = {
          },
         ],
       },
+      {  
+        type: 'category',
+        label: 'GitHub',
+        link: { type: 'doc', id: 'GitHub/Introduction' },
+        items: [
+         'GitHub/Docs/Getting Started',
+         'GitHub/Docs/GitHub with Visual Studio',
+         'GitHub/Docs/Repository Management',
+        ],
+      },
+      {  
+        type: 'category',
+        label: 'Networking',
+        link: { type: 'doc', id: 'Networking/Introduction' },
+        items: [
+         {
+           type: 'category',
+           label: 'Storage',
+           link: { type: 'doc', id: 'Networking/Storage/Introduction' },
+           items: [
+             'Networking/Storage/NFS',
+             'Networking/Storage/CIFS-SMB',
+             'Networking/Storage/SSHFS',
+             'Networking/Storage/mergerfs',
+           ],
+         },
+        ],
+      },
   ],
 
 

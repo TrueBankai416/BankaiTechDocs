@@ -37,7 +37,7 @@ nano docker-compose.yaml
 name: "kms"
 services:
   kms:
-    image: "11notes/kms:stable"
+    image: "11notes/kms:1.0.1"
     container_name: "kms"
     environment:
       TZ: "America/New_York"
@@ -48,8 +48,12 @@ services:
     restart: "always"
 
   kms-gui:
-    image: "11notes/kms-gui:stable"
+    image: "11notes/kms-gui:latest"
     container_name: "kms-gui"
+    depends_on:
+      kms:
+        condition: "service_healthy"
+        restart: true
     environment:
       TZ: "America/New_York"
     volumes:

@@ -13,25 +13,36 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 name: radarr
 
 services:
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
+    radarr:
+    image: linuxserver/radarr:latest
     container_name: radarr
     hostname: radarr
-    environtment:
+    environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./radarr:/config
-      - /media/Movies:/Movies #optional
-      - /media/Downloads:/media/Downloads #optional
+      - /media/merged:/media
+    ports:
+      - "${RADARR_PORT:-7878}:7878"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - 7878:7878
-    restart: unless-stopped
 ```
 
 <BuyMeACoffeeButton />

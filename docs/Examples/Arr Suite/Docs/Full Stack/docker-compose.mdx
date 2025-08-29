@@ -24,8 +24,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./radarr:/config
-      - /media/Movies:/Movies #optional
-      - /media/Downloads:/media/Downloads #optional
+      - /media/merged:/media #optional
     logging:
       options:
         max-size: "10m"
@@ -45,8 +44,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./readarr:/config
-      - /media/Books:/books #optional
-      - /media/Downloads:/media/Downloads #optional
+      - /media/merged:/media #optional
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -63,8 +61,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./sonarr:/config
-      - /media/TV:/TV #optional
-      - /media/Downloads:/media/Downloads #optional
+      - /media/merged:/media #optional
     logging:
       options:
         max-size: "10m"
@@ -85,8 +82,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./lidarr/config:/config
-      - /media/Music:/music #optional
-      - /media/Downloads:/media/Downloads #optional
+      - /media/merged:/merged #optional
     ports:
       - 8686:8686
     restart: unless-stopped
