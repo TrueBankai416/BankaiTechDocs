@@ -288,7 +288,6 @@ curl --interface 192.168.9.152 --connect-timeout 5 ifconfig.me
 # - Connection timeout
 # - DNS resolution failure
 # - Network unreachable error
-# - 407 Proxy Authentication Required (if attempting proxy without auth)
 ```
 
 **Important**: If the command returns your real IP address, the kill switch is NOT working properly and needs to be fixed.
@@ -407,14 +406,18 @@ SOCKS5 is a proxy protocol that routes network traffic through a proxy server. B
 
 #### 2. Find NordVPN SOCKS5 Servers
 
+**Important**: Not all NordVPN servers support SOCKS5. Use the [NordVPN server list](https://nordvpn.com/servers/tools/) to find SOCKS5-compatible servers.
+
 NordVPN SOCKS5 servers use this format:
 - **Hostname**: `[country-code][server-number].nordvpn.com`
 - **Port**: `1080`
 
-Examples:
-- `us2345.nordvpn.com:1080` (US server)
-- `uk1234.nordvpn.com:1080` (UK server)
-- `de567.nordvpn.com:1080` (Germany server)
+Examples of known SOCKS5-compatible servers:
+- `us5959.nordvpn.com:1080` (US server)
+- `uk2029.nordvpn.com:1080` (UK server)
+- `de1008.nordvpn.com:1080` (Germany server)
+
+**Note**: Server numbers change frequently. Always verify current SOCKS5 availability through NordVPN's official server list.
 
 #### 3. Configure SOCKS5 in qBittorrent
 
@@ -460,8 +463,8 @@ Create a `.netrc` file for authentication:
 
 ```bash title="~/.netrc"
 machine us2345.nordvpn.com
-login your-nordvpn-service-username
-password your-nordvpn-service-password
+login YOUR_NORDVPN_SERVICE_USERNAME
+password YOUR_NORDVPN_SERVICE_PASSWORD
 ```
 
 Set proper permissions:
