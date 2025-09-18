@@ -1,0 +1,568 @@
+---
+title: qBittorrent with Secondary IP and VPN Setup
+tags:
+    - Arr Suite
+    - qBittorrent
+    - VPN
+    - Security
+    - Ubuntu
+keywords: [qBittorrent, VPN, SOCKS5, UFW, Kill Switch, Secondary IP, Ubuntu 24, NordVPN]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# qBittorrent with Secondary IP and VPN Setup
+
+This comprehensive guide covers setting up qBittorrent with a secondary IP address on Ubuntu 24, implementing a UFW kill switch, and configuring SOCKS5 proxy for enhanced privacy and security.
+
+## Overview
+
+This setup provides multiple layers of security:
+1. **Secondary IP binding** - Isolates qBittorrent traffic
+2. **UFW kill switch** - Prevents traffic leaks if VPN fails
+3. **SOCKS5 proxy** - Routes traffic through VPN provider
+4. **Network isolation** - Separates torrent traffic from other services
+
+## Prerequisites
+
+- Ubuntu 24.04 LTS server
+- Root or sudo access
+- Basic understanding of networking concepts
+- VPN provider with SOCKS5 proxy support (NordVPN example used)
+
+## Part 1: Secondary IP Address Configuration
+
+### Understanding Secondary IP Addresses
+
+A secondary IP address allows you to bind specific applications to a dedicated IP, providing network isolation and better traffic control. This is particularly useful for torrent clients to:
+- Isolate torrent traffic from other services
+- Apply specific firewall rules
+- Enable better monitoring and control
+
+### Automatic Setup Script
+
+Create and run the following script to automatically configure a secondary IP:
+
+```bash title="secondary-ip-setup.sh"
+#!/bin/bash
+
+# Simple Secondary IP Setup Script for Ubuntu 24
+# This script adds a secondary IP address for qBittorrent binding
+
+set -e
+
+# Configuration - MODIFY THESE VALUES FOR YOUR NETWORK
+INTERFACE="enp6s0"           # Change to your network interface
+SECONDARY_IP="192.168.9.152" # Change to an available IP in your subnet
+SUBNET_MASK="24"             # Usually 24 for /24 networks
+GATEWAY="192.168.9.1"        # Your router's IP address
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+   print_error "This script must be run as root (use sudo)"
+   exit 1
+fi
+
+print_status "Starting secondary IP setup..."
+
+# Detect primary network interface if specified interface doesn't exist
+if ! ip link show $INTERFACE &> /dev/null; then
+    print_warning "Interface $INTERFACE not found. Detecting primary interface..."
+    INTERFACE=$(ip route | grep default | awk '{print $5}' | head -n1)
+    print_status "Using interface: $INTERFACE"
+fi
+
+# Prompt user for confirmation
+echo
+print_warning "Configuration Summary:"
+echo "  Primary Interface: $INTERFACE"
+echo "  Secondary IP: $SECONDARY_IP/$SUBNET_MASK"
+echo "  Gateway: $GATEWAY"
+echo
+read -p "Continue with this configuration? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    print_status "Setup cancelled by user"
+    exit 0
+fi
+
+# Add secondary IP address
+print_status "Adding secondary IP address $SECONDARY_IP to $INTERFACE..."
+if ip addr show dev $INTERFACE | grep -q $SECONDARY_IP; then
+    print_warning "Secondary IP $SECONDARY_IP already exists on $INTERFACE"
+else
+    ip addr add $SECONDARY_IP/$SUBNET_MASK dev $INTERFACE
+    print_status "Secondary IP added successfully"
+fi
+
+# Verify IP is configured
+print_status "Verifying IP configuration..."
+if ip addr show dev $INTERFACE | grep -q $SECONDARY_IP; then
+    print_status "Secondary IP $SECONDARY_IP is active"
+else
+    print_error "Failed to configure secondary IP"
+    exit 1
+fi
+
+# Test connectivity
+print_status "Testing connectivity..."
+if ping -c 1 -W 5 -I $SECONDARY_IP $GATEWAY &> /dev/null; then
+    print_status "Connectivity test passed"
+else
+    print_warning "Connectivity test failed - this may be normal depending on network configuration"
+fi
+
+# Create systemd service for persistence
+print_status "Creating systemd service for persistence..."
+cat > /etc/systemd/system/secondary-ip.service << EOF
+[Unit]
+Description=Secondary IP Address
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/ip addr replace $SECONDARY_IP/$SUBNET_MASK dev $INTERFACE
+ExecStop=/usr/sbin/ip addr del $SECONDARY_IP/$SUBNET_MASK dev $INTERFACE || true
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable secondary-ip.service
+systemctl start secondary-ip.service
+print_status "Systemd service created, enabled, and started"
+
+# Display final status
+echo
+print_status "Secondary IP setup completed successfully!"
+echo
+echo "Configuration Summary:"
+echo "  Secondary IP: $SECONDARY_IP"
+echo "  Interface: $INTERFACE"
+echo "  Status: $(ip addr show dev $INTERFACE | grep -q $SECONDARY_IP && echo "Active" || echo "Inactive")"
+echo
+echo "Next steps:"
+echo "1. Configure qBittorrent to bind to $SECONDARY_IP on interface $INTERFACE"
+echo "2. Set up UFW kill switch rules"
+echo "3. Configure SOCKS5 proxy"
+echo "4. Test the configuration"
+echo
+print_status "Setup complete!"
+```
+
+### Manual Configuration Steps
+
+#### 1. Find Your Network Interface
+
+```bash
+# List all network interfaces
+ip link show
+
+# Find the active interface (usually the one with an IP)
+ip addr show
+
+# Or find the default route interface
+ip route | grep default
+```
+
+Common interface names:
+- `eth0`, `eth1` - Ethernet interfaces
+- `enp6s0`, `enp0s3` - Predictable network interface names
+- `wlan0` - Wireless interfaces
+
+#### 2. Determine Available IP Address
+
+```bash
+# Check your current IP and subnet
+ip addr show
+
+# Scan your network to find available IPs (optional)
+nmap -sn 192.168.9.0/24  # Replace with your subnet
+```
+
+#### 3. Modify Script Configuration
+
+Edit the script variables at the top:
+
+```bash
+INTERFACE="enp6s0"           # Your network interface name
+SECONDARY_IP="192.168.9.152" # Available IP in your subnet  
+SUBNET_MASK="24"             # Your subnet mask (usually 24)
+GATEWAY="192.168.9.1"        # Your router's IP
+```
+
+#### 4. Run the Setup Script
+
+```bash
+# Make script executable
+chmod +x secondary-ip-setup.sh
+
+# Run with sudo
+sudo ./secondary-ip-setup.sh
+```
+
+### Verification
+
+```bash
+# Check if secondary IP is active
+ip addr show
+
+# Test connectivity from secondary IP
+ping -c 3 -I 192.168.9.152 8.8.8.8
+
+# Check systemd service status
+sudo systemctl status secondary-ip.service
+```
+
+## Part 2: UFW Kill Switch Configuration
+
+### Understanding Kill Switch
+
+A kill switch prevents internet traffic when your VPN connection fails. This is crucial for torrent clients to prevent IP leaks that could expose your real IP address.
+
+### Kill Switch Rules
+
+Apply these UFW rules to create a comprehensive kill switch:
+
+```bash
+# Block all outbound traffic from secondary IP by default
+sudo ufw deny out from 192.168.9.152 comment 'Block qBittorrent'
+
+# Allow SOCKS5 proxy traffic (NordVPN uses port 1080)
+sudo ufw allow out from 192.168.9.152 to any port 1080 comment 'NordVPN Proxy'
+
+# Allow DNS resolution
+sudo ufw allow out from 192.168.9.152 to any port 53 comment 'DNS'
+
+# Allow local network communication (adjust IP range as needed)
+sudo ufw allow out from 192.168.9.152 to 192.168.9.0/24 comment 'Local Network'
+
+# Allow qBittorrent WebUI access
+sudo ufw allow 8080/tcp comment 'qBittorrent WebUI'
+
+# Enable UFW if not already enabled
+sudo ufw --force enable
+```
+
+### Rule Explanation
+
+| Rule | Purpose |
+|------|---------|
+| `deny out from 192.168.9.152` | Blocks all outbound traffic from secondary IP |
+| `allow out ... port 1080` | Permits SOCKS5 proxy connections |
+| `allow out ... port 53` | Allows DNS queries |
+| `allow out ... to 192.168.9.0/24` | Permits local network access |
+| `allow 8080/tcp` | Enables WebUI access |
+
+### Testing Kill Switch
+
+Test the kill switch to ensure it works properly:
+
+```bash
+# Test without proxy (should fail/timeout)
+curl --interface 192.168.9.152 --connect-timeout 5 ifconfig.me
+
+# Expected result: Connection timeout or failure
+```
+
+If the command returns your real IP, the kill switch is not working properly.
+
+### UFW Management Commands
+
+```bash
+# View current rules
+sudo ufw status numbered
+
+# Delete a rule by number
+sudo ufw delete [number]
+
+# Reset all rules (use with caution)
+sudo ufw --force reset
+
+# Disable UFW temporarily
+sudo ufw disable
+```
+
+## Part 3: qBittorrent Configuration
+
+### Docker Compose Setup
+
+```yaml title="docker-compose.yml"
+name: qbittorrent
+
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    hostname: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8080
+    volumes:
+      - ./qbittorrent:/config
+      - /media/merged/downloads/Torrent:/downloads
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    restart: unless-stopped
+    network_mode: host  # Required for secondary IP binding
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+### qBittorrent Settings Configuration
+
+After starting qBittorrent, configure these settings via the WebUI:
+
+#### Connection Settings
+
+1. Navigate to **Tools** → **Options** → **Connection**
+2. Set **Listening Port**: `6881` (or your preferred port)
+3. **Interface**: Select your secondary IP `192.168.9.152`
+4. **Optional IP address to bind to**: `192.168.9.152`
+
+#### Advanced Settings
+
+1. Go to **Tools** → **Options** → **Advanced**
+2. **Network Interface**: Select the interface with your secondary IP
+3. **Optional IP Address to bind to**: `192.168.9.152`
+
+## Part 4: SOCKS5 Proxy Configuration
+
+### Understanding SOCKS5 Proxy
+
+SOCKS5 is a proxy protocol that routes network traffic through a proxy server. Benefits include:
+- **Privacy**: Hides your real IP address
+- **Security**: Encrypts traffic between client and proxy
+- **Performance**: Often faster than full VPN tunnels
+- **Flexibility**: Application-specific routing
+
+### NordVPN SOCKS5 Setup
+
+#### 1. Obtain NordVPN SOCKS5 Credentials
+
+1. Log into your NordVPN account
+2. Navigate to **Services** → **NordVPN** → **Manual Setup**
+3. Select **SOCKS5 Proxy**
+4. Copy your username and password (different from account credentials)
+
+#### 2. Find NordVPN SOCKS5 Servers
+
+NordVPN SOCKS5 servers use this format:
+- **Hostname**: `[country-code][server-number].nordvpn.com`
+- **Port**: `1080`
+
+Examples:
+- `us2345.nordvpn.com:1080` (US server)
+- `uk1234.nordvpn.com:1080` (UK server)
+- `de567.nordvpn.com:1080` (Germany server)
+
+#### 3. Configure SOCKS5 in qBittorrent
+
+1. Open qBittorrent WebUI
+2. Go to **Tools** → **Options** → **Connection**
+3. **Proxy Server** section:
+   - **Type**: `SOCKS5`
+   - **Host**: `us2345.nordvpn.com` (replace with your chosen server)
+   - **Port**: `1080`
+   - **Authentication**: ✅ Checked
+   - **Username**: Your NordVPN service username
+   - **Password**: Your NordVPN service password
+
+4. **Proxy Settings**:
+   - ✅ **Use proxy for peer connections**
+   - ✅ **Use proxy for RSS feeds**
+   - ✅ **Use proxy for general purposes**
+   - ✅ **Use proxy for BitTorrent DHT**
+
+#### 4. Additional Security Settings
+
+1. **Tools** → **Options** → **BitTorrent**:
+   - ✅ **Enable anonymous mode**
+   - **Encryption mode**: `Require encryption`
+
+2. **Tools** → **Options** → **Advanced**:
+   - **Validate HTTPS tracker certificates**: ✅ Enabled
+
+### Testing SOCKS5 Configuration
+
+#### 1. Test Proxy Connection
+
+```bash
+# Test SOCKS5 proxy directly
+curl --socks5 us2345.nordvpn.com:1080 \
+     --socks5-basic \
+     --user "your-nordvpn-username:your-nordvpn-password" \
+     ifconfig.me
+```
+
+#### 2. Verify qBittorrent IP
+
+1. Add a test torrent (like Ubuntu ISO)
+2. Check the **Peers** tab to see connected IPs
+3. Use online tools to verify your torrent IP:
+   - Visit: https://torguard.net/checkmytorrentipaddress.php
+   - Download their test torrent
+   - Add to qBittorrent and check reported IP
+
+#### 3. Complete Kill Switch Test
+
+```bash
+# With SOCKS5 configured, this should still fail
+curl --interface 192.168.9.152 --connect-timeout 5 ifconfig.me
+
+# This confirms kill switch is working even with proxy configured
+```
+
+## Part 5: Advanced Configuration
+
+### DNS Configuration
+
+For enhanced privacy, configure custom DNS servers:
+
+```bash
+# Edit systemd-resolved configuration
+sudo nano /etc/systemd/resolved.conf
+
+# Add these lines:
+DNS=1.1.1.1 9.9.9.9
+FallbackDNS=8.8.8.8 8.8.4.4
+DNSOverTLS=yes
+
+# Restart systemd-resolved
+sudo systemctl restart systemd-resolved
+```
+
+### Monitoring and Logging
+
+#### 1. Monitor UFW Logs
+
+```bash
+# View UFW logs
+sudo tail -f /var/log/ufw.log
+
+# Filter for secondary IP traffic
+sudo grep "192.168.9.152" /var/log/ufw.log
+```
+
+#### 2. qBittorrent Logs
+
+```bash
+# View qBittorrent container logs
+docker logs qbittorrent -f
+
+# Check for connection errors
+docker logs qbittorrent 2>&1 | grep -i error
+```
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Secondary IP not persistent after reboot**
+   ```bash
+   # Check systemd service status
+   sudo systemctl status secondary-ip.service
+   
+   # Restart service if needed
+   sudo systemctl restart secondary-ip.service
+   ```
+
+2. **qBittorrent not binding to secondary IP**
+   - Ensure `network_mode: host` in docker-compose
+   - Verify interface selection in qBittorrent settings
+   - Check that secondary IP is active: `ip addr show`
+
+3. **SOCKS5 authentication failures**
+   - Verify NordVPN service credentials (not account credentials)
+   - Test proxy connection manually with curl
+   - Check server availability: `ping us2345.nordvpn.com`
+
+4. **Kill switch not working**
+   ```bash
+   # Check UFW status
+   sudo ufw status verbose
+   
+   # Test kill switch
+   curl --interface 192.168.9.152 --connect-timeout 5 ifconfig.me
+   ```
+
+#### Diagnostic Commands
+
+```bash
+# Check network configuration
+ip addr show
+ip route show
+
+# Test connectivity
+ping -c 3 -I 192.168.9.152 8.8.8.8
+
+# Check UFW rules
+sudo ufw status numbered
+
+# Monitor network traffic
+sudo netstat -tulpn | grep :8080
+sudo ss -tulpn | grep :1080
+```
+
+## Security Best Practices
+
+1. **Regular Updates**: Keep system and containers updated
+2. **Strong Passwords**: Use complex passwords for all services
+3. **Access Control**: Limit WebUI access to trusted networks
+4. **Monitoring**: Regularly check logs for suspicious activity
+5. **Backup**: Backup configurations and important data
+6. **Testing**: Periodically test kill switch functionality
+
+## Conclusion
+
+This setup provides a robust, secure torrent environment with multiple layers of protection:
+- Network isolation through secondary IP binding
+- Traffic control via UFW kill switch
+- Privacy protection through SOCKS5 proxy
+- Comprehensive monitoring and logging
+
+Regular testing and monitoring ensure continued security and functionality of your qBittorrent setup.
+
+<BuyMeACoffeeButton />
