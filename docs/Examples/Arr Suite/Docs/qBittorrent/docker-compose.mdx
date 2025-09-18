@@ -200,7 +200,8 @@ Common interface names:
 # Check your current IP and subnet
 ip addr show
 
-# Scan your network to find available IPs (optional)
+# Scan your network to find available IPs (optional - requires nmap)
+sudo apt install nmap  # Install if not present
 nmap -sn 192.168.9.0/24  # Replace with your subnet
 ```
 
@@ -397,6 +398,8 @@ SOCKS5 is a proxy protocol that routes network traffic through a proxy server. B
 
 ### NordVPN SOCKS5 Setup
 
+This section is based on the [official NordVPN qBittorrent proxy setup guide](https://support.nordvpn.com/hc/en-us/articles/20195967385745-NordVPN-proxy-setup-for-qBittorrent).
+
 #### 1. Obtain NordVPN SOCKS5 Credentials
 
 1. Log into your NordVPN account
@@ -461,10 +464,10 @@ curl --socks5-hostname us2345.nordvpn.com:1080 \
 
 Create a `.netrc` file for authentication:
 
-```bash title="~/.netrc"
-machine us2345.nordvpn.com
-login YOUR_NORDVPN_SERVICE_USERNAME
-password YOUR_NORDVPN_SERVICE_PASSWORD
+```text title="~/.netrc"
+machine us5959.nordvpn.com
+login [your-nordvpn-service-username]
+password [your-nordvpn-service-password]
 ```
 
 Set proper permissions:
