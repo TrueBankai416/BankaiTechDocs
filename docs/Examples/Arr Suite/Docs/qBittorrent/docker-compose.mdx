@@ -260,8 +260,8 @@ sudo ufw allow out from 192.168.9.152 to 192.168.9.0/24 comment 'Local Network'
 # Block all other outbound traffic from secondary IP (must be last)
 sudo ufw deny out from 192.168.9.152 comment 'Block qBittorrent'
 
-# Allow qBittorrent WebUI access from local network only
-sudo ufw allow from 192.168.9.0/24 to any port 8080 proto tcp comment 'qBittorrent WebUI'
+# Allow qBittorrent WebUI access from local network to secondary IP only
+sudo ufw allow from 192.168.9.0/24 to 192.168.9.152 port 8080 proto tcp comment 'qBittorrent WebUI'
 
 # Enable UFW if not already enabled
 sudo ufw --force enable
@@ -428,7 +428,7 @@ Examples of known SOCKS5-compatible servers:
 2. Go to **Tools** → **Options** → **Connection**
 3. **Proxy Server** section:
    - **Type**: `SOCKS5`
-   - **Host**: `us2345.nordvpn.com` (replace with your chosen server)
+   - **Host**: `[your-socks5-hostname]` (e.g., `us5959.nordvpn.com`)
    - **Port**: `1080`
    - **Authentication**: ✅ Checked
    - **Username**: Your NordVPN service username
@@ -456,7 +456,7 @@ Examples of known SOCKS5-compatible servers:
 
 ```bash
 # Test SOCKS5 proxy directly (DNS resolution via proxy)
-curl --socks5-hostname us2345.nordvpn.com:1080 \
+curl --socks5-hostname [your-socks5-hostname]:1080 \
      --socks5-basic \
      --netrc-file ~/.netrc \
      ifconfig.me
@@ -465,7 +465,7 @@ curl --socks5-hostname us2345.nordvpn.com:1080 \
 Create a `.netrc` file for authentication:
 
 ```text title="~/.netrc"
-machine us5959.nordvpn.com
+machine [your-socks5-hostname]
 login [your-nordvpn-service-username]
 password [your-nordvpn-service-password]
 ```
