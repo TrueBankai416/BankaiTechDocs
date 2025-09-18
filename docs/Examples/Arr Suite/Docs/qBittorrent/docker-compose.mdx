@@ -284,10 +284,14 @@ Test the kill switch to ensure it works properly:
 # Test without proxy (should fail/timeout)
 curl --interface 192.168.9.152 --connect-timeout 5 ifconfig.me
 
-# Expected result: Connection timeout or failure
+# Expected results (any of these indicate kill switch is working):
+# - Connection timeout
+# - DNS resolution failure
+# - Network unreachable error
+# - 407 Proxy Authentication Required (if attempting proxy without auth)
 ```
 
-If the command returns your real IP, the kill switch is not working properly.
+**Important**: If the command returns your real IP address, the kill switch is NOT working properly and needs to be fixed.
 
 ### UFW Management Commands
 
@@ -305,45 +309,63 @@ sudo ufw --force reset
 sudo ufw disable
 ```
 
-## Part 3: qBittorrent Configuration
+## Part 3: qBittorrent Installation and Configuration
 
-### Docker Compose Setup
+### Host Installation
 
-```yaml title="docker-compose.yml"
-name: qbittorrent
+Install qBittorrent directly on the host system:
 
-services:
-  qbittorrent:
-    image: linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    hostname: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-      - WEBUI_PORT=8080
-    volumes:
-      - ./qbittorrent:/config
-      - /media/merged/downloads/Torrent:/downloads
-    restart: unless-stopped
-    network_mode: host  # Required for secondary IP binding (ports mapping ignored with host mode)
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 512M
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
+```bash
+# Add qBittorrent stable PPA
+sudo add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
+
+# Update package list
+sudo apt update
+
+# Install qBittorrent
+sudo apt install qbittorrent-nox -y
+
+# Create qBittorrent user (optional, for security)
+sudo useradd --system --shell /usr/sbin/nologin --home-dir /var/lib/qbittorrent --create-home qbittorrent
+
+# Create downloads directory
+sudo mkdir -p /media/merged/downloads/Torrent
+sudo chown qbittorrent:qbittorrent /media/merged/downloads/Torrent
+
+# Create systemd service
+sudo tee /etc/systemd/system/qbittorrent-nox.service > /dev/null <<EOF
+[Unit]
+Description=qBittorrent Command Line Client
+After=network.target
+
+[Service]
+Type=forking
+User=qbittorrent
+Group=qbittorrent
+UMask=007
+ExecStart=/usr/bin/qbittorrent-nox -d --webui-port=8080
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable qbittorrent-nox.service
+sudo systemctl start qbittorrent-nox.service
+
+# Check service status
+sudo systemctl status qbittorrent-nox.service
 ```
+
+### Initial Setup
+
+1. **Access WebUI**: Navigate to `http://your-server-ip:8080`
+2. **Default credentials**:
+   - Username: `admin`
+   - Password: `adminadmin`
+3. **Change default password** immediately after first login
 
 ### qBittorrent Settings Configuration
 
@@ -368,9 +390,11 @@ After starting qBittorrent, configure these settings via the WebUI:
 
 SOCKS5 is a proxy protocol that routes network traffic through a proxy server. Benefits include:
 - **Privacy**: Hides your real IP address
-- **Security**: Encrypts traffic between client and proxy
+- **Authentication**: Supports username/password authentication
 - **Performance**: Often faster than full VPN tunnels
 - **Flexibility**: Application-specific routing
+
+**Note**: SOCKS5 itself doesn't encrypt traffic. Encryption depends on the application layer (e.g., HTTPS) or additional tunneling.
 
 ### NordVPN SOCKS5 Setup
 
@@ -409,6 +433,7 @@ Examples:
    - ✅ **Use proxy for RSS feeds**
    - ✅ **Use proxy for general purposes**
    - ✅ **Use proxy for BitTorrent DHT**
+   - ✅ **Use proxy for hostname lookups** (prevents DNS leaks)
 
 #### 4. Additional Security Settings
 
@@ -424,11 +449,24 @@ Examples:
 #### 1. Test Proxy Connection
 
 ```bash
-# Test SOCKS5 proxy directly
-curl --socks5 us2345.nordvpn.com:1080 \
+# Test SOCKS5 proxy directly (DNS resolution via proxy)
+curl --socks5-hostname us2345.nordvpn.com:1080 \
      --socks5-basic \
-     --user "your-nordvpn-username:your-nordvpn-password" \
+     --netrc-file ~/.netrc \
      ifconfig.me
+```
+
+Create a `.netrc` file for authentication:
+
+```bash title="~/.netrc"
+machine us2345.nordvpn.com
+login your-nordvpn-service-username
+password your-nordvpn-service-password
+```
+
+Set proper permissions:
+```bash
+chmod 600 ~/.netrc
 ```
 
 #### 2. Verify qBittorrent IP
@@ -483,11 +521,14 @@ sudo grep "192.168.9.152" /var/log/ufw.log
 #### 2. qBittorrent Logs
 
 ```bash
-# View qBittorrent container logs
-docker logs qbittorrent -f
+# View qBittorrent service logs
+sudo journalctl -u qbittorrent-nox.service -f
 
 # Check for connection errors
-docker logs qbittorrent 2>&1 | grep -i error
+sudo journalctl -u qbittorrent-nox.service | grep -i error
+
+# View qBittorrent log files (if configured)
+sudo tail -f /var/lib/qbittorrent/.local/share/qBittorrent/logs/qbittorrent.log
 ```
 
 ### Troubleshooting
@@ -504,9 +545,9 @@ docker logs qbittorrent 2>&1 | grep -i error
    ```
 
 2. **qBittorrent not binding to secondary IP**
-   - Ensure `network_mode: host` in docker-compose
-   - Verify interface selection in qBittorrent settings
+   - Verify interface selection in qBittorrent WebUI settings
    - Check that secondary IP is active: `ip addr show`
+   - Restart qBittorrent service: `sudo systemctl restart qbittorrent-nox.service`
 
 3. **SOCKS5 authentication failures**
    - Verify NordVPN service credentials (not account credentials)

@@ -12,6 +12,3 @@ src/components/BuyMeACoffeeFloatingWidget/
 
 # Ignore example Tor HashedControlPassword in proxy documentation
 bc5bf91967ecad9c030302d55ff253d84e11ea3b:docs/Networking/Docs/Proxies.mdx:generic-api-key:530
-
-# Ignore example curl SOCKS5 authentication in qBittorrent documentation
-76c4b350323cf7a2e7701935bfb6997ef917e3b8:docs/Examples/Arr Suite/Docs/qBittorrent/docker-compose.mdx:curl-auth-user:434
