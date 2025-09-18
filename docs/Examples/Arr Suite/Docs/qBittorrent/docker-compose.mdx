@@ -248,21 +248,19 @@ A kill switch prevents internet traffic when your VPN connection fails. This is 
 
 Apply these UFW rules to create a comprehensive kill switch:
 
+**Important**: Replace `192.168.9.152` and `192.168.9.0/24` with your actual secondary IP and subnet.
+
 ```bash
-# Block all outbound traffic from secondary IP by default
-sudo ufw deny out from 192.168.9.152 comment 'Block qBittorrent'
-
-# Allow SOCKS5 proxy traffic (NordVPN uses port 1080)
+# Add allow rules first (they must come before the deny rule)
 sudo ufw allow out from 192.168.9.152 to any port 1080 comment 'NordVPN Proxy'
-
-# Allow DNS resolution
 sudo ufw allow out from 192.168.9.152 to any port 53 comment 'DNS'
-
-# Allow local network communication (adjust IP range as needed)
 sudo ufw allow out from 192.168.9.152 to 192.168.9.0/24 comment 'Local Network'
 
-# Allow qBittorrent WebUI access
-sudo ufw allow 8080/tcp comment 'qBittorrent WebUI'
+# Block all other outbound traffic from secondary IP (must be last)
+sudo ufw deny out from 192.168.9.152 comment 'Block qBittorrent'
+
+# Allow qBittorrent WebUI access from local network only
+sudo ufw allow from 192.168.9.0/24 to any port 8080 proto tcp comment 'qBittorrent WebUI'
 
 # Enable UFW if not already enabled
 sudo ufw --force enable
@@ -327,12 +325,8 @@ services:
     volumes:
       - ./qbittorrent:/config
       - /media/merged/downloads/Torrent:/downloads
-    ports:
-      - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
     restart: unless-stopped
-    network_mode: host  # Required for secondary IP binding
+    network_mode: host  # Required for secondary IP binding (ports mapping ignored with host mode)
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
@@ -359,7 +353,7 @@ After starting qBittorrent, configure these settings via the WebUI:
 
 1. Navigate to **Tools** → **Options** → **Connection**
 2. Set **Listening Port**: `6881` (or your preferred port)
-3. **Interface**: Select your secondary IP `192.168.9.152`
+3. **Interface**: Select your network interface (e.g., `enp6s0`) that has `192.168.9.152`
 4. **Optional IP address to bind to**: `192.168.9.152`
 
 #### Advanced Settings
@@ -543,7 +537,7 @@ sudo ufw status numbered
 
 # Monitor network traffic
 sudo netstat -tulpn | grep :8080
-sudo ss -tulpn | grep :1080
+sudo ss -tnp | grep ':1080'  # Show established SOCKS5 connections
 ```
 
 ## Security Best Practices
