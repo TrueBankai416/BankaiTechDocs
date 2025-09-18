@@ -14,6 +14,8 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # qBittorrent with Secondary IP and VPN Setup
 
+**Note**: This guide is for host (non-Docker) installation of qBittorrent.
+
 This comprehensive guide covers setting up qBittorrent with a secondary IP address on Ubuntu 24, implementing a UFW kill switch, and configuring SOCKS5 proxy for enhanced privacy and security.
 
 ## Overview
@@ -456,23 +458,20 @@ Examples of known SOCKS5-compatible servers:
 
 ```bash
 # Test SOCKS5 proxy directly (DNS resolution via proxy)
-curl --socks5-hostname [your-socks5-hostname]:1080 \
-     --socks5-basic \
-     --netrc-file ~/.netrc \
-     ifconfig.me
-```
+# Create a curl config file for proxy authentication
+cat > ~/.curlrc << EOF
+proxy = socks5h://[your-socks5-hostname]:1080
+proxy-user = [your-nordvpn-service-username]:[your-nordvpn-service-password]
+EOF
 
-Create a `.netrc` file for authentication:
+# Set proper permissions
+chmod 600 ~/.curlrc
 
-```text title="~/.netrc"
-machine [your-socks5-hostname]
-login [your-nordvpn-service-username]
-password [your-nordvpn-service-password]
-```
+# Test the proxy connection
+curl ifconfig.me
 
-Set proper permissions:
-```bash
-chmod 600 ~/.netrc
+# Clean up config file after testing
+rm ~/.curlrc
 ```
 
 #### 2. Verify qBittorrent IP
