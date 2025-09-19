@@ -1,5 +1,5 @@
 ---
-title: qBittorrent Docker Compose Example
+title: docker-compose.yaml
 tags:
     - Arr Suite
     - qBittorrent
@@ -55,23 +55,6 @@ services:
 networks:
   media-network:
     driver: bridge
-```
-
-## Quick Start
-
-```bash
-# Create directory structure
-mkdir -p qbittorrent/config
-
-# Start the container
-docker compose up -d
-
-# Check logs for VPN connection
-docker logs qbittorrent-vpn
-
-# Access WebUI at http://your-server-ip:8085
-# Default username: admin
-# Default password: Check ./qbittorrent/config/supervisord.log for randomly generated password
 ```
 
 ## Important Notes
