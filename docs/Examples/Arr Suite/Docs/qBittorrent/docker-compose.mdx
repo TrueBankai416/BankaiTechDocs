@@ -15,7 +15,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 This example shows how to deploy qBittorrent with built-in VPN support using the `binhex/arch-qbittorrentvpn` container.
 
-For complete setup instructions, troubleshooting, and configuration details, see the [full qBittorrent Docker VPN Setup guide](../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
+For complete setup instructions, troubleshooting, and configuration details, see the [full qBittorrent Docker VPN Setup guide](../../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
 
 ## Docker Compose Configuration
 
@@ -70,7 +70,8 @@ docker compose up -d
 docker logs qbittorrent-vpn
 
 # Access WebUI at http://your-server-ip:8085
-# Default credentials: admin / adminadmin
+# Default username: admin
+# Default password: Check ./qbittorrent/config/supervisord.log for randomly generated password
 ```
 
 ## Important Notes
@@ -93,6 +94,6 @@ Configure these paths in the qBittorrent WebUI to match your *Arr applications:
 - [Sonarr Docker Compose](../Sonarr/docker-compose.mdx)
 - [Prowlarr Docker Compose](../Prowlarr/docker-compose.mdx)
 
-For detailed setup instructions, VPN configuration, troubleshooting, and advanced options, see the [complete qBittorrent Docker VPN Setup guide](../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
+For detailed setup instructions, VPN configuration, troubleshooting, and advanced options, see the [complete qBittorrent Docker VPN Setup guide](../../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
 
 <BuyMeACoffeeButton />
