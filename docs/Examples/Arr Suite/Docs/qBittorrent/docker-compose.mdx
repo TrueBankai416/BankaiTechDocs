@@ -73,16 +73,15 @@ services:
       - WEBUI_PORT=8085                      # Must match container port for CSRF protection
     volumes:
       - ./qbittorrent/config:/config
-      - /media/merged/downloads:/downloads   # Downloads directory
-      - /media/merged:/media                 # Media storage
-      - /media/server/Processing:/processing # Processing directory
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Temp directory
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   media-network:
-    external: true
+    driver: bridge
 ```
 
 ### Configuration Explanation
