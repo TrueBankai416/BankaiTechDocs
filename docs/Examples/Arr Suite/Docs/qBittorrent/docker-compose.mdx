@@ -58,7 +58,8 @@ services:
       - media-network
     ports:
       - "8085:8085"  # Changed from 8080 due to CSRF host issues
-      - "6881:6881"
+      - "6881:6881/tcp"
+      - "6881:6881/udp"
     environment:
       - VPN_ENABLED=yes
       - VPN_PROV=nordvpn
@@ -114,6 +115,9 @@ The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is
 - Nginx reverse proxy is on a different subnet
 - You have multiple VLANs or network segments
 - Docker networks span multiple IP ranges
+- Other containers (Radarr/Sonarr) need to access qBittorrent's WebUI
+
+**Note**: If other Docker containers need to access qBittorrent's WebUI, include the Docker bridge subnet (typically `172.17.0.0/16`) in your `LAN_NETWORK` setting.
 
 #### Volume Mapping Consistency
 
@@ -195,6 +199,13 @@ docker-compose up -d
 ```
 
 **Important**: The container needs the actual .ovpn configuration files from NordVPN to establish the VPN connection.
+
+**Optional**: If you have multiple .ovpn files, you can specify which one to use:
+
+```yaml
+environment:
+  - OPENVPN_CONFIG=us1234.nordvpn.com.udp  # Specify exact .ovpn file to use
+```
 
 #### 3. Supported VPN Providers
 
@@ -327,9 +338,12 @@ Optimize your container for better performance:
 
 #### Resource Limits
 
+**Note**: The `deploy.resources` section only works in Docker Swarm mode. For regular Docker Compose, use these alternatives:
+
 ```yaml
 services:
   qbittorrent-vpn:
+    # For Docker Swarm mode:
     deploy:
       resources:
         limits:
@@ -338,6 +352,10 @@ services:
         reservations:
           memory: 512M
           cpus: '0.5'
+    
+    # For regular Docker Compose:
+    mem_limit: 2g
+    cpus: 1.0
 ```
 
 #### BitTorrent Settings
