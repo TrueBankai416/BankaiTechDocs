@@ -1,0 +1,221 @@
+---
+title: Torrent Clients Overview
+tags:
+    - Torrent Clients
+    - BitTorrent
+    - P2P
+    - Media Management
+keywords: [torrent, bittorrent, qbittorrent, deluge, transmission, rtorrent, utorrent]
+last_update:
+  author: BankaiTech
+---
+
+# Torrent Clients Overview
+
+This section covers various BitTorrent clients, their features, and setup guides for different use cases. Whether you're building a media server, need a lightweight client, or require advanced automation features, this guide will help you choose the right torrent client.
+
+## What is a Torrent Client?
+
+A torrent client is software that implements the BitTorrent protocol for peer-to-peer file sharing. It connects to other peers in a torrent swarm to download and upload pieces of files, enabling distributed file sharing without relying on centralized servers.
+
+## Popular Torrent Clients Comparison
+
+### qBittorrent
+**Best for: General use, media servers, *Arr integration**
+
+**Pros:**
+- ✅ **Open source** and actively maintained
+- ✅ **Web UI** for remote management
+- ✅ **No ads** or bundled software
+- ✅ **Excellent *Arr integration** (Radarr, Sonarr, etc.)
+- ✅ **Built-in search** engine support
+- ✅ **RSS feed** support for automatic downloads
+- ✅ **Sequential downloading** for streaming
+- ✅ **IP filtering** and proxy support
+
+**Cons:**
+- ❌ **Higher resource usage** than lightweight alternatives
+- ❌ **Limited plugin system** compared to Deluge
+
+**Use Cases:**
+- Media server setups with Radarr/Sonarr
+- Remote server management
+- Users wanting a feature-rich, ad-free client
+
+---
+
+### Deluge
+**Best for: Plugin extensibility, advanced users**
+
+**Pros:**
+- ✅ **Highly extensible** plugin system
+- ✅ **Daemon/client architecture** for remote management
+- ✅ **Lightweight core** with optional features
+- ✅ **Cross-platform** support
+- ✅ **Good *Arr integration**
+- ✅ **Flexible scheduling** and bandwidth management
+
+**Cons:**
+- ❌ **Development has slowed** in recent years
+- ❌ **Plugin quality varies** significantly
+- ❌ **More complex setup** for beginners
+
+**Use Cases:**
+- Users needing specific plugins
+- Advanced automation setups
+- Headless server deployments
+
+---
+
+### Transmission
+**Best for: Simplicity, low resource usage**
+
+**Pros:**
+- ✅ **Very lightweight** and fast
+- ✅ **Simple, clean interface**
+- ✅ **Low memory footprint**
+- ✅ **Web UI available**
+- ✅ **Good for embedded systems**
+- ✅ **Stable and reliable**
+
+**Cons:**
+- ❌ **Limited features** compared to others
+- ❌ **Basic *Arr integration**
+- ❌ **No built-in search**
+- ❌ **Limited customization options**
+
+**Use Cases:**
+- Resource-constrained systems
+- Simple downloading needs
+- Embedded devices (NAS, Raspberry Pi)
+
+---
+
+### rTorrent/ruTorrent
+**Best for: Power users, seedboxes, high-performance**
+
+**Pros:**
+- ✅ **Extremely efficient** and fast
+- ✅ **Command-line based** (rTorrent)
+- ✅ **Highly configurable**
+- ✅ **Excellent for seedboxes**
+- ✅ **Low resource usage**
+- ✅ **ruTorrent web interface** available
+
+**Cons:**
+- ❌ **Steep learning curve**
+- ❌ **Complex configuration**
+- ❌ **Command-line intimidating** for beginners
+- ❌ **Limited modern features**
+
+**Use Cases:**
+- Dedicated seedboxes
+- High-performance requirements
+- Users comfortable with command-line
+
+---
+
+### μTorrent (uTorrent)
+**Best for: Windows users (with caveats)**
+
+**Pros:**
+- ✅ **Familiar interface** for many users
+- ✅ **Feature-rich**
+- ✅ **Wide compatibility**
+
+**Cons:**
+- ❌ **Contains ads** and bundled software
+- ❌ **Privacy concerns**
+- ❌ **Bloated** in recent versions
+- ❌ **Not recommended** for privacy-focused users
+
+**Use Cases:**
+- Legacy Windows setups (not recommended for new installations)
+
+## Choosing the Right Client
+
+### For Media Server Setups (*Arr Suite)
+**Recommended: qBittorrent**
+- Best integration with Radarr, Sonarr, Lidarr, etc.
+- Reliable category and labeling support
+- Good API for automation
+
+### For Headless Servers
+**Recommended: qBittorrent or Deluge**
+- Both offer web interfaces
+- qBittorrent for simplicity
+- Deluge for plugin extensibility
+
+### For Low-Resource Systems
+**Recommended: Transmission**
+- Minimal resource usage
+- Simple and stable
+- Good for NAS devices
+
+### For High-Performance/Seedboxes
+**Recommended: rTorrent**
+- Maximum efficiency
+- Handles thousands of torrents
+- Preferred by private tracker communities
+
+### For Docker Deployments
+**Recommended: qBittorrent with VPN**
+- Excellent Docker images available
+- Built-in VPN support options
+- Easy container management
+
+## Security and Privacy Considerations
+
+### VPN Integration
+- **Essential** for privacy and security
+- **Kill switch** prevents IP leaks
+- **Choose providers** that allow P2P traffic
+
+### IP Filtering
+- **Block malicious IPs** and monitoring organizations
+- **Most clients support** IP filter lists
+- **Regularly update** filter lists
+
+### Proxy Support
+- **SOCKS5 proxies** for additional privacy
+- **HTTP proxies** for basic anonymization
+- **Combine with VPN** for maximum protection
+
+### Private Trackers
+- **Follow ratio requirements** strictly
+- **Use clients approved** by the tracker
+- **Avoid** clients with poor reputation
+
+## Integration with Media Management
+
+### *Arr Suite Compatibility
+All major clients work with the *Arr suite, but with varying levels of support:
+
+| Client | Radarr/Sonarr Support | Category Support | Label Support | API Quality |
+|--------|----------------------|------------------|---------------|-------------|
+| qBittorrent | ⭐⭐⭐⭐⭐ | ✅ Excellent | ✅ Excellent | ⭐⭐⭐⭐⭐ |
+| Deluge | ⭐⭐⭐⭐ | ✅ Good | ✅ Good | ⭐⭐⭐⭐ |
+| Transmission | ⭐⭐⭐ | ❌ Limited | ❌ Limited | ⭐⭐⭐ |
+| rTorrent | ⭐⭐⭐ | ✅ Good | ✅ Good | ⭐⭐⭐ |
+
+### Path Management
+- **Consistent volume mapping** across containers
+- **Proper permissions** for file access
+- **Atomic moves** for completed downloads
+
+## Getting Started
+
+1. **Choose your client** based on your needs
+2. **Review security setup** (VPN, IP filtering)
+3. **Configure integration** with your media management tools
+4. **Test with legal content** before production use
+5. **Monitor performance** and adjust settings as needed
+
+## Available Guides
+
+- [qBittorrent Docker VPN Setup](./qBittorrent/Docs/docker-vpn.mdx) - Complete Docker setup with built-in VPN
+- More guides coming soon...
+
+---
+
+**Remember**: Always respect copyright laws and use torrent clients responsibly. This documentation is for educational purposes and legal use cases only.

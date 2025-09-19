@@ -1,0 +1,82 @@
+---
+title: docker-compose.yaml
+tags:
+    - Arr Suite
+    - qBittorrent
+    - Docker Compose
+    - Examples
+keywords: [qBittorrent, Docker, Compose, VPN, Arr Suite, Example]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# qBittorrent Docker Compose Example
+
+This example shows how to deploy qBittorrent with built-in VPN support using the `binhex/arch-qbittorrentvpn` container.
+
+For complete setup instructions, troubleshooting, and configuration details, see the [full qBittorrent Docker VPN Setup guide](../../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
+
+## Docker Compose Configuration
+
+```yaml title="docker-compose.yaml"
+services:
+  qbittorrent-vpn:
+    image: binhex/arch-qbittorrentvpn
+    container_name: qbittorrent-vpn
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - media-network
+    ports:
+      - "8085:8085"  # WebUI port (changed from 8080 due to CSRF issues)
+      - "6881:6881/tcp"  # BitTorrent port
+      - "6881:6881/udp"  # BitTorrent port
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_PROV=nordvpn                     # VPN provider
+      - VPN_CLIENT=openvpn                   # VPN client type
+      - VPN_USER=your-nordvpn-username       # Replace with your credentials
+      - VPN_PASS=your-nordvpn-password       # Replace with your credentials
+      - VPN_OPTIONS=
+      - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Your network subnets
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - PUID=1000
+      - PGID=1000
+      - WEBUI_PORT=8085                      # Must match container port
+    volumes:
+      - ./qbittorrent/config:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  media-network:
+    driver: bridge
+```
+
+## Important Notes
+
+- **VPN Configuration**: You need to place OpenVPN `.ovpn` files in `./qbittorrent/config/openvpn/` after first startup
+- **CSRF Protection**: Port 8085 is used to avoid CSRF host header issues
+- **Path Consistency**: Volume mappings must match your Radarr/Sonarr configuration
+- **Multiple Networks**: `LAN_NETWORK` supports multiple subnets for complex setups
+
+## qBittorrent Settings
+
+Configure these paths in the qBittorrent WebUI to match your *Arr applications:
+
+- **Default Save Path**: `/media/Downloads/Torrent`
+- **Temp Directory**: `/processing/Downloads/Torrent/temp`
+
+## Related Examples
+
+- [Radarr Docker Compose](../Radarr/docker-compose.mdx)
+- [Sonarr Docker Compose](../Sonarr/docker-compose.mdx)
+- [Prowlarr Docker Compose](../Prowlarr/docker-compose.mdx)
+
+For detailed setup instructions, VPN configuration, troubleshooting, and advanced options, see the [complete qBittorrent Docker VPN Setup guide](../../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
+
+<BuyMeACoffeeButton />
