@@ -115,6 +115,19 @@ The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is
 - You have multiple VLANs or network segments
 - Docker networks span multiple IP ranges
 
+#### Volume Mapping Consistency
+
+**Important**: The volume mappings must match your other *Arr applications (Radarr, Sonarr, etc.) for proper integration:
+
+```yaml
+# Standard *Arr volume mapping pattern
+volumes:
+  - /media/merged:/media                 # Media library
+  - /media/server/Processing:/processing # Temporary/processing files
+```
+
+This ensures qBittorrent downloads are accessible to Radarr/Sonarr for post-processing and organization.
+
 ### Environment Variables to Modify
 
 Before starting the container, update these values:
@@ -154,14 +167,36 @@ environment:
 
 The container supports multiple VPN providers, but this guide focuses on NordVPN setup.
 
-#### 1. Obtain NordVPN Credentials
+#### 1. Obtain NordVPN Credentials and Configuration Files
 
 1. Log into your NordVPN account
 2. Navigate to **Services** → **NordVPN** → **Manual Setup**
 3. Select **OpenVPN** (not SOCKS5 for this setup)
 4. Copy your service username and password (different from account credentials)
+5. **Download OpenVPN configuration files** for your preferred servers
 
-#### 2. Supported VPN Providers
+#### 2. Place OpenVPN Configuration Files
+
+After starting the container for the first time, it creates the necessary folders:
+
+```bash
+# Start container to create folder structure
+docker-compose up -d
+
+# Wait for container to initialize, then stop it
+docker-compose down
+
+# Place your downloaded .ovpn files in the config directory
+# Copy your NordVPN .ovpn files to:
+./qbittorrent/config/openvpn/
+
+# Restart the container to use the new configuration
+docker-compose up -d
+```
+
+**Important**: The container needs the actual .ovpn configuration files from NordVPN to establish the VPN connection.
+
+#### 3. Supported VPN Providers
 
 The binhex container supports these VPN providers:
 
@@ -173,7 +208,7 @@ The binhex container supports these VPN providers:
 | Private Internet Access | `pia` | Popular choice |
 | Custom | `custom` | Use your own OpenVPN config |
 
-#### 3. Advanced VPN Options
+#### 4. Advanced VPN Options
 
 You can customize VPN behavior with the `VPN_OPTIONS` environment variable:
 
@@ -223,8 +258,7 @@ Deploy the container using Docker Compose:
 # Create the directory structure
 mkdir -p qbittorrent/config
 
-# Create the Docker network (if using external network)
-docker network create media-network
+# Docker Compose will create the bridge network automatically
 
 # Start the container
 docker-compose up -d
@@ -282,9 +316,9 @@ The container automatically configures qBittorrent for VPN use, but you may want
 #### Downloads Settings
 
 1. Go to **Tools** → **Options** → **Downloads**
-2. **Default Save Path**: `/downloads` (mapped to your host directory)
-3. **Keep incomplete torrents in**: `/downloads/incomplete`
-4. **Copy .torrent files to**: `/downloads/torrents`
+2. **Default Save Path**: `/media/Downloads/Torrent` (matches Radarr/Sonarr paths)
+3. **Keep incomplete torrents in**: `/processing/Downloads/Torrent/temp`
+4. **Copy .torrent files to**: `/media/Downloads/Torrent/torrents`
 
 ## Part 4: Advanced Configuration and Optimization
 ### Performance Optimization
