@@ -28,6 +28,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - media-network
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -106,6 +108,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - media-network
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -123,6 +127,8 @@ services:
       - ./readarr:/config
       - /media/merged:/media                 # Media directory
       - /media/server/Processing:/processing # Processing directory
+    networks:
+      - media-network
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -145,6 +151,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - media-network
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -163,6 +171,8 @@ services:
       - ./lidarr/config:/config
       - /media/merged:/merged                 # Media directory
       - /media/server/Processing:/processing # Processing directory
+    networks:
+      - media-network
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -174,6 +184,8 @@ services:
     environment:
       - LOG_LEVEL=debug
       - TZ=America/New_York
+    networks:
+      - media-network
     ports:
       - 5055:5055
     volumes:
@@ -183,6 +195,12 @@ services:
         max-size: "10m"
         max-file: "3"
     restart: unless-stopped
+
+networks:
+  media-network:
+    driver: bridge
+  database-network:
+    driver: bridge
 ```
 
 <BuyMeACoffeeButton />
