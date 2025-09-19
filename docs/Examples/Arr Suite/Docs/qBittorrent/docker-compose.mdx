@@ -73,6 +73,7 @@ services:
       - WEBUI_PORT=8085                      # Must match container port for CSRF protection
     volumes:
       - ./qbittorrent/config:/config
+      - /media/merged/downloads:/downloads   # Downloads directory
       - /media/merged:/media                 # Media storage
       - /media/server/Processing:/processing # Processing directory
     restart: unless-stopped
@@ -129,6 +130,24 @@ LAN_NETWORK=your-subnet-ranges      # Your actual network ranges
 PUID=your-user-id                   # Run 'id' command to get your user ID
 PGID=your-group-id                  # Run 'id' command to get your group ID
 ```
+
+### Security Tip: Use Environment Files
+
+For better security, store sensitive credentials in a `.env` file:
+
+```bash title=".env"
+VPN_USER=your-nordvpn-username
+VPN_PASS=your-nordvpn-password
+```
+
+Then reference them in docker-compose.yml:
+```yaml
+environment:
+  - VPN_USER=${VPN_USER}
+  - VPN_PASS=${VPN_PASS}
+```
+
+**Important**: Add `.env` to your `.gitignore` to avoid committing credentials.
 
 ## Part 2: VPN Provider Setup
 
@@ -204,6 +223,9 @@ Deploy the container using Docker Compose:
 ```bash
 # Create the directory structure
 mkdir -p qbittorrent/config
+
+# Create the Docker network (if using external network)
+docker network create media-network
 
 # Start the container
 docker-compose up -d
@@ -455,11 +477,11 @@ df -h /media/merged/
 #### Network Performance
 
 ```bash
-# Test VPN speed
-docker exec qbittorrent-vpn curl -s https://fast.com
-
-# Check VPN server location
+# Check VPN server location and IP
 docker exec qbittorrent-vpn curl -s ifconfig.me
+
+# Test basic connectivity speed (download test)
+docker exec qbittorrent-vpn wget -qO- --timeout=10 https://speed.cloudflare.com/__down?bytes=10000000 | wc -c
 ```
 
 ## Security Best Practices
