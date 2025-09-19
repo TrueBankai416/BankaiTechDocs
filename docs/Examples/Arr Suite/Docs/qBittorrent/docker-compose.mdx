@@ -1,51 +1,23 @@
 ---
-title: qBittorrent with Docker VPN Setup
+title: qBittorrent Docker Compose Example
 tags:
     - Arr Suite
     - qBittorrent
-    - VPN
-    - Docker
-    - Security
-keywords: [qBittorrent, VPN, Docker, OpenVPN, Kill Switch, NordVPN, binhex]
+    - Docker Compose
+    - Examples
+keywords: [qBittorrent, Docker, Compose, VPN, Arr Suite, Example]
 last_update:
   author: BankaiTech
 ---
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-# qBittorrent with Docker VPN Setup
+# qBittorrent Docker Compose Example
 
-This comprehensive guide covers setting up qBittorrent using the binhex/arch-qbittorrentvpn Docker container with built-in OpenVPN support for enhanced privacy and security.
+This example shows how to deploy qBittorrent with built-in VPN support using the `binhex/arch-qbittorrentvpn` container.
 
-## Overview
+For complete setup instructions, troubleshooting, and configuration details, see the [full qBittorrent Docker VPN Setup guide](../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
 
-This setup provides comprehensive VPN protection with built-in security features:
-1. **Docker container isolation** - Separates torrent traffic from host system
-2. **Built-in VPN kill switch** - Automatically blocks traffic if VPN connection fails
-3. **OpenVPN integration** - Direct VPN tunnel through your provider
-4. **Automatic reconnection** - Maintains VPN connection reliability
-5. **Multi-network support** - Handles complex network configurations
-
-## Prerequisites
-
-- Docker and Docker Compose installed
-- VPN provider account (NordVPN example used)
-- Basic understanding of Docker concepts
-- Access to VPN provider's OpenVPN configuration files
-
-## Part 1: Docker Container Setup
-
-### Understanding the binhex/arch-qbittorrentvpn Container
-
-The binhex/arch-qbittorrentvpn container provides a complete qBittorrent solution with integrated VPN support. Key features include:
-- Built-in OpenVPN client with automatic connection
-- Integrated kill switch that blocks traffic if VPN fails
-- Support for multiple VPN providers (NordVPN, ExpressVPN, etc.)
-- Automatic IP leak protection
-- Web UI access with configurable ports
-
-### Docker Compose Configuration
-
-Create your docker-compose.yaml file with the following configuration:
+## Docker Compose Configuration
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -57,25 +29,25 @@ services:
     networks:
       - media-network
     ports:
-      - "8085:8085"  # Changed from 8080 due to CSRF host issues
-      - "6881:6881/tcp"
-      - "6881:6881/udp"
+      - "8085:8085"  # WebUI port (changed from 8080 due to CSRF issues)
+      - "6881:6881/tcp"  # BitTorrent port
+      - "6881:6881/udp"  # BitTorrent port
     environment:
       - VPN_ENABLED=yes
-      - VPN_PROV=nordvpn
-      - VPN_CLIENT=openvpn
-      - VPN_USER=changeme                    # Replace with your NordVPN username
-      - VPN_PASS=changeme                    # Replace with your NordVPN password
+      - VPN_PROV=nordvpn                     # VPN provider
+      - VPN_CLIENT=openvpn                   # VPN client type
+      - VPN_USER=your-nordvpn-username       # Replace with your credentials
+      - VPN_PASS=your-nordvpn-password       # Replace with your credentials
       - VPN_OPTIONS=
-      - LAN_NETWORK=192.168.8.0/24,192.168.9.0/24  # Multiple subnets (nginx on different subnet)
+      - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Your network subnets
       - NAME_SERVERS=1.1.1.1,1.0.0.1
       - PUID=1000
       - PGID=1000
-      - WEBUI_PORT=8085                      # Must match container port for CSRF protection
+      - WEBUI_PORT=8085                      # Must match container port
     volumes:
       - ./qbittorrent/config:/config
       - /media/merged:/media                 # Media directory
-      - /media/server/Processing:/processing # Temp directory
+      - /media/server/Processing:/processing # Processing directory
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -85,459 +57,42 @@ networks:
     driver: bridge
 ```
 
-### Configuration Explanation
-
-#### Key Settings
-
-| Setting | Purpose |
-|---------|---------|
-| `NET_ADMIN` capability | Required for VPN tunnel creation |
-| `VPN_ENABLED=yes` | Enables the built-in VPN client |
-| `VPN_PROV=nordvpn` | Specifies NordVPN as the provider |
-| `VPN_CLIENT=openvpn` | Uses OpenVPN protocol |
-| `WEBUI_PORT=8085` | **Important**: Must match container port to avoid CSRF issues |
-| `LAN_NETWORK` | Multiple subnets for complex network setups |
-
-#### Port Configuration
-
-**Important**: The container port and `WEBUI_PORT` environment variable must match to prevent CSRF (Cross-Site Request Forgery) protection issues. If you change the port mapping, update both:
-
-```yaml
-ports:
-  - "8085:8085"  # Host:Container - both must match
-environment:
-  - WEBUI_PORT=8085  # Must match container port
-```
-
-#### Network Configuration
-
-The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is useful when:
-- Nginx reverse proxy is on a different subnet
-- You have multiple VLANs or network segments
-- Docker networks span multiple IP ranges
-- Other containers (Radarr/Sonarr) need to access qBittorrent's WebUI
-
-**Note**: If other Docker containers need to access qBittorrent's WebUI, include the Docker bridge subnet (typically `172.17.0.0/16`) in your `LAN_NETWORK` setting.
-
-#### Volume Mapping Consistency
-
-**Important**: The volume mappings must match your other *Arr applications (Radarr, Sonarr, etc.) for proper integration:
-
-```yaml
-# Standard *Arr volume mapping pattern
-volumes:
-  - /media/merged:/media                 # Media library
-  - /media/server/Processing:/processing # Temporary/processing files
-```
-
-This ensures qBittorrent downloads are accessible to Radarr/Sonarr for post-processing and organization.
-
-### Environment Variables to Modify
-
-Before starting the container, update these values:
+## Quick Start
 
 ```bash
-# Required changes
-VPN_USER=your-nordvpn-username      # Your NordVPN service username
-VPN_PASS=your-nordvpn-password      # Your NordVPN service password
-LAN_NETWORK=your-subnet-ranges      # Your actual network ranges
+# Create directory structure
+mkdir -p qbittorrent/config
 
-# Optional changes
-PUID=your-user-id                   # Run 'id' command to get your user ID
-PGID=your-group-id                  # Run 'id' command to get your group ID
-```
-
-### Security Tip: Use Environment Files
-
-For better security, store sensitive credentials in a `.env` file:
-
-```bash title=".env"
-VPN_USER=your-nordvpn-username
-VPN_PASS=your-nordvpn-password
-```
-
-Then reference them in docker-compose.yaml:
-```yaml
-environment:
-  - VPN_USER=${VPN_USER}
-  - VPN_PASS=${VPN_PASS}
-```
-
-**Important**: Add `.env` to your `.gitignore` to avoid committing credentials.
-
-## Part 2: VPN Provider Setup
-
-### NordVPN Configuration
-
-The container supports multiple VPN providers, but this guide focuses on NordVPN setup.
-
-#### 1. Obtain NordVPN Credentials and Configuration Files
-
-1. Log into your NordVPN account
-2. Navigate to **Services** → **NordVPN** → **Manual Setup**
-3. Select **OpenVPN** (not SOCKS5 for this setup)
-4. Copy your service username and password (different from account credentials)
-5. **Download OpenVPN configuration files** for your preferred servers
-
-#### 2. Place OpenVPN Configuration Files
-
-After starting the container for the first time, it creates the necessary folders:
-
-```bash
-# Start container to create folder structure
-docker compose up -d
-
-# Wait for container to initialize, then stop it
-docker compose down
-
-# Place your downloaded .ovpn files in the config directory
-# Copy your NordVPN .ovpn files to:
-./qbittorrent/config/openvpn/
-
-# Restart the container to use the new configuration
-docker compose up -d
-```
-
-**Important**: The container needs the actual .ovpn configuration files from NordVPN to establish the VPN connection.
-
-**Optional**: If you have multiple .ovpn files, you can specify which one to use:
-
-```yaml
-environment:
-  - OPENVPN_CONFIG=us1234.nordvpn.com.udp  # Specify exact .ovpn file to use
-```
-
-#### 3. Supported VPN Providers
-
-The binhex container supports these VPN providers:
-
-| Provider | VPN_PROV Value | Notes |
-|----------|----------------|-------|
-| NordVPN | `nordvpn` | Recommended, well-tested |
-| ExpressVPN | `expressvpn` | Requires additional config |
-| Surfshark | `surfshark` | Good alternative |
-| Private Internet Access | `pia` | Popular choice |
-| Custom | `custom` | Use your own OpenVPN config |
-
-#### 4. Advanced VPN Options
-
-You can customize VPN behavior with the `VPN_OPTIONS` environment variable:
-
-```yaml
-environment:
-  - VPN_OPTIONS=--remote-random --auth-retry nointeract
-```
-
-Common options:
-- `--remote-random` - Randomize server selection
-- `--auth-retry nointeract` - Don't prompt for credentials
-- `--ping 10` - Send ping every 10 seconds
-- `--ping-restart 60` - Restart if no ping response for 60 seconds
-
-### Built-in Kill Switch
-
-Unlike manual UFW configurations, this container includes an **automatic kill switch** that:
-
-- ✅ **Blocks all traffic** if VPN connection fails
-- ✅ **Automatically reconnects** when VPN is restored
-- ✅ **Prevents IP leaks** without manual firewall rules
-- ✅ **Works immediately** - no additional configuration needed
-
-The kill switch is enabled by default when `VPN_ENABLED=yes`.
-
-### Testing VPN Connection
-
-Verify your VPN is working properly:
-
-```bash
-# Check container logs for VPN connection status
-docker logs qbittorrent-vpn
-
-# Look for these success indicators:
-# - "VPN connected"
-# - "qBittorrent started"
-# - IP address from VPN provider's range
-```
-
-## Part 3: Container Management and Configuration
-
-### Initial Container Setup
-
-1. **Wait for VPN connection**: Monitor logs until you see "VPN connected"
-2. **Access WebUI**: Navigate to `http://your-server-ip:8085`
-3. **Default credentials**:
-   - Username: `admin`
-   - Password: randomly created
-4. **Find the Password**
-   ```bash
-   cat ./qbittorrent/config/supervisord.log
-   ```
-5. **Change default password** immediately after first login
-
-### Container Management Commands
-
-```bash
 # Start the container
 docker compose up -d
 
-# Stop the container
-docker compose down
-
-# Restart the container
-docker compose restart
-
-# View logs
+# Check logs for VPN connection
 docker logs qbittorrent-vpn
 
-# Access container shell (for troubleshooting)
-docker exec -it qbittorrent-vpn /bin/bash
-
-# Update container image
-docker compose pull
-docker compose up -d
+# Access WebUI at http://your-server-ip:8085
+# Default credentials: admin / adminadmin
 ```
 
-### qBittorrent Configuration
+## Important Notes
 
-The container automatically configures qBittorrent for VPN use, but you may want to adjust these settings:
+- **VPN Configuration**: You need to place OpenVPN `.ovpn` files in `./qbittorrent/config/openvpn/` after first startup
+- **CSRF Protection**: Port 8085 is used to avoid CSRF host header issues
+- **Path Consistency**: Volume mappings must match your Radarr/Sonarr configuration
+- **Multiple Networks**: `LAN_NETWORK` supports multiple subnets for complex setups
 
-#### Connection Settings
+## qBittorrent Settings
 
-1. Navigate to **Tools** → **Options** → **Connection**
-2. **Listening Port**: Usually `6881` (already configured)
-3. **Use UPnP/NAT-PMP**: Disable (not needed with VPN)
-4. **Use different port on each startup**: Disable for consistency
+Configure these paths in the qBittorrent WebUI to match your *Arr applications:
 
-#### Downloads Settings
+- **Default Save Path**: `/media/Downloads/Torrent`
+- **Temp Directory**: `/processing/Downloads/Torrent/temp`
 
-1. Go to **Tools** → **Options** → **Downloads**
-2. **Default Save Path**: `/media/Downloads/Torrent` (matches Radarr/Sonarr paths)
-3. **Keep incomplete torrents in**: `/processing/Downloads/Torrent/temp`
+## Related Examples
 
-## Part 4: Advanced Configuration and Optimization
-### Performance Optimization
+- [Radarr Docker Compose](../Radarr/docker-compose.mdx)
+- [Sonarr Docker Compose](../Sonarr/docker-compose.mdx)
+- [Prowlarr Docker Compose](../Prowlarr/docker-compose.mdx)
 
-Optimize your container for better performance:
-
-#### Resource Limits
-
-**Note**: The `deploy.resources` section only works in Docker Swarm mode. For regular Docker Compose, use these alternatives:
-
-```yaml
-services:
-  qbittorrent-vpn:
-    # For Docker Swarm mode:
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-    
-    # For regular Docker Compose:
-    mem_limit: 2g
-    cpus: 1.0
-```
-
-#### BitTorrent Settings
-
-1. **Tools** → **Options** → **BitTorrent**:
-   - **Enable anonymous mode**: ✅ Checked
-   - **Encryption mode**: `Require encryption`
-   - **Maximum active downloads**: `5`
-   - **Maximum active uploads**: `3`
-
-2. **Tools** → **Options** → **Speed**:
-   - **Global maximum number of connections**: `200`
-   - **Maximum number of connections per torrent**: `100`
-   - **Global maximum number of upload slots**: `4`
-
-### Monitoring and Verification
-
-#### 1. Check VPN Status
-
-```bash
-# View container logs for VPN status
-docker logs qbittorrent-vpn | grep -i "vpn\|connected\|tunnel"
-
-# Check if VPN is working
-docker exec qbittorrent-vpn curl -s ifconfig.me
-```
-
-#### 2. Verify IP Address
-
-1. Add a test torrent (like Ubuntu ISO)
-2. Check the **Peers** tab to see connected IPs
-3. Use online tools to verify your torrent IP:
-   - Visit: https://torguard.net/checkmytorrentipaddress.php
-   - Download their test torrent
-   - Add to qBittorrent and check reported IP
-
-#### 3. Monitor Container Health
-
-```bash
-# Check container resource usage
-docker stats qbittorrent-vpn
-
-# View detailed container information
-docker inspect qbittorrent-vpn
-
-# Check container uptime and restart count
-docker ps -a | grep qbittorrent-vpn
-```
-
-### Network Configuration
-
-#### Multiple Subnets
-
-The container supports multiple LAN networks for complex setups:
-
-```yaml
-environment:
-  - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24,10.0.0.0/8
-```
-
-This is useful when:
-- **Reverse proxy** is on a different subnet
-- **Multiple VLANs** need access
-- **Docker networks** span multiple ranges
-- **Management interfaces** are separate
-
-## Part 5: Troubleshooting and Maintenance
-
-### Common Issues
-
-#### 1. VPN Connection Problems
-
-```bash
-# Check VPN connection status
-docker logs qbittorrent-vpn | grep -i "vpn\|error\|failed"
-
-# Restart container if VPN fails
-docker compose restart qbittorrent-vpn
-
-# Check VPN credentials
-docker exec qbittorrent-vpn cat /config/openvpn/credentials.conf
-```
-
-#### 2. WebUI Access Issues
-
-**CSRF Protection Error**: Ensure container port matches `WEBUI_PORT`:
-
-```yaml
-ports:
-  - "8085:8085"  # Both ports must match
-environment:
-  - WEBUI_PORT=8085  # Must match container port
-```
-
-**Can't Access WebUI**: Check LAN network configuration:
-
-```yaml
-environment:
-  - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Include your subnet
-```
-
-#### 3. Container Won't Start
-
-```bash
-# Check container logs for errors
-docker logs qbittorrent-vpn
-
-# Common issues:
-# - Missing NET_ADMIN capability
-# - Invalid VPN credentials
-# - Network conflicts
-# - Permission issues with volumes
-```
-
-#### 4. Download Issues
-
-- **No incoming connections**: Normal with VPN, relies on outbound connections
-- **Slow speeds**: Try different VPN servers or check VPN_OPTIONS
-- **Torrents stuck**: Check if tracker allows VPN connections
-
-### Maintenance Tasks
-
-#### Regular Updates
-
-```bash
-# Update container image
-docker compose pull
-docker compose up -d
-
-# Check for new image versions
-docker images | grep binhex/arch-qbittorrentvpn
-```
-
-#### Backup Configuration
-
-```bash
-# Backup qBittorrent configuration
-tar -czf qbittorrent-backup-$(date +%Y%m%d).tar.gz ./qbittorrent/
-
-# Backup docker-compose configuration
-cp docker-compose.yaml docker-compose.yaml.backup
-```
-
-#### Log Management
-
-```bash
-# View container logs
-docker logs qbittorrent-vpn --tail 100
-
-# Clear old logs (if needed)
-docker logs qbittorrent-vpn --since 24h
-
-# Monitor real-time logs
-docker logs qbittorrent-vpn -f
-```
-
-### Performance Monitoring
-
-#### Resource Usage
-
-```bash
-# Monitor container resources
-docker stats qbittorrent-vpn
-
-# Check disk usage
-du -sh ./qbittorrent/
-df -h /media/merged/
-```
-
-#### Network Performance
-
-```bash
-# Check VPN server location and IP
-docker exec qbittorrent-vpn curl -s ifconfig.me
-
-# Test basic connectivity speed (download test)
-docker exec qbittorrent-vpn wget -qO- --timeout=10 https://speed.cloudflare.com/__down?bytes=10000000 | wc -c
-```
-
-## Security Best Practices
-
-1. **Regular Updates**: Keep container images and host system updated
-2. **Strong Credentials**: Use complex VPN passwords and change WebUI password
-3. **Network Segmentation**: Use Docker networks to isolate containers
-4. **Access Control**: Restrict WebUI access to trusted networks only
-5. **Monitoring**: Regularly check logs for connection issues or failures
-6. **Backup**: Maintain regular backups of configurations and important data
-
-## Conclusion
-
-This Docker VPN setup provides a robust, secure torrent environment with several advantages:
-
-- ✅ **Built-in VPN integration** with automatic kill switch
-- ✅ **Container isolation** for enhanced security
-- ✅ **Easy management** through Docker Compose
-- ✅ **Multiple VPN provider support** for flexibility
-- ✅ **Automatic reconnection** for reliability
-- ✅ **No complex firewall rules** required
-
-The binhex/arch-qbittorrentvpn container eliminates the complexity of manual VPN configuration while providing enterprise-grade security and reliability for your torrenting needs.
+For detailed setup instructions, VPN configuration, troubleshooting, and advanced options, see the [complete qBittorrent Docker VPN Setup guide](../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
 
 <BuyMeACoffeeButton />
