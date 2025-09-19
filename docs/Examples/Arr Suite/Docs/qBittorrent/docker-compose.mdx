@@ -45,9 +45,9 @@ The binhex/arch-qbittorrentvpn container provides a complete qBittorrent solutio
 
 ### Docker Compose Configuration
 
-Create your docker-compose.yml file with the following configuration:
+Create your docker-compose.yaml file with the following configuration:
 
-```yaml title="docker-compose.yml"
+```yaml title="docker-compose.yaml"
 services:
   qbittorrent-vpn:
     image: binhex/arch-qbittorrentvpn
@@ -156,7 +156,7 @@ VPN_USER=your-nordvpn-username
 VPN_PASS=your-nordvpn-password
 ```
 
-Then reference them in docker-compose.yml:
+Then reference them in docker-compose.yaml:
 ```yaml
 environment:
   - VPN_USER=${VPN_USER}
@@ -185,17 +185,17 @@ After starting the container for the first time, it creates the necessary folder
 
 ```bash
 # Start container to create folder structure
-docker-compose up -d
+docker compose up -d
 
 # Wait for container to initialize, then stop it
-docker-compose down
+docker compose down
 
 # Place your downloaded .ovpn files in the config directory
 # Copy your NordVPN .ovpn files to:
 ./qbittorrent/config/openvpn/
 
 # Restart the container to use the new configuration
-docker-compose up -d
+docker compose up -d
 ```
 
 **Important**: The container needs the actual .ovpn configuration files from NordVPN to establish the VPN connection.
@@ -261,46 +261,30 @@ docker logs qbittorrent-vpn
 
 ## Part 3: Container Management and Configuration
 
-### Starting the Container
-
-Deploy the container using Docker Compose:
-
-```bash
-# Create the directory structure
-mkdir -p qbittorrent/config
-
-# Docker Compose will create the bridge network automatically
-
-# Start the container
-docker-compose up -d
-
-# Check container status
-docker-compose ps
-
-# View container logs
-docker logs qbittorrent-vpn -f
-```
-
 ### Initial Container Setup
 
 1. **Wait for VPN connection**: Monitor logs until you see "VPN connected"
 2. **Access WebUI**: Navigate to `http://your-server-ip:8085`
 3. **Default credentials**:
    - Username: `admin`
-   - Password: `adminadmin`
-4. **Change default password** immediately after first login
+   - Password: randomly created
+4. **Find the Password**
+   ```bash
+   cat ./qbittorrent/config/supervisord.log
+   ```
+5. **Change default password** immediately after first login
 
 ### Container Management Commands
 
 ```bash
 # Start the container
-docker-compose up -d
+docker compose up -d
 
 # Stop the container
-docker-compose down
+docker compose down
 
 # Restart the container
-docker-compose restart
+docker compose restart
 
 # View logs
 docker logs qbittorrent-vpn
@@ -309,8 +293,8 @@ docker logs qbittorrent-vpn
 docker exec -it qbittorrent-vpn /bin/bash
 
 # Update container image
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 ### qBittorrent Configuration
@@ -329,7 +313,6 @@ The container automatically configures qBittorrent for VPN use, but you may want
 1. Go to **Tools** → **Options** → **Downloads**
 2. **Default Save Path**: `/media/Downloads/Torrent` (matches Radarr/Sonarr paths)
 3. **Keep incomplete torrents in**: `/processing/Downloads/Torrent/temp`
-4. **Copy .torrent files to**: `/media/Downloads/Torrent/torrents`
 
 ## Part 4: Advanced Configuration and Optimization
 ### Performance Optimization
@@ -433,7 +416,7 @@ This is useful when:
 docker logs qbittorrent-vpn | grep -i "vpn\|error\|failed"
 
 # Restart container if VPN fails
-docker-compose restart qbittorrent-vpn
+docker compose restart qbittorrent-vpn
 
 # Check VPN credentials
 docker exec qbittorrent-vpn cat /config/openvpn/credentials.conf
@@ -482,8 +465,8 @@ docker logs qbittorrent-vpn
 
 ```bash
 # Update container image
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 
 # Check for new image versions
 docker images | grep binhex/arch-qbittorrentvpn
@@ -496,7 +479,7 @@ docker images | grep binhex/arch-qbittorrentvpn
 tar -czf qbittorrent-backup-$(date +%Y%m%d).tar.gz ./qbittorrent/
 
 # Backup docker-compose configuration
-cp docker-compose.yml docker-compose.yml.backup
+cp docker-compose.yaml docker-compose.yaml.backup
 ```
 
 #### Log Management
