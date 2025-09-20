@@ -1,7 +1,7 @@
 ---
 title: Access Points
 description: Comprehensive guide to Ubiquiti Access Points including model differences, UniFi Controller requirements, and deployment considerations.
-image: /img/social/ubiquiti-social.webp
+image: /img/social/ubiquiti-social.jpg
 tags:
    - Ubiquiti
    - Unifi Controller
