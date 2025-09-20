@@ -1,9 +1,10 @@
 ---
 title: Nginx
+description: Comprehensive introduction to Nginx web server covering reverse proxy, load balancing, HTTP caching, and key features for high-performance applications.
+image: /img/social/nginx-social.png
 tags:
    - Reverse Proxy
    - Nginx
-
 keywords: [Reverse Proxy, Nginx]
 last_update:
   author: BankaiTech
