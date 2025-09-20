@@ -59,6 +59,69 @@ sudo docker exec -it -u 33 nextcloud php occ maintenance:repair
 sudo docker restart nextcloud
 ```
 
+### **Image Previews Show Incorrect Images**
+
+<p>
+<>When image previews display one image but downloading and viewing shows a different image, this indicates corrupted preview cache. Follow these steps to fix the issue:</>
+</p>
+
+**Step 1: Verify the directory structure**
+```bash
+ls /var/docker/nextcloud/nextcloud/data
+```
+<p>
+<>You should see `appdata_<instanceid>` in the output. Note: Your Nextcloud path may differ (some setups use `/etc/docker/nextcloud/nextcloud/data`). Adjust the path according to your setup.</>
+</p>
+
+<p>
+<>To identify the instance ID more easily, you can also run:</>
+</p>
+```bash
+ls -d /var/docker/nextcloud/nextcloud/data/appdata_*
+```
+
+**Step 2: Navigate to the appdata directory**
+```bash
+cd /var/docker/nextcloud/nextcloud/data/appdata_<instanceid>
+```
+<p>
+<>Replace `<instanceid>` with the actual instance ID you saw in Step 1.</>
+</p>
+
+**Step 3: Verify location and remove the corrupted preview directory**
+```bash
+pwd
+ls -d preview
+```
+<p>
+<>Confirm you're in the correct appdata directory and that the preview directory exists.</>
+</p>
+
+:::caution[Destructive Operation]
+The following command will permanently delete the preview cache. Make sure you're in the correct directory before proceeding.
+:::
+
+```bash
+sudo rm -rf ./preview
+```
+
+**Step 4: Regenerate all previews**
+```bash
+sudo docker exec -it -u 33 nextcloud php occ preview:generate-all
+```
+<p>
+<>Change `nextcloud` to your actual container name if different. Once completed, it will still take some time for previews to populate on the web interface.</>
+</p>
+
+:::info[Preview Generator App Required]
+The `preview:generate-all` command requires the Preview Generator app. If the command fails with "command not found", install and enable the app:
+```bash
+sudo docker exec -it -u 33 nextcloud php occ app:install previewgenerator
+sudo docker exec -it -u 33 nextcloud php occ app:enable previewgenerator
+```
+Then retry the preview generation command.
+:::
+
 ## **Resources**
 [Geometry Table](https://memories.gallery/troubleshooting/#trigger-compatibility-mode)
 
