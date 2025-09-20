@@ -70,8 +70,15 @@ sudo docker restart nextcloud
 ls /etc/docker/nextcloud/nextcloud/data
 ```
 <p>
-<>You should see `appdata_<instanceid>` in the output.</>
+<>You should see `appdata_<instanceid>` in the output. Note: Your Nextcloud path may differ (commonly `/var/docker/nextcloud/nextcloud/data`). Adjust the path according to your setup.</>
 </p>
+
+<p>
+<>To identify the instance ID more easily, you can also run:</>
+</p>
+```bash
+ls -d /etc/docker/nextcloud/nextcloud/data/appdata_*
+```
 
 **Step 2: Navigate to the appdata directory**
 ```bash
@@ -105,6 +112,15 @@ sudo docker exec -it -u 33 nextcloud php occ preview:generate-all
 <p>
 <>Change `nextcloud` to your actual container name if different. Once completed, it will still take some time for previews to populate on the web interface.</>
 </p>
+
+:::info[Preview Generator App Required]
+The `preview:generate-all` command requires the Preview Generator app. If the command fails with "command not found", install and enable the app:
+```bash
+sudo docker exec -it -u 33 nextcloud php occ app:install previewgenerator
+sudo docker exec -it -u 33 nextcloud php occ app:enable previewgenerator
+```
+Then retry the preview generation command.
+:::
 
 ## **Resources**
 [Geometry Table](https://memories.gallery/troubleshooting/#trigger-compatibility-mode)
