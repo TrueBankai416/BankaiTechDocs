@@ -75,12 +75,27 @@ ls /etc/docker/nextcloud/nextcloud/data
 
 **Step 2: Navigate to the appdata directory**
 ```bash
-cd /etc/docker/nextcloud/nextcloud/data/appdata*
+cd /etc/docker/nextcloud/nextcloud/data/appdata_<instanceid>
 ```
+<p>
+<>Replace `<instanceid>` with the actual instance ID you saw in Step 1.</>
+</p>
 
-**Step 3: Remove the corrupted preview directory**
+**Step 3: Verify location and remove the corrupted preview directory**
 ```bash
-sudo rm -rf preview
+pwd
+ls -d preview
+```
+<p>
+<>Confirm you're in the correct appdata directory and that the preview directory exists.</>
+</p>
+
+:::caution[Destructive Operation]
+The following command will permanently delete the preview cache. Make sure you're in the correct directory before proceeding.
+:::
+
+```bash
+sudo rm -rf ./preview
 ```
 
 **Step 4: Regenerate all previews**
