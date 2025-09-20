@@ -67,22 +67,22 @@ sudo docker restart nextcloud
 
 **Step 1: Verify the directory structure**
 ```bash
-ls /etc/docker/nextcloud/nextcloud/data
+ls /var/docker/nextcloud/nextcloud/data
 ```
 <p>
-<>You should see `appdata_<instanceid>` in the output. Note: Your Nextcloud path may differ (commonly `/var/docker/nextcloud/nextcloud/data`). Adjust the path according to your setup.</>
+<>You should see `appdata_<instanceid>` in the output. Note: Your Nextcloud path may differ (some setups use `/etc/docker/nextcloud/nextcloud/data`). Adjust the path according to your setup.</>
 </p>
 
 <p>
 <>To identify the instance ID more easily, you can also run:</>
 </p>
 ```bash
-ls -d /etc/docker/nextcloud/nextcloud/data/appdata_*
+ls -d /var/docker/nextcloud/nextcloud/data/appdata_*
 ```
 
 **Step 2: Navigate to the appdata directory**
 ```bash
-cd /etc/docker/nextcloud/nextcloud/data/appdata_<instanceid>
+cd /var/docker/nextcloud/nextcloud/data/appdata_<instanceid>
 ```
 <p>
 <>Replace `<instanceid>` with the actual instance ID you saw in Step 1.</>
