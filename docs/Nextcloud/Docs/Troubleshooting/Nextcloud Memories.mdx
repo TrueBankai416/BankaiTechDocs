@@ -85,7 +85,7 @@ sudo rm -rf preview
 
 **Step 4: Regenerate all previews**
 ```bash
-sudo docker exec -it nextcloud php occ preview:generate-all
+sudo docker exec -it -u 33 nextcloud php occ preview:generate-all
 ```
 <p>
 <>Change `nextcloud` to your actual container name if different. Once completed, it will still take some time for previews to populate on the web interface.</>
