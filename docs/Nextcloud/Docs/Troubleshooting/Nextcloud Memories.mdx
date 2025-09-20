@@ -59,6 +59,38 @@ sudo docker exec -it -u 33 nextcloud php occ maintenance:repair
 sudo docker restart nextcloud
 ```
 
+### **Image Previews Show Incorrect Images**
+
+<p>
+<>When image previews display one image but downloading and viewing shows a different image, this indicates corrupted preview cache. Follow these steps to fix the issue:</>
+</p>
+
+**Step 1: Verify the directory structure**
+```bash
+ls /etc/docker/nextcloud/nextcloud/data
+```
+<p>
+<>You should see `appdata_<instanceid>` in the output.</>
+</p>
+
+**Step 2: Navigate to the appdata directory**
+```bash
+cd /etc/docker/nextcloud/nextcloud/data/appdata*
+```
+
+**Step 3: Remove the corrupted preview directory**
+```bash
+sudo rm -rf preview
+```
+
+**Step 4: Regenerate all previews**
+```bash
+sudo docker exec -it nextcloud php occ preview:generate-all
+```
+<p>
+<>Change `nextcloud` to your actual container name if different. Once completed, it will still take some time for previews to populate on the web interface.</>
+</p>
+
 ## **Resources**
 [Geometry Table](https://memories.gallery/troubleshooting/#trigger-compatibility-mode)
 
