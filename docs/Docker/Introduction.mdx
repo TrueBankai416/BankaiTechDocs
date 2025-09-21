@@ -1126,7 +1126,7 @@ These storage options allow Docker to support a wide range of applications, from
 Docker Compose `pull_policy` is a powerful configuration option that controls when and how Docker images are pulled from registries. This feature gives you precise control over image management in your Docker Compose applications, helping optimize deployment times, ensure consistency, and manage bandwidth usage effectively.
 
 :::info Compatibility Note
-The `pull_policy` feature requires **Docker Compose V2** (docker compose). For the most up-to-date information, refer to the [official Docker Compose specification](https://docs.docker.com/compose/compose-file/05-services/#pull_policy).
+The `pull_policy` feature requires **Docker Compose V2** (docker compose). This section uses the modern `docker compose` CLI syntax. If you're using the legacy `docker-compose` (with hyphen), adjust commands accordingly. For the most up-to-date information, refer to the [official Docker Compose specification](https://docs.docker.com/compose/compose-file/05-services/#pull_policy).
 :::
 
 ### **Understanding Pull Policy**
@@ -1189,7 +1189,7 @@ services:
 
 #### **2. Always Policy**
 
-The `always` policy ensures you get the latest version of the image every time:
+The `always` policy ensures you get the latest version of the image every time by re-pulling from the registry. Note that this re-pulls the same tag (avoiding stale local copies) but doesn't change the tag/version itself:
 
 ```yaml
 version: '3.8'
@@ -1278,7 +1278,17 @@ services:
 - Force rebuilds even when an image already exists (similar to `docker compose up --build`)
 
 :::note Important
-The `build` policy only applies to services that define a `build:` context. Services with only an `image:` property will ignore this policy. Additionally, `pull_policy: build` controls when to rebuild the service image, but pulling newer base images during the Dockerfile build process is controlled separately (e.g., `docker compose build --pull` or the `build.pull` option).
+The `build` policy only applies to services that define a `build:` context. Services with only an `image:` property will ignore this policy. Additionally, `pull_policy: build` controls when to rebuild the service image, but pulling newer base images during the Dockerfile build process is controlled separately using the `build.pull` option:
+
+```yaml
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      pull: true  # Pull newer base images during build
+    pull_policy: build  # Always rebuild the service image
+```
 :::
 
 ### **Mixed Pull Policy Strategies**
