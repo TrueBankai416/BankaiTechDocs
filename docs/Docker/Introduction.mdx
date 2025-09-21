@@ -1125,9 +1125,13 @@ These storage options allow Docker to support a wide range of applications, from
 
 Docker Compose `pull_policy` is a powerful configuration option that controls when and how Docker images are pulled from registries. This feature gives you precise control over image management in your Docker Compose applications, helping optimize deployment times, ensure consistency, and manage bandwidth usage effectively.
 
+:::info Compatibility Note
+The `pull_policy` feature requires **Docker Compose V2** (docker compose). The `build` policy option was introduced in Docker Compose specification version 3.8+. For the most up-to-date information, refer to the [official Docker Compose specification](https://docs.docker.com/compose/compose-file/05-services/#pull_policy).
+:::
+
 ### **Understanding Pull Policy**
 
-The `pull_policy` directive in Docker Compose determines the behavior for pulling images when you run `docker-compose up` or similar commands. By default, Docker Compose uses the `missing` policy, but you can explicitly configure this behavior for each service in your `docker-compose.yml` file.
+The `pull_policy` directive in Docker Compose determines the behavior for pulling images when you run `docker compose up` or similar commands. By default, Docker Compose uses the `missing` policy, but you can explicitly configure this behavior for each service in your `docker-compose.yml` file.
 
 ### **Available Pull Policy Options**
 
@@ -1414,7 +1418,7 @@ services:
 **1. Image Not Found with `never` Policy**
 ```bash
 # Error: image not found locally
-ERROR: pull access denied for myapp, repository does not exist or may require 'docker login'
+ERROR: No such image: myapp:latest
 ```
 
 **Solution:** Ensure the image exists locally or change to `missing` policy:
@@ -1553,17 +1557,13 @@ services:
   app:
     image: myapp:${VERSION:-latest}
     pull_policy: ${PULL_POLICY:-missing}
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
 ```
 
 #### **Multi-Stage Pull Strategy**
@@ -1601,13 +1601,13 @@ Enable verbose logging to monitor pull policy behavior:
 
 ```bash
 # Enable debug logging
-COMPOSE_LOG_LEVEL=DEBUG docker-compose up -d
+COMPOSE_LOG_LEVEL=DEBUG docker compose up -d
 
 # Monitor image pulls
-docker-compose events --filter type=image
+docker compose events --filter type=image
 
 # Check which images were pulled
-docker-compose images
+docker compose images
 ```
 
 ### **Integration with CI/CD Pipelines**
@@ -1631,17 +1631,23 @@ jobs:
         run: |
           export PULL_POLICY=always
           export APP_VERSION=${{ github.sha }}
-          docker-compose -f docker-compose.staging.yml up -d
+          docker compose -f docker-compose.staging.yml up -d
       
       - name: Deploy to production
         if: github.ref == 'refs/heads/main'
         run: |
           export PULL_POLICY=always
           export APP_VERSION=${{ github.sha }}
-          docker-compose -f docker-compose.prod.yml up -d
+          docker compose -f docker-compose.prod.yml up -d
 ```
 
 Docker Compose pull policies provide fine-grained control over image management, enabling you to optimize for performance, security, and reliability across different environments and use cases. By understanding and properly configuring pull policies, you can create more efficient and predictable Docker Compose deployments.
+
+### **Additional Resources**
+
+- [Docker Compose Specification - pull_policy](https://docs.docker.com/compose/compose-file/05-services/#pull_policy)
+- [Docker Compose CLI Reference](https://docs.docker.com/compose/reference/)
+- [Docker Compose Best Practices](https://docs.docker.com/compose/production/)
 
 ## **Conclusion**
 
