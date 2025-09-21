@@ -1121,6 +1121,528 @@ This configuration demonstrates how to effectively use `tmpfs` mounts for tempor
 
 These storage options allow Docker to support a wide range of applications, from temporary data processing to persistent data storage, offering flexibility in how data is managed within and across containers.
 
+## **Docker Compose Pull Policy**
+
+Docker Compose `pull_policy` is a powerful configuration option that controls when and how Docker images are pulled from registries. This feature gives you precise control over image management in your Docker Compose applications, helping optimize deployment times, ensure consistency, and manage bandwidth usage effectively.
+
+### **Understanding Pull Policy**
+
+The `pull_policy` directive in Docker Compose determines the behavior for pulling images when you run `docker-compose up` or similar commands. By default, Docker Compose uses the `missing` policy, but you can explicitly configure this behavior for each service in your `docker-compose.yml` file.
+
+### **Available Pull Policy Options**
+
+Docker Compose supports four distinct pull policy options:
+
+| Policy | Behavior | Use Case |
+|--------|----------|----------|
+| `missing` | Pull only if image doesn't exist locally (default) | General development and production |
+| `always` | Always pull the latest version from registry | CI/CD pipelines, production updates |
+| `never` | Never pull, use only local images | Offline environments, custom builds |
+| `build` | Always build the image instead of pulling | Development with local Dockerfiles |
+
+### **Pull Policy Configuration Syntax**
+
+The `pull_policy` is configured at the service level in your `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  service-name:
+    image: nginx:latest
+    pull_policy: always  # Options: missing, always, never, build
+```
+
+### **Detailed Pull Policy Examples**
+
+#### **1. Missing Policy (Default)**
+
+The `missing` policy is the default behavior and pulls images only when they don't exist locally:
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    pull_policy: missing  # Optional - this is the default
+    ports:
+      - "80:80"
+    
+  database:
+    image: postgres:13
+    # No pull_policy specified = missing (default)
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+```
+
+**When to use `missing`:**
+- Standard development environments
+- Production deployments where you want to avoid unnecessary pulls
+- When you want to minimize startup time and bandwidth usage
+
+#### **2. Always Policy**
+
+The `always` policy ensures you get the latest version of the image every time:
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    image: myapp:latest
+    pull_policy: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    
+  monitoring:
+    image: grafana/grafana:latest
+    pull_policy: always
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+```
+
+**When to use `always`:**
+- CI/CD pipelines to ensure latest updates
+- Production deployments with rolling updates
+- When using `latest` tags and you want the newest version
+- Automated deployment systems
+
+#### **3. Never Policy**
+
+The `never` policy uses only locally available images and will fail if the image isn't present:
+
+```yaml
+version: '3.8'
+
+services:
+  custom-app:
+    image: my-custom-app:v1.0.0
+    pull_policy: never
+    ports:
+      - "8080:8080"
+    
+  offline-service:
+    image: local-registry/my-service:stable
+    pull_policy: never
+    environment:
+      - OFFLINE_MODE=true
+```
+
+**When to use `never`:**
+- Air-gapped or offline environments
+- When using custom-built images that aren't in registries
+- Testing with specific local image versions
+- Environments with restricted internet access
+
+#### **4. Build Policy**
+
+The `build` policy always builds the image from a Dockerfile instead of pulling:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    ports:
+      - "3000:3000"
+    
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.worker
+    pull_policy: build
+    environment:
+      - WORKER_THREADS=4
+```
+
+**When to use `build`:**
+- Active development with frequent code changes
+- When you want to ensure the latest local code is always used
+- Custom applications that require building from source
+- Development environments where you're modifying the application
+
+### **Mixed Pull Policy Strategies**
+
+You can use different pull policies for different services in the same compose file:
+
+```yaml
+version: '3.8'
+
+services:
+  # Always get the latest stable database
+  database:
+    image: postgres:13
+    pull_policy: always
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  
+  # Use local Redis for development
+  redis:
+    image: redis:alpine
+    pull_policy: never
+    ports:
+      - "6379:6379"
+  
+  # Build the main application from source
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+      - redis
+  
+  # Use cached nginx for reverse proxy
+  nginx:
+    image: nginx:alpine
+    pull_policy: missing
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+
+volumes:
+  db_data:
+```
+
+### **Environment-Specific Pull Policies**
+
+Use environment variables to control pull policies across different environments:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: myapp:${APP_VERSION:-latest}
+    pull_policy: ${PULL_POLICY:-missing}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+  
+  database:
+    image: postgres:13
+    pull_policy: ${DB_PULL_POLICY:-always}
+    environment:
+      - POSTGRES_DB=${DB_NAME:-myapp}
+```
+
+**Environment files for different stages:**
+
+**Development (.env.dev):**
+```env
+PULL_POLICY=never
+DB_PULL_POLICY=missing
+APP_VERSION=dev
+NODE_ENV=development
+```
+
+**Production (.env.prod):**
+```env
+PULL_POLICY=always
+DB_PULL_POLICY=always
+APP_VERSION=v1.2.3
+NODE_ENV=production
+```
+
+### **Pull Policy with Docker Compose Profiles**
+
+Combine pull policies with profiles for sophisticated deployment strategies:
+
+```yaml
+version: '3.8'
+
+services:
+  # Core services - always pull latest in production
+  app:
+    image: myapp:latest
+    pull_policy: always
+    ports:
+      - "3000:3000"
+  
+  database:
+    image: postgres:13
+    pull_policy: always
+    environment:
+      POSTGRES_DB: myapp
+  
+  # Development tools - build locally
+  dev-tools:
+    build:
+      context: ./dev-tools
+    pull_policy: build
+    profiles:
+      - development
+    volumes:
+      - .:/workspace
+  
+  # Testing services - never pull to ensure consistency
+  test-db:
+    image: postgres:13-test
+    pull_policy: never
+    profiles:
+      - testing
+    environment:
+      POSTGRES_DB: test_db
+```
+
+### **Troubleshooting Pull Policy Issues**
+
+#### **Common Problems and Solutions**
+
+**1. Image Not Found with `never` Policy**
+```bash
+# Error: image not found locally
+ERROR: pull access denied for myapp, repository does not exist or may require 'docker login'
+```
+
+**Solution:** Ensure the image exists locally or change to `missing` policy:
+```bash
+# Check local images
+docker images | grep myapp
+
+# Or change pull policy
+pull_policy: missing
+```
+
+**2. Slow Deployments with `always` Policy**
+```yaml
+# Problem: Always pulling large images
+services:
+  heavy-app:
+    image: tensorflow/tensorflow:latest-gpu  # Large image
+    pull_policy: always  # Slow every time
+```
+
+**Solution:** Use conditional pull policy:
+```yaml
+services:
+  heavy-app:
+    image: tensorflow/tensorflow:latest-gpu
+    pull_policy: ${PULL_POLICY:-missing}  # Control via environment
+```
+
+**3. Build Failures with `build` Policy**
+```yaml
+# Problem: Build context issues
+services:
+  app:
+    build: .
+    pull_policy: build  # Fails if Dockerfile missing
+```
+
+**Solution:** Ensure build context is correct:
+```yaml
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    pull_policy: build
+```
+
+### **Best Practices for Pull Policy**
+
+#### **1. Environment-Specific Strategies**
+
+**Development:**
+```yaml
+# Fast iteration, use local builds
+services:
+  app:
+    build: .
+    pull_policy: build
+  
+  database:
+    image: postgres:13
+    pull_policy: missing  # Cache for speed
+```
+
+**Staging:**
+```yaml
+# Balance between updates and stability
+services:
+  app:
+    image: myapp:staging
+    pull_policy: always  # Get latest staging builds
+  
+  database:
+    image: postgres:13
+    pull_policy: missing  # Stable database
+```
+
+**Production:**
+```yaml
+# Explicit versions with controlled updates
+services:
+  app:
+    image: myapp:v1.2.3  # Specific version
+    pull_policy: always  # Ensure we get the right version
+  
+  database:
+    image: postgres:13.8  # Specific patch version
+    pull_policy: always
+```
+
+#### **2. Performance Optimization**
+
+```yaml
+# Optimize for different update frequencies
+services:
+  # Frequently updated application
+  api:
+    image: myapi:latest
+    pull_policy: always
+  
+  # Stable infrastructure components
+  nginx:
+    image: nginx:1.21-alpine
+    pull_policy: missing
+  
+  # Development dependencies
+  redis:
+    image: redis:alpine
+    pull_policy: missing
+```
+
+#### **3. Security Considerations**
+
+```yaml
+# Ensure security updates for base images
+services:
+  web:
+    image: nginx:alpine
+    pull_policy: always  # Get security patches
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build  # Control base image updates in Dockerfile
+```
+
+### **Advanced Pull Policy Patterns**
+
+#### **Conditional Pull Policy with Health Checks**
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: myapp:${VERSION:-latest}
+    pull_policy: ${PULL_POLICY:-missing}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+```
+
+#### **Multi-Stage Pull Strategy**
+
+```yaml
+# Different policies for different stages of the same app
+version: '3.8'
+
+services:
+  # Base service - stable
+  app-base:
+    image: myapp-base:stable
+    pull_policy: missing
+  
+  # Application layer - always updated
+  app:
+    image: myapp:latest
+    pull_policy: always
+    depends_on:
+      - app-base
+  
+  # Development overlay - built locally
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    pull_policy: build
+    profiles:
+      - development
+```
+
+### **Monitoring and Logging Pull Policy Behavior**
+
+Enable verbose logging to monitor pull policy behavior:
+
+```bash
+# Enable debug logging
+COMPOSE_LOG_LEVEL=DEBUG docker-compose up -d
+
+# Monitor image pulls
+docker-compose events --filter type=image
+
+# Check which images were pulled
+docker-compose images
+```
+
+### **Integration with CI/CD Pipelines**
+
+**GitHub Actions Example:**
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy with Pull Policy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Deploy to staging
+        run: |
+          export PULL_POLICY=always
+          export APP_VERSION=${{ github.sha }}
+          docker-compose -f docker-compose.staging.yml up -d
+      
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          export PULL_POLICY=always
+          export APP_VERSION=${{ github.sha }}
+          docker-compose -f docker-compose.prod.yml up -d
+```
+
+Docker Compose pull policies provide fine-grained control over image management, enabling you to optimize for performance, security, and reliability across different environments and use cases. By understanding and properly configuring pull policies, you can create more efficient and predictable Docker Compose deployments.
+
 ## **Conclusion**
 
 Docker has revolutionized how developers build, deploy, and manage applications. By leveraging Docker, teams can focus on building great software without worrying about inconsistencies between development and production environments. Whether you're developing complex applications, deploying microservices, or automating your development pipeline, Docker provides the tools and flexibility needed to streamline these processes.
