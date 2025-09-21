@@ -1,0 +1,5 @@
+version: '3.8'
+services:
+  test:
+    image: nginx:alpine
+    pull_policy: build

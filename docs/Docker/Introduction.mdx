@@ -1135,14 +1135,13 @@ The `pull_policy` directive in Docker Compose determines the behavior for pullin
 
 ### **Available Pull Policy Options**
 
-Docker Compose supports four distinct pull policy options:
+Docker Compose supports three distinct pull policy options:
 
 | Policy | Behavior | Use Case |
 |--------|----------|----------|
 | `missing` | Pull only if image doesn't exist locally (default) | General development and production |
 | `always` | Always pull the latest version from registry | CI/CD pipelines, production updates |
 | `never` | Never pull, use only local images | Offline environments, custom builds |
-| `build` | Always build the image instead of pulling | Development with local Dockerfiles |
 
 ### **Pull Policy Configuration Syntax**
 
@@ -1154,7 +1153,7 @@ version: '3.8'
 services:
   service-name:
     image: nginx:latest
-    pull_policy: always  # Options: missing, always, never, build
+    pull_policy: always  # Options: missing, always, never
 ```
 
 ### **Detailed Pull Policy Examples**
@@ -1245,10 +1244,19 @@ services:
 - Testing with specific local image versions
 - Environments with restricted internet access
 
-#### **4. Build Policy**
+### **Building vs Pulling Images**
 
-The `build` policy always builds the image from a Dockerfile instead of pulling:
+While `pull_policy` controls when to pull pre-built images, building images from source is handled differently:
 
+#### **When to Build Instead of Pull**
+- Active development with frequent code changes
+- Custom applications that require building from source
+- When you want to ensure the latest local code is always used
+- Development environments where you're modifying the application
+
+#### **How to Control Building**
+
+**Using build context:**
 ```yaml
 version: '3.8'
 
@@ -1257,7 +1265,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    pull_policy: build
+      pull: true  # Pull newer base images during build
     ports:
       - "3000:3000"
     
@@ -1265,30 +1273,24 @@ services:
     build:
       context: ./worker
       dockerfile: Dockerfile.worker
-    pull_policy: build
     environment:
       - WORKER_THREADS=4
 ```
 
-**When to use `build`:**
-- Active development with frequent code changes
-- When you want to ensure the latest local code is always used
-- Custom applications that require building from source
-- Development environments where you're modifying the application
-- Force rebuilds even when an image already exists (similar to `docker compose up --build`)
+**Force rebuilds with CLI:**
+```bash
+# Force rebuild all services with build contexts
+docker compose up --build
+
+# Build without using cache
+docker compose build --no-cache
+
+# Pull base images during build
+docker compose build --pull
+```
 
 :::note Important
-The `build` policy only applies to services that define a `build:` context. Services with only an `image:` property will ignore this policy. Additionally, `pull_policy: build` controls when to rebuild the service image, but pulling newer base images during the Dockerfile build process is controlled separately using the `build.pull` option:
-
-```yaml
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      pull: true  # Pull newer base images during build
-    pull_policy: build  # Always rebuild the service image
-```
+Building is controlled by defining a `build:` context in your service, not by `pull_policy`. If both `image:` and `build:` are present, Compose builds the image and tags it with the specified image name. Use `build.pull: true` to pull newer base images during the Dockerfile build process.
 :::
 
 ### **Mixed Pull Policy Strategies**
@@ -1322,7 +1324,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    pull_policy: build
     ports:
       - "3000:3000"
     depends_on:
@@ -1371,7 +1372,7 @@ services:
 
 **Development (.env.dev):**
 ```env
-PULL_POLICY=never
+PULL_POLICY=missing
 DB_PULL_POLICY=missing
 APP_VERSION=dev
 NODE_ENV=development
@@ -1410,7 +1411,6 @@ services:
   dev-tools:
     build:
       context: ./dev-tools
-    pull_policy: build
     profiles:
       - development
     volumes:
@@ -1462,13 +1462,12 @@ services:
     pull_policy: ${PULL_POLICY:-missing}  # Control via environment
 ```
 
-**3. Build Failures with `build` Policy**
+**3. Build Failures**
 ```yaml
 # Problem: Build context issues
 services:
   app:
-    build: .
-    pull_policy: build  # Fails if Dockerfile missing
+    build: .  # Fails if Dockerfile missing or context incorrect
 ```
 
 **Solution:** Ensure build context is correct:
@@ -1478,7 +1477,6 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
-    pull_policy: build
 ```
 
 ### **Best Practices for Pull Policy**
@@ -1490,8 +1488,7 @@ services:
 # Fast iteration, use local builds
 services:
   app:
-    build: .
-    pull_policy: build
+    build: .  # Build from local source
   
   database:
     image: postgres:13
@@ -1558,7 +1555,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    pull_policy: build  # Control base image updates in Dockerfile
+      pull: true  # Pull newer base images during build
 ```
 
 ### **Advanced Pull Policy Patterns**
@@ -1605,23 +1602,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    pull_policy: build
     profiles:
       - development
 ```
 
 ### **Pull Policy vs CLI Flags**
 
-Docker Compose also provides command-line flags that can override or complement pull_policy settings:
+Docker Compose provides command-line flags that can override pull_policy settings or control building:
 
-| CLI Flag | Related Setting | When to Use |
-|----------|----------------|-------------|
+#### **Pull Policy Overrides**
+| CLI Flag | Equivalent pull_policy | When to Use |
+|----------|----------------------|-------------|
 | `--pull always` | `pull_policy: always` | One-time deployments requiring latest images |
 | `--pull missing` | `pull_policy: missing` | Default behavior override |
 | `--pull never` | `pull_policy: never` | Offline deployments or testing |
-| `--build` | `pull_policy: build` | Force rebuild for development/testing* |
 
-*Note: `--build` triggers rebuilds for services with build contexts and is conceptually similar to `pull_policy: build`.
+#### **Build Control (Independent of pull_policy)**
+| CLI Flag | Purpose | When to Use |
+|----------|---------|-------------|
+| `--build` | Force rebuild services with build contexts | Development/testing with code changes |
+| `--no-cache` | Build without using cache | Clean builds after dependency changes |
 
 #### **File-level vs Command-line Settings**
 
@@ -1631,10 +1631,15 @@ Docker Compose also provides command-line flags that can override or complement 
 - Setting up automated deployments or CI/CD pipelines
 - Documenting intended deployment behavior
 
-**Use CLI flags when:**
+**Use `--pull` CLI flags when:**
 - Making one-time deployments with special requirements
 - Overriding file settings for testing or debugging
-- Quick development iterations
+- Testing different pull behaviors
+
+**Use `--build` CLI flags when:**
+- Force rebuilding during development
+- Ensuring fresh builds after code changes
+- One-time builds without modifying compose files
 
 #### **Examples**
 
@@ -1645,8 +1650,11 @@ docker compose up --pull always
 # Force rebuild all services with build contexts
 docker compose up --build
 
-# Combine flags for specific scenarios
+# Combine pull and build flags
 docker compose up --pull always --build
+
+# Build with specific options
+docker compose build --pull --no-cache
 ```
 
 ### **Monitoring and Logging Pull Policy Behavior**
