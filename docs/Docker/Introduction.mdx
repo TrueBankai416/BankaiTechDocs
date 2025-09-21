@@ -1277,6 +1277,10 @@ services:
 - Development environments where you're modifying the application
 - Force rebuilds even when an image already exists (similar to `docker compose up --build`)
 
+:::note Important
+The `build` policy only applies to services that define a `build:` context. Services with only an `image:` property will ignore this policy. Additionally, `pull_policy: build` controls when to rebuild the service image, but pulling newer base images during the Dockerfile build process is controlled separately (e.g., `docker compose build --pull` or the `build.pull` option).
+:::
+
 ### **Mixed Pull Policy Strategies**
 
 You can use different pull policies for different services in the same compose file:
