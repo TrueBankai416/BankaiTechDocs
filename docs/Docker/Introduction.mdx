@@ -1248,6 +1248,10 @@ services:
 
 While `pull_policy` controls when to pull pre-built images, building images from source is handled differently:
 
+:::note Important
+`pull_policy` is ignored when a service defines `build:`, since Docker Compose builds the image locally instead of pulling it from a registry.
+:::
+
 #### **When to Build Instead of Pull**
 - Active development with frequent code changes
 - Custom applications that require building from source
