@@ -1614,12 +1614,14 @@ services:
 
 Docker Compose also provides command-line flags that can override or complement pull_policy settings:
 
-| CLI Flag | Equivalent pull_policy | When to Use |
-|----------|----------------------|-------------|
+| CLI Flag | Related Setting | When to Use |
+|----------|----------------|-------------|
 | `--pull always` | `pull_policy: always` | One-time deployments requiring latest images |
 | `--pull missing` | `pull_policy: missing` | Default behavior override |
 | `--pull never` | `pull_policy: never` | Offline deployments or testing |
-| `--build` | `pull_policy: build` | Force rebuild for development/testing |
+| `--build` | `pull_policy: build` | Force rebuild for development/testing* |
+
+*Note: `--build` triggers rebuilds for services with build contexts and is conceptually similar to `pull_policy: build`.
 
 #### **File-level vs Command-line Settings**
 
