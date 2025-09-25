@@ -333,8 +333,9 @@ myapp.example.com → May resolve to Tailscale IP (100.x.x.x)
 # Disable Magic DNS if causing issues
 tailscale set --accept-dns=false
 
-# Or use split DNS
-tailscale set --accept-dns --dns=1.1.1.1 --dns-search=ts.net
+# Or configure split DNS in the Tailscale admin console
+# Then accept DNS settings on clients
+tailscale set --accept-dns=true
 ```
 
 #### **2. Routing Table Changes**
@@ -482,8 +483,11 @@ sudo ip route add 192.168.1.0/24 via 192.168.1.1 dev eth0 metric 100
 
 #### **2. Use Specific DNS Configuration**
 ```bash
-# Configure DNS to avoid conflicts
-tailscale set --accept-dns --dns=1.1.1.1 --dns-search=ts.net,local
+# Configure DNS servers and split DNS in the Tailscale admin console
+# Then accept or reject DNS settings on clients as needed
+tailscale set --accept-dns=true   # Accept Tailscale DNS settings
+# or
+tailscale set --accept-dns=false  # Use system DNS only
 ```
 
 #### **3. Document Your Setup**
@@ -565,8 +569,8 @@ tailscale status
 # Network connectivity check
 tailscale netcheck
 
-# Debug information
-tailscale debug
+# Generate bug report (includes debug info)
+tailscale bugreport
 
 # View logs
 journalctl -u tailscaled -f
