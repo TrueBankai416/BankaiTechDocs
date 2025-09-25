@@ -95,14 +95,14 @@ sudo iptables -A FORWARD -o tailscale0 -j ACCEPT
 #### **Using an Exit Node**
 
 ```bash
-# List available exit nodes
-tailscale exit-node list
+# View available exit nodes (check admin console or use status)
+tailscale status --json | jq '.Peer[] | select(.ExitNodeOption == true) | {Name: .DNSName, IP: .TailscaleIPs[0]}'
 
 # Use a specific exit node
 tailscale set --exit-node=100.64.0.1
 
-# Use exit node with specific routing
-tailscale set --exit-node=100.64.0.1 --exit-node-allow-lan-access
+# Use exit node with LAN access
+tailscale set --exit-node=100.64.0.1 --exit-node-allow-lan-access=true
 
 # Stop using exit node
 tailscale set --exit-node=
@@ -157,14 +157,15 @@ ping phone
 #### **MagicDNS Configuration**
 
 ```bash
-# Enable MagicDNS
+# Enable MagicDNS in the Tailscale admin console first
+# Then accept DNS settings on the client
 tailscale set --accept-dns
 
 # Check DNS configuration
 tailscale status --json | jq '.MagicDNSSuffix'
 
 # View current DNS settings
-tailscale debug dns-config
+cat /etc/resolv.conf
 ```
 
 ### **DNS Resolution Hierarchy**
@@ -185,14 +186,15 @@ tailscale debug dns-config
 ### **Custom DNS Configuration**
 
 ```bash
-# Set custom DNS servers
-tailscale set --accept-dns --dns=1.1.1.1,8.8.8.8
+# Configure custom DNS servers in the Tailscale admin console
+# Then accept DNS settings on clients
+tailscale set --accept-dns
 
-# Use split DNS
-tailscale set --accept-dns --dns=192.168.1.1 --dns-search=local.domain
-
-# Disable Magic DNS
+# Disable Magic DNS (client won't use Tailscale DNS settings)
 tailscale set --accept-dns=false
+
+# Check current DNS status
+tailscale status
 ```
 
 ## **Tailscale with Reverse Proxies: Compatibility and Considerations**
@@ -260,8 +262,9 @@ app:3000 (internal)
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 
-# Tailscale manages its own firewall rules
-# No additional firewall config needed for Tailscale
+# Allow Tailscale traffic (may be needed with UFW)
+sudo ufw allow in on tailscale0
+sudo ufw allow 41641/udp
 
 # Restrict direct access to applications
 sudo ufw deny 3000/tcp  # Block direct access, force through proxy
@@ -423,11 +426,14 @@ sudo tailscale up
 
 #### **Solution 1: Split DNS Configuration**
 ```bash
-# Configure Tailscale to only handle .ts.net domains
-tailscale set --accept-dns --dns=1.1.1.1,8.8.8.8 --dns-search=ts.net
+# Configure split DNS in the Tailscale admin console:
+# - Set custom nameservers for your domain
+# - Enable MagicDNS for .ts.net domains
+# Then accept DNS settings on clients
+tailscale set --accept-dns
 
 # This allows:
-# - Public domains → Public DNS
+# - Public domains → Public DNS (configured in admin console)
 # - .ts.net domains → Magic DNS
 ```
 
@@ -448,13 +454,13 @@ echo "203.0.113.1 myapp.example.com" | sudo tee -a /etc/hosts
 # This forces local resolution regardless of Tailscale DNS
 ```
 
-#### **Solution 4: Network Namespace Isolation**
+#### **Solution 4: Use Specific Routes**
 ```bash
-# Run Tailscale in separate network namespace
-sudo ip netns add tailscale
-sudo ip netns exec tailscale tailscale up
+# Add specific routes for Tailscale traffic
+sudo ip route add 100.64.0.0/10 dev tailscale0
 
-# This isolates Tailscale from main network stack
+# Add route for local network to avoid conflicts
+sudo ip route add 192.168.1.0/24 via 192.168.1.1 dev eth0 metric 100
 ```
 
 ### **Best Practices for Avoiding Conflicts**
@@ -534,8 +540,8 @@ Manage device authentication:
 # Check key expiry
 tailscale status
 
-# Disable key expiry
-tailscale set --auth-key-expiry=false
+# Disable key expiry (done in admin console under machine settings)
+# Navigate to admin console → Machines → Select device → Disable key expiry
 
 # Rotate keys
 tailscale logout
