@@ -111,7 +111,7 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 
 - **Number of subnets**: 2^(borrowed bits)
 - **Number of hosts per subnet**: 2^(host bits) - 2
-- **Subnet increment**: 256 - subnet mask value
+- **Subnet increment (block size)**: 256 minus the mask value in the relevant octet
 
 ### **Step-by-Step Subnetting Process**
 
@@ -121,7 +121,7 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 2. **Calculate borrowed bits**: 2^2 = 4 subnets, so borrow 2 bits
 3. **New subnet mask**: /24 + 2 = /26 (255.255.255.192)
 4. **Hosts per subnet**: 2^6 - 2 = 62 hosts
-5. **Subnet increment**: 256 - 192 = 64
+5. **Subnet increment**: 256 - 192 = 64 (in the last octet)
 
 **Resulting subnets:**
 ```
@@ -321,11 +321,14 @@ ipcalc -c 192.168.1.100/24
 # Split network into equal subnets
 ipcalc 10.0.0.0/16 --split 4
 
-# Calculate supernet
-ipcalc 192.168.1.0/24 192.168.2.0/24 --aggregate
+# Calculate supernet (adjacent networks)
+ipcalc 192.168.0.0/24 192.168.1.0/24 --aggregate
 
 # Show binary representation
 ipcalc 192.168.1.0/24 --binary
+
+# Note: Advanced options like --split/--aggregate vary by ipcalc implementation
+# (ipcalc vs ipcalc-ng). Check your version's manual for exact syntax.
 ```
 
 ### **Online Subnet Calculators**
@@ -349,7 +352,16 @@ network = ipaddress.IPv4Network('192.168.1.0/24')
 print(f"Network: {network}")
 print(f"Netmask: {network.netmask}")
 print(f"Broadcast: {network.broadcast_address}")
-print(f"Hosts: {network.num_addresses - 2}")
+
+# Calculate usable hosts (handle special cases)
+if network.prefixlen == 31:
+    hosts = 2  # Point-to-point link
+elif network.prefixlen == 32:
+    hosts = 1  # Host route
+else:
+    hosts = network.num_addresses - 2  # Normal subnet
+
+print(f"Hosts: {hosts}")
 
 # Subnet the network
 subnets = list(network.subnets(new_prefix=26))
