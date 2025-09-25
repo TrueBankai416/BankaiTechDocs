@@ -544,6 +544,100 @@ DB_Backup:      172.16.3.64/28   # Backup systems
 DB_Monitor:     172.16.3.80/28   # Database monitoring
 ```
 
+## **Quick Reference Cheat Sheet**
+
+### **Common Subnet Configurations**
+
+| CIDR | Subnet Mask | Hosts | Block Size | Example Network | Common Use Case |
+|------|-------------|-------|------------|-----------------|-----------------|
+| /32 | 255.255.255.255 | 1 | 1 | 192.168.1.100/32 | Host route, loopback |
+| /31 | 255.255.255.254 | 2 | 2 | 10.0.0.0/31 | Point-to-point links |
+| /30 | 255.255.255.252 | 2 | 4 | 10.0.0.0/30 | Point-to-point links (legacy) |
+| /29 | 255.255.255.248 | 6 | 8 | 192.168.1.0/29 | Small office segments |
+| /28 | 255.255.255.240 | 14 | 16 | 192.168.1.0/28 | Department networks |
+| /27 | 255.255.255.224 | 30 | 32 | 192.168.1.0/27 | Medium office segments |
+| /26 | 255.255.255.192 | 62 | 64 | 192.168.1.0/26 | Large office segments |
+| /25 | 255.255.255.128 | 126 | 128 | 192.168.1.0/25 | Small enterprise LANs |
+| /24 | 255.255.255.0 | 254 | 256 | 192.168.1.0/24 | Standard home/office LAN |
+| /23 | 255.255.254.0 | 510 | 512 | 192.168.0.0/23 | Medium enterprise LANs |
+| /22 | 255.255.252.0 | 1022 | 1024 | 192.168.0.0/22 | Large enterprise LANs |
+| /21 | 255.255.248.0 | 2046 | 2048 | 192.168.0.0/21 | Campus networks |
+| /20 | 255.255.240.0 | 4094 | 4096 | 192.168.0.0/20 | Large campus networks |
+| /16 | 255.255.0.0 | 65534 | 65536 | 192.168.0.0/16 | Enterprise networks |
+| /8 | 255.0.0.0 | 16777214 | 16777216 | 10.0.0.0/8 | ISP/Large enterprise |
+
+### **Private IP Address Ranges**
+
+| Range | CIDR | Class | Addresses | Typical Usage |
+|-------|------|-------|-----------|---------------|
+| 10.0.0.0 - 10.255.255.255 | 10.0.0.0/8 | A | 16,777,216 | Large enterprises, ISPs |
+| 172.16.0.0 - 172.31.255.255 | 172.16.0.0/12 | B | 1,048,576 | Medium enterprises |
+| 192.168.0.0 - 192.168.255.255 | 192.168.0.0/16 | C | 65,536 | Home, small office |
+
+### **Quick Calculation Formulas**
+
+```bash
+# Number of subnets from borrowed bits
+Subnets = 2^(borrowed_bits)
+
+# Number of hosts per subnet
+Hosts = 2^(host_bits) - 2  # (except /31 and /32)
+
+# Subnet increment (block size)
+Increment = 256 - (subnet_mask_value_in_relevant_octet)
+
+# Network address
+Network = IP_Address AND Subnet_Mask
+
+# Broadcast address  
+Broadcast = Network + (Block_Size - 1)
+```
+
+### **Common Network Design Patterns**
+
+#### **Home Network (192.168.1.0/24)**
+```bash
+Main Network:    192.168.1.0/26     # 62 hosts
+Guest Network:   192.168.1.64/27    # 30 hosts  
+IoT Devices:     192.168.1.96/27    # 30 hosts
+Management:      192.168.1.128/29   # 6 hosts
+```
+
+#### **Small Office (10.0.0.0/16)**
+```bash
+Users:           10.0.1.0/24        # 254 hosts
+Servers:         10.0.10.0/24       # 254 hosts
+Printers:        10.0.20.0/28       # 14 hosts
+WiFi:            10.0.30.0/24       # 254 hosts
+Management:      10.0.100.0/28      # 14 hosts
+P2P Links:       10.0.200.0/30      # 2 hosts each
+```
+
+#### **Enterprise (172.16.0.0/12)**
+```bash
+Site 1:          172.16.0.0/16      # 65,534 hosts
+Site 2:          172.17.0.0/16      # 65,534 hosts
+Site 3:          172.18.0.0/16      # 65,534 hosts
+WAN Links:       172.31.0.0/24      # P2P connections
+```
+
+### **Essential Commands**
+
+```bash
+# Calculate subnet info
+ipcalc 192.168.1.0/24
+
+# Check routing
+ip route show
+
+# Test connectivity
+ping 192.168.1.1
+traceroute 8.8.8.8
+
+# View interfaces
+ip addr show
+```
+
 Understanding subnets and subnet masks is crucial for effective network design and management. Whether you're setting up a home network, designing enterprise infrastructure, or troubleshooting connectivity issues, mastering these concepts will enable you to create efficient, scalable, and secure network architectures.
 
 <BuyMeACoffeeButton />
