@@ -52,8 +52,8 @@ Before CIDR (Classless Inter-Domain Routing), networks were divided into classes
 
 These ranges are reserved for private networks and not routed on the public internet:
 
-| Class | Private Range | Default Mask | CIDR | Common Usage |
-|-------|---------------|--------------|------|--------------|
+| Class | Private Range | Classful Default Mask | CIDR | Common Usage |
+|-------|---------------|----------------------|------|--------------|
 | **Class A** | 10.0.0.0 - 10.255.255.255 | 255.0.0.0 | /8 | Large enterprises |
 | **Class B** | 172.16.0.0 - 172.31.255.255 | 255.255.0.0 | /12 | Medium networks |
 | **Class C** | 192.168.0.0 - 192.168.255.255 | 255.255.255.0 | /16 | Home/small office |
@@ -110,7 +110,7 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 ### **Basic Subnetting Formula**
 
 - **Number of subnets**: 2^(borrowed bits)
-- **Number of hosts per subnet**: 2^(host bits) - 2
+- **Number of hosts per subnet**: 2^(host bits) - 2 (except /31 and /32)
 - **Subnet increment (block size)**: 256 minus the mask value in the relevant octet
 
 ### **Step-by-Step Subnetting Process**
