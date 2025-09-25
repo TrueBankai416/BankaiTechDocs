@@ -96,6 +96,7 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 | Subnet Mask | CIDR | Network Bits | Host Bits | Possible Hosts | Subnets (from /24) |
 |-------------|------|--------------|-----------|----------------|-------------------|
 | 255.255.255.255 | /32 | 32 | 0 | 1 (host route) | 256 |
+| 255.255.255.254 | /31 | 31 | 1 | 2 (point-to-point) | 128 |
 | 255.255.255.252 | /30 | 30 | 2 | 2 | 64 |
 | 255.255.255.248 | /29 | 29 | 3 | 6 | 32 |
 | 255.255.255.240 | /28 | 28 | 4 | 14 | 16 |
@@ -305,11 +306,14 @@ ipcalc 192.168.1.0/24
 # HostMax:   192.168.1.254
 # Hosts/Net: 254
 
-# Subnet a network
+# Subnet a network (if supported by your ipcalc version)
 ipcalc 192.168.1.0/24 -s 50 30 20 10
 
 # Check if IP is in subnet
 ipcalc -c 192.168.1.100/24
+
+# Note: Some distributions use ipcalc-ng with different syntax
+# If -s option isn't available, try: sipcalc or install ipcalc-ng
 ```
 
 #### **Advanced ipcalc Usage**
@@ -327,10 +331,10 @@ ipcalc 192.168.1.0/24 --binary
 ### **Online Subnet Calculators**
 
 Popular online tools for subnet calculations:
-- **subnet-calculator.com**: Comprehensive subnet calculator
-- **calculator.net/ip-subnet-calculator.html**: Simple subnet calculator  
-- **davidc.net/sites/default/subnets/subnets.html**: Visual subnet calculator
-- **tunnelsup.com/subnet-calculator**: Advanced subnet calculator
+- [**subnet-calculator.com**](https://www.subnet-calculator.com): Comprehensive subnet calculator
+- [**calculator.net IP Subnet Calculator**](https://www.calculator.net/ip-subnet-calculator.html): Simple subnet calculator  
+- [**davidc.net Subnet Calculator**](https://www.davidc.net/sites/default/subnets/subnets.html): Visual subnet calculator
+- [**tunnelsup.com Subnet Calculator**](https://www.tunnelsup.com/subnet-calculator/): Advanced subnet calculator
 
 ### **Programming and Scripting**
 
@@ -463,8 +467,11 @@ ipcalc 192.168.1.100/26
 ### **Network Verification**
 
 ```bash
-# Verify network connectivity within subnet
-ping $(ip route | grep eth0 | grep -E '192\.168\.1\.' | head -1 | awk '{print $1}' | cut -d'/' -f1)
+# Verify network connectivity within subnet (ping default gateway)
+ping "$(ip route | awk '/default/ {print $3; exit}')"
+
+# Or ping a known host in your subnet
+ping 192.168.1.1
 
 # Check if IP is in correct subnet
 ip route get 192.168.1.100
