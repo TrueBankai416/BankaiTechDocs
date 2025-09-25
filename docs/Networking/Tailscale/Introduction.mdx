@@ -86,8 +86,8 @@ echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
 echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 
-# Configure firewall (example for iptables)
-sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+# Configure firewall (replace WAN_INTERFACE with your actual outbound interface)
+sudo iptables -t nat -A POSTROUTING -o WAN_INTERFACE -j MASQUERADE
 sudo iptables -A FORWARD -i tailscale0 -j ACCEPT
 sudo iptables -A FORWARD -o tailscale0 -j ACCEPT
 ```
@@ -95,14 +95,17 @@ sudo iptables -A FORWARD -o tailscale0 -j ACCEPT
 #### **Using an Exit Node**
 
 ```bash
-# View available exit nodes (check admin console or use status)
-tailscale status --json | jq '.Peer[] | select(.ExitNodeOption == true) | {Name: .DNSName, IP: .TailscaleIPs[0]}'
+# View available exit nodes (recommended: check Tailscale admin console)
+# Or use CLI to see all peers and identify exit nodes
+tailscale status
 
-# Use a specific exit node
+# Use a specific exit node (by name or IP)
+tailscale set --exit-node=exit-node-name
+# or
 tailscale set --exit-node=100.64.0.1
 
 # Use exit node with LAN access
-tailscale set --exit-node=100.64.0.1 --exit-node-allow-lan-access=true
+tailscale set --exit-node=exit-node-name --exit-node-allow-lan-access=true
 
 # Stop using exit node
 tailscale set --exit-node=
@@ -315,13 +318,14 @@ When Tailscale is running, you might experience issues accessing your services v
 
 #### **1. DNS Resolution Conflicts**
 
-**Problem**: Magic DNS overrides local DNS resolution
+**Problem**: Magic DNS may override local DNS resolution if configured
 ```bash
 # Before Tailscale
 myapp.example.com → Public IP (203.0.113.1)
 
-# After Tailscale with Magic DNS
+# After Tailscale with Magic DNS + split DNS configured for your domain
 myapp.example.com → May resolve to Tailscale IP (100.x.x.x)
+# This only happens if you've configured split DNS for example.com in admin console
 ```
 
 **Solution**: Configure DNS properly
@@ -456,7 +460,10 @@ echo "203.0.113.1 myapp.example.com" | sudo tee -a /etc/hosts
 
 #### **Solution 4: Use Specific Routes**
 ```bash
-# Add specific routes for Tailscale traffic
+# Note: Tailscale normally manages routes automatically
+# Manual routes are only needed for special cases
+
+# Add specific routes for Tailscale traffic (if needed)
 sudo ip route add 100.64.0.0/10 dev tailscale0
 
 # Add route for local network to avoid conflicts
