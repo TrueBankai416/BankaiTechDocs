@@ -91,6 +91,8 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 
 ### **Common Subnet Masks and Their CIDR Equivalents**
 
+*Note: "Subnets (from /24)" shows how many equal subnets you get when splitting a /24 network into the indicated prefix length.*
+
 | Subnet Mask | CIDR | Network Bits | Host Bits | Possible Hosts | Subnets (from /24) |
 |-------------|------|--------------|-----------|----------------|-------------------|
 | 255.255.255.255 | /32 | 32 | 0 | 1 (host route) | 256 |
@@ -210,14 +212,25 @@ Printers:        10.0.2.224/28      # 10.0.2.225 - 10.0.2.238
 
 ### **Point-to-Point Links**
 
-For router-to-router connections, use /30 subnets (2 usable hosts):
+For router-to-router connections, you can use /30 or /31 subnets:
 
+#### **/30 Subnets (Traditional)**
 ```bash
-# WAN links between routers
+# WAN links between routers (2 usable hosts each)
 Router1-Router2: 10.0.100.0/30     # 10.0.100.1, 10.0.100.2
 Router2-Router3: 10.0.100.4/30     # 10.0.100.5, 10.0.100.6
 Router3-Router4: 10.0.100.8/30     # 10.0.100.9, 10.0.100.10
 ```
+
+#### **/31 Subnets (Modern - RFC 3021)**
+```bash
+# More efficient for P2P links (2 usable hosts, no network/broadcast)
+Router1-Router2: 10.0.100.0/31     # 10.0.100.0, 10.0.100.1
+Router2-Router3: 10.0.100.2/31     # 10.0.100.2, 10.0.100.3
+Router3-Router4: 10.0.100.4/31     # 10.0.100.4, 10.0.100.5
+```
+
+**Note**: /31 subnets are preferred in modern networks as they save IP addresses by eliminating the need for network and broadcast addresses on point-to-point links.
 
 ## **Subnet Design Best Practices**
 
@@ -269,6 +282,17 @@ Management:     192.168.50.0/24
 ### **Command Line Tools**
 
 #### **Linux/Unix Tools**
+
+**Installation:**
+```bash
+# Ubuntu/Debian
+sudo apt install ipcalc
+
+# Red Hat/CentOS/Fedora
+sudo dnf install ipcalc
+```
+
+**Usage:**
 ```bash
 # Calculate subnet information
 ipcalc 192.168.1.0/24
