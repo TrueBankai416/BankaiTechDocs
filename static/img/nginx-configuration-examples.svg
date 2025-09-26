@@ -1,4 +1,17 @@
 <svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <title>NGINX Configuration Examples - Production Ready Setup</title>
+  <desc>Comprehensive visual guide showcasing production-ready NGINX configurations including security headers, performance optimizations, service examples, and modular configuration structure for professional web server deployments.</desc>
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <rdf:Description rdf:about="">
+        <dc:title>NGINX Configuration Examples Infographic</dc:title>
+        <dc:creator>BankaiTech Documentation</dc:creator>
+        <dc:description>Production-ready NGINX configuration examples with security, performance, and service integration</dc:description>
+        <dc:subject>NGINX, Web Server, Configuration, Security, Performance</dc:subject>
+      </rdf:Description>
+    </rdf:RDF>
+  </metadata>
   <defs>
     <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
@@ -23,7 +36,7 @@
   <!-- Header -->
   <rect x="0" y="0" width="1200" height="80" fill="url(#headerGradient)"/>
   <text x="600" y="45" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold">
-    NGINX Configuration Examples - Production Ready Setup
+    NGINX Configuration Examples - Production-Ready Setup
   </text>
   
   <!-- Main Architecture Section -->
@@ -207,13 +220,13 @@
     
     <!-- Feature grid -->
     <g transform="translate(30, 60)">
-      <text x="0" y="20" fill="#374151" font-family="Arial, sans-serif" font-size="12">🔒 <tspan font-weight="bold">Security:</tspan> HSTS, CSP, XSS Protection, CSRF Prevention</text>
+      <text x="0" y="20" fill="#374151" font-family="Arial, sans-serif" font-size="12">🔒 <tspan font-weight="bold">Security:</tspan> HSTS, CSP, Clickjacking Protection, Referrer Policy</text>
       <text x="0" y="40" fill="#374151" font-family="Arial, sans-serif" font-size="12">⚡ <tspan font-weight="bold">Performance:</tspan> HTTP/2, Gzip, Caching, Connection Pooling</text>
     </g>
     
     <g transform="translate(580, 60)">
       <text x="0" y="20" fill="#374151" font-family="Arial, sans-serif" font-size="12">🛡️ <tspan font-weight="bold">Rate Limiting:</tspan> DDoS Protection, API Throttling</text>
-      <text x="0" y="40" fill="#374151" font-family="Arial, sans-serif" font-size="12">📊 <tspan font-weight="bold">Monitoring:</tspan> Enhanced Logging, Health Checks</text>
+      <text x="0" y="40" fill="#374151" font-family="Arial, sans-serif" font-size="12">📊 <tspan font-weight="bold">Monitoring:</tspan> Enhanced Logging, Structured Access Logs</text>
     </g>
   </g>
   
