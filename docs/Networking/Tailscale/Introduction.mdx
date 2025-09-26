@@ -162,7 +162,7 @@ ping phone
 ```bash
 # Enable MagicDNS in the Tailscale admin console first
 # Then accept DNS settings on the client
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # Check DNS configuration
 tailscale status --json | jq '.MagicDNSSuffix'
@@ -191,7 +191,7 @@ cat /etc/resolv.conf
 ```bash
 # Configure custom DNS servers in the Tailscale admin console
 # Then accept DNS settings on clients
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # Disable Magic DNS (client won't use Tailscale DNS settings)
 tailscale set --accept-dns=false
@@ -310,13 +310,128 @@ Sensitive services only accessible via Tailscale:
 # Not exposed through reverse proxy
 ```
 
-## **Why Public IP Access May Stop Working with Tailscale**
+## **Why Internet Access May Stop Working with Tailscale**
 
-When Tailscale is running, you might experience issues accessing your services via public IP and domain names. This happens due to **routing conflicts** and **DNS resolution changes**.
+When Tailscale is running, you might experience issues accessing the internet entirely - unable to browse websites, access services, or resolve domain names. This happens due to **routing conflicts** and **DNS resolution changes** that can completely break internet connectivity.
 
 ### **Common Issues and Causes**
 
-#### **1. DNS Resolution Conflicts**
+#### **1. Complete Internet Access Lost But Can Still Ping IP Addresses**
+
+**🚨 Quick Fix (Try This First)**:
+```bash
+# If your internet completely stopped working after tailscale up:
+tailscale set --accept-dns=false
+
+# If you can't even ping IP addresses, check for exit node issues:
+tailscale status  # Look for "Exit node:" line
+tailscale set --exit-node=  # Disable exit node if active
+```
+
+**Problem**: After running `sudo tailscale up`, you completely lose internet access - can't browse websites, access google.com, or use any internet services by domain name, but you can still ping IP addresses like `1.1.1.1` or `8.8.8.8`.
+
+**Why This Happens**:
+- Tailscale modifies your system's DNS configuration when Magic DNS is enabled
+- Your system may start using Tailscale's DNS servers instead of your original DNS servers
+- If Tailscale's DNS configuration is incomplete or conflicts with your network setup, all domain name resolution fails
+- IP addresses still work because they don't require DNS resolution
+- This affects all internet access, not just your own services
+
+**Note**: If you can't ping IP addresses either, the issue may be routing-related (e.g., misconfigured exit node). Check `tailscale status` to see if you're using an exit node and disable it with `tailscale set --exit-node=` if needed.
+
+**Symptoms**:
+```bash
+# These work (IP addresses)
+ping 1.1.1.1          # Works
+ping 8.8.8.8          # Works
+
+# These fail (domain names)
+ping google.com       # Fails - "Name or service not known"
+curl https://google.com # Fails - DNS resolution error
+```
+
+**Diagnosis**:
+```bash
+# Check current DNS configuration
+cat /etc/resolv.conf
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+
+# Check DNS status (Linux with systemd)
+resolvectl status
+
+# Check Tailscale status
+tailscale status
+```
+
+**Solutions**:
+
+**Option 1: Disable Tailscale DNS (Quickest Fix)**
+```bash
+# Disable Tailscale DNS management
+tailscale set --accept-dns=false
+
+# This stops Tailscale from managing DNS and reverts to your system's DNS configuration
+# You'll lose Magic DNS for .ts.net domains but internet will work normally
+```
+
+**Option 2: Configure Proper DNS Servers in Tailscale Admin Console**
+```bash
+# 1. Go to Tailscale admin console (https://login.tailscale.com/admin)
+# 2. Navigate to DNS settings
+# 3. Add reliable DNS servers (e.g., 1.1.1.1, 8.8.8.8)
+# 4. Enable "Override local DNS"
+# 5. Then on your device:
+tailscale set --accept-dns=true
+```
+
+**Option 3: Manual DNS Configuration (Advanced)**
+```bash
+# WARNING: Manual DNS changes may be temporary and overwritten
+
+# For systemd-resolved systems (Ubuntu/Debian):
+# Option 3a: Temporary runtime configuration (recommended for testing)
+# First identify your uplink interface:
+ip route get 1.1.1.1
+# Look for "dev" in the output and use that interface name (e.g., eth0, wlan0)
+# Then set DNS on that interface (replace eth0 with your actual interface):
+sudo resolvectl dns eth0 1.1.1.1 8.8.8.8
+# Note: This is temporary and will be lost on reboot
+
+# Option 3b: Persistent configuration (backup existing settings first)
+sudo cp /etc/systemd/resolved.conf /etc/systemd/resolved.conf.bak
+# Edit the file to uncomment and set DNS lines:
+# DNS=1.1.1.1 8.8.8.8
+# FallbackDNS=9.9.9.9
+# Then restart:
+sudo systemctl restart systemd-resolved
+
+# For other systems, check if /etc/resolv.conf is managed:
+ls -l /etc/resolv.conf
+# If it's a symlink to systemd-resolved, use resolvectl instead
+# ONLY do the following if /etc/resolv.conf is NOT a symlink:
+if [ ! -L /etc/resolv.conf ]; then
+    echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+    echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+else
+    echo "WARNING: /etc/resolv.conf is a symlink - use resolvectl instead"
+fi
+```
+
+**Option 4: Reset Network Configuration**
+```bash
+# If other options don't work, restart networking
+sudo systemctl restart systemd-resolved  # Ubuntu/Debian
+sudo systemctl restart NetworkManager    # Most Linux distros
+
+# Or restart Tailscale
+sudo tailscale down
+sudo tailscale up
+```
+
+#### **2. DNS Resolution Conflicts**
 
 **Problem**: Magic DNS may override local DNS resolution if configured
 ```bash
@@ -338,7 +453,7 @@ tailscale set --accept-dns=false
 tailscale set --accept-dns=true
 ```
 
-#### **2. Routing Table Changes**
+#### **3. Routing Table Changes**
 
 **Problem**: Tailscale modifies routing tables
 ```bash
@@ -355,7 +470,7 @@ ip route show
 sudo ip route add 203.0.113.0/24 via 192.168.1.1 dev eth0
 ```
 
-#### **3. Interface Priority**
+#### **4. Interface Priority**
 
 **Problem**: Tailscale interface takes precedence
 ```bash
@@ -371,7 +486,7 @@ sudo ip route add 203.0.113.0/24 via 192.168.1.1 dev eth0
 sudo ip route change default via 192.168.1.1 dev eth0 metric 100
 ```
 
-#### **4. Firewall Rule Conflicts**
+#### **5. Firewall Rule Conflicts**
 
 **Problem**: Tailscale firewall rules block local access
 ```bash
@@ -435,7 +550,7 @@ sudo tailscale up
 # - Set custom nameservers for your domain
 # - Enable MagicDNS for .ts.net domains
 # Then accept DNS settings on clients
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # This allows:
 # - Public domains → Public DNS (configured in admin console)
