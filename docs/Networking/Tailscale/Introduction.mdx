@@ -675,6 +675,209 @@ tailscale logout
 tailscale login
 ```
 
+## **Updates and Maintenance**
+
+### **Tailscale Auto-Updates**
+
+Tailscale supports automatic updates to keep your installation current with the latest features and security patches.
+
+#### **Enabling Auto-Updates**
+
+**Linux (systemd-based distributions):**
+```bash
+# Enable auto-updates (requires sudo)
+sudo tailscale set --auto-update
+
+# Check auto-update status
+tailscale status | grep -i update
+
+# Disable auto-updates
+sudo tailscale set --auto-update=false
+```
+
+**macOS:**
+```bash
+# Auto-updates are managed through the Tailscale app preferences
+# Or via command line:
+sudo tailscale set --auto-update
+
+# Check status
+tailscale status
+```
+
+**Windows:**
+```powershell
+# Run as Administrator
+tailscale set --auto-update
+
+# Check status
+tailscale status
+```
+
+#### **Auto-Update Behavior**
+
+- **Automatic Installation**: Updates install automatically during low-usage periods
+- **Service Restart**: Tailscale service restarts briefly during updates
+- **Rollback Protection**: Failed updates automatically rollback
+- **Notification**: Updates are logged and can be monitored
+
+### **Manual Updates**
+
+#### **Checking for Updates**
+```bash
+# Check current version
+tailscale version
+
+# Check for available updates (shows current and latest versions)
+tailscale update --check
+
+# View update history
+journalctl -u tailscaled | grep -i update
+```
+
+#### **Manual Update Commands**
+
+**Linux (Package Manager Installations):**
+```bash
+# Ubuntu/Debian (APT)
+sudo apt update && sudo apt upgrade tailscale
+
+# CentOS/RHEL/Fedora (YUM/DNF)
+sudo yum update tailscale
+# or
+sudo dnf update tailscale
+
+# Arch Linux
+sudo pacman -Syu tailscale
+```
+
+**Linux (Direct Installation):**
+```bash
+# Download and install latest version
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Or update using Tailscale's built-in updater
+sudo tailscale update
+```
+
+**macOS:**
+```bash
+# Using Homebrew
+brew update && brew upgrade tailscale
+
+# Using Mac App Store (if installed from there)
+# Updates handled automatically through App Store
+
+# Using direct download
+# Download latest .pkg from https://tailscale.com/download/mac
+```
+
+**Windows:**
+```powershell
+# Using Chocolatey
+choco upgrade tailscale
+
+# Using Scoop
+scoop update tailscale
+
+# Manual download
+# Download latest installer from https://tailscale.com/download/windows
+```
+
+#### **Docker Container Updates**
+```bash
+# Pull latest Tailscale image
+docker pull tailscale/tailscale:latest
+
+# Update running container (example with docker-compose)
+docker-compose pull tailscale
+docker-compose up -d tailscale
+
+# Or restart with latest image
+docker stop tailscale-container
+docker rm tailscale-container
+docker run -d --name tailscale-container \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  -v /var/lib/tailscale:/var/lib/tailscale \
+  tailscale/tailscale:latest
+```
+
+### **Update Best Practices**
+
+#### **Before Updating**
+```bash
+# Check current status and connectivity
+tailscale status
+tailscale netcheck
+
+# Note current version
+tailscale version
+
+# Backup configuration (if customized)
+sudo cp -r /var/lib/tailscale /var/lib/tailscale.backup
+```
+
+#### **After Updating**
+```bash
+# Verify new version
+tailscale version
+
+# Check connectivity
+tailscale status
+tailscale ping other-device
+
+# Test key services
+curl http://server.tailnet.ts.net:8080
+```
+
+#### **Update Scheduling**
+```bash
+# For production systems, consider scheduling updates during maintenance windows
+# Example cron job for weekly updates (Sundays at 2 AM)
+echo "0 2 * * 0 root /usr/bin/tailscale update" | sudo tee -a /etc/crontab
+
+# Or use systemd timer for more control
+sudo systemctl enable --now tailscale-update.timer  # If available
+```
+
+### **Troubleshooting Updates**
+
+#### **Failed Updates**
+```bash
+# Check update logs
+journalctl -u tailscaled | grep -i update
+
+# Force update check
+sudo tailscale update --check
+
+# Manual reinstall if update fails
+curl -fsSL https://tailscale.com/install.sh | sh
+```
+
+#### **Version Conflicts**
+```bash
+# Check if multiple Tailscale installations exist
+which tailscale
+whereis tailscale
+
+# Remove conflicting installations
+sudo apt remove tailscale  # Remove package manager version
+# Then reinstall from preferred source
+```
+
+#### **Service Issues After Update**
+```bash
+# Restart Tailscale service
+sudo systemctl restart tailscaled
+
+# Check service status
+sudo systemctl status tailscaled
+
+# Re-authenticate if needed
+tailscale login
+```
+
 ## **Monitoring and Troubleshooting**
 
 ### **Status and Diagnostics**
