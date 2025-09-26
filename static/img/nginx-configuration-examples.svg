@@ -1,6 +1,6 @@
-<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
-  <title>NGINX Configuration Examples - Production Ready Setup</title>
-  <desc>Comprehensive visual guide showcasing production-ready NGINX configurations including security headers, performance optimizations, service examples, and modular configuration structure for professional web server deployments.</desc>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nginx-main-title nginx-main-desc">
+  <title id="nginx-main-title">NGINX Configuration Examples - Production-Ready Setup</title>
+  <desc id="nginx-main-desc">Comprehensive visual guide showcasing production-ready NGINX configurations including security headers, performance optimizations, service examples, and modular configuration structure for professional web server deployments.</desc>
   <metadata>
     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
              xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -178,7 +178,7 @@
       • Gzip compression
     </text>
     <text x="20" y="165" fill="#374151" font-family="Arial, sans-serif" font-size="12">
-      • Connection pooling
+      • Keep-alive connections
     </text>
     <text x="20" y="185" fill="#374151" font-family="Arial, sans-serif" font-size="12">
       • SSL session caching
@@ -273,7 +273,7 @@
     <!-- Feature grid -->
     <g transform="translate(30, 60)">
       <text x="0" y="20" fill="#374151" font-family="Arial, sans-serif" font-size="12">🔒 <tspan font-weight="bold">Security:</tspan> HSTS, CSP, Clickjacking Protection, Referrer Policy</text>
-      <text x="0" y="40" fill="#374151" font-family="Arial, sans-serif" font-size="12">⚡ <tspan font-weight="bold">Performance:</tspan> HTTP/2, Gzip, Caching, Connection Pooling</text>
+      <text x="0" y="40" fill="#374151" font-family="Arial, sans-serif" font-size="12">⚡ <tspan font-weight="bold">Performance:</tspan> HTTP/2, Gzip, Caching, Keep-alive Connections</text>
     </g>
     
     <g transform="translate(580, 60)">
