@@ -162,7 +162,7 @@ ping phone
 ```bash
 # Enable MagicDNS in the Tailscale admin console first
 # Then accept DNS settings on the client
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # Check DNS configuration
 tailscale status --json | jq '.MagicDNSSuffix'
@@ -191,7 +191,7 @@ cat /etc/resolv.conf
 ```bash
 # Configure custom DNS servers in the Tailscale admin console
 # Then accept DNS settings on clients
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # Disable Magic DNS (client won't use Tailscale DNS settings)
 tailscale set --accept-dns=false
@@ -326,6 +326,8 @@ When Tailscale is running, you might experience issues accessing the internet en
 - If Tailscale's DNS configuration is incomplete or conflicts with your network setup, all domain name resolution fails
 - IP addresses still work because they don't require DNS resolution
 - This affects all internet access, not just your own services
+
+**Note**: If you can't ping IP addresses either, the issue may be routing-related (e.g., misconfigured exit node). Check `tailscale status` to see if you're using an exit node and disable it with `tailscale set --exit-node=` if needed.
 
 **Symptoms**:
 ```bash
@@ -533,7 +535,7 @@ sudo tailscale up
 # - Set custom nameservers for your domain
 # - Enable MagicDNS for .ts.net domains
 # Then accept DNS settings on clients
-tailscale set --accept-dns
+tailscale set --accept-dns=true
 
 # This allows:
 # - Public domains → Public DNS (configured in admin console)
