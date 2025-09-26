@@ -229,7 +229,7 @@
   
   <!-- Configuration Structure -->
   <g transform="translate(600, 350)">
-    <rect x="0" y="0" width="500" height="180" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="500" height="200" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="500" height="40" fill="#ea580c" rx="8"/>
     <text x="250" y="25" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
       Modular Configuration Structure
