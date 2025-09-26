@@ -310,21 +310,22 @@ Sensitive services only accessible via Tailscale:
 # Not exposed through reverse proxy
 ```
 
-## **Why Public IP Access May Stop Working with Tailscale**
+## **Why Internet Access May Stop Working with Tailscale**
 
-When Tailscale is running, you might experience issues accessing your services via public IP and domain names. This happens due to **routing conflicts** and **DNS resolution changes**.
+When Tailscale is running, you might experience issues accessing the internet entirely - unable to browse websites, access services, or resolve domain names. This happens due to **routing conflicts** and **DNS resolution changes** that can completely break internet connectivity.
 
 ### **Common Issues and Causes**
 
-#### **1. Internet Access Lost But Can Still Ping IP Addresses**
+#### **1. Complete Internet Access Lost But Can Still Ping IP Addresses**
 
-**Problem**: After running `sudo tailscale up`, you can no longer browse websites or access services by domain name, but you can still ping IP addresses like `1.1.1.1` or `8.8.8.8`.
+**Problem**: After running `sudo tailscale up`, you completely lose internet access - can't browse websites, access google.com, or use any internet services by domain name, but you can still ping IP addresses like `1.1.1.1` or `8.8.8.8`.
 
 **Why This Happens**:
 - Tailscale modifies your system's DNS configuration when Magic DNS is enabled
 - Your system may start using Tailscale's DNS servers instead of your original DNS servers
-- If Tailscale's DNS configuration is incomplete or conflicts with your network setup, domain name resolution fails
+- If Tailscale's DNS configuration is incomplete or conflicts with your network setup, all domain name resolution fails
 - IP addresses still work because they don't require DNS resolution
+- This affects all internet access, not just your own services
 
 **Symptoms**:
 ```bash
@@ -360,7 +361,7 @@ tailscale status
 # Disable Tailscale DNS management
 tailscale set --accept-dns=false
 
-# This restores your original DNS settings
+# This stops Tailscale from managing DNS and reverts to your system's DNS configuration
 # You'll lose Magic DNS for .ts.net domains but internet will work normally
 ```
 
@@ -380,7 +381,10 @@ tailscale set --accept-dns=true
 
 # For systemd-resolved systems (Ubuntu/Debian):
 # Option 3a: Temporary runtime configuration (recommended for testing)
-sudo resolvectl dns tailscale0 1.1.1.1 8.8.8.8
+# First identify your uplink interface:
+ip route get 1.1.1.1 | grep -oP 'dev \K\w+'
+# Then set DNS on that interface (replace eth0 with your actual interface):
+sudo resolvectl dns eth0 1.1.1.1 8.8.8.8
 # Note: This is temporary and will be lost on reboot
 
 # Option 3b: Persistent configuration (backup existing settings first)
