@@ -30,11 +30,11 @@
     </filter>
   </defs>
   
-  <!-- Background -->
-  <rect width="1200" height="630" fill="#f8fafc"/>
+  <!-- Dark Background -->
+  <rect width="1200" height="630" fill="#0f172a"/>
   
   <!-- Background Config Snippets -->
-  <g opacity="0.06" fill="#64748b" font-family="'Courier New', monospace" font-size="10">
+  <g opacity="0.15" fill="#64748b" font-family="'Courier New', monospace" font-size="10">
     <text x="20" y="100">user www-data; worker_processes auto;</text>
     <text x="20" y="115">events { worker_connections 2048; multi_accept on; }</text>
     <text x="20" y="130">ssl_protocols TLSv1.2 TLSv1.3; ssl_prefer_server_ciphers off;</text>
@@ -71,145 +71,145 @@
       🛡️ Security Features
     </text>
     
-    <text x="15" y="55" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
+    <text x="15" y="55" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
       Comprehensive Protection:
     </text>
-    <text x="15" y="75" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="75" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • HSTS with preload support
     </text>
-    <text x="15" y="90" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="90" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Content Security Policy
     </text>
-    <text x="15" y="105" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="105" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • X-Frame-Options protection
     </text>
-    <text x="15" y="120" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="120" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Rate limiting &amp; DDoS protection
     </text>
-    <text x="15" y="135" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="135" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Modern SSL/TLS configuration
     </text>
   </g>
   
   <!-- Performance Section -->
   <g transform="translate(340, 90)">
-    <rect x="0" y="0" width="280" height="160" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="280" height="160" fill="#1e293b" stroke="#334155" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="280" height="35" fill="url(#performanceGradient)" rx="8"/>
     <text x="140" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
       ⚡ Performance Optimized
     </text>
     
-    <text x="15" y="55" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
+    <text x="15" y="55" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
       Speed &amp; Efficiency:
     </text>
-    <text x="15" y="75" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="75" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • HTTP/2 with SSL optimization
     </text>
-    <text x="15" y="90" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="90" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Gzip compression (level 6)
     </text>
-    <text x="15" y="105" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="105" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Proxy caching (500MB)
     </text>
-    <text x="15" y="120" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="120" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Keep-alive connections
     </text>
-    <text x="15" y="135" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="135" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Enhanced access logging
     </text>
   </g>
   
   <!-- Services Section -->
   <g transform="translate(640, 90)">
-    <rect x="0" y="0" width="280" height="160" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="280" height="160" fill="#1e293b" stroke="#334155" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="280" height="35" fill="#7c3aed" rx="8"/>
     <text x="140" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
       🚀 Service Examples
     </text>
     
-    <text x="15" y="55" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
+    <text x="15" y="55" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
       Production Configurations:
     </text>
-    <text x="15" y="75" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="75" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Jellyfin (Media streaming)
     </text>
-    <text x="15" y="90" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="90" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Nextcloud (File sync &amp; collaboration)
     </text>
-    <text x="15" y="105" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="105" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Proxmox (Virtualization management)
     </text>
-    <text x="15" y="120" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="120" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Authelia (Authentication proxy)
     </text>
-    <text x="15" y="135" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="135" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • WebSocket &amp; streaming support
     </text>
   </g>
   
   <!-- Configuration Structure -->
   <g transform="translate(40, 270)">
-    <rect x="0" y="0" width="560" height="140" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="560" height="140" fill="#1e293b" stroke="#334155" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="560" height="35" fill="#ea580c" rx="8"/>
     <text x="280" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
       📁 Modular Configuration Structure
     </text>
     
     <g transform="translate(20, 50)">
-      <text x="0" y="15" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Organized &amp; Reusable:</text>
-      <text x="0" y="35" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">• Main nginx.conf with optimized settings</text>
-      <text x="0" y="50" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">• Reusable snippets (security-headers, enhanced-proxy)</text>
-      <text x="0" y="65" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">• Service-specific configurations</text>
-      <text x="0" y="80" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">• Cloudflare integration &amp; SSL automation</text>
+      <text x="0" y="15" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Organized &amp; Reusable:</text>
+      <text x="0" y="35" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">• Main nginx.conf with optimized settings</text>
+      <text x="0" y="50" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">• Reusable snippets (security-headers, enhanced-proxy)</text>
+      <text x="0" y="65" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">• Service-specific configurations</text>
+      <text x="0" y="80" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">• Cloudflare integration &amp; SSL automation</text>
     </g>
     
     <g transform="translate(300, 50)">
-      <text x="0" y="15" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Production Benefits:</text>
-      <text x="0" y="35" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">✓ Consistent security across all services</text>
-      <text x="0" y="50" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">✓ Easy maintenance and updates</text>
-      <text x="0" y="65" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">✓ Tested in production environments</text>
-      <text x="0" y="80" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">✓ Performance optimized for scale</text>
+      <text x="0" y="15" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Production Benefits:</text>
+      <text x="0" y="35" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">✓ Consistent security across all services</text>
+      <text x="0" y="50" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">✓ Easy maintenance and updates</text>
+      <text x="0" y="65" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">✓ Tested in production environments</text>
+      <text x="0" y="80" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">✓ Performance optimized for scale</text>
     </g>
   </g>
   
   <!-- Key Features Banner -->
   <g transform="translate(640, 270)">
-    <rect x="0" y="0" width="280" height="140" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="280" height="140" fill="#1e293b" stroke="#334155" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="280" height="35" fill="#1f2937" rx="8"/>
     <text x="140" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
       ✨ Ready to Deploy
     </text>
     
-    <text x="15" y="55" fill="#374151" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
+    <text x="15" y="55" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="11" font-weight="bold">
       Everything Included:
     </text>
-    <text x="15" y="75" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="75" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • SSL/TLS best practices
     </text>
-    <text x="15" y="90" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="90" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Security headers configured
     </text>
-    <text x="15" y="105" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="105" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Performance optimizations
     </text>
-    <text x="15" y="120" fill="#6b7280" font-family="Arial, sans-serif" font-size="10">
+    <text x="15" y="120" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="10">
       • Real-world service examples
     </text>
   </g>
   
   <!-- Footer -->
   <g transform="translate(0, 430)">
-    <rect x="0" y="0" width="1200" height="200" fill="#f1f5f9"/>
-    <text x="600" y="50" text-anchor="middle" fill="#1f2937" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    <rect x="0" y="0" width="1200" height="200" fill="#1e293b"/>
+    <text x="600" y="50" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
       BankaiTech Documentation
     </text>
-    <text x="600" y="80" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="16">
+    <text x="600" y="80" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="16">
       Professional NGINX Configuration Examples
     </text>
-    <text x="600" y="105" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="14">
+    <text x="600" y="105" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="14">
       Security-first • Performance optimized • Production tested
     </text>
-    <text x="600" y="130" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="14">
+    <text x="600" y="130" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="14">
       Complete guides and configurations at https://docs.bankai-tech.com
     </text>
     
