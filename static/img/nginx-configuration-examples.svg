@@ -33,6 +33,58 @@
   <!-- Background -->
   <rect width="1200" height="800" fill="#f8fafc"/>
   
+  <!-- Background Config Snippets -->
+  <g opacity="0.08" fill="#64748b" font-family="'Courier New', monospace" font-size="11">
+    <!-- Top left config snippet -->
+    <text x="20" y="120">user www-data;</text>
+    <text x="20" y="135">worker_processes auto;</text>
+    <text x="20" y="150">events {</text>
+    <text x="40" y="165">worker_connections 2048;</text>
+    <text x="40" y="180">multi_accept on;</text>
+    <text x="40" y="195">use epoll;</text>
+    <text x="20" y="210">}</text>
+    
+    <!-- Top right config snippet -->
+    <text x="800" y="120">ssl_protocols TLSv1.2 TLSv1.3;</text>
+    <text x="800" y="135">ssl_prefer_server_ciphers off;</text>
+    <text x="800" y="150">ssl_session_cache shared:SSL:50m;</text>
+    <text x="800" y="165">ssl_session_timeout 1d;</text>
+    <text x="800" y="180">ssl_stapling off;</text>
+    
+    <!-- Middle left config snippet -->
+    <text x="50" y="380">server {</text>
+    <text x="70" y="395">listen 443 ssl http2;</text>
+    <text x="70" y="410">server_name example.com;</text>
+    <text x="70" y="425">location / {</text>
+    <text x="90" y="440">proxy_pass http://backend;</text>
+    <text x="90" y="455">include snippets/enhanced-proxy.conf;</text>
+    <text x="70" y="470">}</text>
+    <text x="50" y="485">}</text>
+    
+    <!-- Middle right config snippet -->
+    <text x="650" y="380">add_header X-Frame-Options "SAMEORIGIN";</text>
+    <text x="650" y="395">add_header X-Content-Type-Options "nosniff";</text>
+    <text x="650" y="410">add_header Strict-Transport-Security</text>
+    <text x="670" y="425">"max-age=63072000; includeSubDomains";</text>
+    <text x="650" y="440">add_header Content-Security-Policy</text>
+    <text x="670" y="455">"default-src 'self'";</text>
+    
+    <!-- Bottom config snippet -->
+    <text x="100" y="620">gzip on;</text>
+    <text x="100" y="635">gzip_vary on;</text>
+    <text x="100" y="650">gzip_comp_level 6;</text>
+    <text x="100" y="665">gzip_min_length 1024;</text>
+    
+    <text x="400" y="620">limit_req_zone $binary_remote_addr</text>
+    <text x="420" y="635">zone=general:10m rate=10r/s;</text>
+    <text x="400" y="650">limit_conn_zone $binary_remote_addr</text>
+    <text x="420" y="665">zone=conn_limit_per_ip:10m;</text>
+    
+    <text x="750" y="620">proxy_cache_path /var/www/cache/</text>
+    <text x="770" y="635">levels=1:2 keys_zone=cache:500m</text>
+    <text x="770" y="650">max_size=500m inactive=2d;</text>
+  </g>
+  
   <!-- Header -->
   <rect x="0" y="0" width="1200" height="80" fill="url(#headerGradient)"/>
   <text x="600" y="45" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold">
@@ -114,7 +166,7 @@
       ⚡ Optimized for Speed
     </text>
     <text x="20" y="85" fill="#374151" font-family="Arial, sans-serif" font-size="12">
-      • Multi-accept & epoll
+      • Multi-accept &amp; epoll
     </text>
     <text x="20" y="105" fill="#374151" font-family="Arial, sans-serif" font-size="12">
       • Optimized buffers
