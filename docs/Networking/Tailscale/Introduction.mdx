@@ -698,7 +698,8 @@ sudo dnf install dnf-automatic
 # Set apply_updates = yes in /etc/dnf/automatic.conf
 sudo systemctl enable --now dnf-automatic.timer
 
-# If installed via install script, updates are manual or via re-running the script
+# If installed via the official install script, it configures your package manager
+# to receive updates from the Tailscale repo; use your package manager to update thereafter
 ```
 
 **macOS:**
@@ -707,7 +708,7 @@ sudo systemctl enable --now dnf-automatic.timer
 # If installed via .pkg/.dmg: Updates handled by Tailscale app's built-in updater
 # Check for updates in Tailscale menu → "Check for Updates"
 
-# CLI updater may be available depending on installation method and version
+# Use GUI updater: Tailscale menu → "Check for Updates"
 ```
 
 **Windows:**
@@ -715,12 +716,12 @@ sudo systemctl enable --now dnf-automatic.timer
 # Updates handled by Tailscale app's built-in updater
 # Check for updates in Tailscale system tray → "Check for Updates"
 
-# CLI updater may be available depending on installation method and version
+# Use GUI updater: Tailscale system tray → "Check for Updates"
 
 # If installed via package manager:
 # Chocolatey: choco upgrade tailscale
 # Scoop: scoop update tailscale
-# Winget: winget upgrade tailscale
+# Winget: winget upgrade --id Tailscale.Tailscale
 ```
 
 #### **Update Behavior Notes**
@@ -777,7 +778,6 @@ curl -fsSL https://tailscale.com/install.sh | sh
 
 # macOS/Windows: Use built-in updater via GUI
 # Check Tailscale menu/system tray → "Check for Updates"
-# CLI updater availability varies by platform and installation method
 
 # macOS App Store / Windows Store
 # Updates handled automatically by the respective app store
@@ -865,8 +865,8 @@ journalctl -u tailscaled | grep -i update
 # Manual reinstall if update fails (Linux direct installation)
 curl -fsSL https://tailscale.com/install.sh | sh
 
-# For macOS/Windows, try the built-in updater or re-download installer
-tailscale update  # If supported on your platform
+# For macOS/Windows, use the GUI updater or re-download installer
+# Check Tailscale menu/system tray → "Check for Updates"
 ```
 
 #### **Version Conflicts**
