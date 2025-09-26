@@ -331,7 +331,6 @@ When Tailscale is running, you might experience issues accessing your services v
 # These work (IP addresses)
 ping 1.1.1.1          # Works
 ping 8.8.8.8          # Works
-curl http://1.1.1.1   # Works
 
 # These fail (domain names)
 ping google.com       # Fails - "Name or service not known"
@@ -380,18 +379,22 @@ tailscale set --accept-dns=true
 # WARNING: Manual DNS changes may be temporary and overwritten
 
 # For systemd-resolved systems (Ubuntu/Debian):
-# Edit resolved configuration file
-sudo tee /etc/systemd/resolved.conf > /dev/null << EOF
-[Resolve]
-DNS=1.1.1.1 8.8.8.8
-FallbackDNS=9.9.9.9
-EOF
+# Option 3a: Temporary runtime configuration (recommended for testing)
+sudo resolvectl dns tailscale0 1.1.1.1 8.8.8.8
+# Note: This is temporary and will be lost on reboot
 
-# Restart systemd-resolved
+# Option 3b: Persistent configuration (backup existing settings first)
+sudo cp /etc/systemd/resolved.conf /etc/systemd/resolved.conf.bak
+# Edit the file to uncomment and set DNS lines:
+# DNS=1.1.1.1 8.8.8.8
+# FallbackDNS=9.9.9.9
+# Then restart:
 sudo systemctl restart systemd-resolved
 
-# For other systems, edit /etc/resolv.conf (temporary fix):
-# Note: This file is often managed by the system and changes may be lost
+# For other systems, check if /etc/resolv.conf is managed:
+ls -l /etc/resolv.conf
+# If it's a symlink to systemd-resolved, use resolvectl instead
+# If it's a regular file, you can edit it (changes may be temporary):
 echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
 echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
 ```
