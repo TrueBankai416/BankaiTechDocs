@@ -394,7 +394,8 @@ tailscale set --accept-dns=true
 # For systemd-resolved systems (Ubuntu/Debian):
 # Option 3a: Temporary runtime configuration (recommended for testing)
 # First identify your uplink interface:
-ip route get 1.1.1.1 | grep -oP 'dev \K\w+'
+ip route get 1.1.1.1
+# Look for "dev" in the output and use that interface name (e.g., eth0, wlan0)
 # Then set DNS on that interface (replace eth0 with your actual interface):
 sudo resolvectl dns eth0 1.1.1.1 8.8.8.8
 # Note: This is temporary and will be lost on reboot
