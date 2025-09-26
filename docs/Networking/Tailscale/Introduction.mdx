@@ -689,9 +689,13 @@ Tailscale update behavior varies by platform and installation method. Understand
 # For APT-based systems (Ubuntu/Debian), enable unattended-upgrades:
 sudo apt install unattended-upgrades
 sudo dpkg-reconfigure unattended-upgrades
+# Note: By default, unattended-upgrades focuses on security updates
+# Tailscale updates may require additional configuration or regular apt upgrade
 
 # For DNF-based systems (Fedora/RHEL), enable automatic updates:
 sudo dnf install dnf-automatic
+# Configure to apply updates (default is download-only):
+# Set apply_updates = yes in /etc/dnf/automatic.conf
 sudo systemctl enable --now dnf-automatic.timer
 
 # If installed via install script, updates are manual or via re-running the script
@@ -703,8 +707,7 @@ sudo systemctl enable --now dnf-automatic.timer
 # If installed via .pkg/.dmg: Updates handled by Tailscale app's built-in updater
 # Check for updates in Tailscale menu → "Check for Updates"
 
-# Manual update check via CLI (supported on macOS):
-tailscale update
+# CLI updater may be available depending on installation method and version
 ```
 
 **Windows:**
@@ -712,8 +715,7 @@ tailscale update
 # Updates handled by Tailscale app's built-in updater
 # Check for updates in Tailscale system tray → "Check for Updates"
 
-# Manual update check via CLI (supported on Windows):
-tailscale update
+# CLI updater may be available depending on installation method and version
 
 # If installed via package manager:
 # Chocolatey: choco upgrade tailscale
@@ -734,8 +736,10 @@ tailscale update
 # Check installed version
 tailscale version
 
-# View update history in logs
-journalctl -u tailscaled | grep -i update
+# View service restart logs (updates restart the service)
+journalctl -u tailscaled | grep -i restart
+
+# For update history, check package manager logs (see troubleshooting section)
 ```
 
 #### **Update Methods by Installation Type**
@@ -771,8 +775,9 @@ winget upgrade --id Tailscale.Tailscale
 # Linux (re-run install script)
 curl -fsSL https://tailscale.com/install.sh | sh
 
-# macOS/Windows (built-in updater)
-tailscale update
+# macOS/Windows: Use built-in updater via GUI
+# Check Tailscale menu/system tray → "Check for Updates"
+# CLI updater availability varies by platform and installation method
 
 # macOS App Store / Windows Store
 # Updates handled automatically by the respective app store
