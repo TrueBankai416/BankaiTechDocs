@@ -316,7 +316,92 @@ When Tailscale is running, you might experience issues accessing your services v
 
 ### **Common Issues and Causes**
 
-#### **1. DNS Resolution Conflicts**
+#### **1. Internet Access Lost But Can Still Ping IP Addresses**
+
+**Problem**: After running `sudo tailscale up`, you can no longer browse websites or access services by domain name, but you can still ping IP addresses like `1.1.1.1` or `8.8.8.8`.
+
+**Why This Happens**:
+- Tailscale modifies your system's DNS configuration when Magic DNS is enabled
+- Your system may start using Tailscale's DNS servers instead of your original DNS servers
+- If Tailscale's DNS configuration is incomplete or conflicts with your network setup, domain name resolution fails
+- IP addresses still work because they don't require DNS resolution
+
+**Symptoms**:
+```bash
+# These work (IP addresses)
+ping 1.1.1.1          # ✅ Works
+ping 8.8.8.8          # ✅ Works
+curl http://1.1.1.1   # ✅ Works
+
+# These fail (domain names)
+ping google.com       # ❌ Fails - "Name or service not known"
+curl https://google.com # ❌ Fails - DNS resolution error
+```
+
+**Diagnosis**:
+```bash
+# Check current DNS configuration
+cat /etc/resolv.conf
+
+# Test DNS resolution
+nslookup google.com
+dig google.com
+
+# Check Tailscale DNS status
+tailscale status | grep -i dns
+```
+
+**Solutions**:
+
+**Option 1: Disable Tailscale DNS (Quickest Fix)**
+```bash
+# Disable Tailscale DNS management
+tailscale set --accept-dns=false
+
+# This restores your original DNS settings
+# You'll lose Magic DNS for .ts.net domains but internet will work normally
+```
+
+**Option 2: Configure Proper DNS Servers in Tailscale Admin Console**
+```bash
+# 1. Go to Tailscale admin console (https://login.tailscale.com/admin)
+# 2. Navigate to DNS settings
+# 3. Add reliable DNS servers (e.g., 1.1.1.1, 8.8.8.8)
+# 4. Enable "Override local DNS"
+# 5. Then on your device:
+tailscale set --accept-dns=true
+```
+
+**Option 3: Manual DNS Configuration**
+```bash
+# Temporarily fix by manually setting DNS servers
+# Edit /etc/resolv.conf (changes may be overwritten)
+sudo nano /etc/resolv.conf
+
+# Add these lines:
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+
+# Or use systemd-resolved (Ubuntu/Debian)
+sudo systemctl edit systemd-resolved
+# Add:
+[Service]
+ExecStart=
+ExecStart=/lib/systemd/systemd-resolved --dns=1.1.1.1 --dns=8.8.8.8
+```
+
+**Option 4: Reset Network Configuration**
+```bash
+# If other options don't work, restart networking
+sudo systemctl restart systemd-resolved  # Ubuntu/Debian
+sudo systemctl restart NetworkManager    # Most Linux distros
+
+# Or restart Tailscale
+sudo tailscale down
+sudo tailscale up
+```
+
+#### **2. DNS Resolution Conflicts**
 
 **Problem**: Magic DNS may override local DNS resolution if configured
 ```bash
