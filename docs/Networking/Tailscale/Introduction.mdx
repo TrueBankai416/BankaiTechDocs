@@ -429,7 +429,7 @@ tailscale set --accept-dns=false
 tailscale set --accept-dns=true
 ```
 
-#### **2. Routing Table Changes**
+#### **3. Routing Table Changes**
 
 **Problem**: Tailscale modifies routing tables
 ```bash
@@ -446,7 +446,7 @@ ip route show
 sudo ip route add 203.0.113.0/24 via 192.168.1.1 dev eth0
 ```
 
-#### **3. Interface Priority**
+#### **4. Interface Priority**
 
 **Problem**: Tailscale interface takes precedence
 ```bash
@@ -462,7 +462,7 @@ sudo ip route add 203.0.113.0/24 via 192.168.1.1 dev eth0
 sudo ip route change default via 192.168.1.1 dev eth0 metric 100
 ```
 
-#### **4. Firewall Rule Conflicts**
+#### **5. Firewall Rule Conflicts**
 
 **Problem**: Tailscale firewall rules block local access
 ```bash
