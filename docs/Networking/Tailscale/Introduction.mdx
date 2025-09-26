@@ -743,7 +743,7 @@ journalctl -u tailscaled | grep -i update
 **Package Manager Installations:**
 ```bash
 # Ubuntu/Debian (APT)
-sudo apt update && sudo apt upgrade tailscale
+sudo apt update && sudo apt install tailscale
 
 # CentOS/RHEL/Fedora (YUM/DNF)
 sudo yum update tailscale
@@ -754,7 +754,7 @@ sudo dnf update tailscale
 sudo pacman -Syu tailscale
 
 # macOS with Homebrew
-brew update && brew upgrade tailscale
+brew update && brew upgrade --cask tailscale
 
 # Windows with Chocolatey
 choco upgrade tailscale
@@ -763,7 +763,7 @@ choco upgrade tailscale
 scoop update tailscale
 
 # Windows with Winget
-winget upgrade tailscale
+winget upgrade --id Tailscale.Tailscale
 ```
 
 **Direct Installation/App Store:**
@@ -779,12 +779,11 @@ tailscale update
 ```
 
 **Manual Download:**
-```bash
-# Download latest installers from:
-# Linux: https://tailscale.com/download/linux
-# macOS: https://tailscale.com/download/mac  
-# Windows: https://tailscale.com/download/windows
-```
+
+Download latest installers from:
+- **Linux**: [https://tailscale.com/download/linux](https://tailscale.com/download/linux)
+- **macOS**: [https://tailscale.com/download/mac](https://tailscale.com/download/mac)
+- **Windows**: [https://tailscale.com/download/windows](https://tailscale.com/download/windows)
 
 #### **Docker Container Updates**
 ```bash
@@ -803,6 +802,9 @@ docker run -d --name tailscale-container \
   --device /dev/net/tun \
   -v /var/lib/tailscale:/var/lib/tailscale \
   tailscale/tailscale:latest
+
+# Note: Many host-integration use cases may require --net=host
+# Docker flags can vary based on your specific networking requirements
 ```
 
 ### **Update Best Practices**
@@ -853,7 +855,7 @@ journalctl -u tailscaled | grep -i update
 
 # For package manager installations, check package manager logs
 # APT: /var/log/apt/history.log
-# DNF: journalctl -u dnf
+# DNF: dnf history (or /var/log/dnf.rpm.log)
 
 # Manual reinstall if update fails (Linux direct installation)
 curl -fsSL https://tailscale.com/install.sh | sh
@@ -871,7 +873,7 @@ whereis tailscale
 # Remove conflicting installations (choose one method)
 sudo apt remove tailscale        # Remove APT version
 sudo dnf remove tailscale        # Remove DNF version
-brew uninstall tailscale         # Remove Homebrew version
+brew uninstall --cask tailscale  # Remove Homebrew version
 
 # Then reinstall from your preferred source
 ```
