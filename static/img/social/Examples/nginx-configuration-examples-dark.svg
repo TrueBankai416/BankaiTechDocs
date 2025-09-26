@@ -212,11 +212,5 @@
     <text x="600" y="130" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="14">
       Complete guides and configurations at https://docs.bankai-tech.com
     </text>
-    
-    <!-- Social media optimized call-to-action -->
-    <rect x="450" y="150" width="300" height="40" fill="url(#headerGradient)" rx="20"/>
-    <text x="600" y="175" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
-      View Complete Documentation →
-    </text>
   </g>
 </svg>
