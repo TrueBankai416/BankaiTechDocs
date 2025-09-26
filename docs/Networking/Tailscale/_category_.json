@@ -1,0 +1,8 @@
+{
+  "label": "Tailscale",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "Networking/Tailscale/Introduction"
+  }
+}
