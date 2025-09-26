@@ -359,7 +359,7 @@ tailscale status
 **Option 1: Disable Tailscale DNS (Quickest Fix)**
 ```bash
 # Disable Tailscale DNS management
-tailscale up --accept-dns=false
+tailscale set --accept-dns=false
 
 # This restores your original DNS settings
 # You'll lose Magic DNS for .ts.net domains but internet will work normally
@@ -372,7 +372,7 @@ tailscale up --accept-dns=false
 # 3. Add reliable DNS servers (e.g., 1.1.1.1, 8.8.8.8)
 # 4. Enable "Override local DNS"
 # 5. Then on your device:
-tailscale up --accept-dns=true
+tailscale set --accept-dns=true
 ```
 
 **Option 3: Manual DNS Configuration (Advanced)**
@@ -380,23 +380,20 @@ tailscale up --accept-dns=true
 # WARNING: Manual DNS changes may be temporary and overwritten
 
 # For systemd-resolved systems (Ubuntu/Debian):
-# Create or edit resolved configuration
-sudo nano /etc/systemd/resolved.conf
-
-# Add these lines:
+# Edit resolved configuration file
+sudo tee /etc/systemd/resolved.conf > /dev/null << EOF
 [Resolve]
 DNS=1.1.1.1 8.8.8.8
 FallbackDNS=9.9.9.9
+EOF
 
 # Restart systemd-resolved
 sudo systemctl restart systemd-resolved
 
 # For other systems, edit /etc/resolv.conf (temporary fix):
 # Note: This file is often managed by the system and changes may be lost
-sudo nano /etc/resolv.conf
-# Add:
-nameserver 1.1.1.1
-nameserver 8.8.8.8
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
 ```
 
 **Option 4: Reset Network Configuration**
