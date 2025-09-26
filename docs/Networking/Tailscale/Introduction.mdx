@@ -329,13 +329,13 @@ When Tailscale is running, you might experience issues accessing your services v
 **Symptoms**:
 ```bash
 # These work (IP addresses)
-ping 1.1.1.1          # ✅ Works
-ping 8.8.8.8          # ✅ Works
-curl http://1.1.1.1   # ✅ Works
+ping 1.1.1.1          # Works
+ping 8.8.8.8          # Works
+curl http://1.1.1.1   # Works
 
 # These fail (domain names)
-ping google.com       # ❌ Fails - "Name or service not known"
-curl https://google.com # ❌ Fails - DNS resolution error
+ping google.com       # Fails - "Name or service not known"
+curl https://google.com # Fails - DNS resolution error
 ```
 
 **Diagnosis**:
@@ -347,8 +347,11 @@ cat /etc/resolv.conf
 nslookup google.com
 dig google.com
 
-# Check Tailscale DNS status
-tailscale status | grep -i dns
+# Check DNS status (Linux with systemd)
+resolvectl status
+
+# Check Tailscale status
+tailscale status
 ```
 
 **Solutions**:
@@ -356,7 +359,7 @@ tailscale status | grep -i dns
 **Option 1: Disable Tailscale DNS (Quickest Fix)**
 ```bash
 # Disable Tailscale DNS management
-tailscale set --accept-dns=false
+tailscale up --accept-dns=false
 
 # This restores your original DNS settings
 # You'll lose Magic DNS for .ts.net domains but internet will work normally
@@ -369,25 +372,31 @@ tailscale set --accept-dns=false
 # 3. Add reliable DNS servers (e.g., 1.1.1.1, 8.8.8.8)
 # 4. Enable "Override local DNS"
 # 5. Then on your device:
-tailscale set --accept-dns=true
+tailscale up --accept-dns=true
 ```
 
-**Option 3: Manual DNS Configuration**
+**Option 3: Manual DNS Configuration (Advanced)**
 ```bash
-# Temporarily fix by manually setting DNS servers
-# Edit /etc/resolv.conf (changes may be overwritten)
-sudo nano /etc/resolv.conf
+# WARNING: Manual DNS changes may be temporary and overwritten
+
+# For systemd-resolved systems (Ubuntu/Debian):
+# Create or edit resolved configuration
+sudo nano /etc/systemd/resolved.conf
 
 # Add these lines:
+[Resolve]
+DNS=1.1.1.1 8.8.8.8
+FallbackDNS=9.9.9.9
+
+# Restart systemd-resolved
+sudo systemctl restart systemd-resolved
+
+# For other systems, edit /etc/resolv.conf (temporary fix):
+# Note: This file is often managed by the system and changes may be lost
+sudo nano /etc/resolv.conf
+# Add:
 nameserver 1.1.1.1
 nameserver 8.8.8.8
-
-# Or use systemd-resolved (Ubuntu/Debian)
-sudo systemctl edit systemd-resolved
-# Add:
-[Service]
-ExecStart=
-ExecStart=/lib/systemd/systemd-resolved --dns=1.1.1.1 --dns=8.8.8.8
 ```
 
 **Option 4: Reset Network Configuration**
