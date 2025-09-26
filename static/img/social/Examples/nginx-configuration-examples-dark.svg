@@ -65,7 +65,7 @@
   <!-- Main Content Grid -->
   <g transform="translate(40, 90)">
     <!-- Security Section -->
-    <rect x="0" y="0" width="280" height="160" fill="white" stroke="#e2e8f0" stroke-width="2" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="280" height="160" fill="#1e293b" stroke="#334155" stroke-width="2" rx="8" filter="url(#shadow)"/>
     <rect x="0" y="0" width="280" height="35" fill="url(#securityGradient)" rx="8"/>
     <text x="140" y="22" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
       🛡️ Security Features
