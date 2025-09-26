@@ -318,6 +318,16 @@ When Tailscale is running, you might experience issues accessing the internet en
 
 #### **1. Complete Internet Access Lost But Can Still Ping IP Addresses**
 
+**🚨 Quick Fix (Try This First)**:
+```bash
+# If your internet completely stopped working after tailscale up:
+tailscale set --accept-dns=false
+
+# If you can't even ping IP addresses, check for exit node issues:
+tailscale status  # Look for "Exit node:" line
+tailscale set --exit-node=  # Disable exit node if active
+```
+
 **Problem**: After running `sudo tailscale up`, you completely lose internet access - can't browse websites, access google.com, or use any internet services by domain name, but you can still ping IP addresses like `1.1.1.1` or `8.8.8.8`.
 
 **Why This Happens**:
@@ -400,9 +410,13 @@ sudo systemctl restart systemd-resolved
 # For other systems, check if /etc/resolv.conf is managed:
 ls -l /etc/resolv.conf
 # If it's a symlink to systemd-resolved, use resolvectl instead
-# If it's a regular file, you can edit it (changes may be temporary):
-echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
-echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+# ONLY do the following if /etc/resolv.conf is NOT a symlink:
+if [ ! -L /etc/resolv.conf ]; then
+    echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+    echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+else
+    echo "WARNING: /etc/resolv.conf is a symlink - use resolvectl instead"
+fi
 ```
 
 **Option 4: Reset Network Configuration**
