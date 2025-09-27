@@ -675,6 +675,226 @@ tailscale logout
 tailscale login
 ```
 
+## **Updates and Maintenance**
+
+### **Tailscale Auto-Updates**
+
+Tailscale update behavior varies by platform and installation method. Understanding how updates work on your platform helps ensure you stay current with security patches and new features.
+
+#### **Auto-Update Configuration by Platform**
+
+**Linux:**
+```bash
+# Auto-updates are managed by your OS package manager, not Tailscale CLI
+# For APT-based systems (Ubuntu/Debian), enable unattended-upgrades:
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure unattended-upgrades
+# Note: By default, unattended-upgrades focuses on security updates
+# Tailscale updates may require additional configuration or regular apt upgrade
+
+# For DNF-based systems (Fedora/RHEL), enable automatic updates:
+sudo dnf install dnf-automatic
+# Configure to apply updates (default is download-only):
+# Set apply_updates = yes in /etc/dnf/automatic.conf
+sudo systemctl enable --now dnf-automatic.timer
+
+# If installed via the official install script, it configures your package manager
+# to receive updates from the Tailscale repo; use your package manager to update thereafter
+```
+
+**macOS:**
+```bash
+# If installed via App Store: Updates come through App Store automatically
+# If installed via .pkg/.dmg: Updates handled by Tailscale app's built-in updater
+# Check for updates in Tailscale menu → "Check for Updates"
+
+# Use GUI updater: Tailscale menu → "Check for Updates"
+```
+
+**Windows:**
+```powershell
+# Updates handled by Tailscale app's built-in updater
+# Check for updates in Tailscale system tray → "Check for Updates"
+
+# Use GUI updater: Tailscale system tray → "Check for Updates"
+
+# If installed via package manager:
+# Chocolatey: choco upgrade tailscale
+# Scoop: scoop update tailscale
+# Winget: winget upgrade --id Tailscale.Tailscale
+```
+
+#### **Update Behavior Notes**
+
+- **Service Restart**: Updates may restart the Tailscale service briefly
+- **Connection Interruption**: Plan maintenance windows for critical systems
+- **Authentication**: Re-authentication is rarely required after updates
+
+### **Manual Updates**
+
+#### **Checking Current Version**
+```bash
+# Check installed version
+tailscale version
+
+# View service restart logs (updates restart the service)
+journalctl -u tailscaled | grep -i restart
+
+# For update history, check package manager logs (see troubleshooting section)
+```
+
+#### **Update Methods by Installation Type**
+
+**Package Manager Installations:**
+```bash
+# Ubuntu/Debian (APT)
+sudo apt update && sudo apt install tailscale
+
+# CentOS/RHEL/Fedora (YUM/DNF)
+sudo yum update tailscale
+# or
+sudo dnf update tailscale
+
+# Arch Linux
+sudo pacman -Syu tailscale
+
+# macOS with Homebrew
+brew update && brew upgrade --cask tailscale
+
+# Windows with Chocolatey
+choco upgrade tailscale
+
+# Windows with Scoop
+scoop update tailscale
+
+# Windows with Winget
+winget upgrade --id Tailscale.Tailscale
+```
+
+**Direct Installation/App Store:**
+```bash
+# Linux (re-run install script)
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# macOS/Windows: Use built-in updater via GUI
+# Check Tailscale menu/system tray → "Check for Updates"
+
+# macOS App Store / Windows Store
+# Updates handled automatically by the respective app store
+```
+
+**Manual Download:**
+
+Download latest installers from:
+- **Linux**: [https://tailscale.com/download/linux](https://tailscale.com/download/linux)
+- **macOS**: [https://tailscale.com/download/mac](https://tailscale.com/download/mac)
+- **Windows**: [https://tailscale.com/download/windows](https://tailscale.com/download/windows)
+
+#### **Docker Container Updates**
+```bash
+# Pull latest Tailscale image
+docker pull tailscale/tailscale:latest
+
+# Update running container (example with docker-compose)
+docker-compose pull tailscale
+docker-compose up -d tailscale
+
+# Or restart with latest image using recommended flags
+docker stop tailscale-container
+docker rm tailscale-container
+docker run -d --name tailscale-container \
+  --cap-add=NET_ADMIN \
+  --device /dev/net/tun \
+  -v /var/lib/tailscale:/var/lib/tailscale \
+  tailscale/tailscale:latest
+
+# Note: Many host-integration use cases may require --net=host
+# Docker flags can vary based on your specific networking requirements
+```
+
+### **Update Best Practices**
+
+#### **Before Updating**
+```bash
+# Check current status and connectivity
+tailscale status
+tailscale netcheck
+
+# Note current version
+tailscale version
+
+# Backup configuration (stop service first for consistency)
+sudo systemctl stop tailscaled
+sudo cp -a /var/lib/tailscale /var/lib/tailscale.backup
+sudo systemctl start tailscaled
+```
+
+#### **After Updating**
+```bash
+# Verify new version
+tailscale version
+
+# Check connectivity and test key services
+tailscale status
+tailscale ping other-device
+curl http://server.tailnet.ts.net:8080
+```
+
+#### **Production Update Scheduling**
+```bash
+# Linux: Use OS-native update automation
+# Ubuntu/Debian - configure unattended-upgrades for automatic security updates
+# RHEL/Fedora - use dnf-automatic for scheduled updates
+
+# For manual scheduling, use package manager commands:
+# Example weekly update check (adjust for your package manager)
+echo "0 2 * * 0 root apt update && apt list --upgradable | grep tailscale" | sudo tee -a /etc/crontab
+```
+
+### **Troubleshooting Updates**
+
+#### **Failed Updates**
+```bash
+# Check update logs
+journalctl -u tailscaled | grep -i update
+
+# For package manager installations, check package manager logs
+# APT: /var/log/apt/history.log
+# DNF: dnf history (or /var/log/dnf.rpm.log)
+
+# Manual reinstall if update fails (Linux direct installation)
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# For macOS/Windows, use the GUI updater or re-download installer
+# Check Tailscale menu/system tray → "Check for Updates"
+```
+
+#### **Version Conflicts**
+```bash
+# Check if multiple Tailscale installations exist
+which tailscale
+whereis tailscale
+
+# Remove conflicting installations (choose one method)
+sudo apt remove tailscale        # Remove APT version
+sudo dnf remove tailscale        # Remove DNF version
+brew uninstall --cask tailscale  # Remove Homebrew version
+
+# Then reinstall from your preferred source
+```
+
+#### **Service Issues After Update**
+```bash
+# Restart Tailscale service
+sudo systemctl restart tailscaled
+
+# Check service status
+sudo systemctl status tailscaled
+
+# Re-authenticate if needed (rarely required)
+tailscale login
+```
+
 ## **Monitoring and Troubleshooting**
 
 ### **Status and Diagnostics**
