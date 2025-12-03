@@ -147,5 +147,11 @@ sudo docker compose pull
 ```bash
 sudo docker system prune
 ```
+:::info[Crontab Example]
+```bash
+# Run daily at 3am
+0 3 * * * /usr/bin/docker system prune -af
+```
+###
 
 <BuyMeACoffeeButton />
