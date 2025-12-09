@@ -61,12 +61,12 @@ Find the appropriate KMS client setup key for your target edition from the [Micr
 
 Open PowerShell as Administrator and run:
 ```PowerShell
-changepk.exe /ProductKey <Paste_Product_Key_Here>
+changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
 ```
-:::note
-you may have to use a generic key first.
-`VK7JG-NPHTM-C97JM-9MPGT-3V66T`
-:::
+After It is done, run:
+```PowerShell
+slmgr /ipk <Product_Key_Here>
+```
 
 ### Step 4: Activate Windows
 
