@@ -1,1 +1,73 @@
+---
+title: Upgrading Windows Edition
+description: Guide for upgrading Windows editions using KMS activation
+sidebar_position: 3
+---
 
+# Upgrading Windows Edition
+
+## Overview
+
+This guide explains how to upgrade your Windows edition (e.g., from Home to Pro, Pro to Enterprise) using KMS activation methods.
+
+## Prerequisites
+
+- Administrator access to the Windows system
+- Active KMS server connection
+- Valid product key for target edition
+- Backup of important data (recommended)
+
+## Supported Edition Upgrades
+
+### Windows 11
+
+| From Edition | To Edition | Supported |
+|--------------|------------|-----------|
+| Home | Pro | ✅ |
+| Pro | Enterprise | ✅ |
+| Pro | Education | ✅ |
+
+### Windows 10
+
+| From Edition | To Edition | Supported |
+|--------------|------------|-----------|
+| Home | Pro | ✅ |
+| Pro | Enterprise | ✅ |
+| Pro | Education | ✅ |
+
+## Upgrade Process
+
+### Step 1: Check Current Edition
+
+Open Powershell as Administrator and run:
+```PowerShell
+slmgr /dlv
+```
+
+### Step 2: Obtain Product Key
+
+Find the appropriate KMS client setup key for your target edition from the [Microsoft documentation](https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys).
+
+**Common KMS Client Keys:**
+
+- **Windows 11/10 Pro**: W269N-WFGWX-YVC9B-4J6C9-T83GX
+- **Windows 11/10 Enterprise**: NPPR9-FWDCX-D2C8J-H872K-2YT43
+- **Windows 11/10 Education**: NW6C2-QMPVW-D7KKK-3GKT6-VCFB2
+
+### Step 3: Install Product Key
+
+Open PowerShell as Administrator and run:
+```PowerShell
+changepk.exe /ProductKey <Paste_Product_Key_Here>
+```
+:::note
+you may have to use a generic key first.
+`VK7JG-NPHTM-C97JM-9MPGT-3V66T`
+:::
+
+### Step 4: Activate Windows
+
+Open PowerShell as Administrator and run:
+```PowerShell
+slmgr /ato
+```
