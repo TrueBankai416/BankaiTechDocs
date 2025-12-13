@@ -1,0 +1,407 @@
+---
+title: Jellyfin Addons
+description: Essential Jellyfin addons and patches including Nvidia GPU acceleration, hardware transcoding, and performance enhancements
+sidebar_position: 2
+toc_min_heading_level: 2
+toc_max_heading_level: 6
+tags: [jellyfin, addons, nvidia, gpu, transcoding, hardware-acceleration, media-server, performance]
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+### Nvidia Patch
+
+Description: This patch removes restriction on maximum number of simultaneous NVENC video encoding sessions imposed by Nvidia to consumer-grade GPUs. 
+
+#### Download 
+
+[NVIDIA Patch Linux](https://github.com/keylase/nvidia-patch)
+
+[NVIDIA Patch Windows](https://github.com/keylase/nvidia-patch/tree/master/win)
+
+### ErsatzTV
+
+Description: Stream custom live channels using your own media
+
+#### Download 
+
+[ErsatzTV Github](https://github.com/ErsatzTV/ErsatzTV)
+
+[ErsatzTV Download](https://github.com/ErsatzTV/ErsatzTV/releases)
+
+#### Other Links
+
+[ErsatzTV Documentation](https://ersatztv.org)
+
+[ErsatzTV Discord](https://discord.gg/hHaJm3yGy6)
+
+### Tunarr
+
+Description: Create and configure live TV channels using media on your Plex, Jellyfin, or Emby servers.
+
+Access your channels by adding the spoofed Tunarr HDHomerun tuner to Plex, Jellyfin, or Emby. Or utilize the m3u URL with any IPTV player app (we love UHF and Tivimate).
+
+
+#### Features
+
+    NEW Advanced filtering of Plex libraries, helping to easily find the content you want to schedule
+    NEW Jellyfin / Emby library support!
+    NEW Stream your channels directly in the browser
+    NEW Complete rewrite of streaming pipeline, offering better stability and improved performance
+    NEW New and more powerful scheduling options!
+    NEW Dark mode!
+    NEW Quickly find content you want for your channels with advanced filtering and sorting (Jellyfin filtering coming soon)
+    NEW Scheduled, configurable backups - never lose your channels and configuration!
+    NEW Support multiple transcode configurations and set them per-channel
+    NEW Audio language preference support
+    NEW Improved UI for time/random slot scheduling
+    NEW Improved Subtitle support: support for image and text based subtitles. Supports extracting embedded text based subtitles. Configure subtitle preferences (language, subtitle type, etc) per-channel.
+    Spoofed HDHR tuner and a IPTV channel list, providing a large amount of flexibility and easing integration with xTeVe or Threadfin and Plex, or the IPTV client of your choice.
+    Customize channels with a logo, filler content ("commercials", music videos, prerolls, channel branding videos) between programming, and more!
+    View channel lineups on the web-based TV Guide
+    Support for hardware accelerated transcoding, including Nvidia, VAAPI, QuickSync, and macOS VideoToolbox. (AMF; #1131 and Vulkann #1172 are coming soon!)
+
+#### Download 
+
+[Tunarr Github](https://github.com/chrisbenincasa/tunarr)
+
+[Tunarr Download](https://github.com/chrisbenincasa/tunarr/releases)
+
+#### Other Links
+
+[Tunarr Documentation](https://tunarr.com/)
+
+[Tunarr Discord](https://discord.gg/svgSBYkEK5)
+
+### JF-Secure
+
+Description: There are many great reverse-proxy tools available on GitHub, however, I didn't find one that really suit my needs and was user friendly for beginner users, so I decided to take open source software like Caddy Web-server and WinSSW to create a tool stack that will reverse-proxy Jellyfin for you. I wanted it to be automated and easy to use, even for novice users.
+
+#### Download
+
+[JF-Secure Github](https://github.com/dab2020/JF-secure)
+
+[JF-Secure Download](https://github.com/dab2020/JF-secure/releases)
+
+###  Jellyfin HA
+
+Description: Jellyfin integration for Home Assistant 
+
+#### Download
+
+[Jellyfin HA Github](https://github.com/koying/jellyfin_ha)
+
+### Jelly Party
+
+Description: Jelly-Party synchronizes videos you play in your browser, so that you and your friends can enjoy your favorite content — together.
+
+
+#### Download
+
+[Jelly Party Install](https://www.jelly-party.com/)
+
+[Jelly Party Github](https://github.com/Jelly-Party/jelly-party-extension)
+
+### JFA-Go
+
+Description: jfa-go is a user management app for Jellyfin (and Emby as 2nd class) that provides invite-based account creation as well as other features that make one's instance much easier to manage.
+
+#### Download
+
+[Github](https://github.com/hrfee/jfa-go)
+
+[Docker](https://github.com/hrfee/jfa-go?tab=readme-ov-file#docker)
+
+[JFA-Go](https://github.com/hrfee/jfa-go/releases)
+
+[Debian/Ubuntu](https://github.com/hrfee/jfa-go?tab=readme-ov-file#debian/)
+
+[Arch](https://github.com/hrfee/jfa-go?tab=readme-ov-file#aur)
+
+### Jellyfin Renamer
+
+Description: Python script that parses existing file names for season and episode terms and renames all files in a specified folder to match Jellyfin's naming convention. Supports [tags] and double episodes and part numbers. Files must have the episode pattern SXXEXX somewhere in the original filename. Most downloaded files have this pattern somewhere, so use it to tidy up downloaded seasons to work with Jellyfin or organise your files.
+
+#### Download
+
+[Jellyfin Renamer Github](https://github.com/moseymoose1/JellyfinRenamer)
+
+[Jellyfin Renamer](https://github.com/moseymoose1/JellyfinRenamer/releases)
+
+
+### Wizarr
+
+Description: Wizarr is a automatic user invitation system for Plex and Jellyfin. Create a unique link and share it to a user and they will be invited to your Media Server after they complete there signup proccess! They can even be guided to download the clients and read instructions on how to use your media software!
+
+#### Download
+
+[Wizarr Github](https://github.com/wizarrrr/wizarr/)
+
+[Wizarr](https://github.com/wizarrrr/wizarr/tree/master#getting-started)
+
+#### Extra INFO
+
+[Documentation](https://docs.wizarr.dev/)
+
+[Discord](https://discord.gg/XXCz7aM3ak)
+
+### Reiverr
+
+Description: Reiverr is a project that aims to create a single UI for interacting with TMDB, Jellyfin, Radarr and Sonarr, as well as be an alternative to Overseerr.
+
+#### Download
+
+[Reiverr Github](https://github.com/aleksilassila/reiverr)
+
+[Reiverr Docker Install](https://github.com/aleksilassila/reiverr#installation)
+
+
+#### Extra Info
+
+[Discord](https://discord.gg/enypPQh6pz)
+
+### Janitorr
+
+Description:
+
+Janitorr manages your media and cleans up after you.
+
+    Do you hate being the janitor of your server?
+    Do you have a lot of media that never gets watched?
+    Do your users constantly request media, and let it sit there afterward never to be touched again?
+
+You NEED Maintainerr for Plex or Janitorr for Jellyfin and Emby. It's THE solution for cleaning up your server and freeing up space before you run into issues.
+
+#### Download
+
+[Janitorr Github](https://github.com/Schaka/janitorr)
+
+[Docker Install](https://github.com/Schaka/janitorr#docker-config)
+
+### Threadfin
+
+Description: M3U Proxy for Plex DVR and Emby/Jellyfin Live TV. Based on xTeVe.
+
+
+#### Download
+
+[Threadfin Github](https://github.com/Threadfin/Threadfin)
+
+[Threadfin Download](https://github.com/Threadfin/Threadfin/releases)
+
+#### Extra Info
+
+[Threadfin Documentation](https://github.com/xteve-project/xTeVe-Documentation/blob/bac5fc1e63a27e575d9e18a3c4dba77f93fcc028/en/configuration.md)
+
+
+### Tdarr
+
+Description: Tdarr V2 is a cross-platform conditional based transcoding application for automating media library transcode/remux management in order to process your media files as required. For example, you can set rules for the required codecs, containers, languages etc that your media should have which helps keeps things organized and can increase compatability with your devices. A common use for Tdarr is to simply convert video files from h264 to h265 (hevc), saving 40%-50% in size.
+
+#### Download
+
+[Tdarr Download](https://home.tdarr.io/download/)
+
+#### Extra Info
+
+[Tdarr Website](https://tdarr.io/)
+
+[Tdarr Docs](https://docs.tdarr.io/)
+
+[Tdarr Discord](https://discord.com/invite/GF8X8cq)
+
+[Tdarr Reddit](https://www.reddit.com/r/Tdarr/)
+
+### Jellystat
+
+Description: Jellystat is a free and open source Statistics App for Jellyfin!
+
+#### Download
+
+[Jellystat Github](https://github.com/CyferShepard/Jellystat)
+
+[Jellystat Dockerhub](https://hub.docker.com/r/cyfershepard/jellystat)
+
+#### Extra Info
+
+[Discord](https://discord.gg/9SMBj2RyEe)
+
+### Calibre2Jellyfin
+
+Description: Python script to construct a Jellyfin ebook library from a Calibre library.
+
+#### Download
+
+[CalibreJellyfin Github](https://github.com/shawn61cp/calibre2jellyfin)
+
+[WinCalibre2Jellyfin Github](https://github.com/shawn61cp/wincalibre2jellyfin)
+
+### MediaTracker
+
+Description: Self hosted platform for tracking movies, tv shows, video games, books and audiobooks, highly inspired by flox
+
+#### Download
+
+[MediaTracker Github](https://github.com/bonukai/MediaTracker)
+
+### Movary
+
+Description: Movary is a free and open source web application to track, rate and explore your movie watch history. You can host it for yourself and others. It offers detailed statistics, third-party integrations for importing and exporting your history from platforms like Trakt, Letterboxd, or Netflix, automated play tracking for Plex, Jellyfin or Emby and much [more](https://github.com/leepeuker/movary#features)
+
+#### Download
+
+[Movary Github](https://github.com/leepeuker/movary)
+
+#### Extra Info
+
+[Movary Discord](https://discord.gg/KbcSqggrgW)
+
+[Movary Docs](https://docs.movary.org/)
+
+[Movary Demo](https://demo.movary.org/)  (USER: `testUser@movary.org` Password: `testuser`)
+
+### Multi-User Media Cleaner
+
+Description: Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query your Emby/Jellyfin server for the movies, tv episodes, audio tracks, and audiobooks in your libraries. Then delete media items you no longer want taking up disk space.
+
+#### Download
+
+[Multi-User Media Cleaner Github](https://github.com/terrelsa13/MUMC/releases)
+
+#### Extra Info
+
+[Multi-User Media Cleaner Documentation](https://github.com/terrelsa13/MUMC/wiki)
+
+### JellyHub (The jellyfin servers media indexer)
+
+Description:  JellyHub is a web app that allow you to fetch media from all of your jellyfin servers and regroup it in one place, so there is one place to search for specific media and tells you on wich server the desired media is located. 
+
+#### Download
+
+[Jellyhub Github](https://github.com/Zigl3ur/jellyhub)
+
+#### Extra Info
+
+[Jellyhub Dockerhub](https://hub.docker.com/r/zigleur/jellyhub)
+
+
+### Jellyplist
+
+Description:   A utility to help you sync playlists from spotify to your jellyfin server. 
+Jellyplist aims to be a companion app for your self-hosted Jellyfin Server. With Jellyplist you will be able to replicate/sync playlists from Spotify to your local Jellyfin account. Under the hood, it uses SpotDL for downloading the corresponding tracks from the available sources if a track isn´t found in your local library.
+
+Features:
+
+
+    Discover Playlists: Browse playlists like its nothing.
+    View Monitored Playlists: View playlists which are already synced by the server, adding these to your Jellyfin account will make them available immediately
+    Search Playlist: Search for playlists
+    No Sign-Up or User-Accounts: Jellyplist uses your local Jellyfin server for authentication
+    Automatically keep track of changes: Changes in order, added or removed songs will be tracked and synced with Jellyfin.
+    Metadata Sync: Playlist Metadata will be available at your Jellyfin Server
+    Lidarr Integrations: Automatically submit Artists or only Albums to your Lidarr instance
+    Automatic Quality Upgrades: When the same track from a playlist is added later with better quality, the playlist in Jellyfin will be updated to use the better sounding track.
+
+
+#### Download
+
+[Jellyplist Github](https://github.com/kamilkosek/jellyplist)
+
+### CrossWatch
+
+<!-- Logo centered -->
+<p align="center">
+  <img src="https://github.com/cenodude/CrossWatch/blob/main/images/CrossWatch.png" alt="CrossWatch" width="480"/>
+</p>
+
+Description:   CrossWatch is a synchronization engine that keeps your Plex, Jellyfin, Emby, SIMKL, Trakt and MDBlist in sync.
+It runs locally with a clean web UI where you link accounts, define sync pairs, run them manually or on a schedule, and review stats and history.
+CrossWatch also includes its own tracker to keep your data safe with snapshots. It supports movies and shows/episodes Anime is not supported yet....sorry..
+
+Screenshots:
+
+<!-- Click-to-zoom screenshots (links to full size) -->
+<p align="center">
+  <a href="images/screenshot1.jpg">
+    <img src="https://github.com/cenodude/CrossWatch/blob/main/images/screenshot1.jpg" alt="CrossWatch — Screenshot 1" width="24%"/>
+  </a>
+  <a href="images/screenshot2.jpg">
+    <img src="https://github.com/cenodude/CrossWatch/blob/main/images/screenshot2.jpg" alt="CrossWatch — Screenshot 2" width="24%"/>
+  </a>
+  <a href="images/screenshot3.jpg">
+    <img src="https://github.com/cenodude/CrossWatch/blob/main/images/screenshot3.jpg" alt="CrossWatch — Screenshot 3" width="24%"/>
+  </a>
+  <a href="images/screenshot4.jpg">
+    <img src="https://github.com/cenodude/CrossWatch/blob/main/images/screenshot4.jpg" alt="CrossWatch — Screenshot 4" width="24%"/>
+  </a>
+</p>
+
+<!-- Caption directly under screenshots -->
+<p align="center"><sub>Click any screenshot to view it full size.</sub></p>
+<p align="center">
+  <img width="783" height="225" alt="image" src="https://github.com/user-attachments/assets/4337e4b3-b641-4826-9460-d4be441ddc14" />
+</p>
+
+<!-- Download + Wiki + Best Practices -->
+<p align="center">
+  <a href="https://github.com/cenodude/CrossWatch/releases/latest">
+    <img
+      alt="Latest Release"
+      src="https://img.shields.io/github/v/release/cenodude/CrossWatch?display_name=release&sort=semver&logo=github&label=Latest%20Release&style=for-the-badge"/>
+  </a>
+  <a href="https://github.com/cenodude/CrossWatch/wiki/Best-Practices">
+    <img
+      alt="Must-read: Best Practices"
+      src="https://img.shields.io/badge/Best%20Practices-Must%20read!-d93c4a?style=for-the-badge&logo=gitbook"/>
+  </a>
+  <a href="https://github.com/cenodude/CrossWatch/wiki">
+  </a>
+</p>
+
+Features:
+
+<h2 align="center">🚀 Features</h2>
+<div align="center">
+  <table style="display:inline-block;text-align:left;">
+    <tr>
+      <td valign="top">
+        <ul style="margin:0;padding-left:1.1em">
+          <li>Sync watchlists (one-/two-way)</li>
+          <li>Live scrobble (Plex/Jellyfin/Emby → Trakt)</li>
+          <li>Sync ratings (one-/two-way)</li>
+          <li>Sync watch history (one-/two-way)</li>
+          <li>Keep snapshots with CrossWatch tracker</li>
+          <li>Auto-remove from watchlist after finish</li>
+        </ul>
+      </td>
+      <td valign="top">
+        <ul style="margin:0;padding-left:1.1em">
+          <li>Analyzer - finds broken or missing matches/IDs</li>
+          <li>Exporter - CSV files for popular service</li>
+          <li>Now Playing card, Stats, history, live logs</li>
+          <li>Headless scheduled runs</li>
+          <li><strong>Trackers:</strong>
+            <img alt="CrossWatch" src="https://img.shields.io/badge/CrossWatch-7C5CFF?labelColor=1f2328&logoColor=white" />
+            &nbsp;<img alt="SIMKL" src="https://img.shields.io/badge/SIMKL-0AAEEF?labelColor=1f2328" />
+            &nbsp;<img alt="Trakt" src="https://img.shields.io/badge/Trakt-ED1C24?labelColor=1f2328" />
+            &nbsp;<img alt="MDBList" src="https://img.shields.io/badge/MDBList-3B73B9?labelColor=1f2328" />
+          </li>
+          <li><strong>Media servers:</strong>
+            <img alt="Plex" src="https://img.shields.io/badge/Plex-E08A00?logo=plex&logoColor=white&labelColor=1f2328" />
+            &nbsp;<img alt="Jellyfin" src="https://img.shields.io/badge/Jellyfin-946AD9?logo=jellyfin&logoColor=white&labelColor=1f2328" />
+            &nbsp;<img alt="Emby" src="https://img.shields.io/badge/Emby-52B54B?logo=emby&logoColor=white&labelColor=1f2328" />
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+#### Download
+
+[CrossWatch Github](https://github.com/cenodude/CrossWatch/blob/main/README.md#%EF%B8%8F-download)
+
+<BuyMeACoffeeButton />
+
+
