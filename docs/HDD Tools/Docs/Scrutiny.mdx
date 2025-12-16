@@ -1,0 +1,218 @@
+---
+id: scrutiny-setup
+title: Scrutiny Setup Guide
+sidebar_label: Scrutiny Setup
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Scrutiny Setup Guide
+
+Scrutiny is a hard drive health monitoring tool that tracks SMART metrics and provides a web dashboard. This guide covers both the host/server setup and collector configuration.
+
+---
+
+## Setup Scrutiny Host (Web Server)
+
+The Scrutiny host consists of three services: InfluxDB (database), the web UI, and an optional collector for the host machine itself.
+
+### Deploy the Stack
+
+1. Create the directory structure and set ownership:
+   ```bash
+   sudo mkdir -p /opt/docker/scrutiny
+   sudo chown -R $USER:$USER /opt/docker
+   cd /opt/docker/scrutiny
+   ```
+
+2. Create the `docker-compose.yml` file with the following configuration:
+
+   ```yaml
+   name: scrutiny
+
+   services:
+     influxdb:
+       restart: unless-stopped
+       image: influxdb:2.2
+       ports:
+         - '8089:8086'
+       volumes:
+         - './influxdb:/var/lib/influxdb2'
+       healthcheck:
+         test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+         interval: 5s
+         timeout: 10s
+         retries: 20
+
+
+     web:
+       restart: unless-stopped
+       image: 'ghcr.io/analogj/scrutiny:master-web'
+       ports:
+         - '8091:8080'
+       volumes:
+         - './config:/opt/scrutiny/config'
+       environment:
+         SCRUTINY_WEB_INFLUXDB_HOST: 'influxdb'
+       depends_on:
+         influxdb:
+           condition: service_healthy
+       healthcheck:
+         test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+         interval: 5s
+         timeout: 10s
+         retries: 20
+         start_period: 10s
+
+     collector:
+       restart: unless-stopped
+       image: 'ghcr.io/analogj/scrutiny:master-collector'
+       cap_add:
+         - SYS_RAWIO
+         - SYS_ADMIN
+       volumes:
+         - '/run/udev:/run/udev:ro'
+       environment:
+         COLLECTOR_API_ENDPOINT: 'http://web:8080'
+         COLLECTOR_HOST_ID: 'Ubuntu Media Server'
+         # If true forces the collector to run on startup (cron will be started after the collector completes)
+         # see: https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DEVICE_COLLECTOR.md#collector-trigger-on-startup
+         COLLECTOR_RUN_STARTUP: true
+       depends_on:
+         web:
+           condition: service_healthy
+       devices:
+         - "/dev/nvme0"
+         - "/dev/nvme1"
+         - "/dev/sde"
+         - "/dev/sdg"
+         - "/dev/sdf"
+         - "/dev/sdd"
+         - "/dev/sdb"
+         - "/dev/sda"
+         - "/dev/sdc"
+   ```
+
+3. Start the services:
+   ```bash
+   docker compose up -d
+   ```
+
+4. Access the web interface at `http://<server-ip>:8091`
+
+### Configuration Notes
+
+- **InfluxDB**: Exposed on port 8089 (mapped from 8086) for direct access if needed
+- **Web UI**: Accessible on port 8091 (mapped from 8080)
+- **Collector**: The built-in collector runs on the same host as the Docker containers
+  - Update the `COLLECTOR_HOST_ID` to identify your host server
+  - Add or remove device mappings under `devices:` section based on your drives
+  - The collector automatically runs on startup and then on a cron schedule
+
+### Device Discovery
+
+To find your device names on Linux:
+
+```bash
+lsblk
+# or
+ls -la /dev/sd* /dev/nvme*
+```
+
+Add each drive you want to monitor to the `devices:` section in the collector service.
+
+---
+
+## Setup Scrutiny Collector on Windows
+
+The Scrutiny collector binary can be run on Windows to gather SMART metrics and send them to your Scrutiny web server. This guide explains how to install prerequisites, configure the collector, and run it.
+
+---
+
+## 1. Install Smartmontools
+
+Scrutiny relies on `smartctl` from [smartmontools](https://www.smartmontools.org/wiki/Download).
+
+- Download and install the Windows package.
+- During installation, check the option to **add smartctl to PATH**.
+- Verify installation:
+
+```powershell
+smartctl --version
+```
+
+---
+
+## 2. Download the Scrutiny Collector Binary
+
+* Get the latest Windows release from [Scrutiny GitHub Releases](https://github.com/AnalogJ/scrutiny/releases).
+* Place the binary in a folder, e.g.:
+
+```
+C:\scrutiny\
+```
+
+---
+
+## 3. Run the Collector
+
+You can run the collector manually from PowerShell:
+
+```powershell
+cd C:\scrutiny
+.\scrutiny-collector-metrics-windows-amd64.exe run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"
+```
+
+* Replace `<server-ip>` with the IP or hostname of your Scrutiny web server.
+* Set `--host-id` to a friendly name for this computer (e.g. `MyWindowsPC`). This name will appear in the Scrutiny dashboard.
+
+---
+
+## 4. Optional: Configuration File
+
+Instead of passing flags every time, you can create a config file:
+
+```
+C:\opt\scrutiny\config\collector.yaml
+```
+
+Example:
+
+```yaml
+api:
+  endpoint: http://<server-ip>:8091
+host:
+  id: MyWindowsPC
+```
+
+Then run simply:
+
+```powershell
+.\scrutiny-collector-metrics-windows-amd64.exe run
+```
+
+---
+
+## 5. Automate with Task Scheduler
+
+To collect metrics regularly:
+
+1. Open **Task Scheduler**.
+2. Create a new task:
+   * **Program/script**: `C:\scrutiny\`[`scrutiny-collector-metrics-windows-amd64.exe`](https://scrutiny-collector-metrics-windows-amd64.exe)
+   * **Arguments**: `run`
+   * **Start in**: `C:\scrutiny`
+3. Check **Run with highest privileges**.
+4. Set a trigger (e.g. daily).
+5. Save the task.
+
+---
+
+## 6. Verify in Dashboard
+
+After the collector runs, drives from this Windows PC will appear in the Scrutiny dashboard under the configured Host ID.
+
+---
+
+<Tabs> <TabItem value="Manual Run" label="Manual Run"> Run once from PowerShell to test connectivity. </TabItem> <TabItem value="Scheduled Task" label="Scheduled Task"> Automate collection daily with Task Scheduler. </TabItem> </Tabs>
