@@ -200,7 +200,7 @@ To collect metrics regularly:
 
 1. Open **Task Scheduler**.
 2. Create a new task:
-   * **Program/script**: `C:\scrutiny\`[`scrutiny-collector-metrics-windows-amd64.exe`](https://scrutiny-collector-metrics-windows-amd64.exe)
+   * **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
    * **Arguments**: `run`
    * **Start in**: `C:\scrutiny`
 3. Check **Run with highest privileges**.
@@ -215,4 +215,11 @@ After the collector runs, drives from this Windows PC will appear in the Scrutin
 
 ---
 
-<Tabs> <TabItem value="Manual Run" label="Manual Run"> Run once from PowerShell to test connectivity. </TabItem> <TabItem value="Scheduled Task" label="Scheduled Task"> Automate collection daily with Task Scheduler. </TabItem> </Tabs>
+<Tabs>
+  <TabItem value="Manual Run" label="Manual Run">
+    Run once from PowerShell to test connectivity.
+  </TabItem>
+  <TabItem value="Scheduled Task" label="Scheduled Task">
+    Automate collection daily with Task Scheduler.
+  </TabItem>
+</Tabs>
