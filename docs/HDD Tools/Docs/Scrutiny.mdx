@@ -201,7 +201,7 @@ To collect metrics regularly:
 1. Open **Task Scheduler**.
 2. Create a new task:
    * **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
-   * **Arguments**: `run`
+   * **Arguments**: `run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"`
    * **Start in**: `C:\scrutiny`
 3. Check **Run with highest privileges**.
 4. Set a trigger (e.g. daily).
