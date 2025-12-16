@@ -36,7 +36,21 @@ const config: Config = {
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-live-codeblock', 
+    '@docusaurus/theme-mermaid',
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        indexPages: true,
+        indexBlog: false,
+        highlightSearchTermsOnTargetPage: true,
+      },
+    ],
+  ],
   
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
@@ -157,23 +171,23 @@ const config: Config = {
     },
     // Replace with your project's social card
     image: 'img/social-card.jpg',
-    algolia: {
-      appId: process.env.ALGOLIA_APP_ID,
-      apiKey: process.env.ALGOLIA_API_KEY,
-      indexName: 'bankai-tech',
-      // Optional: see doc section below
-      contextualSearch: true,
-      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
-      replaceSearchResultPathname: {
-        from: '/docs/', // or as RegExp: /\/docs\//
-        to: '/',
-      },
-      // Optional: Algolia search parameters
-      searchParameters: {},
+    // algolia: {
+    //   appId: process.env.ALGOLIA_APP_ID,
+    //   apiKey: process.env.ALGOLIA_API_KEY,
+    //   indexName: 'bankai-tech',
+    //   // Optional: see doc section below
+    //   contextualSearch: true,
+    //   // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+    //   replaceSearchResultPathname: {
+    //     from: '/docs/', // or as RegExp: /\/docs\//
+    //     to: '/',
+    //   },
+    //   // Optional: Algolia search parameters
+    //   searchParameters: {},
 
-      // Optional: path for search page that enabled by default (`false` to disable it)
-      searchPagePath: 'search',
-    },
+    //   // Optional: path for search page that enabled by default (`false` to disable it)
+    //   searchPagePath: 'search',
+    // },
     navbar: {
       title: 'Bankai-Tech Docs',
       logo: {
