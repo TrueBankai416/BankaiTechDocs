@@ -70,6 +70,30 @@ I am using `typescript` but you may be using `javascript` make sure you use the 
 
 <p>Add `routeBasePath: '/', // Serve the docs at the site's root` above `sidebarPath: './sidebars.js',`</p>
 
+:::important
+It is strongly recommended to use relative path links in your docs. This ensures links work correctly regardless of your `routeBasePath` configuration.
+
+**Directory Structure Example:**
+```
+docs/
+├── Docusaurus/
+│   ├── Introduction.mdx
+│   └── Docs/
+│       ├── Docs Only Mode.mdx  ← You are here
+│       └── Configuration.mdx
+└── Docker/
+    ├── Introduction.mdx
+    └── Docs/
+        └── Installation.mdx
+```
+
+**Examples:**
+- Same folder: `[link](./Configuration.mdx)`
+- Parent folder: `[link](../Introduction.mdx)`
+- Grandparent folder: `[link](../../Docker/Introduction.mdx)`
+- Instead of absolute: ~~`[link](/docs/Docker/Introduction.mdx)`~~
+:::
+
 #### *My finished changes to docusaurus.config.ts file*
 
 <p>It should look like this</p>
