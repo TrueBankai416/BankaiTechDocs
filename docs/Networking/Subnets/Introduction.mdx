@@ -369,8 +369,12 @@ print(f"Hosts: {hosts}")
 subnets = list(network.subnets(new_prefix=26))
 for i, subnet in enumerate(subnets, 1):
     print(f"Subnet {i}: {subnet}")
-    print(f"  First host: {list(subnet.hosts())[0]}")
-    print(f"  Last host: {list(subnet.hosts())[-1]}")
+    hosts = list(subnet.hosts())
+    if hosts:
+        print(f"  First host: {hosts[0]}")
+        print(f"  Last host: {hosts[-1]}")
+    else:
+        print("  No usable host addresses in this subnet.")
 ```
 
 #### **Bash Subnet Calculator Script**
