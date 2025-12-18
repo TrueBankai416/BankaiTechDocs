@@ -485,7 +485,7 @@ ipcalc 192.168.1.100/26
 ### **Network Verification**
 
 ```bash
-# Verify network connectivity within subnet (ping default gateway)
+# Verify connectivity to your default gateway (detected dynamically from routing table)
 ping "$(ip route | awk '/default/ {print $3; exit}')"
 
 # Or ping a known host in your subnet
