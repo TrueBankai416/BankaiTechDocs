@@ -311,8 +311,8 @@ ipcalc 192.168.1.0/24
 # Subnet a network (if supported by your ipcalc version)
 ipcalc 192.168.1.0/24 -s 50 30 20 10
 
-# Check if IP is in subnet
-ipcalc -c 192.168.1.100/24
+# Validate IPv4 address format (implementation-specific)
+ipcalc -c 192.168.1.100
 
 # Note: Some distributions use ipcalc-ng with different syntax
 # If -s option isn't available, try: sipcalc or install ipcalc-ng
