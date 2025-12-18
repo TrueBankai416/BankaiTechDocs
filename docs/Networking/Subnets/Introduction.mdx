@@ -490,8 +490,8 @@ ping 192.168.1.1
 # Check if IP is in correct subnet
 ip route get 192.168.1.100
 
-# Verify broadcast domain
-ping -b 192.168.1.255
+# Verify broadcast domain (may require root/sudo and can be disabled by system policy)
+sudo ping -b 192.168.1.255
 ```
 
 ## **Real-World Implementation Examples**
