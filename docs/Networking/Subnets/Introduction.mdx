@@ -392,8 +392,14 @@ calculate_subnet() {
     else
         echo "Network: $ip/$cidr"
         # Basic calculation without ipcalc
-        local host_bits=$((32 - cidr))
-        local hosts=$((2**host_bits - 2))
+        if (( cidr == 32 )); then
+            local hosts=1
+        elif (( cidr == 31 )); then
+            local hosts=2
+        else
+            local host_bits=$((32 - cidr))
+            local hosts=$((2**host_bits - 2))
+        fi
         echo "Hosts: $hosts"
     fi
 }
