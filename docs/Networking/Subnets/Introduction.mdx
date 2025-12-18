@@ -233,7 +233,7 @@ Router2-Router3: 10.0.100.2/31     # 10.0.100.2, 10.0.100.3
 Router3-Router4: 10.0.100.4/31     # 10.0.100.4, 10.0.100.5
 ```
 
-**Note**: /31 subnets are preferred in modern networks as they save IP addresses by eliminating the need for network and broadcast addresses on point-to-point links.
+**Note**: /31 subnets are preferred in modern networks as they save IP addresses by allowing both addresses to be used as host addresses on point-to-point links (per RFC 3021), rather than reserving them for network and broadcast purposes.
 
 ## **Subnet Design Best Practices**
 
