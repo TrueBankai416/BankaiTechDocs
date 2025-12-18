@@ -1,0 +1,655 @@
+---
+title: Subnets and Subnet Masks - Complete Guide to Network Subnetting
+tags:
+   - Networking
+   - Subnets
+   - IP Addressing
+   - CIDR
+   - Network Design
+   - Subnet Masks
+keywords: [subnets, subnet masks, CIDR, IP addressing, network segmentation, subnetting, network design, routing]
+last_update:
+  author: BankaiTech
+---
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Subnets and Subnet Masks: Complete Guide to Network Subnetting**
+
+Subnetting is a fundamental networking concept that allows you to divide a large network into smaller, more manageable segments called subnets. Understanding subnets and subnet masks is essential for network design, security, performance optimization, and efficient IP address management.
+
+## **What are Subnets?**
+
+A **subnet** (short for "subnetwork") is a logical subdivision of an IP network. Subnetting allows you to take a single network address space and divide it into multiple smaller networks, each with its own range of IP addresses. This division is accomplished using subnet masks, which define the boundary between the network portion and host portion of an IP address.
+
+### **Why Use Subnets?**
+
+1. **Network Organization**: Logically separate different departments, functions, or device types
+2. **Security**: Isolate sensitive systems and control traffic flow between network segments
+3. **Performance**: Reduce broadcast domains and network congestion
+4. **Scalability**: Efficiently manage large networks by breaking them into smaller pieces
+5. **IP Address Conservation**: Make better use of available IP address space
+6. **Administrative Control**: Apply different policies and configurations to different network segments
+
+## **Understanding IP Addresses and Network Classes**
+
+### **IPv4 Address Structure**
+
+An IPv4 address consists of 32 bits, typically written in dotted decimal notation (e.g., 192.168.1.100). Each address has two parts:
+- **Network portion**: Identifies the network
+- **Host portion**: Identifies the specific device on that network
+
+### **Traditional Network Classes**
+
+Before CIDR (Classless Inter-Domain Routing), networks were divided into classes:
+
+| Class | Range | Default Subnet Mask | Network Bits | Host Bits | Networks | Hosts per Network |
+|-------|-------|-------------------|--------------|-----------|----------|-------------------|
+| **Class A** | 1.0.0.0 - 126.255.255.255 | 255.0.0.0 (/8) | 8 | 24 | 126 | 16,777,214 |
+| **Class B** | 128.0.0.0 - 191.255.255.255 | 255.255.0.0 (/16) | 16 | 16 | 16,384 | 65,534 |
+| **Class C** | 192.0.0.0 - 223.255.255.255 | 255.255.255.0 (/24) | 24 | 8 | 2,097,152 | 254 |
+
+### **Private IP Address Ranges**
+
+These ranges are reserved for private networks and not routed on the public internet:
+
+| Class | Private Range | Classful Default Mask | CIDR | Common Usage |
+|-------|---------------|----------------------|------|--------------|
+| **Class A** | 10.0.0.0 - 10.255.255.255 | 255.0.0.0 | /8 | Large enterprises |
+| **Class B** | 172.16.0.0 - 172.31.255.255 | 255.255.0.0 | /12 | Medium networks |
+| **Class C** | 192.168.0.0 - 192.168.255.255 | 255.255.255.0 | /16 | Home/small office |
+
+*Note: The "CIDR" column shows the CIDR notation for each private address block (for example, 172.16.0.0/12 covers 172.16.0.0–172.31.255.255), while "Classful Default Mask" refers to the traditional class-based default subnet masks.*
+
+## **Subnet Masks Explained**
+
+### **What is a Subnet Mask?**
+
+A **subnet mask** is a 32-bit number that defines which portion of an IP address represents the network and which portion represents the host. It uses binary 1s for the network portion and binary 0s for the host portion.
+
+### **Subnet Mask Formats**
+
+#### **Dotted Decimal Notation**
+```
+255.255.255.0    (Standard Class C mask)
+255.255.240.0    (Custom subnet mask)
+255.255.255.192  (Custom subnet mask)
+```
+
+#### **Binary Representation**
+```
+255.255.255.0 = 11111111.11111111.11111111.00000000
+255.255.240.0 = 11111111.11111111.11110000.00000000
+255.255.255.192 = 11111111.11111111.11111111.11000000
+```
+
+#### **CIDR Notation**
+CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a slash followed by the number of network bits:
+
+```
+192.168.1.0/24    (24 network bits, 8 host bits)
+10.0.0.0/8        (8 network bits, 24 host bits)
+172.16.0.0/20     (20 network bits, 12 host bits)
+```
+
+### **Common Subnet Masks and Their CIDR Equivalents**
+
+*Note: "Subnets (from /24)" shows how many equal subnets you get when splitting a /24 network into the indicated prefix length.*
+
+| Subnet Mask | CIDR | Network Bits | Host Bits | Possible Hosts | Subnets (from /24) |
+|-------------|------|--------------|-----------|----------------|-------------------|
+| 255.255.255.255 | /32 | 32 | 0 | 1 (host route) | 256 |
+| 255.255.255.254 | /31 | 31 | 1 | 2 (point-to-point) | 128 |
+| 255.255.255.252 | /30 | 30 | 2 | 2 | 64 |
+| 255.255.255.248 | /29 | 29 | 3 | 6 | 32 |
+| 255.255.255.240 | /28 | 28 | 4 | 14 | 16 |
+| 255.255.255.224 | /27 | 27 | 5 | 30 | 8 |
+| 255.255.255.192 | /26 | 26 | 6 | 62 | 4 |
+| 255.255.255.128 | /25 | 25 | 7 | 126 | 2 |
+| 255.255.255.0 | /24 | 24 | 8 | 254 | 1 |
+
+## **Subnetting Calculations**
+
+### **Basic Subnetting Formula**
+
+- **Number of subnets**: 2^(borrowed bits)
+- **Number of hosts per subnet**: 2^(host bits) - 2 (except /31 and /32)
+- **Subnet increment (block size)**: 256 minus the mask value in the relevant octet
+
+### **Step-by-Step Subnetting Process**
+
+#### **Example: Subnetting 192.168.1.0/24 into 4 subnets**
+
+1. **Determine requirements**: Need 4 subnets
+2. **Calculate borrowed bits**: 2^2 = 4 subnets, so borrow 2 bits
+3. **New subnet mask**: /24 + 2 = /26 (255.255.255.192)
+4. **Hosts per subnet**: 2^6 - 2 = 62 hosts
+5. **Subnet increment**: 256 - 192 = 64 (in the last octet)
+
+**Resulting subnets:**
+```
+Subnet 1: 192.168.1.0/26    (192.168.1.1 - 192.168.1.62)
+Subnet 2: 192.168.1.64/26   (192.168.1.65 - 192.168.1.126)
+Subnet 3: 192.168.1.128/26  (192.168.1.129 - 192.168.1.190)
+Subnet 4: 192.168.1.192/26  (192.168.1.193 - 192.168.1.254)
+```
+
+### **Variable Length Subnet Masking (VLSM)**
+
+VLSM allows you to use different subnet mask lengths within the same network, optimizing IP address usage.
+
+#### **Example: VLSM for Different Department Sizes**
+
+Starting with 192.168.1.0/24, create subnets for:
+- Sales: 50 hosts
+- Engineering: 25 hosts  
+- HR: 10 hosts
+- Management: 5 hosts
+
+**Solution:**
+```
+Sales:       192.168.1.0/26    (62 hosts available)
+Engineering: 192.168.1.64/27   (30 hosts available)
+HR:          192.168.1.96/28   (14 hosts available)
+Management:  192.168.1.112/29  (6 hosts available)
+```
+
+## **Practical Subnetting Examples**
+
+### **Home Network Segmentation**
+
+#### **Scenario**: Segment home network for security and organization
+
+**Network**: 192.168.1.0/24
+
+**Requirements**:
+- Main devices: 50 hosts
+- Guest network: 20 hosts
+- IoT devices: 30 hosts
+- Management: 5 hosts
+
+**Solution using VLSM**:
+```bash
+# Main network (needs 50 hosts, use /26 = 62 hosts)
+Main Network:    192.168.1.0/26     # 192.168.1.1 - 192.168.1.62
+
+# IoT devices (needs 30 hosts, use /27 = 30 hosts)  
+IoT Network:     192.168.1.64/27    # 192.168.1.65 - 192.168.1.94
+
+# Guest network (needs 20 hosts, use /27 = 30 hosts)
+Guest Network:   192.168.1.96/27    # 192.168.1.97 - 192.168.1.126
+
+# Management (needs 5 hosts, use /29 = 6 hosts)
+Management:      192.168.1.128/29   # 192.168.1.129 - 192.168.1.134
+```
+
+### **Small Office Network**
+
+#### **Scenario**: Design network for small office with multiple departments
+
+**Network**: 10.0.0.0/16
+
+**Requirements**:
+- Sales: 100 hosts
+- Engineering: 200 hosts
+- Administration: 50 hosts
+- Servers: 20 hosts
+- Printers: 10 hosts
+
+**Solution**:
+```bash
+# Engineering (needs 200 hosts, use /24 = 254 hosts)
+Engineering:     10.0.1.0/24        # 10.0.1.1 - 10.0.1.254
+
+# Sales (needs 100 hosts, use /25 = 126 hosts)
+Sales:           10.0.2.0/25        # 10.0.2.1 - 10.0.2.126
+
+# Administration (needs 50 hosts, use /26 = 62 hosts)
+Administration:  10.0.2.128/26      # 10.0.2.129 - 10.0.2.190
+
+# Servers (needs 20 hosts, use /27 = 30 hosts)
+Servers:         10.0.2.192/27      # 10.0.2.193 - 10.0.2.222
+
+# Printers (needs 10 hosts, use /28 = 14 hosts)
+Printers:        10.0.2.224/28      # 10.0.2.225 - 10.0.2.238
+```
+
+### **Point-to-Point Links**
+
+For router-to-router connections, you can use /30 or /31 subnets:
+
+#### **/30 Subnets (Traditional)**
+```bash
+# WAN links between routers (2 usable hosts each)
+Router1-Router2: 10.0.100.0/30     # 10.0.100.1, 10.0.100.2
+Router2-Router3: 10.0.100.4/30     # 10.0.100.5, 10.0.100.6
+Router3-Router4: 10.0.100.8/30     # 10.0.100.9, 10.0.100.10
+```
+
+#### **/31 Subnets (Modern - RFC 3021)**
+```bash
+# More efficient for P2P links (2 usable hosts, no network/broadcast)
+Router1-Router2: 10.0.100.0/31     # 10.0.100.0, 10.0.100.1
+Router2-Router3: 10.0.100.2/31     # 10.0.100.2, 10.0.100.3
+Router3-Router4: 10.0.100.4/31     # 10.0.100.4, 10.0.100.5
+```
+
+**Note**: /31 subnets are preferred in modern networks as they save IP addresses by allowing both addresses to be used as host addresses on point-to-point links (per RFC 3021), rather than reserving them for network and broadcast purposes.
+
+## **Subnet Design Best Practices**
+
+### **Planning Guidelines**
+
+1. **Plan for Growth**: Always allocate more addresses than currently needed
+2. **Use Consistent Addressing**: Develop and follow an IP addressing scheme
+3. **Document Everything**: Maintain accurate network documentation
+4. **Reserve Address Ranges**: Set aside blocks for future expansion
+5. **Use Private Addresses**: Utilize RFC 1918 private address space
+
+### **Addressing Scheme Examples**
+
+#### **Hierarchical Addressing**
+```bash
+# Site-based addressing (10.Site.Subnet.Host)
+Site 1: 10.1.0.0/16
+  - LAN 1: 10.1.1.0/24
+  - LAN 2: 10.1.2.0/24
+  - Servers: 10.1.10.0/24
+
+Site 2: 10.2.0.0/16
+  - LAN 1: 10.2.1.0/24
+  - LAN 2: 10.2.2.0/24
+  - Servers: 10.2.10.0/24
+```
+
+#### **Function-based Addressing**
+```bash
+# Function-based addressing
+Users:          192.168.1.0/24
+Servers:        192.168.10.0/24
+Printers:       192.168.20.0/24
+WiFi:           192.168.30.0/24
+Guest:          192.168.40.0/24
+Management:     192.168.50.0/24
+```
+
+### **Security Considerations**
+
+1. **Network Segmentation**: Isolate sensitive systems
+2. **VLAN Implementation**: Use VLANs with subnets for layer 2 separation
+3. **Access Control Lists**: Implement inter-subnet communication rules
+4. **DMZ Networks**: Place public-facing services in separate subnets
+5. **Management Networks**: Use dedicated subnets for network management
+
+## **Subnetting Tools and Commands**
+
+### **Command Line Tools**
+
+#### **Linux/Unix Tools**
+
+**Installation:**
+```bash
+# Ubuntu/Debian
+sudo apt install ipcalc
+
+# Red Hat/CentOS/Fedora
+sudo dnf install ipcalc
+```
+
+**Usage:**
+```bash
+# Calculate subnet information
+ipcalc 192.168.1.0/24
+
+# Example output:
+# Network:   192.168.1.0/24
+# Netmask:   255.255.255.0 = 24
+# Broadcast: 192.168.1.255
+# HostMin:   192.168.1.1
+# HostMax:   192.168.1.254
+# Hosts/Net: 254
+
+# Subnet a network (if supported by your ipcalc version)
+ipcalc 192.168.1.0/24 -s 50 30 20 10
+
+# Validate IPv4 address format (implementation-specific)
+ipcalc -c 192.168.1.100
+
+# Note: Some distributions use ipcalc-ng with different syntax
+# If -s option isn't available, try: sipcalc or install ipcalc-ng
+```
+
+#### **Advanced ipcalc Usage**
+```bash
+# Split network into equal subnets
+ipcalc 10.0.0.0/16 --split 4
+
+# Calculate supernet (adjacent networks)
+ipcalc 192.168.0.0/24 192.168.1.0/24 --aggregate
+
+# Show binary representation
+ipcalc 192.168.1.0/24 --binary
+
+# Note: Advanced options like --split/--aggregate vary by ipcalc implementation
+# (ipcalc vs ipcalc-ng). Check your version's manual for exact syntax.
+```
+
+### **Online Subnet Calculators**
+
+Popular online tools for subnet calculations:
+- [**subnet-calculator.com**](https://www.subnet-calculator.com): Comprehensive subnet calculator
+- [**calculator.net IP Subnet Calculator**](https://www.calculator.net/ip-subnet-calculator.html): Simple subnet calculator  
+- [**davidc.net Subnet Calculator**](https://www.davidc.net/sites/default/subnets/subnets.html): Visual subnet calculator
+- [**tunnelsup.com Subnet Calculator**](https://www.tunnelsup.com/subnet-calculator/): Advanced subnet calculator
+
+### **Programming and Scripting**
+
+#### **Python Example**
+```python
+import ipaddress
+
+# Create network object
+network = ipaddress.IPv4Network('192.168.1.0/24')
+
+# Get network information
+print(f"Network: {network}")
+print(f"Netmask: {network.netmask}")
+print(f"Broadcast: {network.broadcast_address}")
+
+# Calculate usable hosts (handle special cases)
+if network.prefixlen == 31:
+    hosts = 2  # Point-to-point link
+elif network.prefixlen == 32:
+    hosts = 1  # Host route
+else:
+    hosts = network.num_addresses - 2  # Normal subnet
+
+print(f"Hosts: {hosts}")
+
+# Subnet the network
+subnets = list(network.subnets(new_prefix=26))
+for i, subnet in enumerate(subnets, 1):
+    print(f"Subnet {i}: {subnet}")
+    hosts = list(subnet.hosts())
+    if hosts:
+        print(f"  First host: {hosts[0]}")
+        print(f"  Last host: {hosts[-1]}")
+    else:
+        print("  No usable host addresses in this subnet.")
+```
+
+#### **Bash Subnet Calculator Script**
+```bash
+#!/bin/bash
+# Simple subnet calculator
+
+calculate_subnet() {
+    local ip=$1
+    local cidr=$2
+    
+    # Use ipcalc if available
+    if command -v ipcalc >/dev/null 2>&1; then
+        ipcalc "$ip/$cidr"
+    else
+        echo "Network: $ip/$cidr"
+        # Basic calculation without ipcalc
+        if (( cidr == 32 )); then
+            local hosts=1
+        elif (( cidr == 31 )); then
+            local hosts=2
+        else
+            local host_bits=$((32 - cidr))
+            local hosts=$((2**host_bits - 2))
+        fi
+        echo "Hosts: $hosts"
+    fi
+}
+
+# Usage
+calculate_subnet 192.168.1.0 24
+```
+
+## **Advanced Subnetting Concepts**
+
+### **Supernetting (Route Aggregation)**
+
+Supernetting combines multiple smaller networks into a larger one to reduce routing table size:
+
+```bash
+# Combine these networks:
+192.168.0.0/24
+192.168.1.0/24
+192.168.2.0/24
+192.168.3.0/24
+
+# Into supernet:
+192.168.0.0/22  # Covers 192.168.0.0 - 192.168.3.255
+```
+
+### **IPv6 Subnetting**
+
+IPv6 uses 128-bit addresses with different subnetting principles:
+
+```bash
+# IPv6 network
+2001:db8::/32
+
+# Subnet into /48s (site-level)
+2001:db8:0000::/48
+2001:db8:0001::/48
+2001:db8:0002::/48
+
+# Further subnet into /64s (LAN-level)
+2001:db8:0000:0000::/64
+2001:db8:0000:0001::/64
+2001:db8:0000:0002::/64
+```
+
+### **Subnet Masks in Routing**
+
+Understanding how routers use subnet masks for routing decisions:
+
+```bash
+# Routing table example
+Destination     Gateway         Genmask         Interface
+192.168.1.0     0.0.0.0         255.255.255.0   eth0
+192.168.2.0     192.168.1.1     255.255.255.0   eth0
+0.0.0.0         192.168.1.1     0.0.0.0         eth0
+```
+
+## **Troubleshooting Subnet Issues**
+
+### **Common Problems**
+
+1. **Incorrect Subnet Mask**: Devices can't communicate across subnets
+2. **Overlapping Subnets**: IP address conflicts and routing issues
+3. **Wrong Default Gateway**: Devices can't reach other subnets
+4. **Missing Routes**: Routers don't know how to reach certain subnets
+
+### **Diagnostic Commands**
+
+```bash
+# Check IP configuration
+ip addr show
+ifconfig
+
+# Check routing table
+ip route show
+route -n
+
+# Test connectivity
+ping 192.168.1.1
+traceroute 192.168.2.100
+
+# Check ARP table
+ip neigh show
+arp -a
+
+# Verify subnet calculations
+ipcalc 192.168.1.100/26
+```
+
+### **Network Verification**
+
+```bash
+# Verify connectivity to your default gateway (detected dynamically from routing table)
+ping "$(ip route | awk '/default/ {print $3; exit}')"
+
+# Or ping a known host in your subnet
+ping 192.168.1.1
+
+# Check if IP is in correct subnet
+ip route get 192.168.1.100
+
+# Verify broadcast domain (may require root/sudo and can be disabled by system policy)
+sudo ping -b 192.168.1.255
+```
+
+## **Real-World Implementation Examples**
+
+### **Enterprise Network Design**
+
+```bash
+# Corporate network: 10.0.0.0/8
+# Regional breakdown: 10.Region.0.0/16
+
+# North America: 10.1.0.0/16
+NA_Users:       10.1.1.0/24
+NA_Servers:     10.1.10.0/24
+NA_Printers:    10.1.20.0/24
+NA_WiFi:        10.1.30.0/24
+
+# Europe: 10.2.0.0/16  
+EU_Users:       10.2.1.0/24
+EU_Servers:     10.2.10.0/24
+EU_Printers:    10.2.20.0/24
+EU_WiFi:        10.2.30.0/24
+
+# Asia: 10.3.0.0/16
+ASIA_Users:     10.3.1.0/24
+ASIA_Servers:   10.3.10.0/24
+ASIA_Printers:  10.3.20.0/24
+ASIA_WiFi:      10.3.30.0/24
+```
+
+### **Data Center Subnetting**
+
+```bash
+# Data center: 172.16.0.0/12
+# Pod-based design: 172.16.Pod.0/24
+
+# Pod 1: Web servers
+Web_DMZ:        172.16.1.0/26    # Public-facing web servers
+Web_Internal:   172.16.1.64/26   # Internal web services
+Load_Balancers: 172.16.1.128/28  # Load balancer cluster
+Management:     172.16.1.144/28  # Management interfaces
+
+# Pod 2: Application servers  
+App_Tier1:      172.16.2.0/26    # Primary application servers
+App_Tier2:      172.16.2.64/26   # Secondary application servers
+App_Cache:      172.16.2.128/27  # Caching layer
+App_Queue:      172.16.2.160/27  # Message queues
+
+# Pod 3: Database servers
+DB_Primary:     172.16.3.0/27    # Primary database cluster
+DB_Replica:     172.16.3.32/27   # Read replicas
+DB_Backup:      172.16.3.64/28   # Backup systems
+DB_Monitor:     172.16.3.80/28   # Database monitoring
+```
+
+## **Quick Reference Cheat Sheet**
+
+### **Common Subnet Configurations**
+
+| CIDR | Subnet Mask | Hosts | Block Size | Example Network | Common Use Case |
+|------|-------------|-------|------------|-----------------|-----------------|
+| /32 | 255.255.255.255 | 1 | 1 | 192.168.1.100/32 | Host route, loopback |
+| /31 | 255.255.255.254 | 2 | 2 | 10.0.0.0/31 | Point-to-point links |
+| /30 | 255.255.255.252 | 2 | 4 | 10.0.0.0/30 | Point-to-point links (legacy) |
+| /29 | 255.255.255.248 | 6 | 8 | 192.168.1.0/29 | Small office segments |
+| /28 | 255.255.255.240 | 14 | 16 | 192.168.1.0/28 | Department networks |
+| /27 | 255.255.255.224 | 30 | 32 | 192.168.1.0/27 | Medium office segments |
+| /26 | 255.255.255.192 | 62 | 64 | 192.168.1.0/26 | Large office segments |
+| /25 | 255.255.255.128 | 126 | 128 | 192.168.1.0/25 | Small enterprise LANs |
+| /24 | 255.255.255.0 | 254 | 256 | 192.168.1.0/24 | Standard home/office LAN |
+| /23 | 255.255.254.0 | 510 | 512 | 192.168.0.0/23 | Medium enterprise LANs |
+| /22 | 255.255.252.0 | 1022 | 1024 | 192.168.0.0/22 | Large enterprise LANs |
+| /21 | 255.255.248.0 | 2046 | 2048 | 192.168.0.0/21 | Campus networks |
+| /20 | 255.255.240.0 | 4094 | 4096 | 192.168.0.0/20 | Large campus networks |
+| /16 | 255.255.0.0 | 65534 | 65536 | 192.168.0.0/16 | Enterprise networks |
+| /8 | 255.0.0.0 | 16777214 | 16777216 | 10.0.0.0/8 | ISP/Large enterprise |
+
+### **Private IP Address Ranges**
+
+| Range | CIDR | Class | Addresses | Typical Usage |
+|-------|------|-------|-----------|---------------|
+| 10.0.0.0 - 10.255.255.255 | 10.0.0.0/8 | A | 16,777,216 | Large enterprises, ISPs |
+| 172.16.0.0 - 172.31.255.255 | 172.16.0.0/12 | B | 1,048,576 | Medium enterprises |
+| 192.168.0.0 - 192.168.255.255 | 192.168.0.0/16 | C | 65,536 | Home, small office |
+
+### **Quick Calculation Formulas**
+
+```bash
+# Number of subnets from borrowed bits
+Subnets = 2^(borrowed_bits)
+
+# Number of hosts per subnet
+Hosts = 2^(host_bits) - 2  # (except /31 and /32)
+
+# Subnet increment (block size)
+Increment = 256 - (subnet_mask_value_in_relevant_octet)
+
+# Network address
+Network = IP_Address AND Subnet_Mask
+
+# Broadcast address  
+Broadcast = Network + (Block_Size - 1)
+```
+
+### **Common Network Design Patterns**
+
+#### **Home Network (192.168.1.0/24)**
+```bash
+Main Network:    192.168.1.0/26     # 62 hosts
+Guest Network:   192.168.1.64/27    # 30 hosts  
+IoT Devices:     192.168.1.96/27    # 30 hosts
+Management:      192.168.1.128/29   # 6 hosts
+```
+
+#### **Small Office (10.0.0.0/16)**
+```bash
+Users:           10.0.1.0/24        # 254 hosts
+Servers:         10.0.10.0/24       # 254 hosts
+Printers:        10.0.20.0/28       # 14 hosts
+WiFi:            10.0.30.0/24       # 254 hosts
+Management:      10.0.100.0/28      # 14 hosts
+P2P Links:       10.0.200.0/30      # 2 hosts each
+```
+
+#### **Enterprise (172.16.0.0/12)**
+```bash
+Site 1:          172.16.0.0/16      # 65,534 hosts
+Site 2:          172.17.0.0/16      # 65,534 hosts
+Site 3:          172.18.0.0/16      # 65,534 hosts
+WAN Links:       172.31.0.0/24      # P2P connections
+```
+
+### **Essential Commands**
+
+```bash
+# Calculate subnet info
+ipcalc 192.168.1.0/24
+
+# Check routing
+ip route show
+
+# Test connectivity
+ping 192.168.1.1
+traceroute 8.8.8.8
+
+# View interfaces
+ip addr show
+```
+
+Understanding subnets and subnet masks is crucial for effective network design and management. Whether you're setting up a home network, designing enterprise infrastructure, or troubleshooting connectivity issues, mastering these concepts will enable you to create efficient, scalable, and secure network architectures.
+
+<BuyMeACoffeeButton />
