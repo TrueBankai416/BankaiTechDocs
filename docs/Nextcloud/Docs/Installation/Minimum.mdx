@@ -63,9 +63,9 @@ Paste the Following
 # NEXTCLOUD CONFIGURATION
 # =============================================================================
 # Nextcloud & MariaDB
-# Directory paths for persistent data storage
-DATA_LOCATION=./nextcloud
-DB_DATA_LOCATION=./mariadb
+# Named Docker volumes for persistent data storage
+DATA_LOCATION=nextcloud_data
+DB_DATA_LOCATION=db_data
 // highlight-start
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
 TRUSTED_PROXIES=<IP address of your Reverse Proxy>
