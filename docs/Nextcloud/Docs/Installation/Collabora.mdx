@@ -117,7 +117,7 @@ services:
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
-      - ${DB_DATA_LOCATION}:/var/lib/mysql
+      - ${DB_DATA_LOCATION:-db_data}:/var/lib/mysql
     env_file:
       - .env
     networks:
