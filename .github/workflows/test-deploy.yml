@@ -10,6 +10,8 @@ on:
 jobs:
   test-deploy:
     name: Test deployment
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
