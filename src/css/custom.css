@@ -37,10 +37,6 @@
   overflow-y: auto !important;
 }
 
-.theme-doc-toc-desktop {
-  max-height: calc(100vh - 200px) !important;
-}
-
 /* Ensure TOC doesn't extend to bottom of viewport */
 .theme-doc-toc-desktop .table-of-contents {
   padding-bottom: 20px !important;
