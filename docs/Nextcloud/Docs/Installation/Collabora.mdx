@@ -182,6 +182,10 @@ services:
 networks:
   nextcloud:
     driver: bridge
+
+volumes:
+  nextcloud_data:
+  db_data:
 ```
 :::warning
 tmpfs uses memory (RAM), adjust the value as needed or optionally remove the volume section from the redis container
