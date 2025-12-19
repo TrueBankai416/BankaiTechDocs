@@ -15,7 +15,7 @@ const BottomBar: React.FC = () => {
       <div className={styles.container}>
         <button
           onClick={handleDiscordClick}
-          className={styles.button}
+          className={`${styles.button} ${styles.discordButton}`}
           title="Join our Discord community!"
           aria-label="Join Discord"
         >
@@ -25,7 +25,7 @@ const BottomBar: React.FC = () => {
         
         <button
           onClick={handleCoffeeClick}
-          className={styles.button}
+          className={`${styles.button} ${styles.coffeeButton}`}
           title="Support me on Buy me a coffee!"
           aria-label="Buy me a coffee"
         >

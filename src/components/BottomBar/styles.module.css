@@ -41,22 +41,22 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.button:first-child {
+.discordButton {
   background-color: #7289da;
   color: white;
 }
 
-.button:first-child:hover {
+.discordButton:hover {
   background-color: #677bc4;
   transform: scale(1.05);
 }
 
-.button:last-child {
+.coffeeButton {
   background-color: #5F7FFF;
   color: white;
 }
 
-.button:last-child:hover {
+.coffeeButton:hover {
   background-color: #4F6FEF;
   transform: scale(1.05);
 }
