@@ -1,0 +1,190 @@
+name: media-management
+
+services:
+
+  # Core Services
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    hostname: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./prowlarr:/config
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - media-network
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  qbittorrent-vpn:
+    image: binhex/arch-qbittorrentvpn
+    container_name: qbittorrent-vpn
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - media-network
+    ports:
+      - "8085:8085"  # WebUI port (changed from 8080 due to CSRF issues)
+      - "6881:6881/tcp"  # BitTorrent port
+      - "6881:6881/udp"  # BitTorrent port
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_PROV=nordvpn                     # VPN provider
+      - VPN_CLIENT=openvpn                   # VPN client type
+      - VPN_USER=your-nordvpn-username       # Replace with your credentials
+      - VPN_PASS=your-nordvpn-password       # Replace with your credentials
+      - VPN_OPTIONS=
+      - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Your network subnets
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - PUID=1000
+      - PGID=1000
+      - WEBUI_PORT=8085                      # Must match container port
+    volumes:
+      - ./qbittorrent/config:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    hostname: sabnzbd
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./sabnzbd/config:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    networks:
+      - media-network
+    ports:
+      - 8065:8080
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+# Media Management Services
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    hostname: radarr
+    depends_on:
+      - prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./radarr:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - media-network
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    depends_on:
+      - prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./readarr:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    networks:
+      - media-network
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    hostname: sonarr
+    depends_on:
+      - prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./sonarr:/config
+      - /media/merged:/media                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - media-network
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    hostname: lidarr
+    depends_on:
+      - prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./lidarr/config:/config
+      - /media/merged:/merged                 # Media directory
+      - /media/server/Processing:/processing # Processing directory
+    networks:
+      - media-network
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    hostname: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/New_York
+    networks:
+      - media-network
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr/config:/app/config
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+networks:
+  media-network:
+    driver: bridge
