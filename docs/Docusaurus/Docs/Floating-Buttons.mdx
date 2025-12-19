@@ -405,6 +405,69 @@ const YourFloatingWidget: React.FC = () => {
 - Check for CSS transitions
 - Verify color values are correct
 
+### Table of Contents Overlapping Buttons
+
+:::warning TOC Overlap Issue
+If you notice that your floating buttons are being covered by the Table of Contents (TOC) on the right side of the page, you may need to apply a CSS fix to prevent the TOC from extending to the bottom of the viewport.
+:::
+
+#### Symptoms
+- The last 2-3 TOC entries overlap with your floating buttons
+- Discord, Buy Me a Coffee, or other bottom-right buttons are partially or fully hidden
+- TOC extends too far down on pages with many headings
+
+#### Solution: Add Custom CSS
+
+Follow these steps to fix the TOC overlap:
+
+**Step 1:** Open your custom CSS file at [src/css/custom.css](../../../src/css/custom.css)
+
+**Step 2:** Add the following CSS rules at the end of the file:
+
+```css
+/* Prevent TOC from overlapping with floating widgets at bottom right */
+.table-of-contents {
+  max-height: calc(100vh - 200px) !important;
+  overflow-y: auto !important;
+}
+
+.theme-doc-toc-desktop {
+  max-height: calc(100vh - 200px) !important;
+}
+
+/* Ensure TOC doesn't extend to bottom of viewport */
+.theme-doc-toc-desktop .table-of-contents {
+  padding-bottom: 20px !important;
+}
+```
+
+**Step 3:** Save the file and restart your development server
+
+**Step 4:** Verify the fix by checking:
+- TOC now stops 200px from the viewport bottom
+- TOC becomes scrollable when content exceeds the height
+- Floating buttons are fully visible
+- Last TOC entries are accessible via scroll
+
+#### Explanation
+
+This fix works by:
+1. **Setting max-height** - Limits the TOC height to `calc(100vh - 200px)`, leaving 200px of space at the bottom for widgets
+2. **Adding overflow-y: auto** - Makes the TOC scrollable when content exceeds the max height
+3. **Adding padding-bottom** - Provides additional buffer space to ensure all TOC entries are accessible
+
+#### Adjusting the Space
+
+If you need more or less space for your buttons, adjust the `200px` value:
+- **More space for buttons**: Increase to `250px` or `300px`
+- **Less space for buttons**: Decrease to `150px` or `100px`
+- **Formula**: Total space = button height + margins + comfortable buffer
+
+For example, if you have buttons at `bottom: 15px` with `40px` height each, and two buttons vertically stacked:
+```
+200px = 15px (bottom margin) + 40px (button 1) + 10px (gap) + 40px (button 2) + 95px (buffer)
+```
+
 ## Conclusion
 
 Floating buttons are a powerful way to provide persistent access to important actions in your Docusaurus site. By following this guide, you can create professional-looking floating buttons that enhance user engagement while maintaining good performance and accessibility.
