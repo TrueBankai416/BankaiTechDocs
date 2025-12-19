@@ -142,7 +142,7 @@ services:
       - redis
       - go-vod
     volumes:
-      - ${DATA_LOCATION}:/var/www/html
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html
     env_file:
       - .env
     networks:
