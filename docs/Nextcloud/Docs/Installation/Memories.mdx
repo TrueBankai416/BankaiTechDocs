@@ -68,9 +68,9 @@ When editing the configuration below, remove all instances of `<>` from the valu
 Paste the Following with `CNTRL+SHIFT+V`
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
 # Nextcloud and MariaDB
-# Directory paths for persistent data storage
-DATA_LOCATION=./nextcloud
-DB_DATA_LOCATION=./mariadb
+# Named Docker volumes for persistent data storage
+DATA_LOCATION=nextcloud_data
+DB_DATA_LOCATION=db_data
 # Nextcloud Port
 HTTP_PORT=8080
 // highlight-start
@@ -193,6 +193,10 @@ services:
 networks:
   nextcloud:
     driver: bridge
+
+volumes:
+  nextcloud_data:
+  db_data:
 ```
 
 :::info[NVIDIA HWA]
