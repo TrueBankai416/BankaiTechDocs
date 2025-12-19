@@ -30,3 +30,18 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --ifm-link-color: #68e4f5;
 }
+
+/* Prevent TOC from overlapping with floating widgets at bottom right */
+.table-of-contents {
+  max-height: calc(100vh - 200px) !important;
+  overflow-y: auto !important;
+}
+
+.theme-doc-toc-desktop {
+  max-height: calc(100vh - 200px) !important;
+}
+
+/* Ensure TOC doesn't extend to bottom of viewport */
+.theme-doc-toc-desktop .table-of-contents {
+  padding-bottom: 20px !important;
+}
