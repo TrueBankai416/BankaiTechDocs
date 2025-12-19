@@ -183,7 +183,7 @@ services:
     container_name: nextcloud
     restart: always
     ports:
-      - "${PORT:-8080}:80"
+      - "${HTTP_PORT:-8080}:80"
     links:
       - mariadb
       - redis
