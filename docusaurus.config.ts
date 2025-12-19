@@ -53,15 +53,15 @@ const config: Config = {
   ],
   
   // Set the production url of your site here
-  url: 'https://docs.bankai-tech.com',
+  url: 'https://truebankai416.github.io',
   // Set the /<baseUrl>/ pathname under which your site is servedd
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/BankaiTechDocs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'HomeLab Docs', // Usually your repo name.
+  organizationName: 'TrueBankai416', // Usually your GitHub org/user name.
+  projectName: 'BankaiTechDocs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
  // onBrokenMarkdownLinks: 'warn', // Will be removed in v4
@@ -116,15 +116,18 @@ const config: Config = {
 //         ignoreStub: true
  //       },
  //     ],
-      [
-        'posthog-docusaurus',
-        {
-          id: 'posthog',
-          apiKey: process.env.POSTHOG_API_KEY,
-          appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
-          enableInDevelopment: false, // optional
-        },
-      ],
+      // Only include PostHog if API key is available
+      ...(process.env.POSTHOG_API_KEY ? [
+        [
+          'posthog-docusaurus',
+          {
+            id: 'posthog',
+            apiKey: process.env.POSTHOG_API_KEY,
+            appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+            enableInDevelopment: false, // optional
+          },
+        ],
+      ] : []),
      
     ],
 
