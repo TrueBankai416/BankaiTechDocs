@@ -62,7 +62,7 @@ Paste the following using `CTRL+SHIFT+V`
 DATA_LOCATION=./nextcloud
 DB_DATA_LOCATION=./mariadb
 # Nextcloud Port
-PORT=8080
+HTTP_PORT=8080
 // highlight-start
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
 TRUSTED_PROXIES=<IP address of your Reverse Proxy>
@@ -128,7 +128,7 @@ services:
     container_name: nextcloud
     restart: always
     ports:
-      - ${PORT}:80
+      - ${HTTP_PORT:-8080}:80
     links:
       - mariadb
       - redis
