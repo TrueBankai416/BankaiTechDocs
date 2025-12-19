@@ -11,8 +11,8 @@ updates:
       interval: "weekly"
 
   # Enable version updates for Docker
-  - package-ecosystem: "docker compose"
-    # Look for a `docker compose` in the `root` directory
+  - package-ecosystem: "docker-compose"
+    # Look for a `docker-compose` in the `root` directory
     directory: "/"
     # Check for updates once a week
     schedule:
