@@ -64,11 +64,11 @@ When editing the configuration below, remove all instances of `<>` from the valu
 Paste the Following with `CNTRL+SHIFT+V`
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
 # Nextcloud and MariaDB
-# Directory paths for persistent data storage
-DATA_LOCATION=./nextcloud
-DB_DATA_LOCATION=./mariadb
+# Named Docker volumes for persistent data storage
+DATA_LOCATION=nextcloud_data
+DB_DATA_LOCATION=db_data
 # Nextcloud Port
-PORT=8080
+HTTP_PORT=8080
 // highlight-start
 NEXTCLOUD_TRUSTED_DOMAINS=cloud.<YourDomain>.com
 TRUSTED_PROXIES=<IP address of your Reverse Proxy>
@@ -129,7 +129,7 @@ services:
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --log_bin_trust_function_creators=true
     volumes:
-      - ${DB_DATA_LOCATION}:/var/lib/mysql
+      - ${DB_DATA_LOCATION:-db_data}:/var/lib/mysql
     env_file:
       - .env
     networks:
@@ -140,7 +140,7 @@ services:
     container_name: nextcloud
     restart: always
     ports:
-      - ${PORT}:80
+      - ${HTTP_PORT:-8080}:80
     links:
       - mariadb
       - redis
@@ -148,7 +148,7 @@ services:
 #      - onlyoffice
       - go-vod
     volumes:
-      - ${DATA_LOCATION}:/var/www/html
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html
     env_file:
       - .env
     networks:
@@ -159,7 +159,7 @@ services:
     container_name: cron
     restart: always
     volumes:
-      - ${DATA_LOCATION}:/var/www/html:z
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html:z
     depends_on:
       - mariadb
       - redis
@@ -209,7 +209,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ${DATA_LOCATION}:/var/www/html:ro
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html:ro
     networks:
       - nextcloud
 #    runtime: nvidia # (NVENC)
@@ -230,6 +230,10 @@ services:
 networks:
   nextcloud:
     driver: bridge
+
+volumes:
+  nextcloud_data:
+  db_data:
 ```
 
 :::info[NVIDIA HWA]
