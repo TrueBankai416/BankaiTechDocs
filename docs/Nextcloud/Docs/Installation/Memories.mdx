@@ -153,7 +153,7 @@ services:
     container_name: cron
     restart: always
     volumes:
-      - ${DATA_LOCATION}:/var/www/html:z
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html:z
     depends_on:
       - mariadb
       - redis
@@ -185,7 +185,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ${DATA_LOCATION}:/var/www/html:ro
+      - ${DATA_LOCATION:-nextcloud_data}:/var/www/html:ro
     networks:
       - nextcloud
 #    runtime: nvidia # (NVENC)
