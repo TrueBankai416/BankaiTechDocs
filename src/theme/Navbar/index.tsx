@@ -21,7 +21,7 @@ export default function NavbarWrapper(props: Props): JSX.Element {
     <>
       <Navbar {...props} />
       <div style={navbarBadgesStyle}>
-        <a href="https://docs.bankai-tech.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://docs.bankai-tech.com" target="_blank" rel="noopener noreferrer" aria-label="Visit the BankaiTech documentation website">
           <img src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.bankai-tech.com" alt="Website" />
         </a>
         <a href="https://github.com/TrueBankai416/BankaiTechDocs" target="_blank" rel="noopener noreferrer" aria-label="Open the BankaiTechDocs GitHub repository (last commit)">
