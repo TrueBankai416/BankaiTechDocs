@@ -33,7 +33,7 @@
 
 /* Prevent TOC from overlapping with floating widgets at bottom right */
 .table-of-contents {
-  max-height: calc(100vh - 200px) !important;
+  max-height: calc(100vh - 180px) !important;
   overflow-y: auto !important;
 }
 
