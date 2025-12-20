@@ -19,7 +19,9 @@ export default function NavbarWrapper(props: Props): JSX.Element {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <img src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.bankai-tech.com" alt="Website" />
+        <a href="https://docs.bankai-tech.com" target="_blank" rel="noopener noreferrer">
+          <img src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.bankai-tech.com" alt="Website" />
+        </a>
         <a href="https://github.com/TrueBankai416/BankaiTechDocs" target="_blank" rel="noopener noreferrer">
           <img src="https://img.shields.io/github/last-commit/TrueBankai416/BankaiTechDocs/main" alt="GitHub last commit" />
         </a>
