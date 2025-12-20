@@ -31,10 +31,20 @@
   --ifm-link-color: #68e4f5;
 }
 
+/* CSS custom property for floating widget clearance */
+:root {
+  --floating-widget-clearance: 100px; /* Space reserved for floating buttons at bottom: 15px bottom margin + ~40px button height + 45px buffer */
+}
+
 /* Prevent TOC from overlapping with floating widgets at bottom right */
 .table-of-contents {
-  max-height: calc(100vh - 180px) !important;
+  max-height: calc(100vh - var(--floating-widget-clearance)) !important;
   overflow-y: auto !important;
+}
+
+/* Constrain the TOC desktop container as well */
+.theme-doc-toc-desktop {
+  max-height: calc(100vh - var(--floating-widget-clearance)) !important;
 }
 
 /* Ensure TOC doesn't extend to bottom of viewport */
