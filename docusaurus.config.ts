@@ -215,15 +215,6 @@ const config: Config = {
         },
           {to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left'},
     //    {to: '/blog', label: 'Blog', position: 'left'},
-        {
-          href: 'https://github.com/TrueBankai416/BankaiTechDocs',
-          label: 'GitHub',
-          position: 'right',
-        },
-        { href: 'https://github.com/TrueBankai416/BankaiTechDocs/issues',
-          label: 'Issues',
-          position: 'right',
-        },
       ],
     },
     footer: {
