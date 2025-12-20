@@ -33,7 +33,7 @@
 
 /* CSS custom property for floating widget clearance */
 :root {
-  --floating-widget-clearance: 225px; /* Greater the number = shorter the TOC */
+  --floating-widget-clearance: 225px; /* Greater the number = more clearance reserved for widgets (shorter TOC) */
 }
 
 /* Prevent TOC from overlapping with floating widgets at bottom right */
