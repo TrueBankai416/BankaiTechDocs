@@ -7,7 +7,7 @@ interface BuyMeACoffeeButtonProps {
 const BuyMeACoffeeButton: React.FC<BuyMeACoffeeButtonProps> = ({ className }) => {
   return (
     <a href="https://www.buymeacoffee.com/BankaiTech" className={className}>
-      <img src="/img/buymeacoffee-button.svg" alt="Buy me a beer" />
+      <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍻&slug=BankaiTech&button_colour=ff0000&font_colour=ffffff&font_family=Cookie&outline_colour=ffffff&coffee_colour=FFDD00" />
     </a>
   );
 };
