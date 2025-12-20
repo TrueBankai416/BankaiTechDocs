@@ -5,20 +5,22 @@ import type {WrapperProps} from '@docusaurus/types';
 
 type Props = WrapperProps<typeof NavbarType>;
 
+const navbarBadgesStyle: React.CSSProperties = {
+  backgroundColor: 'var(--ifm-navbar-background-color)',
+  borderBottom: '1px solid var(--ifm-toc-border-color)',
+  padding: '0.5rem 1rem',
+  display: 'flex',
+  gap: '0.5rem',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+
 export default function NavbarWrapper(props: Props): JSX.Element {
   return (
     <>
       <Navbar {...props} />
-      <div style={{
-        backgroundColor: 'var(--ifm-navbar-background-color)',
-        borderBottom: '1px solid var(--ifm-toc-border-color)',
-        padding: '0.5rem 1rem',
-        display: 'flex',
-        gap: '0.5rem',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
+      <div style={navbarBadgesStyle}>
         <a href="https://docs.bankai-tech.com" target="_blank" rel="noopener noreferrer">
           <img src="https://img.shields.io/website?url=https%3A%2F%2Fdocs.bankai-tech.com" alt="Website" />
         </a>
