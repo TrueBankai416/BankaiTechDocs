@@ -33,7 +33,7 @@
 
 /* CSS custom property for floating widget clearance */
 :root {
-  --floating-widget-clearance: 100px; /* Space reserved for floating buttons at bottom: 15px bottom margin + ~40px button height + 45px buffer */
+  --floating-widget-clearance: 100px; /* Calculation: 15px (bottom margin) + 40px (button height) + 45px (buffer) = 100px */
 }
 
 /* Prevent TOC from overlapping with floating widgets at bottom right */
