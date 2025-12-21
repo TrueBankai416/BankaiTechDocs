@@ -46,11 +46,11 @@ You can change the directories to your liking.
 :::
 
 ```bash
-sudo mkdir /var/docker && sudo mkdir /var/docker/nextcloud
+sudo mkdir /opt/docker && sudo mkdir /opt/docker/nextcloud
 ```
 Lets take ownership of the directory
 ```bash
-sudo chown -R 1000:1000 /var/docker
+sudo chown -R $USER:$USER /opt/docker
 ```
 
 ### ***Creating .env file***
@@ -303,7 +303,7 @@ nano nextcloud/config/config.php
 <p>
 <>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</>
 </p>
-Run `cd /var/docker/nextcloud` then try again.
+Run `cd /opt/docker/nextcloud` then try again.
 :::
 
 Now add the following to the bottom of the file.
