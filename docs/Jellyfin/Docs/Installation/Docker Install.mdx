@@ -33,10 +33,14 @@ Ensure your system is up-to-date by running:
 sudo apt update && sudo apt upgrade -y
 ```
 
-### *Step 2: Create Directory for Jellyfin Files and Enter the Directory*
+### *Step 2: Create Directory for Jellyfin Files and Set Permissions*
 
 ```bash
-sudo mkdir /var/docker && sudo mkdir /var/docker/jellyfin && cd /var/docker/jellyfin
+sudo mkdir /opt/docker && sudo mkdir /opt/docker/jellyfin && sudo chown $USER:$USER -R /opt/docker
+```
+Enter the Directory
+```bash
+cd /opt/docker/jellyfin
 ```
 
 ### *Step 3: Create a Docker Compose file for Jellyfin*
