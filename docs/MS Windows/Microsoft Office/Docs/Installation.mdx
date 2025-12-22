@@ -21,6 +21,8 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 2. **Edit or Create config file**:
    - Go to the folder where you extracted the ODT files.
    - You'll find a `configuration.xml` file among the extracted files, If the name differs then rename it. Edit this file to specify which Office products to install, including Office LTSC Professional Plus 2024. Microsoft provides detailed instructions and configuration options in its online documentation.
+   - **Tip**: You can easily generate custom configuration.xml files using the [Office Customization Tool](https://config.office.com/deploymentsettings).
+   - **Note**: If you use the generator tool, you will need to edit the generated file and change the `AUTOACTIVATE` value from `1` to `0`.
 
 Example used in this documentation:
 ```xml
