@@ -32,7 +32,7 @@
   --ifm-link-color: #68e4f5;
 }
 
-/* Prevent TOC from overlapping with floating widgets at bottom right */
+/* Prevent TOC from overlapping with bottom bar */
 .table-of-contents {
   max-height: calc(100vh - var(--floating-widget-clearance)) !important;
   overflow-y: auto !important;
