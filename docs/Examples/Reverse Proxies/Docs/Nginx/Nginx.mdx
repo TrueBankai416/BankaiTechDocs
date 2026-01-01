@@ -1245,7 +1245,7 @@ To use these snippets in your nginx configurations, include them in your server 
 
 ```nginx title="Example usage in server configuration"
 server {
-    listen 443 ssl;
+    listen 443 ssl http2;
     server_name example.bankai-tech.com;
     
     # Use standardized security headers
