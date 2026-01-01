@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "discord.js": "^14.16.3",
-    "express": "^4.21.2",
+    "express": "^4.22.1",
     "cors": "^2.8.5",
     "sqlite3": "^5.1.7",
     "dotenv": "^16.4.7"
