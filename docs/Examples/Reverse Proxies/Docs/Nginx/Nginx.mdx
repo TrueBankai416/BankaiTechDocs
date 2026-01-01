@@ -41,12 +41,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name cloud.bankai-tech.com;
-    #                         Redirect to https version of website
-// highlight-next-line
-    return 301 https://cloud.bankai-tech.com;
-    #                         Logging
-    access_log /var/log/nginx/nextcloud_access.log;
-    error_log /var/log/nginx/nextcloud_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -150,7 +145,6 @@ server {
     listen 80;
 // highlight-next-line
     server_name onlyoffice.bankai-tech.com;
-    access_log /var/log/nginx/onlyoffice.log;
     return 301 https://$host$request_uri;
 }
 server {
@@ -253,7 +247,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name auth.bankai-tech.com;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -311,12 +305,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name homebridge.bankai-tech.com;
-    #             Redirect to https version of website
-// highlight-next-line
-    return 301 https://homebridge.bankai-tech.com;
-    #             Logging
-    access_log /var/log/nginx/HomeBridge_access.log;
-    error_log /var/log/nginx/HomeBridge_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -371,12 +360,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name home.bankai-tech.com;
-    #            Redirect to https version of website
-// highlight-next-line
-    return 301 https://home.bankai-tech.com;
-    #            Logging
-    access_log /var/log/nginx/Home_Assistant_access.log;
-    error_log /var/log/nginx/Home_Assistant_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -431,7 +415,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name jellyfin.bankai-tech.com;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -585,12 +569,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name requests.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://requests.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Jellyseer_access.log;
-    error_log /var/log/nginx/Jellyseer_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -772,12 +751,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name docs.bankai-tech.com;
-    #                      Redirect to https version of website
-// highlight-next-line
-    return 301 https://docs.bankai-tech.com;
-    #                      Logging
-    access_log /var/log/nginx/docs_access.log;
-    error_log /var/log/nginx/docs_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -836,12 +810,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name photos.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://photos.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Immich_access.log;
-    error_log /var/log/nginx/Immich_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -905,12 +874,7 @@ server {
     listen [::]:80;
 // highlight-next-line
     server_name docker.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://docker.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Portainer_access.log;
-    error_log /var/log/nginx/Portainer_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen [::]:443 ssl http2;
@@ -968,12 +932,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name vault.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://vault.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Vaultwarden_access.log;
-    error_log /var/log/nginx/Vaultwarden_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
@@ -1027,12 +986,7 @@ server {
     listen 80;
 // highlight-next-line
     server_name status.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://status.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/UptimeKuma_access.log;
-    error_log /var/log/nginx/UptimeKuma_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen 443 ssl http2;
