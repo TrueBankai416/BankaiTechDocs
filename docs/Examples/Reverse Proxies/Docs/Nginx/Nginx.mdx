@@ -41,23 +41,17 @@ server {
     listen 80;
 // highlight-next-line
     server_name cloud.bankai-tech.com;
-    #                         Redirect to https version of website
-// highlight-next-line
-    return 301 https://cloud.bankai-tech.com;
-    #                         Logging
-    access_log /var/log/nginx/nextcloud_access.log;
-    error_log /var/log/nginx/nextcloud_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name cloud.bankai-tech.com;
     #                         Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     #                         ssl_stapling off;
     #                         ssl_stapling_verify off;
@@ -126,7 +120,6 @@ server {
         proxy_set_header Connection "Upgrade";
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
         proxy_set_header Upgrade websocket;
         proxy_set_header Connection Upgrade;
         proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
@@ -143,7 +136,7 @@ server {
 ```
 
 ## OnlyOffice
-```nginx title="Highlighted items will need to be modified: showLineNumbers
+```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
     '' close;
@@ -152,18 +145,16 @@ server {
     listen 80;
 // highlight-next-line
     server_name onlyoffice.bankai-tech.com;
-    access_log /var/log/nginx/onlyoffice.log;
     return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-start
     server_name onlyoffice.bankai-tech.com;
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
 // highlight-end
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
     ssl_stapling off;
     ssl_stapling_verify off;
     # OnlyOffice-specific security headers (modified from global headers to allow framing)
@@ -175,7 +166,7 @@ server {
     add_header Expect-CT "enforce, max-age=86400" always;
     
     # Allow framing from Nextcloud domain for OnlyOffice integration using CSP frame-ancestors
-    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net *.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data:https: http:; connect-src 'self' wss: ws: https:; frame-ancestors 'self' https://cloud.bankai-tech.com; object-src 'none'; base-uri 'self'; form-action 'self';" always;
+    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net *.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data: https: http:; connect-src 'self' wss: ws: https:; frame-ancestors 'self' https://cloud.bankai-tech.com; object-src 'none'; base-uri 'self'; form-action 'self';" always;
     # Connect to backend server
 // highlight-next-line
     set $onlyoffice http://192.168.8.181:87;
@@ -210,7 +201,7 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     ssl_stapling off;
     ssl_stapling_verify off;
@@ -256,11 +247,10 @@ server {
     listen 80;
 // highlight-next-line
     server_name auth.bankai-tech.com;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name auth.bankai-tech.com;
 // highlight-next-line
@@ -268,7 +258,7 @@ server {
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     #        proxy_ssl_verify on;
     #        ssl_stapling off;
@@ -315,23 +305,17 @@ server {
     listen 80;
 // highlight-next-line
     server_name homebridge.bankai-tech.com;
-    #             Redirect to https version of website
-// highlight-next-line
-    return 301 https://homebridge.bankai-tech.com;
-    #             Logging
-    access_log /var/log/nginx/HomeBridge_access.log;
-    error_log /var/log/nginx/HomeBridge_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name homebridge.bankai-tech.com;
     #             Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     #             Logging
     access_log /var/log/nginx/HomeBridge_access.log;
@@ -376,23 +360,17 @@ server {
     listen 80;
 // highlight-next-line
     server_name home.bankai-tech.com;
-    #            Redirect to https version of website
-// highlight-next-line
-    return 301 https://home.bankai-tech.com;
-    #            Logging
-    access_log /var/log/nginx/Home_Assistant_access.log;
-    error_log /var/log/nginx/Home_Assistant_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name home.bankai-tech.com;
     #            Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     #            Logging
     access_log /var/log/nginx/Home_Assistant_access.log;
@@ -437,11 +415,10 @@ server {
     listen 80;
 // highlight-next-line
     server_name jellyfin.bankai-tech.com;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name jellyfin.bankai-tech.com;
     #                     The default `client_max_body_size` is 1M, this might not be enough for some posters, etc.
@@ -592,23 +569,17 @@ server {
     listen 80;
 // highlight-next-line
     server_name requests.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://requests.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Jellyseer_access.log;
-    error_log /var/log/nginx/Jellyseer_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name requests.bankai-tech.com;
     #                    Load TLS Certs
 // highlight-start
     ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
-    proxy_ssl_trusted_certificate /etc/nginx/SSL/chain.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
 // highlight-end
     #       proxy_ssl_verify on;
     #       ssl_stapling off;
@@ -649,8 +620,7 @@ map $http_upgrade $connection_upgrade {
     '' close;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name radarr.bankai-tech.com;
     #                      Load TLS Certs
@@ -694,8 +664,7 @@ map $http_upgrade $connection_upgrade {
     '' close;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name sonarr.bankai-tech.com;
     #                      Load TLS Certs
@@ -739,8 +708,7 @@ map $http_upgrade $connection_upgrade {
     '' close;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name prowlarr.bankai-tech.com;
     #                      Load TLS Certs
@@ -783,16 +751,10 @@ server {
     listen 80;
 // highlight-next-line
     server_name docs.bankai-tech.com;
-    #                      Redirect to https version of website
-// highlight-next-line
-    return 301 https://docs.bankai-tech.com;
-    #                      Logging
-    access_log /var/log/nginx/docs_access.log;
-    error_log /var/log/nginx/docs_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name docs.bankai-tech.com;
     #                      Logging
@@ -846,19 +808,12 @@ map $http_upgrade $connection_upgrade {
 }
 server {
     listen 80;
-    http2 on;
 // highlight-next-line
     server_name photos.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://photos.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Immich_access.log;
-    error_log /var/log/nginx/Immich_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name photos.bankai-tech.com;
     #                    Load TLS Certs
@@ -889,8 +844,6 @@ server {
     #                    set timeout
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
-    #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
     send_timeout 600s;
     #                    Include Authelia location block
     include /etc/nginx/snippets/authelia-location.conf;
@@ -921,12 +874,7 @@ server {
     listen [::]:80;
 // highlight-next-line
     server_name docker.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://docker.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Portainer_access.log;
-    error_log /var/log/nginx/Portainer_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
     listen [::]:443 ssl http2;
@@ -984,16 +932,10 @@ server {
     listen 80;
 // highlight-next-line
     server_name vault.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://vault.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/Vaultwarden_access.log;
-    error_log /var/log/nginx/Vaultwarden_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name vault.bankai-tech.com;
     #                    Load TLS Certs
@@ -1044,16 +986,10 @@ server {
     listen 80;
 // highlight-next-line
     server_name status.bankai-tech.com;
-    #                    Redirect to https version of website
-// highlight-next-line
-    return 301 https://status.bankai-tech.com;
-    #                    Logging
-    access_log /var/log/nginx/UptimeKuma_access.log;
-    error_log /var/log/nginx/UptimeKuma_error.log;
+    return 301 https://$host$request_uri;
 }
 server {
-    listen 443 ssl;
-    http2 on;
+    listen 443 ssl http2;
 // highlight-next-line
     server_name status.bankai-tech.com;
     #                    Load TLS Certs
@@ -1309,7 +1245,7 @@ To use these snippets in your nginx configurations, include them in your server 
 
 ```nginx title="Example usage in server configuration"
 server {
-    listen 443 ssl;
+    listen 443 ssl http2;
     server_name example.bankai-tech.com;
     
     # Use standardized security headers
