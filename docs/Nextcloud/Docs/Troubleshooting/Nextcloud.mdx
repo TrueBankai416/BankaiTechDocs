@@ -102,6 +102,51 @@ If the error doesnt go away, you may need to clear your browser cache and restar
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
 ```
+
+### ***Upstream Timed Out Error on Large File Uploads/Downloads***
+
+<p>
+<>If you encounter this error when uploading or downloading large files:</>
+</p>
+```
+[error] 412#412: *464 upstream timed out (110: Operation timed out) while reading response header from upstream
+```
+<p>
+<>This error typically occurs when Nginx times out while waiting for a response from the PHP-FPM upstream when handling large files. The solution is to disable the content length header in Nextcloud's configuration.</>
+</p>
+
+#### *Editing the config.php file*
+
+<p>
+<>Navigate to your Nextcloud installation directory and edit the `config.php` file:</>
+</p>
+```bash
+cd /opt/docker/nextcloud/nextcloud
+nano config/config.php
+```
+<p>
+<>Add the following line to your config array:</>
+</p>
+```php
+'set_time_limit' => 3600,
+'set_header_content_length' => false,
+```
+:::info
+The `'set_header_content_length' => false,` setting prevents Nextcloud from setting the Content-Length header, which can cause issues with large file transfers through reverse proxies.
+:::
+<p>
+<>After adding this configuration, save the file and restart your Nextcloud container:</>
+</p>
+```bash
+sudo docker restart nextcloud
+```
+:::tip
+If you continue to experience issues, you may also need to increase timeout values in your Nginx configuration:
+- `proxy_read_timeout`
+- `proxy_connect_timeout`
+- `proxy_send_timeout`
+:::
+
 ## **Example Files**
 
 ### ***Config.php***
