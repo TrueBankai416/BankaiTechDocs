@@ -16,7 +16,7 @@ Meilisearch is a powerful, fast, and open-source search engine that can be integ
 
 ### Docker Compose Installation
 
-Create a `docker-compose.yml` file for Meilisearch:
+Create a `docker-compose.yaml` file for Meilisearch:
 
 ```yaml
 name: meilisearch
@@ -73,7 +73,7 @@ If you've already updated to a newer version without creating a dump and are see
    - `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-4`
    
 
-2. **Update your `docker-compose.yml`** to use the older image:
+2. **Update your `docker-compose.yaml`** to use the older image:
 
 ```yaml
 services:
@@ -142,7 +142,7 @@ sudo docker rm meilisearch
 
 ### Step 3: Pull New Image and Start
 
-Update your `docker-compose.yml` to use the latest tag:
+Update your `docker-compose.yaml` to use the latest tag:
 
 ```yaml
 services:
@@ -181,7 +181,7 @@ Look for messages about API keys or authentication tokens. If a new API key was 
 
 If you need to restore from your backup:
 
-1. **Add the import environment variable** to your `docker-compose.yml`:
+1. **Add the import environment variable** to your `docker-compose.yaml`:
 
 ```yaml
 environment:
@@ -220,7 +220,7 @@ sudo docker logs -f meilisearch
 Look for messages indicating the dump was successfully imported.
 
 :::tip
-After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` environment variable from your `docker-compose.yml` and restart the container to prevent it from attempting to import on every restart.
+After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` environment variable from your `docker-compose.yaml` and restart the container to prevent it from attempting to import on every restart.
 :::
 
 ## Integrating with Jellyfin
