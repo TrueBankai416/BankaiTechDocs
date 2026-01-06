@@ -218,15 +218,15 @@ After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` env
 
 If Jellyfin cannot connect to Meilisearch:
 
-- Verify Meilisearch is running: `docker ps | grep meilisearch`
-- Check logs: `docker logs meilisearch`
+- Verify Meilisearch is running: `sudo docker ps | grep meilisearch`
+- Check logs: `sudo docker logs meilisearch`
 - Ensure the port 7700 is accessible
 - Verify the API key is correct
 
 ### Performance Issues
 
 - Increase memory allocation for the container if needed
-- Monitor resource usage: `docker stats meilisearch`
+- Monitor resource usage: `sudo docker stats meilisearch`
 - Consider adjusting the `MEILI_MAX_INDEXING_MEMORY` environment variable
 
 ## Additional Resources
