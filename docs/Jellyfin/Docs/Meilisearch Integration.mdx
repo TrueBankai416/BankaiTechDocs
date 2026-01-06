@@ -132,6 +132,17 @@ sudo docker rm meilisearch
 
 ### Step 3: Pull New Image and Start
 
+Update your `docker-compose.yml` to use the latest tag:
+
+```yaml
+services:
+  meilisearch:
+    //highlight-next-line
+    image: getmeili/meilisearch:latest
+```
+
+Then pull and start the new image:
+
 ```bash
 # Pull the latest image
 sudo docker pull getmeili/meilisearch:latest
