@@ -264,16 +264,15 @@ When you run `git pull origin main` you will have to run `npm run build` afterwa
 ### ***Editing the docusaurus config file***
 
 <Tabs groupId="Java-Type">
-  <TabItem value="js" label="Javascript">
-    <p>
-    <>We will need to first make some changes in your `docusaurus.config.js` file</>
-    </p>
+<TabItem value="js" label="Javascript">
+
+We will need to first make some changes in your `docusaurus.config.js` file
+
 ```bash
 nano docusaurus.config.js
 ```
-<p>
-<>Find the following Snippet of code</>
-</p>
+
+Find the following Snippet of code
 ```js
   presets: [
     [
@@ -301,9 +300,9 @@ nano docusaurus.config.js
     ],
   ],
 ```
-<p>
-<>Add the following lines in the `docs` section</>
-</p>
+
+Add the following lines in the `docs` section
+
 ```js
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
@@ -312,9 +311,9 @@ nano docusaurus.config.js
 :::important
 Setting `routeBasePath: '/', // Serve the docs at the site's root` is strongly recommended and also required when deploying on Cloudflare Pages to show accurate git history.
 :::
-<p>
-<>The snippet of code should now look like this</>
-</p>
+
+The snippet of code should now look like this
+
 ```js
   presets: [
     [
@@ -346,15 +345,15 @@ Setting `routeBasePath: '/', // Serve the docs at the site's root` is strongly r
 ```
   </TabItem>
   <TabItem value="ts" label="Typescript">
-    <p>
-    <>We will need to first make some changes in your `docusaurus.config.ts` file</>
-    </p>
+
+We will need to first make some changes in your `docusaurus.config.ts` file
+
 ```bash
 nano docusaurus.config.ts
 ```
-<p>
-<>Find the following Snippet of code</>
-</p>
+
+Find the following Snippet of code
+
 ```ts
   presets: [
     [
@@ -382,16 +381,16 @@ nano docusaurus.config.ts
     ],
   ],
 ```
-<p>
-<>Add the following lines in the `docs` section</>
-</p>
+
+Add the following lines in the `docs` section
+
 ```ts
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
 ```
-<p>
-<>The snippet of code should now look like this</>
-</p>
+
+The snippet of code should now look like this
+
 ```ts
   presets: [
     [
@@ -430,13 +429,10 @@ nano docusaurus.config.ts
 By default it will show the GitHub user that last updated the file. Setting this will override the GitHub name.
 :::
 
-<p>
-<>Open up one of your `.md` files in `/docs`</>
-</p>
+Open up one of your `.md` files in `/docs`
 
-<p>
-<>Add the following lines to the top of the file</>
-</p>
+Add the following lines to the top of the file
+
 ```
 ---
 last_update:
@@ -444,9 +440,7 @@ last_update:
 ---
 ```
 
-<p>
-<>Now everytime you run `git pull origin main` and `npm run build` it will update the `last_updated` line from `git history`</>
-</p>
+Now everytime you run `git pull origin main` and `npm run build` it will update the `last_updated` line from `git history`
 
 ## **References**
 

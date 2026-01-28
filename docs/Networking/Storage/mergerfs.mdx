@@ -333,10 +333,11 @@ mergerfs uses policies to determine where files are created, accessed, and manag
 | `ff` | First found | Quick operations |
 
 **Recommended Action Policies:**
+
 - **Default**: `epall` - Maintains consistency while respecting structure
 - **Performance**: `ff` - Faster operations on large datasets
-</TabItem>
 
+</TabItem>
 <TabItem value="search">
 **Search Policies (readdir, getattr)**
 
@@ -347,8 +348,10 @@ mergerfs uses policies to determine where files are created, accessed, and manag
 | `all` | Search all branches | Complete file listing |
 
 **Recommended Search Policies:**
+
 - **Performance**: `ff` - Fastest file access
 - **Completeness**: `all` - Ensure all files are visible
+
 </TabItem>
 </Tabs>
 
