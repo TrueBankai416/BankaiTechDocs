@@ -9,19 +9,20 @@ keywords: [Docusaurus, GitHub]
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
 ## **Adding Last Updated Feature**
+
 <h3>
 <>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</>
 </h3>
 ![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
 
-### ***Creating a GitHub Repository***
+### **_Creating a GitHub Repository_**
 
 <p>
 <>First we need to create a [GitHub Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/quickstart-for-repositories).</>
@@ -59,7 +60,7 @@ I used my repo name `BankaiTechDocs` for the Key name\
 Key type is `Authentication key`
 :::
 
-### ***Creating local SSH key***
+### **_Creating local SSH key_**
 
 <p>
 <>Go to your temninal and run this command</>
@@ -90,7 +91,7 @@ cat /root/.ssh/<id_key.pub>
 I ran `cat /root/.ssh/id_ed25519.pub`
 :::
 
-### ***Adding SSH key to GitHub***
+### **_Adding SSH key to GitHub_**
 
 <p>
 <>Go back over to GitHub and Paste the SSH key you just copied</>
@@ -138,16 +139,17 @@ git remote add origin <SSh Repo URL>
 
 ## **Security**
 
-### ***Installing [talisman](https://github.com/thoughtworks/talisman)***
+### **_Installing [talisman](https://github.com/thoughtworks/talisman)_**
 
 Go to the root directory of your website and run the following
+
 ```bash
 curl --silent  https://raw.githubusercontent.com/thoughtworks/talisman/main/global_install_scripts/install.bash > /tmp/install_talisman.bash && /bin/bash /tmp/install_talisman.bash
 ```
 
-### ***Setting Up [GitLeaks](https://github.com/gitleaks/gitleaks)***
+### **_Setting Up [GitLeaks](https://github.com/gitleaks/gitleaks)_**
 
-#### *Creating a GitHub API Key*
+#### _Creating a GitHub API Key_
 
 <p>
 <>Click the user icon at the top right and go to `Settings`</>
@@ -159,10 +161,9 @@ curl --silent  https://raw.githubusercontent.com/thoughtworks/talisman/main/glob
 <>On the bottom left go to `Developer Settings`</>
 </p>
 
-
 ![GitHub Developer Settings](/img/Docusaurus/GitHub_Developer.png)
 
-##### *Creating a new Token (classic)*
+##### _Creating a new Token (classic)_
 
 <p>
 <>Click on `Tokens (classic)` and then Generate a new Token</>
@@ -185,7 +186,7 @@ It is recommended that you set an expiration date instead of having no Expiratio
 ![Token Repo](/img/Docusaurus/Token_Repo.png)
 ![Token Project](/img/Docusaurus/Token_Project.png)
 
-##### *Creating Action Secrets for GitLeaks*
+##### _Creating Action Secrets for GitLeaks_
 
 <p>
 <>Go to `Settings` and then `Secrets and Variables > Actions` and create a new Repository Secret</>
@@ -196,7 +197,7 @@ It is recommended that you set an expiration date instead of having no Expiratio
 </p>
 Paste your GitHub API Key into the secret field and then save.
 
-#### *Creating the GitLeaks Workflow Action*
+#### _Creating the GitLeaks Workflow Action_
 
 <p>
 <>Go to `Actions` and then Click `New Workflow`</>
@@ -235,7 +236,7 @@ jobs:
           GITLEAKS_NOTIFY_USER_LIST: "@<YOUR_GITHUB_USER>"
 ```
 
-##### *Running the Action*
+##### _Running the Action_
 
 Run the New GitLeaks Workflow
 
@@ -261,7 +262,7 @@ When you run `git pull origin main` you will have to run `npm run build` afterwa
 
 ## **Enabling the last updated footer**
 
-### ***Editing the docusaurus config file***
+### **_Editing the docusaurus config file_**
 
 <Tabs groupId="Java-Type">
   <TabItem value="js" label="Javascript">
@@ -312,6 +313,7 @@ nano docusaurus.config.js
 :::important
 Setting `routeBasePath: '/', // Serve the docs at the site's root` is strongly recommended and also required when deploying on Cloudflare Pages to show accurate git history.
 :::
+
 <p>
 <>The snippet of code should now look like this</>
 </p>
@@ -424,7 +426,7 @@ nano docusaurus.config.ts
   </TabItem>
 </Tabs>
 
-### ***Adding the last updated to Font Matter***
+### **_Adding the last updated to Font Matter_**
 
 :::note
 By default it will show the GitHub user that last updated the file. Setting this will override the GitHub name.
@@ -456,6 +458,5 @@ last_update:
 [GitHub Remote Repositories](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)\
 [Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)\
 [Generating SSH key to local System](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-
 
 <BuyMeACoffeeButton />

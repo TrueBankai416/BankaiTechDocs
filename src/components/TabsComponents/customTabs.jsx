@@ -9,10 +9,10 @@ const CustomTabs = ({ tabs }) => {
   return (
     <Tabs
       defaultValue={activeTab}
-      values={tabs.map(tab => ({ label: tab.label, value: tab.value }))}
+      values={tabs.map((tab) => ({ label: tab.label, value: tab.value }))}
       onChange={(event, newValue) => setActiveTab(newValue)}
     >
-      {tabs.map(tab => (
+      {tabs.map((tab) => (
         <TabItem key={tab.value} value={tab.value}>
           {activeTab === tab.value ? tab.content : null}
         </TabItem>

@@ -23,6 +23,7 @@ The Scrutiny host consists of three services: InfluxDB (database), the web UI, a
 ### Deploy the Stack
 
 1. Create the directory structure and set ownership:
+
    ```bash
    sudo mkdir -p /opt/docker/scrutiny
    sudo chown -R $USER:$USER /opt/docker
@@ -98,6 +99,7 @@ The Scrutiny host consists of three services: InfluxDB (database), the web UI, a
    ```
 
 3. Start the services:
+
    ```bash
    docker compose up -d
    ```
@@ -134,6 +136,7 @@ Scrutiny can send email notifications when drive issues are detected. This requi
 ### Setup Steps
 
 1. Navigate to the Scrutiny config directory:
+
    ```bash
    cd /opt/docker/scrutiny/config
    ```
@@ -260,8 +263,9 @@ Scrutiny can send email notifications when drive issues are detected. This requi
    - Replace `@` with `%40`
    - Replace `.` with `%2E`
    - Replace `$` with `%24`
-   
+
    Example: If your username is `myname@example.com` and password is `124@34$1`, the URL becomes:
+
    ```
    smtp://myname%40example%2Ecom:124%4034%241@smtp.example.com:587/?fromAddress=alerts@example.com&toAddresses=admin@example.com
    ```
@@ -316,8 +320,8 @@ smartctl --version
 
 ## 2. Download the Scrutiny Collector Binary
 
-* Get the latest Windows release from [Scrutiny GitHub Releases](https://github.com/AnalogJ/scrutiny/releases).
-* Place the binary in a folder, e.g.:
+- Get the latest Windows release from [Scrutiny GitHub Releases](https://github.com/AnalogJ/scrutiny/releases).
+- Place the binary in a folder, e.g.:
 
 ```
 C:\scrutiny\
@@ -334,8 +338,8 @@ cd C:\scrutiny
 .\scrutiny-collector-metrics-windows-amd64.exe run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"
 ```
 
-* Replace `<server-ip>` with the IP or hostname of your Scrutiny web server.
-* Set `--host-id` to a friendly name for this computer (e.g. `MyWindowsPC`). This name will appear in the Scrutiny dashboard.
+- Replace `<server-ip>` with the IP or hostname of your Scrutiny web server.
+- Set `--host-id` to a friendly name for this computer (e.g. `MyWindowsPC`). This name will appear in the Scrutiny dashboard.
 
 ---
 
@@ -370,9 +374,9 @@ To collect metrics regularly:
 
 1. Open **Task Scheduler**.
 2. Create a new task:
-   * **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
-   * **Arguments**: `run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"`
-   * **Start in**: `C:\scrutiny`
+   - **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
+   - **Arguments**: `run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"`
+   - **Start in**: `C:\scrutiny`
 3. Check **Run with highest privileges**.
 4. Set a trigger (e.g. daily).
 5. Save the task.
@@ -403,6 +407,7 @@ For remote Linux machines that need to report SMART metrics to your Scrutiny ser
 ### Deploy the Collector
 
 1. Create the directory structure and set ownership:
+
    ```bash
    sudo mkdir -p /opt/docker/scrutiny-collector
    sudo chown -R $USER:$USER /opt/docker

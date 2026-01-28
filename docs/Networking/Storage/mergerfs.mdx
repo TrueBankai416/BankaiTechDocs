@@ -13,6 +13,7 @@ keywords: [Proxmox, mergerfs, Union Filesystem, Storage Pool, Drive Pooling, FUS
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -148,21 +149,27 @@ mergerfs is a FUSE-based union filesystem that transparently overlays multiple d
 sudo apt update
 
 # Install mergerfs from official repository
+
 sudo apt install mergerfs
 
 # Verify installation
+
 mergerfs --version
 
 # Install additional utilities and dependencies
+
 sudo apt install fuse3 attr smartmontools
 
 # Ensure FUSE module is loaded
+
 sudo modprobe fuse
 echo 'fuse' | sudo tee -a /etc/modules
 
 # Configure FUSE to allow other users (required for allow_other option)
+
 sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-```
+
+````
 </TabItem>
 
 <TabItem value="centos">
@@ -187,7 +194,8 @@ echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
 
 # Configure FUSE to allow other users (required for allow_other option)
 sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-```
+````
+
 </TabItem>
 
 <TabItem value="source">
@@ -196,24 +204,31 @@ sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 sudo apt install build-essential git pandoc
 
 # Clone mergerfs repository
+
 git clone https://github.com/trapexit/mergerfs.git
 cd mergerfs
 
 # Build mergerfs
+
 make
 
 # Install mergerfs
+
 sudo make install
 
 # Verify installation
+
 mergerfs --version
 
 # Install FUSE and dependencies if not already installed
+
 sudo apt install fuse3 smartmontools
 
 # Configure FUSE to allow other users (required for allow_other option)
+
 sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-```
+
+````
 </TabItem>
 </Tabs>
 
@@ -225,12 +240,12 @@ lsblk -f
 
 # Example output:
 # NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
-# sda                                                      
-# ├─sda1 ext4         a1b2c3d4-e5f6-7890-abcd-ef1234567890 
-# sdb                                                      
-# ├─sdb1 xfs          b2c3d4e5-f6g7-8901-bcde-f23456789012 
-# sdc                                                      
-# ├─sdc1 btrfs        c3d4e5f6-g7h8-9012-cdef-345678901234 
+# sda
+# ├─sda1 ext4         a1b2c3d4-e5f6-7890-abcd-ef1234567890
+# sdb
+# ├─sdb1 xfs          b2c3d4e5-f6g7-8901-bcde-f23456789012
+# sdc
+# ├─sdc1 btrfs        c3d4e5f6-g7h8-9012-cdef-345678901234
 
 # Create mount points for individual drives
 sudo mkdir -p /mnt/disk{1,2,3}
@@ -242,7 +257,7 @@ sudo mkdir -p /mnt/storage
 # sudo mkfs.ext4 -L "disk1" /dev/sda1
 # sudo mkfs.xfs -L "disk2" /dev/sdb1
 # sudo mkfs.btrfs -L "disk3" /dev/sdc1
-```
+````
 
 ### **3. Mount Individual Drives**
 
@@ -307,48 +322,54 @@ mergerfs uses policies to determine where files are created, accessed, and manag
 <TabItem value="creation">
 **File Creation Policies**
 
-| Policy | Description | Use Case |
-|--------|-------------|----------|
-| `epmfs` | Existing path, most free space | Balanced distribution |
-| `mfs` | Most free space | Even space utilization |
-| `lfs` | Least free space | Fill drives sequentially |
-| `lus` | Least used space | Balance by usage |
-| `ff` | First found | Simple, predictable |
-| `epff` | Existing path, first found | Preserve directory structure |
-| `rand` | Random | Even distribution |
+| Policy  | Description                    | Use Case                     |
+| ------- | ------------------------------ | ---------------------------- |
+| `epmfs` | Existing path, most free space | Balanced distribution        |
+| `mfs`   | Most free space                | Even space utilization       |
+| `lfs`   | Least free space               | Fill drives sequentially     |
+| `lus`   | Least used space               | Balance by usage             |
+| `ff`    | First found                    | Simple, predictable          |
+| `epff`  | Existing path, first found     | Preserve directory structure |
+| `rand`  | Random                         | Even distribution            |
 
 **Recommended Creation Policies:**
+
 - **Media Storage**: `mfs` - Distributes large files evenly
 - **General Purpose**: `epmfs` - Balances existing structure with space
 - **Sequential Fill**: `lfs` - Fills drives one by one
+
 </TabItem>
 
 <TabItem value="action">
 **Action Policies (chmod, chown, etc.)**
 
-| Policy | Description | Use Case |
-|--------|-------------|----------|
-| `all` | Apply to all copies | Ensure consistency |
-| `epall` | Existing path, all | Maintain directory structure |
-| `ff` | First found | Quick operations |
+| Policy  | Description         | Use Case                     |
+| ------- | ------------------- | ---------------------------- |
+| `all`   | Apply to all copies | Ensure consistency           |
+| `epall` | Existing path, all  | Maintain directory structure |
+| `ff`    | First found         | Quick operations             |
 
 **Recommended Action Policies:**
+
 - **Default**: `epall` - Maintains consistency while respecting structure
 - **Performance**: `ff` - Faster operations on large datasets
+
 </TabItem>
 
 <TabItem value="search">
 **Search Policies (readdir, getattr)**
 
-| Policy | Description | Use Case |
-|--------|-------------|----------|
-| `ff` | First found | Fastest access |
-| `epff` | Existing path, first found | Preserve structure |
-| `all` | Search all branches | Complete file listing |
+| Policy | Description                | Use Case              |
+| ------ | -------------------------- | --------------------- |
+| `ff`   | First found                | Fastest access        |
+| `epff` | Existing path, first found | Preserve structure    |
+| `all`  | Search all branches        | Complete file listing |
 
 **Recommended Search Policies:**
+
 - **Performance**: `ff` - Fastest file access
 - **Completeness**: `all` - Ensure all files are visible
+
 </TabItem>
 </Tabs>
 
@@ -503,10 +524,14 @@ category.create=mfs,category.action=epall,category.search=ff,\
 func.readdir=epall 0 0
 
 # Explanation:
+
 # - minfreespace=500G: Prevents drives from filling completely
+
 # - category.create=mfs: Distributes large media files evenly
+
 # - cache.files=off: Better for large sequential reads
-```
+
+````
 </TabItem>
 
 <TabItem value="vm">
@@ -525,7 +550,8 @@ func.open=ff 0 0
 # - minfreespace=1T: Larger buffer for VM expansion
 # - category.create=lfs: Fill drives sequentially for better VM performance
 # - cache.files=partial: Some caching for better random I/O
-```
+````
+
 </TabItem>
 
 <TabItem value="general">
@@ -540,9 +566,12 @@ moveonenospc=true,dropcacheonclose=true,minfreespace=10%,\
 category.create=epmfs,category.action=epall,category.search=ff 0 0
 
 # Explanation:
+
 # - minfreespace=10%: Percentage-based for mixed drive sizes
+
 # - category.create=epmfs: Balance existing structure with free space
-```
+
+````
 </TabItem>
 
 <TabItem value="backup">
@@ -559,7 +588,8 @@ category.create=lfs,category.action=epall,category.search=ff 0 0
 # Explanation:
 # - minfreespace=50G: Smaller buffer to maximize storage utilization
 # - category.create=lfs: Fill drives sequentially for backup efficiency
-```
+````
+
 </TabItem>
 </Tabs>
 
@@ -589,7 +619,7 @@ for i in "${!DRIVES[@]}"; do
         free_gb=$(df -BG "$drive" | tail -n 1 | awk '{print $4}' | sed 's/G//')
         free_space[$i]=$free_gb
         echo "Drive $drive: ${free_gb}GB free"
-        
+
         if [ "$free_gb" -lt "$MIN_FREE_GB" ]; then
             echo "  WARNING: Drive $drive below minimum free space threshold!"
         fi
@@ -737,13 +767,13 @@ for drive in "${DRIVES[@]}"; do
         log_message "ERROR: Drive $drive not mounted"
         continue
     fi
-    
+
     # Check free space
     free_space=$(df -BG "$drive" | tail -n 1 | awk '{print $4}' | sed 's/G//')
     if [ "$free_space" -lt 100 ]; then
         log_message "WARNING: Drive $drive has only ${free_space}GB free"
     fi
-    
+
     # Check for I/O errors
     if dmesg | tail -n 100 | grep -i "error.*$(basename $drive)" > /dev/null; then
         log_message "WARNING: I/O errors detected on $drive"

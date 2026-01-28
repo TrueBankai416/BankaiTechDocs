@@ -15,6 +15,7 @@ keywords: [Docker, Backup, Recovery, MariaDB, Nextcloud, Data Protection]
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -46,7 +47,7 @@ A complete Nextcloud backup includes:
 
 ## **Docker-Based Backup Strategies**
 
-### ***Prerequisites***
+### **_Prerequisites_**
 
 Before starting, ensure you have sufficient storage space and appropriate permissions:
 
@@ -59,7 +60,7 @@ sudo mkdir -p /backup/nextcloud
 sudo chown -R $USER:$USER /backup/nextcloud
 ```
 
-### ***Method 1: Complete Docker Backup Script***
+### **_Method 1: Complete Docker Backup Script_**
 
 Create a comprehensive backup script for Docker installations:
 
@@ -232,7 +233,7 @@ crontab -e
   </TabItem>
 </Tabs>
 
-### ***Method 2: Individual Component Backup***
+### **_Method 2: Individual Component Backup_**
 
 For more granular control, you can backup components individually:
 
@@ -275,7 +276,7 @@ cp /var/docker/nextcloud/nextcloud/config/config.php /backup/
 
 ## **Host Installation Backup Strategies**
 
-### ***Method 1: Complete Host Backup Script***
+### **_Method 1: Complete Host Backup Script_**
 
 For traditional server installations:
 
@@ -337,7 +338,7 @@ rm -rf "${BACKUP_NAME}/"
 echo "Backup completed: ${BACKUP_DIR}/${BACKUP_NAME}.tar.gz"
 ```
 
-### ***Method 2: Rsync-based Backup***
+### **_Method 2: Rsync-based Backup_**
 
 For incremental backups with rsync:
 
@@ -362,7 +363,7 @@ find "${BACKUP_DIR}" -maxdepth 1 -name "daily.*" -mtime +30 -exec rm -rf {} \;
 
 ## **Recovery Procedures**
 
-### ***Docker Recovery***
+### **_Docker Recovery_**
 
 <Tabs
   defaultValue="full"
@@ -456,7 +457,7 @@ docker exec -u 33 nextcloud php occ files:scan --all
   </TabItem>
 </Tabs>
 
-### ***Host Installation Recovery***
+### **_Host Installation Recovery_**
 
 ```bash
 # 1. Stop web server
@@ -485,7 +486,7 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
 
 ## **Best Practices**
 
-### ***Backup Strategy***
+### **_Backup Strategy_**
 
 1. **3-2-1 Rule**: 3 copies of data, 2 different media types, 1 offsite
 2. **Regular Schedule**: Daily incremental, weekly full backups
@@ -493,7 +494,7 @@ sudo -u www-data php /var/www/nextcloud/occ maintenance:mode --off
 4. **Monitor Backups**: Set up alerts for backup failures
 5. **Document Process**: Keep recovery procedures documented and accessible
 
-### ***Security Considerations***
+### **_Security Considerations_**
 
 ```bash
 # Encrypt backups
@@ -507,7 +508,7 @@ chown backup-user:backup-group /backup/nextcloud/*
 useradd -r -s /bin/false nextcloud-backup
 ```
 
-### ***Storage Considerations***
+### **_Storage Considerations_**
 
 - **Local Backups**: Fast recovery, but vulnerable to local disasters
 - **Remote Backups**: Slower recovery, but protected from local disasters
@@ -523,7 +524,7 @@ rsync -avz --delete /backup/nextcloud/ user@backup-server:/backups/nextcloud/
 
 ## **Automated Backup Solutions**
 
-### ***Using Cron for Automation***
+### **_Using Cron for Automation_**
 
 ```bash
 # Edit crontab
@@ -539,7 +540,7 @@ crontab -e
 0 3 1 * * find /backup/nextcloud -name "*.tar.gz" -mtime +90 -delete
 ```
 
-### ***Backup Monitoring Script***
+### **_Backup Monitoring Script_**
 
 ```bash title="backup-monitor.sh"
 #!/bin/bash
@@ -572,9 +573,10 @@ echo "Backup successful: ${BACKUP_FILE} (${BACKUP_SIZE})"
 
 ## **Troubleshooting**
 
-### ***Common Backup Issues***
+### **_Common Backup Issues_**
 
 **Database Connection Errors:**
+
 ```bash
 # Test database connection
 docker exec mariadb mysql -u nextcloud -pYOUR_PASSWORD -e "SELECT 1;"
@@ -585,6 +587,7 @@ docker logs mariadb
 ```
 
 **Permission Issues:**
+
 ```bash
 # Fix Nextcloud permissions
 docker exec nextcloud chown -R 33:33 /var/www/html
@@ -594,6 +597,7 @@ sudo chown -R $USER:$USER /backup/nextcloud
 ```
 
 **Disk Space Issues:**
+
 ```bash
 # Check disk space
 df -h /backup
@@ -605,9 +609,10 @@ find /backup/nextcloud -name "*.tar.gz" -mtime +30 -delete
 gzip /backup/nextcloud/*.sql
 ```
 
-### ***Recovery Issues***
+### **_Recovery Issues_**
 
 **Database Import Errors:**
+
 ```bash
 # Check database encoding
 docker exec mariadb mysql -u nextcloud -pYOUR_PASSWORD -e "SHOW VARIABLES LIKE 'character_set%';"
@@ -617,6 +622,7 @@ docker exec -i mariadb mysql -u nextcloud -pYOUR_PASSWORD --default-character-se
 ```
 
 **File Permission Errors:**
+
 ```bash
 # Reset Nextcloud permissions (Docker)
 docker exec nextcloud chown -R 33:33 /var/www/html
@@ -629,13 +635,14 @@ sudo chmod -R 755 /var/www/nextcloud
 
 ## **Testing Your Backups**
 
-### ***Backup Verification Checklist***
+### **_Backup Verification Checklist_**
 
 1. **File Integrity**:
+
    ```bash
    # Test backup archive
    tar -tzf nextcloud_backup.tar.gz > /dev/null && echo "Archive OK" || echo "Archive CORRUPTED"
-   
+
    # Test database dump
    mysql -u nextcloud -pYOUR_PASSWORD --execute="SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'; SOURCE database.sql;" 2>/dev/null && echo "Database OK" || echo "Database CORRUPTED"
    ```
@@ -656,6 +663,7 @@ sudo chmod -R 755 /var/www/nextcloud
 A robust backup strategy is essential for any Nextcloud installation. Whether you're running Docker containers or a host installation, regular automated backups combined with tested recovery procedures will protect your valuable data.
 
 Remember to:
+
 - Test your backups regularly
 - Keep multiple backup copies
 - Store backups in different locations

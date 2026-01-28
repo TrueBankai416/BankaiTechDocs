@@ -12,11 +12,15 @@ keywords: [Nextcloud, occ, commands, administration, Docker, maintenance]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Helpful `occ` commands for Nextcloud**
+
 ## **Break down of the commands**
+
 Here's a breakdown of the command components:
+
 - **`sudo`**: Runs the command with superuser privileges. Docker commands often require such privileges to interact with the Docker daemon, which controls Docker containers and services.
 
 - **`docker exec`**: This is a command used to run a specific command inside an already running container. It's handy when you need to interact with an application inside the container without stopping and starting it with a new command.
@@ -33,64 +37,72 @@ Here's a breakdown of the command components:
   - **`php`**: This specifies that the command following it should be executed with PHP, indicating a PHP script or command is being run.
   - **`occ`**: This is the Nextcloud's command-line interface (CLI) tool. `occ` stands for "ownCloud console," as Nextcloud forked from ownCloud. It allows administrators to perform a wide range of operations, including installing and upgrading Nextcloud, managing users, encrypting data, and much more.
 
-### ***Generating a redacted list of your config.php***
+### **_Generating a redacted list of your config.php_**
 
 This command will output a redacted version of your `config.php` file. This may make it easier for you to view and share your configuration with others without needing to manually hide the sensitive information within the file.
+
 ```bash
 docker exec -it -u www-data nextcloud php occ config:list system
 ```
 
-### ***Reset Password***
+### **_Reset Password_**
 
 This command will allow you to reset the password for a specified user.
+
 - **`user:resetpassword`**: A command for the `occ` tool that resets the password for a specified user.
 
 - **`admin`**: The username whose password is to be reset. In this case, it's the `admin` user, typically the primary administrative account for Nextcloud.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ user:resetpassword admin
 ```
 
-#### *Show mastercontainer password for Nextcloud AIO*
+#### _Show mastercontainer password for Nextcloud AIO_
 
 ```bash
 sudo cat /var/lib/docker/volumes/nextcloud_aio_mastercontainer/_data/data/configuration.json | grep password
 ```
 
-### ***Repair Nextcloud***
+### **_Repair Nextcloud_**
 
 This specific OCC command triggers a variety of repair and maintenance tasks to ensure the Nextcloud installation is running correctly. Tasks include cleaning up the database, ensuring file cache accuracy, and other sanity checks that can resolve common issues automatically.
 
 The `maintenance:repair` command is particularly useful in scenarios where Nextcloud is behaving unexpectedly, after an update that didn't complete successfully, or when recommended by Nextcloud's documentation or support forums as a step to resolve specific issues. Executing this command can help restore Nextcloud to a healthy state without directly manipulating database entries or file system structures manually, offering a safer approach to troubleshooting and system maintenance.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ maintenance:repair
 ```
 
-### ***Generate Geometry Table for Memories***
+### **_Generate Geometry Table for Memories_**
 
 This specific `occ` command will create the Geometry Table for Nextcloud Memories. The "places-setup" will initialize data related to places, set up geotagging features, databases related to locations, and preparing the environment for managing memory-related data more effectively.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ memories:places-setup
 ```
 
-### ***Adding Missing DB Indices***
+### **_Adding Missing DB Indices_**
 
 This is the specific OCC command used to add missing database indices to the Nextcloud's database. Database indices help improve the performance of database operations by allowing the database engine to find data more efficiently. This operation can speed up application performance, especially on larger datasets or more heavily utilized instances.
 
 Administrators might use this command when they notice performance issues with their Nextcloud instance, after an upgrade, or upon recommendation by Nextcloud's administrative tools. Adding missing indices is a maintenance task that helps ensure the database operates efficiently, improving search times and overall responsiveness of the Nextcloud interface.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
 ```
 
-### ***Upgrading***
+### **_Upgrading_**
 
 This specific `occ` command triggers the upgrade process of the Nextcloud installation to the latest version, applying any database schema updates, data migrations, and code updates necessary for the new version to function correctly. You may need to run this command if an Upgrade attempt did not finish succesfully.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ upgrade
 ```
 
-### ***Maintenance Mode***
+### **_Maintenance Mode_**
 
 `--off` disables maintenance mode, making the Nextcloud instance accessible to users again.
+
 <p>
 <>`--on` enables maintenance mode, making the Nextcloud instance not accessible to users.</>
 </p>
@@ -98,35 +110,37 @@ sudo docker exec -it -u 33 nextcloud php occ upgrade
 sudo docker exec -it -u 33 nextcloud php occ maintenance:mode --off
 ```
 
-### ***Scan all Files***
+### **_Scan all Files_**
 
 This OCC command tells Nextcloud to scan for file changes. This is useful for making sure that files added, removed, or modified directly on the filesystem (outside of Nextcloud's web or desktop clients) are correctly reflected in Nextcloud's database.
 
 - **`--all`**: An option for the `files:scan` command that specifies the scan should cover files and directories of all users on the Nextcloud instance, not just a single user.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ files:scan --all
 ```
 
-### ***Scan files for a specific user***
+### **_Scan files for a specific user_**
 
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ files:scan <user>
 ```
 
-### ***Reset BruteForce Detection***
+### **_Reset BruteForce Detection_**
 
 This is a specific OCC command that resets or clears any brute force attempt entries logged against a particular IP address in Nextcloud's security mechanisms.
 
 - **`<ip address>`**: Placeholder for the actual IP address you wish to reset the brute force protection entries for. Replace `<ip address>` with the specific IP address that you're targeting.
 
 This command is particularly useful for administrators who need to unlock access for users who have been locked out of their accounts due to Nextcloud's brute force protection mechanism. This mechanism prevents unauthorized access by temporarily blocking login attempts after several failed login attempts from the same IP address. If a legitimate user is accidentally locked out due to too many failed attempts or another reason, this command allows the administrator to quickly reset the protection for that IP, restoring access for the affected user.
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ security:bruteforce:reset <ip address>
 ```
 
 ## **Resources**
+
 [Reset Nextcloud Password](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/reset_admin_password.html) \
 [Show Nextcloud AIO Admin Panel Password](https://github.com/nextcloud/all-in-one/discussions/803#discussioncomment-2905075)
-
 
 <BuyMeACoffeeButton />

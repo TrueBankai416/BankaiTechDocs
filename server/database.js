@@ -8,7 +8,7 @@ function getWritableDatabasePath() {
   if (process.env.DATABASE_PATH) {
     const customPath = process.env.DATABASE_PATH;
     const dir = path.dirname(customPath);
-    
+
     // Ensure directory exists
     try {
       if (!fs.existsSync(dir)) {
@@ -19,7 +19,7 @@ function getWritableDatabasePath() {
       console.warn(`Could not use custom DATABASE_PATH ${customPath}:`, error.message);
     }
   }
-  
+
   // Try current directory first
   const localPath = path.join(__dirname, 'comments.db');
   try {
@@ -29,13 +29,16 @@ function getWritableDatabasePath() {
     fs.unlinkSync(testFile);
     return localPath;
   } catch (error) {
-    console.warn(`Cannot write to current directory (${__dirname}), falling back to /tmp:`, error.message);
+    console.warn(
+      `Cannot write to current directory (${__dirname}), falling back to /tmp:`,
+      error.message
+    );
   }
-  
+
   // Fallback to /tmp directory
   const tmpPath = path.join('/tmp', 'discord-comments', 'comments.db');
   const tmpDir = path.dirname(tmpPath);
-  
+
   try {
     if (!fs.existsSync(tmpDir)) {
       fs.mkdirSync(tmpDir, { recursive: true });
@@ -68,7 +71,7 @@ db.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
-  
+
   // Add discord_thread_id column to existing tables if it doesn't exist
   db.run(`ALTER TABLE comments ADD COLUMN discord_thread_id TEXT`, (err) => {
     // Ignore error if column already exists
@@ -76,20 +79,20 @@ db.serialize(() => {
       console.error('Error adding discord_thread_id column:', err);
     }
   });
-  
+
   // Add thread status and tags columns
   db.run(`ALTER TABLE comments ADD COLUMN thread_deleted BOOLEAN DEFAULT FALSE`, (err) => {
     if (err && !err.message.includes('duplicate column')) {
       console.error('Error adding thread_deleted column:', err);
     }
   });
-  
+
   db.run(`ALTER TABLE comments ADD COLUMN thread_tags TEXT`, (err) => {
     if (err && !err.message.includes('duplicate column')) {
       console.error('Error adding thread_tags column:', err);
     }
   });
-  
+
   // Add problem summary column
   db.run(`ALTER TABLE comments ADD COLUMN problem_summary TEXT`, (err) => {
     if (err && !err.message.includes('duplicate column')) {
@@ -112,7 +115,7 @@ db.serialize(() => {
       FOREIGN KEY (comment_id) REFERENCES comments (id)
     )
   `);
-  
+
   // Add discord_roles column to existing tables if it doesn't exist
   db.run(`ALTER TABLE replies ADD COLUMN discord_roles TEXT`, (err) => {
     // Ignore error if column already exists
@@ -130,35 +133,75 @@ db.serialize(() => {
 // Database functions
 const dbFunctions = {
   // Store a new comment
-  storeComment: (pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId = null, problemSummary = null) => {
+  storeComment: (
+    pageUrl,
+    pageTitle,
+    authorName,
+    content,
+    discordMessageId,
+    discordChannelId,
+    discordThreadId = null,
+    problemSummary = null
+  ) => {
     return new Promise((resolve, reject) => {
       const stmt = db.prepare(`
         INSERT INTO comments (page_url, page_title, author_name, content, discord_message_id, discord_channel_id, discord_thread_id, problem_summary)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
-      
-      stmt.run([pageUrl, pageTitle, authorName, content, discordMessageId, discordChannelId, discordThreadId, problemSummary], function(err) {
-        if (err) reject(err);
-        else resolve(this.lastID);
-      });
-      
+
+      stmt.run(
+        [
+          pageUrl,
+          pageTitle,
+          authorName,
+          content,
+          discordMessageId,
+          discordChannelId,
+          discordThreadId,
+          problemSummary,
+        ],
+        function (err) {
+          if (err) reject(err);
+          else resolve(this.lastID);
+        }
+      );
+
       stmt.finalize();
     });
   },
 
   // Store a Discord reply
-  storeReply: (commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, discordRoles, content) => {
+  storeReply: (
+    commentId,
+    discordMessageId,
+    discordUserId,
+    discordUsername,
+    discordAvatar,
+    discordRoles,
+    content
+  ) => {
     return new Promise((resolve, reject) => {
       const stmt = db.prepare(`
         INSERT INTO replies (comment_id, discord_message_id, discord_user_id, discord_username, discord_avatar, discord_roles, content)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
-      
-      stmt.run([commentId, discordMessageId, discordUserId, discordUsername, discordAvatar, discordRoles, content], function(err) {
-        if (err) reject(err);
-        else resolve(this.lastID);
-      });
-      
+
+      stmt.run(
+        [
+          commentId,
+          discordMessageId,
+          discordUserId,
+          discordUsername,
+          discordAvatar,
+          discordRoles,
+          content,
+        ],
+        function (err) {
+          if (err) reject(err);
+          else resolve(this.lastID);
+        }
+      );
+
       stmt.finalize();
     });
   },
@@ -166,19 +209,24 @@ const dbFunctions = {
   // Get comment by Discord message ID
   getCommentByDiscordId: (discordMessageId) => {
     return new Promise((resolve, reject) => {
-      db.get(`
+      db.get(
+        `
         SELECT * FROM comments WHERE discord_message_id = ?
-      `, [discordMessageId], (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
-      });
+      `,
+        [discordMessageId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
     });
   },
 
   // Get all comments and replies for a page
   getCommentsForPage: (pageUrl) => {
     return new Promise((resolve, reject) => {
-      db.all(`
+      db.all(
+        `
         SELECT 
           c.id, c.page_url, c.page_title, c.author_name, c.content, c.discord_message_id, c.discord_channel_id,
           c.discord_thread_id, c.thread_deleted, c.thread_tags, c.problem_summary, c.created_at,
@@ -194,75 +242,86 @@ const dbFunctions = {
         LEFT JOIN replies r ON c.id = r.comment_id
         WHERE c.page_url = ? AND c.thread_deleted = FALSE
         ORDER BY c.created_at DESC, r.created_at ASC
-      `, [pageUrl], (err, rows) => {
-        if (err) reject(err);
-        else {
-          // Group replies under their parent comments
-          const commentsMap = new Map();
-          
-          rows.forEach(row => {
-            if (!commentsMap.has(row.id)) {
-              commentsMap.set(row.id, {
-                id: row.id,
-                page_url: row.page_url,
-                page_title: row.page_title,
-                author_name: row.author_name,
-                content: row.content,
-                discord_message_id: row.discord_message_id,
-                discord_channel_id: row.discord_channel_id,
-                discord_thread_id: row.discord_thread_id,
-                thread_deleted: row.thread_deleted,
-                thread_tags: row.thread_tags,
-                problem_summary: row.problem_summary,
-                created_at: row.created_at,
-                replies: []
-              });
-            }
-            
-            if (row.reply_id) {
-              commentsMap.get(row.id).replies.push({
-                id: row.reply_id,
-                discord_message_id: row.reply_discord_id,
-                discord_user_id: row.discord_user_id,
-                discord_username: row.discord_username,
-                discord_avatar: row.discord_avatar,
-                discord_roles: row.discord_roles,
-                content: row.reply_content,
-                created_at: row.reply_created_at
-              });
-            }
-          });
-          
-          resolve(Array.from(commentsMap.values()));
+      `,
+        [pageUrl],
+        (err, rows) => {
+          if (err) reject(err);
+          else {
+            // Group replies under their parent comments
+            const commentsMap = new Map();
+
+            rows.forEach((row) => {
+              if (!commentsMap.has(row.id)) {
+                commentsMap.set(row.id, {
+                  id: row.id,
+                  page_url: row.page_url,
+                  page_title: row.page_title,
+                  author_name: row.author_name,
+                  content: row.content,
+                  discord_message_id: row.discord_message_id,
+                  discord_channel_id: row.discord_channel_id,
+                  discord_thread_id: row.discord_thread_id,
+                  thread_deleted: row.thread_deleted,
+                  thread_tags: row.thread_tags,
+                  problem_summary: row.problem_summary,
+                  created_at: row.created_at,
+                  replies: [],
+                });
+              }
+
+              if (row.reply_id) {
+                commentsMap.get(row.id).replies.push({
+                  id: row.reply_id,
+                  discord_message_id: row.reply_discord_id,
+                  discord_user_id: row.discord_user_id,
+                  discord_username: row.discord_username,
+                  discord_avatar: row.discord_avatar,
+                  discord_roles: row.discord_roles,
+                  content: row.reply_content,
+                  created_at: row.reply_created_at,
+                });
+              }
+            });
+
+            resolve(Array.from(commentsMap.values()));
+          }
         }
-      });
+      );
     });
   },
 
   // Check if reply already exists
   replyExists: (discordMessageId) => {
     return new Promise((resolve, reject) => {
-      db.get(`
+      db.get(
+        `
         SELECT id FROM replies WHERE discord_message_id = ?
-      `, [discordMessageId], (err, row) => {
-        if (err) reject(err);
-        else resolve(!!row);
-      });
+      `,
+        [discordMessageId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(!!row);
+        }
+      );
     });
   },
 
   // Find existing thread for author
   findThreadForAuthor: (authorName, pageUrl) => {
     return new Promise((resolve, reject) => {
-      db.get(`
+      db.get(
+        `
         SELECT discord_thread_id FROM comments 
         WHERE author_name = ? AND page_url = ? AND discord_thread_id IS NOT NULL AND thread_deleted = FALSE
         ORDER BY created_at DESC
         LIMIT 1
-      `, [authorName, pageUrl], (err, row) => {
-        if (err) reject(err);
-        else resolve(row ? row.discord_thread_id : null);
-      });
+      `,
+        [authorName, pageUrl],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row ? row.discord_thread_id : null);
+        }
+      );
     });
   },
 
@@ -274,17 +333,19 @@ const dbFunctions = {
         SET thread_deleted = ?, thread_tags = ?
         WHERE discord_thread_id = ?
       `);
-      
-      stmt.run([isDeleted, tags, threadId], function(err) {
+
+      stmt.run([isDeleted, tags, threadId], function (err) {
         if (err) {
           console.error('Error updating thread status:', err);
           reject(err);
         } else {
-          console.log(`Updated ${this.changes} comments for thread ${threadId}, deleted: ${isDeleted}, tags: ${tags}`);
+          console.log(
+            `Updated ${this.changes} comments for thread ${threadId}, deleted: ${isDeleted}, tags: ${tags}`
+          );
           resolve(this.changes);
         }
       });
-      
+
       stmt.finalize();
     });
   },
@@ -292,14 +353,18 @@ const dbFunctions = {
   // Get all active threads for monitoring
   getActiveThreads: () => {
     return new Promise((resolve, reject) => {
-      db.all(`
+      db.all(
+        `
         SELECT DISTINCT discord_thread_id, discord_channel_id
         FROM comments 
         WHERE discord_thread_id IS NOT NULL AND thread_deleted = FALSE
-      `, [], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
+      `,
+        [],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        }
+      );
     });
   },
 
@@ -309,15 +374,15 @@ const dbFunctions = {
       const stmt = db.prepare(`
         DELETE FROM comments WHERE id = ?
       `);
-      
-      stmt.run([commentId], function(err) {
+
+      stmt.run([commentId], function (err) {
         if (err) reject(err);
         else resolve(this.changes > 0);
       });
-      
+
       stmt.finalize();
     });
-  }
+  },
 };
 
 module.exports = dbFunctions;

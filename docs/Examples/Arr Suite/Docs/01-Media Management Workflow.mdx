@@ -10,11 +10,12 @@ keywords: [Arr Suite, Workflow, Media Management, Jellyseerr, Radarr, Sonarr, Pr
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # Media Management Workflow
 
-This document illustrates a streamlined media management workflow using the *Arr suite of applications with direct integration to Jellyfin libraries, utilizing mergerfs for storage pooling and supporting both torrent and Usenet downloads.
+This document illustrates a streamlined media management workflow using the \*Arr suite of applications with direct integration to Jellyfin libraries, utilizing mergerfs for storage pooling and supporting both torrent and Usenet downloads.
 
 ## Complete Workflow Diagram
 
@@ -22,45 +23,45 @@ This document illustrates a streamlined media management workflow using the *Arr
 flowchart TD
     A[User Request] --> B[Jellyseerr]
     B --> C{Content Type?}
-    
+
     C -->|Movie| D[Radarr]
     C -->|TV Show| E[Sonarr]
-    
+
     D --> F[Prowlarr + Flaresolverr]
     E --> F
-    
+
     F --> G{Download Method?}
     G -->|Torrent| H[qBittorrent]
     G -->|Usenet| I[Usenet Client]
-    
+
     H --> J[Download to /downloads]
     I --> J
-    
+
     J --> K[*Arr Processing]
     K --> L{Content Type?}
-    
+
     L -->|Movie| M[Move directly to<br/>Jellyfin Movies Library]
     L -->|TV Show| N[Move directly to<br/>Jellyfin TV Library]
-    
+
     M --> O[mergerfs Storage Pool]
     N --> O
-    
+
     O --> P[Jellyfin Media Library]
     P --> Q[Available for Streaming]
-    
+
     %% Storage representation
     R[Drive 1] --> O
     S[Drive 2] --> O
     T[Drive 3] --> O
     U[Drive N...] --> O
-    
+
     %% Styling with better contrast
     classDef requestFlow fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:#fff
     classDef arrSuite fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px,color:#fff
     classDef downloadFlow fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
     classDef storageFlow fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#fff
     classDef finalFlow fill:#E91E63,stroke:#C2185B,stroke-width:2px,color:#fff
-    
+
     class A,B requestFlow
     class C,D,E,F,K arrSuite
     class G,H,I,J,L downloadFlow
@@ -71,11 +72,13 @@ flowchart TD
 ## Workflow Components
 
 ### 1. Request Management
+
 - **Jellyseerr**: Web interface for users to request Movies and TV shows
 - Provides a clean, user-friendly interface for content requests
 - Integrates with Radarr and Sonarr for automated processing
 
-### 2. Content Management (*Arr Suite)
+### 2. Content Management (\*Arr Suite)
+
 - **Radarr**: Handles movie requests and management
 - **Sonarr**: Manages TV show requests and episode tracking
 - **Prowlarr**: Unified indexer management with Flaresolverr for CloudFlare bypass
@@ -83,12 +86,14 @@ flowchart TD
 - Configured to move completed downloads directly to Jellyfin libraries
 
 ### 3. Download Management
+
 - **qBittorrent**: Primary torrent client for downloading content
 - **Usenet Client**: Handles Usenet downloads (SABnzbd, NZBGet, etc.)
 - Downloads to centralized `/downloads` folder
 - Both torrent and Usenet sources managed through Prowlarr
 
 ### 4. Storage Management
+
 - **mergerfs**: Union filesystem that pools multiple drives into a single mount point
 - Provides unified storage view for Jellyfin libraries
 - Allows mixing different drive sizes and types
@@ -96,7 +101,8 @@ flowchart TD
 - No RAID overhead - full capacity utilization
 
 ### 5. Media Library Integration
-- **Direct Integration**: *Arr applications move content directly to Jellyfin libraries
+
+- **Direct Integration**: \*Arr applications move content directly to Jellyfin libraries
 - **Automatic Organization**: Files are properly named and organized automatically
 - **Jellyfin**: Media server streams content from mergerfs-pooled storage
 - **Immediate Availability**: Content becomes available for streaming as soon as download completes
@@ -123,7 +129,7 @@ flowchart TD
 ├── downloads/         # Download location (bind mount)
     └── Torrent/       # qBittorrent download location
         ├── temp/      # Temp download location
-        ├── radarr/ 
+        ├── radarr/
         └── tv-sonarr/
     └── Usenet/        # Usenet download location
         └── temp/      # Usenet temp download location
@@ -171,14 +177,14 @@ sudo mount --bind /media/server/Processing/Tdarr /media/merged/cache
 
 ### Docker Integration
 
-Ensure your *Arr containers mount the mergerfs pool with specific media type paths:
+Ensure your \*Arr containers mount the mergerfs pool with specific media type paths:
 
 ```yaml
 # Example for Radarr
 volumes:
   - /media/merged/movies:/movies  # mergerfs movies library
 
-# Example for Sonarr  
+# Example for Sonarr
 volumes:
   - /media/merged/tv:/tv          # mergerfs TV library
 ```
@@ -197,7 +203,7 @@ volumes:
 
 ### Recommended Usenet Clients
 
-- **SABnzbd**: Popular, web-based Usenet client with excellent *Arr integration
+- **SABnzbd**: Popular, web-based Usenet client with excellent \*Arr integration
 - **NZBGet**: Lightweight, efficient Usenet downloader
 - Both integrate seamlessly with Prowlarr for indexer management
 

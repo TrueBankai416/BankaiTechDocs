@@ -45,6 +45,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - **Wiki**: Enable repository wiki for documentation
     - **Discussions**: Enable community discussions
     - **Sponsorships**: Allow sponsorship for your project
+
   </TabItem>
   <TabItem value="security">
     **Visibility Settings:**
@@ -63,6 +64,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - **Security Advisories**: Create private security advisories
     - **Code Scanning**: Automated security code analysis
     - **Secret Scanning**: Detect committed secrets and tokens
+
   </TabItem>
   <TabItem value="branches">
     **Default Branch:**
@@ -76,6 +78,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - **Restrict Pushes**: Limit who can push directly to protected branches
     - **Require Linear History**: Prevent merge commits
     - **Force Push Protection**: Prevent force pushes that rewrite history
+
   </TabItem>
   <TabItem value="webhooks">
     **Webhooks:**
@@ -89,6 +92,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - Configure third-party integrations
     - Manage app permissions and access
     - Review installed apps and their activities
+
   </TabItem>
 </Tabs>
 
@@ -120,6 +124,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - **bugfix/issue-number**: Bug fixes
     - **hotfix/critical-issue**: Emergency fixes
     - **chore/maintenance-task**: Maintenance work
+
   </TabItem>
   <TabItem value="protection">
     **Setting Up Branch Protection:**
@@ -143,6 +148,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - **Allow force pushes (not recommended for protected branches)**
     - **Allow deletions (not recommended for main branches)**
     - **Restrict who can push to matching branches**
+
   </TabItem>
   <TabItem value="merge">
     **Merge Methods:**
@@ -160,6 +166,7 @@ Effective repository management is crucial for maintaining organized, secure, an
     - Use merge commits for release branches to preserve branch points
     - Enable automatic branch deletion to reduce clutter
     - Require up-to-date branches to avoid integration issues
+
   </TabItem>
 </Tabs>
 
@@ -195,6 +202,7 @@ my-project/
     - **.gitignore**: Files and folders to exclude from Git
     - **CONTRIBUTING.md**: Guidelines for contributors
     - **CODE_OF_CONDUCT.md**: Community standards
+
   </TabItem>
   <TabItem value="gitignore">
     **Creating .gitignore:**
@@ -204,43 +212,52 @@ my-project/
 
     **Common .gitignore Patterns:**
     ```
+
 # Operating System files
+
 .DS_Store
 Thumbs.db
 
 # IDE files
+
 .vscode/
 .idea/
-*.swp
+\*.swp
 
 # Dependencies
+
 node_modules/
 vendor/
 
 # Build outputs
+
 dist/
 build/
-*.exe
-*.dll
+_.exe
+_.dll
 
 # Logs
+
 logs/
-*.log
+\*.log
 
 # Environment variables
+
 .env
 .env.local
 
 # Temporary files
-*.tmp
-*.temp
-    ```
+
+_.tmp
+_.temp
+```
 
     **Gitignore Best Practices:**
     - Add .gitignore before making your first commit
     - Use specific patterns rather than wildcards when possible
     - Document why certain files are ignored with comments
     - Use `git rm --cached filename` to untrack already committed files
+
   </TabItem>
   <TabItem value="lfs">
     **Git Large File Storage (LFS):**
@@ -250,27 +267,33 @@ logs/
 
     **Setting up Git LFS:**
     ```
+
 # Install Git LFS
+
 git lfs install
 
 # Track large file types
-git lfs track "*.psd"
-git lfs track "*.zip"
-git lfs track "*.mp4"
+
+git lfs track "_.psd"
+git lfs track "_.zip"
+git lfs track "\*.mp4"
 
 # Add .gitattributes file
+
 git add .gitattributes
 
 # Commit and push
+
 git commit -m "Add Git LFS tracking"
 git push
-    ```
+```
 
     **LFS Commands:**
     - `git lfs ls-files`: List tracked LFS files
     - `git lfs status`: Check LFS file status
     - `git lfs pull`: Download LFS files
     - `git lfs push`: Upload LFS files
+
   </TabItem>
 </Tabs>
 
@@ -298,6 +321,7 @@ git push
     - Identify periods of high and low activity
     - Monitor repository health and community standards
     - Analyze code changes and growth patterns
+
   </TabItem>
   <TabItem value="traffic">
     **Traffic Metrics:**
@@ -312,6 +336,7 @@ git push
     - Helps understand repository popularity and usage
     - Identify which files and documentation are most accessed
     - Track the impact of releases and marketing efforts
+
   </TabItem>
   <TabItem value="dependencies">
     **Dependency Management:**
@@ -325,6 +350,7 @@ git push
     - **Security Updates**: Automated pull requests for security fixes
     - **Dependency Review**: Review dependency changes in pull requests
     - **Supply Chain Security**: Monitor for compromised packages
+
   </TabItem>
 </Tabs>
 
@@ -350,6 +376,7 @@ git push
     - Use Dependabot for automated dependency updates
     - Set up GitHub Actions for periodic maintenance tasks
     - Use issue templates and automation to manage issues efficiently
+
   </TabItem>
   <TabItem value="archiving">
     **Archiving Repositories:**
@@ -369,6 +396,7 @@ git push
     - All issues, pull requests, and wiki content will be lost
     - Forks and stars will be disconnected
     - Consider archiving instead of deleting
+
   </TabItem>
   <TabItem value="migration">
     **Transferring Repositories:**
@@ -389,6 +417,7 @@ git push
     - Supports importing from GitLab, Bitbucket, and other Git services
     - Preserves commit history and branches
     - Issues and pull requests may need separate migration
+
   </TabItem>
 </Tabs>
 

@@ -13,6 +13,7 @@ keywords: [Proxmox, VLAN, 802.1Q, Network Segmentation, Virtual LAN, Tagging, Tr
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -109,6 +110,7 @@ Proxmox supports multiple approaches to VLAN configuration:
 The VLAN-aware bridge method allows a single bridge to handle multiple VLANs with tagging managed at the VM/container level.
 
 **Advantages:**
+
 - Single bridge configuration
 - Dynamic VLAN assignment
 - Simplified management
@@ -120,6 +122,7 @@ The VLAN-aware bridge method allows a single bridge to handle multiple VLANs wit
 Creating separate VLAN interfaces for each VLAN and connecting them to different bridges.
 
 **Advantages:**
+
 - Explicit VLAN separation
 - Compatible with older configurations
 - Fine-grained control
@@ -130,6 +133,7 @@ Creating separate VLAN interfaces for each VLAN and connecting them to different
 Creating separate bridges for each VLAN with dedicated VLAN interfaces.
 
 **Advantages:**
+
 - Complete isolation
 - Simplified firewall rules
 - Clear network topology
@@ -269,14 +273,14 @@ net1: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr20  # VLAN 20
 
 **VLAN Planning:**
 
-| VLAN ID | Purpose | Network | Description |
-|---------|---------|---------|-------------|
-| 10 | Management | 192.168.10.0/24 | Infrastructure management |
-| 20 | Production | 192.168.20.0/24 | Production servers |
-| 30 | Development | 192.168.30.0/24 | Development/testing |
-| 40 | DMZ | 192.168.40.0/24 | Public-facing services |
-| 50 | Storage | 192.168.50.0/24 | Storage network |
-| 60 | Backup | 192.168.60.0/24 | Backup operations |
+| VLAN ID | Purpose     | Network         | Description               |
+| ------- | ----------- | --------------- | ------------------------- |
+| 10      | Management  | 192.168.10.0/24 | Infrastructure management |
+| 20      | Production  | 192.168.20.0/24 | Production servers        |
+| 30      | Development | 192.168.30.0/24 | Development/testing       |
+| 40      | DMZ         | 192.168.40.0/24 | Public-facing services    |
+| 50      | Storage     | 192.168.50.0/24 | Storage network           |
+| 60      | Backup      | 192.168.60.0/24 | Backup operations         |
 
 **Configuration Example:**
 
@@ -296,7 +300,7 @@ iface vmbr0 inet static
 # Web server in DMZ (VLAN 40)
 net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=40
 
-# Database server in Production (VLAN 20)  
+# Database server in Production (VLAN 20)
 net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=20
 
 # Development server (VLAN 30)
@@ -307,12 +311,12 @@ net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=30
 
 **VLAN Planning for Service Provider:**
 
-| VLAN ID | Tenant | Network | Purpose |
-|---------|--------|---------|---------|
-| 100-199 | Customer A | 10.100.x.0/24 | Customer A networks |
-| 200-299 | Customer B | 10.200.x.0/24 | Customer B networks |
-| 300-399 | Customer C | 10.300.x.0/24 | Customer C networks |
-| 999 | Management | 192.168.1.0/24 | Provider management |
+| VLAN ID | Tenant     | Network        | Purpose             |
+| ------- | ---------- | -------------- | ------------------- |
+| 100-199 | Customer A | 10.100.x.0/24  | Customer A networks |
+| 200-299 | Customer B | 10.200.x.0/24  | Customer B networks |
+| 300-399 | Customer C | 10.300.x.0/24  | Customer C networks |
+| 999     | Management | 192.168.1.0/24 | Provider management |
 
 **Configuration:**
 
@@ -339,13 +343,13 @@ net0: virtio=XX:XX:XX:XX:XX:XX,bridge=vmbr0,tag=200
 
 **VLAN Planning for Home Lab:**
 
-| VLAN ID | Purpose | Network | Description |
-|---------|---------|---------|-------------|
-| 10 | Management | 192.168.10.0/24 | Proxmox and infrastructure |
-| 20 | Servers | 192.168.20.0/24 | Production-like services |
-| 30 | Lab | 192.168.30.0/24 | Testing and experiments |
-| 40 | IoT | 192.168.40.0/24 | Internet of Things devices |
-| 50 | Guest | 192.168.50.0/24 | Guest network isolation |
+| VLAN ID | Purpose    | Network         | Description                |
+| ------- | ---------- | --------------- | -------------------------- |
+| 10      | Management | 192.168.10.0/24 | Proxmox and infrastructure |
+| 20      | Servers    | 192.168.20.0/24 | Production-like services   |
+| 30      | Lab        | 192.168.30.0/24 | Testing and experiments    |
+| 40      | IoT        | 192.168.40.0/24 | Internet of Things devices |
+| 50      | Guest      | 192.168.50.0/24 | Guest network isolation    |
 
 ## **Advanced VLAN Configurations**
 
@@ -360,7 +364,7 @@ iface vmbr0 inet static
     bridge-vlan-aware yes
     bridge-vids 10,20,30  # Management and production VLANs
 
-auto vmbr1  
+auto vmbr1
 iface vmbr1 inet manual
     bridge-ports enp0s8
     bridge-vlan-aware yes
@@ -429,7 +433,7 @@ IN DROP # Drop everything else
 
 [GROUP dmz-vlan]
 IN ACCEPT -p tcp --dport 80     # HTTP from anywhere
-IN ACCEPT -p tcp --dport 443    # HTTPS from anywhere  
+IN ACCEPT -p tcp --dport 443    # HTTPS from anywhere
 IN ACCEPT -p tcp --dport 22 -s 192.168.10.0/24 # SSH from management only
 OUT ACCEPT -p tcp --dport 3306 -d 192.168.20.0/24 # Database access
 OUT DROP # Block everything else outbound

@@ -18,7 +18,7 @@ export default {
   // ... other config
   customFields: {
     // ... other custom fields
-    
+
     // Comment System Configuration
     comments: {
       enableGiscus: true,          // Enable/disable Giscus comments
@@ -33,18 +33,21 @@ export default {
 ## Configuration Options
 
 ### `enableGiscus`
+
 - **Type**: `boolean`
 - **Default**: `true`
 - **Description**: Enable or disable Giscus (GitHub-based) comments
 - **Example**: `enableGiscus: false` to disable Giscus
 
 ### `enableDiscord`
+
 - **Type**: `boolean`
 - **Default**: `true`
 - **Description**: Enable or disable Discord comments integration
 - **Example**: `enableDiscord: false` to disable Discord comments
 
 ### `discordApiUrl`
+
 - **Type**: `string | undefined`
 - **Default**: `undefined` (uses environment variable)
 - **Description**: URL of your Discord comments API server. If not set, uses `REACT_APP_API_URL` environment variable
@@ -53,6 +56,7 @@ export default {
 ## Usage Examples
 
 ### Both Systems Enabled (Default)
+
 ```typescript
 comments: {
   enableGiscus: true,
@@ -64,6 +68,7 @@ comments: {
 **Result**: Both Giscus and Discord comments appear on documentation pages
 
 ### Only Giscus Comments
+
 ```typescript
 comments: {
   enableGiscus: true,
@@ -74,6 +79,7 @@ comments: {
 **Result**: Only Giscus comments appear (traditional GitHub-based comments)
 
 ### Only Discord Comments
+
 ```typescript
 comments: {
   enableGiscus: false,
@@ -85,6 +91,7 @@ comments: {
 **Result**: Only Discord comments appear (bidirectional Discord integration)
 
 ### All Comments Disabled
+
 ```typescript
 comments: {
   enableGiscus: false,
@@ -115,6 +122,7 @@ comments: {
 ## Use Cases
 
 ### Development Environment
+
 ```typescript
 comments: {
   enableGiscus: true,
@@ -123,6 +131,7 @@ comments: {
 ```
 
 ### Production with Both Systems
+
 ```typescript
 comments: {
   enableGiscus: true,
@@ -132,6 +141,7 @@ comments: {
 ```
 
 ### Migration from Giscus to Discord
+
 ```typescript
 // Phase 1: Both enabled
 comments: {
@@ -147,6 +157,7 @@ comments: {
 ```
 
 ### Documentation-only Site
+
 ```typescript
 comments: {
   enableGiscus: false,
@@ -167,6 +178,7 @@ comments: {
 ```
 
 Then control via environment variables:
+
 ```env
 ENABLE_GISCUS=true
 ENABLE_DISCORD=false
@@ -184,21 +196,25 @@ REACT_APP_API_URL=http://localhost:3001
 ## Troubleshooting
 
 ### Comments Not Appearing
+
 - Check that the desired comment system is enabled in config
 - Verify environment variables are set correctly
 - Ensure the Discord API server is running (if Discord is enabled)
 
 ### Giscus Not Working
+
 - Check `enableGiscus: true` in config
 - Verify Giscus configuration (repo, repoId, category, categoryId)
 - Ensure GitHub repository settings are correct
 
 ### Discord Comments Not Working
+
 - Check `enableDiscord: true` in config
 - Verify `discordApiUrl` is set correctly
 - Ensure Discord bot and API server are running
 
 ### Configuration Changes Not Applied
+
 - Restart the Docusaurus development server
 - Clear browser cache
 - Check for TypeScript errors in config file
@@ -206,6 +222,7 @@ REACT_APP_API_URL=http://localhost:3001
 ## Migration Guide
 
 ### From Giscus Only to Both Systems
+
 1. Add Discord comment configuration
 2. Set `enableDiscord: true`
 3. Keep `enableGiscus: true`
@@ -213,6 +230,7 @@ REACT_APP_API_URL=http://localhost:3001
 5. Test both systems
 
 ### From Discord Only to Both Systems
+
 1. Add Giscus configuration
 2. Set `enableGiscus: true`
 3. Keep `enableDiscord: true`
@@ -220,6 +238,7 @@ REACT_APP_API_URL=http://localhost:3001
 5. Test both systems
 
 ### Disabling a System
+
 1. Set the appropriate enable flag to `false`
 2. Redeploy the site
 3. Optionally remove related configuration

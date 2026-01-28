@@ -14,12 +14,12 @@ keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Nextcloud Installation using Docker Build and Docker Compose**
 
-***This method includes Redis, MariaDB, Nextcloud Memories, and Office***
+**_This method includes Redis, MariaDB, Nextcloud Memories, and Office_**
 :::note
 inotify libraries have been added to the Dockerfile for the iNotify App
 :::
@@ -28,11 +28,12 @@ Nextcloud 28.0.4 was the latest version when making this tutorial.
 :::
 
 First lets update your system.
+
 ```bash
 sudo apt-get update && apt-get upgrade -y
 ```
 
-### ***Setting up the directories***
+### **_Setting up the directories_**
 
 Now lets setup the Directories
 :::note
@@ -44,28 +45,34 @@ You can change the directories to your liking.
 ```bash
 sudo mkdir /opt/docker && sudo mkdir /opt/docker/nextcloud
 ```
+
 Lets take ownership of the directory
+
 ```bash
 sudo chown -R $USER:$USER /opt/docker
 ```
+
 Enter the Directory
+
 ```bash
 cd /opt/docker/nextcloud
 ```
 
-### ***Creating .env files***
+### **_Creating .env files_**
 
 Now lets create the [Docker Variables](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/#use-the-env_file-attribute) files in the new directory.
 
-### ***Creating .env***
+### **_Creating .env_**
 
 ```bash
 nano .env
 ```
+
 :::warning[warning]
 When editing the configuration below, remove all instances of `<>` from the values
-::: 
+:::
 Paste the Following with `CNTRL+SHIFT+V`
+
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
 # Nextcloud and MariaDB
 # Named Docker volumes for persistent data storage
@@ -115,12 +122,12 @@ Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
 
 Save the new file by pressing `CTRL+X`
 
-### ***Creating the Compose file***
+### **_Creating the Compose file_**
 
-   ```bash
-   nano docker-compose.yaml
-   ```
-  
+```bash
+nano docker-compose.yaml
+```
+
 Now lets edit the compose file.
 
 ```yaml title="The highlighted lines are Optional and can be removed completely"
@@ -242,7 +249,7 @@ volumes:
 
 :::info[NVIDIA HWA]
 If you want to use GPU for transcoding then uncomment this line\
-runtime: nvidia # (NVENC)  # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers.\
+runtime: nvidia # (NVENC) # For Nvidia HW Acceleration, Uncomment after installing nvidia drivers.\
 Test nvidia by running `sudo nvidia-smi`
 :::
 
@@ -253,13 +260,16 @@ tmpfs uses memory (RAM), adjust the value as needed or optionally remove the vol
 ## **Starting Nextcloud**
 
 Now lets start it up.
+
 ```bash
 sudo docker compose up -d
 ```
+
 :::info
 
 the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
 :::
+
 <p>
 <>After its done pulling the docker images you can open up a web browser.</>
 </p>
@@ -279,6 +289,7 @@ Before proceeding, you will need to configure your reverse proxy. I have an exam
 
 :::warning
 If you see this warning
+
 ```
 
 Performance warning
@@ -291,13 +302,14 @@ If you use clients for file syncing, the use of SQLite is highly discouraged.
 ```
 
 You will need to click the drop down and select `MySQL/MariaDB` and type in the info manually.
+
 - **database account:** nextcloud
 - **database password:** YOUR_PASSWORD_FROM .env
 - **database name:** nextcloud
 - **database host:** mariadb:3306
-:::
+  :::
 
-### ***Account Creation***
+### **_Account Creation_**
 
 <p>
 <>Now create an admin account and click `Install`</>
@@ -315,7 +327,7 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 
 ![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
 
-### ***Checking for errors and warnings***
+### **_Checking for errors and warnings_**
 
 <p>
 <>On the top right click the `User Icon` and go to `Administration Settings`</>
@@ -333,12 +345,14 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 <>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
 </p>
 
-### ***Modifying the config.php file***
+### **_Modifying the config.php file_**
 
 Run the following command to open the `config.php` file with nano.
+
 ```bash
 nano nextcloud/config/config.php
 ```
+
 :::tip[Hint]
 
 <p>
@@ -348,11 +362,11 @@ Run `cd /opt/docker/nextcloud` then try again.
 :::
 
 Now add the following to the bottom of the file.
+
 ```editorconfig title="Highlighted items can be changed to your Time Zone Identifier" {2} showLineNumbers
   'maintenance_window_start' => 1,
   'default_phone_region' => 'US',
 ```
-
 
 ![Nextcloud config.php](/img/nextcloud/config.jpg)
 
@@ -371,7 +385,7 @@ Now add the following to the bottom of the file.
 In some cases, you may have to delete your browser cache and restart the browser for the Warnings to update.
 :::
 
-### ***Creating production use user***
+### **_Creating production use user_**
 
 <p>
 <>Now you can go create a user for yourself.</>
@@ -388,7 +402,6 @@ In some cases, you may have to delete your browser cache and restart the browser
 </p>
 
 ![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
-
 
 <p>
 <>Now create your User.</>
@@ -415,7 +428,7 @@ You will have to add an `A` record for `office` and setup your reverse proxy for
 :::
 ![CollaboraUrl](/img/nextcloud/OfficeUrl.jpg)
 
-### ***WOPI List***
+### **_WOPI List_**
 
 <p>
 <>Now scroll down to the `WOPI List`</>
@@ -427,7 +440,7 @@ Ex. `251.163.184.3,192.168.1.1/24,127.0.0.1`
 ![Office WOPI](/img/nextcloud/OfficeWOPI.jpg)
 Press `ENTER`
 
-### ***Testing Nextcloud Office***
+### **_Testing Nextcloud Office_**
 
 <p>
 <>Go to `Files` and create a new document</>
@@ -449,7 +462,7 @@ Press `ENTER`
 <>Now search and install `Preview Generator`.</>
 </p>
 
-### ***Configuring Nextcloud Memories***
+### **_Configuring Nextcloud Memories_**
 
 <p>
 <>Go to your `Administration Settings` and find `Memories`</>
@@ -465,7 +478,7 @@ Press `ENTER`
 ![Memories Setting5](/img/nextcloud/MemoriesSetting5.jpg)
 ![Memories Setting6](/img/nextcloud/MemoriesSetting6.jpg)
 
-### ***Fixing the warnings***
+### **_Fixing the warnings_**
 
 <p>
 <>Im sure you noticed that there are a few warnings we need to take care of.</>
@@ -486,7 +499,7 @@ I prefer generating the Geometry table this way so I can view the progress
 
 ## **Congragulations!! you have installed Nextcloud!**
 
-## ***Troubleshooting***
+## **_Troubleshooting_**
 
 <p>
 <>For troubleshooting, please visit [Troublshooting](../Troubleshooting/Nextcloud.mdx).</>

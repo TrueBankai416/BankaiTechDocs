@@ -13,6 +13,7 @@ keywords: [Proxmox, CIFS, SMB, Samba, Network Storage, Windows Share, Remote Sto
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -83,14 +84,15 @@ CIFS/SMB is a network file sharing protocol suite that allows applications to re
 <TabItem value="comparison">
 **Feature Comparison**
 
-| Feature | SMB 1.x | SMB 2.x | SMB 3.x |
-|---------|---------|---------|---------|
-| Security | Poor | Good | Excellent |
-| Performance | Low | Medium | High |
-| Encryption | No | No | Yes |
-| Multichannel | No | No | Yes |
-| Resilience | No | Limited | Yes |
-| Recommendation | Avoid | Legacy | Use |
+| Feature        | SMB 1.x | SMB 2.x | SMB 3.x   |
+| -------------- | ------- | ------- | --------- |
+| Security       | Poor    | Good    | Excellent |
+| Performance    | Low     | Medium  | High      |
+| Encryption     | No      | No      | Yes       |
+| Multichannel   | No      | No      | Yes       |
+| Resilience     | No      | Limited | Yes       |
+| Recommendation | Avoid   | Legacy  | Use       |
+
 </TabItem>
 </Tabs>
 
@@ -154,21 +156,26 @@ CIFS/SMB is a network file sharing protocol suite that allows applications to re
 sudo apt update
 
 # Install Samba server
+
 sudo apt install samba samba-common-bin
 
 # Install additional utilities
+
 sudo apt install cifs-utils
 
 # Start and enable Samba services
+
 sudo systemctl start smbd
 sudo systemctl enable smbd
 sudo systemctl start nmbd
 sudo systemctl enable nmbd
 
 # Check service status
+
 sudo systemctl status smbd
 sudo systemctl status nmbd
-```
+
+````
 </TabItem>
 
 <TabItem value="centos">
@@ -188,7 +195,8 @@ sudo systemctl enable nmb
 # Check service status
 sudo systemctl status smb
 sudo systemctl status nmb
-```
+````
+
 </TabItem>
 
 <TabItem value="windows">
@@ -210,6 +218,7 @@ sudo systemctl status nmb
    - Open PowerShell as Administrator
    - Run: `Set-SmbServerConfiguration -EnableSMB1Protocol $false`
    - Run: `Set-SmbServerConfiguration -EnableSMB2Protocol $true`
+
 </TabItem>
 </Tabs>
 
@@ -249,18 +258,18 @@ sudo tee /etc/samba/smb.conf > /dev/null << 'EOF'
     workgroup = WORKGROUP
     server string = Proxmox Storage Server
     netbios name = PROXMOX-STORAGE
-    
+
     # Protocol versions
     server min protocol = SMB2
     server max protocol = SMB3
     client min protocol = SMB2
     client max protocol = SMB3
-    
+
     # Security settings
     security = user
     map to guest = bad user
     guest account = nobody
-    
+
     # Performance and reliability
     socket options = TCP_NODELAY IPTOS_LOWDELAY SO_RCVBUF=131072 SO_SNDBUF=131072
     read raw = yes
@@ -268,16 +277,16 @@ sudo tee /etc/samba/smb.conf > /dev/null << 'EOF'
     max xmit = 65535
     dead time = 15
     getwd cache = yes
-    
+
     # Logging
     log file = /var/log/samba/log.%m
     max log size = 1000
     log level = 1
-    
+
     # Character set
     unix charset = UTF-8
     dos charset = CP850
-    
+
     # Disable printing
     load printers = no
     printing = bsd
@@ -656,20 +665,20 @@ pvesm status smb-data
     read raw = yes
     write raw = yes
     max xmit = 65535
-    
+
     # Async I/O
     aio read size = 16384
     aio write size = 16384
     aio write behind = true
-    
+
     # Oplocks for better caching
     oplocks = yes
     level2 oplocks = yes
     kernel oplocks = no
-    
+
     # Memory mapping
     use mmap = yes
-    
+
     # Disable unnecessary features
     load printers = no
     disable spoolss = yes
@@ -735,7 +744,7 @@ sysctl -p
 [global]
     # Force SMB encryption
     smb encrypt = required
-    
+
     # Or allow but don't require
     # smb encrypt = desired
 
@@ -811,6 +820,7 @@ mount -t cifs //192.168.1.100/data /mnt/pve/smb-data -v \
 journalctl -u smbd
 tail -f /var/log/samba/log.smbd
 ```
+
 </TabItem>
 
 <TabItem value="auth">
@@ -833,6 +843,7 @@ sudo ls -la /etc/cifs-credentials/
 # Test with different SMB versions
 mount -t cifs //192.168.1.100/data /mnt/test -o username=smbuser,vers=2.0
 ```
+
 </TabItem>
 
 <TabItem value="performance">
@@ -854,6 +865,7 @@ rm /mnt/pve/smb-data/test
 # Check mount options
 mount | grep cifs
 ```
+
 </TabItem>
 
 <TabItem value="permissions">
@@ -874,6 +886,7 @@ getent group smbgroup
 touch /mnt/pve/smb-data/test
 ls -la /mnt/pve/smb-data/test
 ```
+
 </TabItem>
 </Tabs>
 
@@ -915,7 +928,7 @@ LOG_FILE="/var/log/smb-monitor.log"
 check_smb_mount() {
     local mount_point="$1"
     local name="$2"
-    
+
     if mountpoint -q "$mount_point"; then
         if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
             echo "$(date): ✓ $name is healthy"
@@ -960,15 +973,15 @@ LOG_FILE="/var/log/smb-remount.log"
 remount_smb() {
     local mount_point="$1"
     local name="$2"
-    
+
     echo "$(date): Attempting to remount $name" >> "$LOG_FILE"
-    
+
     # Try to unmount first
     umount "$mount_point" 2>/dev/null
-    
+
     # Wait a moment
     sleep 2
-    
+
     # Remount
     if mount "$mount_point"; then
         echo "$(date): ✓ Successfully remounted $name" >> "$LOG_FILE"

@@ -5,7 +5,7 @@ This server enables Discord integration for comments on your Docusaurus document
 ## Features
 
 - ✅ Post comments from website to Discord
-- ✅ Sync Discord replies back to website  
+- ✅ Sync Discord replies back to website
 - ✅ Thread support for organized discussions
 - ✅ Moderation capabilities
 - ✅ SQLite database for comment storage
@@ -69,7 +69,7 @@ Edit `.env` with your Discord configuration:
 DISCORD_BOT_TOKEN=your_bot_token_here
 DISCORD_CHANNEL_ID=your_channel_id_here
 
-# API Configuration  
+# API Configuration
 PORT=3001
 
 # Database Configuration (optional)
@@ -104,24 +104,28 @@ npm start
 #### Option B: Systemd Service (Recommended)
 
 1. **Create writable database directory**:
+
 ```bash
 sudo mkdir -p /var/lib/discord-comments
 sudo chown your-service-user:your-service-user /var/lib/discord-comments
 ```
 
 2. **Update service file paths**:
+
 ```bash
 # Edit the service file to match your installation path
 sudo nano discord-comments.service
 ```
 
 3. **Update .env for production**:
+
 ```bash
 # Add to your .env file
 DATABASE_PATH=/var/lib/discord-comments/comments.db
 ```
 
 4. **Install service**:
+
 ```bash
 sudo cp discord-comments.service /etc/systemd/system/
 sudo systemctl daemon-reload
@@ -130,6 +134,7 @@ sudo systemctl start discord-comments
 ```
 
 5. **Check service status**:
+
 ```bash
 sudo systemctl status discord-comments
 ```
@@ -157,6 +162,7 @@ docker run -d \
 ```
 
 Check container logs:
+
 ```bash
 docker logs discord-comments -f
 ```
@@ -181,6 +187,7 @@ location /api/ {
 ```
 
 Then reload nginx:
+
 ```bash
 sudo nginx -t
 sudo systemctl reload nginx
@@ -191,9 +198,9 @@ sudo systemctl reload nginx
 ### Context Levels
 
 - **minimal**: Just page title and URL
-- **basic**: Title, URL, and basic page info  
+- **basic**: Title, URL, and basic page info
 - **full**: Complete context with breadcrumbs and section info
-- **custom**: Use individual DISCORD_SHOW_* settings
+- **custom**: Use individual DISCORD*SHOW*\* settings
 
 ### Thread Settings
 
@@ -232,11 +239,13 @@ The SQLite database location is determined automatically:
 
 **Database Location Debug:**
 Check server logs on startup to see which path is being used:
+
 ```bash
 sudo journalctl -u discord-comments -f | grep "Using database path"
 ```
 
 **Reset Database:**
+
 ```bash
 # Find current database location from logs, then:
 rm /path/to/comments.db
@@ -250,10 +259,11 @@ If you see "attempt to write a readonly database" errors:
 
 1. **Quick Fix**: The server will automatically detect this and fallback to `/tmp`
 2. **Persistent Fix**: Set `DATABASE_PATH` to a writable location:
+
    ```bash
    # In your .env file
    DATABASE_PATH=/var/lib/discord-comments/comments.db
-   
+
    # Create the directory with proper permissions
    sudo mkdir -p /var/lib/discord-comments
    sudo chown your-service-user:your-service-user /var/lib/discord-comments
@@ -262,6 +272,7 @@ If you see "attempt to write a readonly database" errors:
 ## Logs
 
 View service logs:
+
 ```bash
 sudo journalctl -u discord-comments -f
 ```

@@ -26,12 +26,13 @@ keywords: [Reverse Proxy,Nginx,Nextcloud,Adguard,Authelia,HomeBridge,Home Assist
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
 ## Nextcloud
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -136,6 +137,7 @@ server {
 ```
 
 ## OnlyOffice
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -164,7 +166,7 @@ server {
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()" always;
     add_header Expect-CT "enforce, max-age=86400" always;
-    
+
     # Allow framing from Nextcloud domain for OnlyOffice integration using CSP frame-ancestors
     add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net *.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data: https: http:; connect-src 'self' wss: ws: https:; frame-ancestors 'self' https://cloud.bankai-tech.com; object-src 'none'; base-uri 'self'; form-action 'self';" always;
     # Connect to backend server
@@ -176,18 +178,19 @@ server {
         proxy_set_header CF-Connecting-IP $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # WebSocket support
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        
+
         proxy_pass $onlyoffice;
     }
 }
 ```
 
 ## Adguard Home
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 server {
     listen [::]:443 ssl http2;
@@ -205,10 +208,10 @@ server {
 // highlight-end
     ssl_stapling off;
     ssl_stapling_verify off;
-    
+
     #              Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
-    
+
     #              Connect to backend server
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -237,6 +240,7 @@ server {
 ```
 
 ## Authelia
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 #websocket
 map $http_upgrade $connection_upgrade {
@@ -270,14 +274,14 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     location / {
         proxy_pass $upstream_authelia;
-        
+
         # Use enhanced proxy configuration without rate limits (important for static assets)
         include /etc/nginx/snippets/enhanced-proxy-no-limits.conf;
-        
+
         # WebSocket support for Authelia
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        
+
         # Cache settings
         proxy_cache_bypass $cookie_session;
         proxy_no_cache $cookie_session;
@@ -296,6 +300,7 @@ server {
 ```
 
 ## HomeBridge
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -351,6 +356,7 @@ server {
 ```
 
 ## Home Assistant
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -406,6 +412,7 @@ server {
 ```
 
 ## Jellyfin | JFA-GO
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -437,20 +444,20 @@ server {
 // highlight-end
     #                     Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
-    
+
     #                     Jellyfin-specific media streaming overrides
     add_header X-XSS-Protection "0";  # Explicitly disabled for media streaming
-    
+
     #                     Media streaming cache killing
     add_header Last-Modified $date_gmt;
     add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
     if_modified_since off;
     expires off;
     etag off;
-    
+
     #                     Enhanced media streaming permissions policy (more restrictive than standard)
     add_header Permissions-Policy "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), clipboard-read=(), display-capture=(), document-domain=(), encrypted-media=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), interest-cohort=(), keyboard-map=(), local-fonts=(), magnetometer=(), microphone=(), payment=(), publickey-credentials-get=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()" always;
-    
+
     #                     Media streaming process isolation
     add_header Origin-Agent-Cluster "?1" always;
     #                     Content Security Policy
@@ -465,28 +472,28 @@ server {
     # }
     location / {
         proxy_pass http://$jellyfin;
-        
+
         #                     Use enhanced proxy configuration without rate limiting for media streaming
         include /etc/nginx/snippets/enhanced-proxy-no-limits.conf;
-        
+
         #                     WebSocket support for real-time features
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        
+
         #                     Jellyfin-specific streaming settings
         proxy_set_header X-Forwarded-Protocol $scheme;
     }
     #                     location block for /web - This is purely for aesthetics so /web/!/ works instead of having to go to /web/index.html/!/
     location = /web/ {
         proxy_pass http://$jellyfin/web/index.html;
-        
+
         #                     Use enhanced proxy configuration without rate limiting for media streaming
         include /etc/nginx/snippets/enhanced-proxy-no-limits.conf;
-        
+
         #                     WebSocket support for real-time features
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-        
+
         #                     Jellyfin-specific header
         proxy_set_header X-Forwarded-Protocol $scheme;
     }
@@ -520,7 +527,7 @@ server {
 // highlight-next-line
         set $upstream_accounts http://192.168.9.151:8056;
         proxy_pass $upstream_accounts;
-        
+
         #                     Authentication configuration (legacy method for compatibility)
         auth_request /internal/authelia/authz;
         auth_request_set $target_url $scheme://$http_host$request_uri;
@@ -530,26 +537,26 @@ server {
         proxy_set_header Remote-Groups $groups;
 // highlight-next-line
         error_page 401 =302 https://auth.bankai-tech.com/?rd=$target_url;
-        
+
         #                     Use Jellyfin-optimized proxy configuration
         include /etc/nginx/snippets/jellyfin-proxy.conf;
-        
+
         #                     Proxy timeouts
         proxy_connect_timeout 240s;
         proxy_send_timeout 240s;
         proxy_read_timeout 300s;
-        
+
         #                     Jellyfin accounts-specific settings
         proxy_cache_bypass $cookie_session;
         proxy_no_cache $cookie_session;
         send_timeout 5m;
-        
+
         #                     Real IP configuration for this network
 // highlight-next-line
         set_real_ip_from 192.168.9.0/24;
         real_ip_header X-Forwarded-For;
         real_ip_recursive on;
-        
+
         #                     WebSocket support
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -560,6 +567,7 @@ server {
 ```
 
 ## Jellyseerr
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -614,6 +622,7 @@ server {
 ```
 
 ## Radarr
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -658,6 +667,7 @@ server {
 ```
 
 ## Sonarr
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -702,6 +712,7 @@ server {
 ```
 
 ## Prowlarr
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -746,6 +757,7 @@ server {
 ```
 
 ## Docusaurus
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 server {
     listen 80;
@@ -801,6 +813,7 @@ server {
 ```
 
 ## Immich
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -864,6 +877,7 @@ server {
 ```
 
 ## Portainer
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -923,6 +937,7 @@ server {
 ```
 
 ## Vaultwarden
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -977,6 +992,7 @@ server {
 ```
 
 ## Uptime Kuma
+
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -1038,6 +1054,7 @@ server {
 The following snippets can be used to simplify nginx configurations and ensure consistency across multiple services. These files should be placed in `/etc/nginx/snippets/`.
 
 ### proxy.conf
+
 ```nginx title="Save as /etc/nginx/snippets/proxy.conf" showLineNumbers
 ## Headers
 proxy_set_header Host $host;
@@ -1076,6 +1093,7 @@ proxy_connect_timeout 360;
 ```
 
 ### authelia-authrequest.conf
+
 ```nginx title="Save as /etc/nginx/snippets/authelia-authrequest.conf" showLineNumbers
 ## Send a subrequest to Authelia to verify if the user is authenticated and has permission to access the resource.
 auth_request /internal/authelia/authz;
@@ -1112,6 +1130,7 @@ error_page 401 =302 $redirection_url;
 ```
 
 ### authelia-location.conf
+
 ```nginx title="Save as /etc/nginx/snippets/authelia-location.conf" showLineNumbers
 // highlight-next-line
 set $upstream_authelia http://192.168.8.77:9091/api/authz/auth-request;
@@ -1149,6 +1168,7 @@ location /internal/authelia/authz {
 ```
 
 ### security-headers.conf
+
 ```nginx title="Save as /etc/nginx/snippets/security-headers.conf" showLineNumbers
 ## Security Headers
 add_header Expect-CT "enforce, max-age=31536000";
@@ -1161,6 +1181,7 @@ add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 ```
 
 ### enhanced-proxy-no-limits.conf
+
 ```nginx title="Save as /etc/nginx/snippets/enhanced-proxy-no-limits.conf" showLineNumbers
 # Enhanced Proxy Configuration - No Rate Limiting
 # Use this for media streaming applications that need high concurrent requests
@@ -1202,6 +1223,7 @@ proxy_busy_buffers_size 256k;
 ```
 
 ### jellyfin-proxy.conf
+
 ```nginx title="Save as /etc/nginx/snippets/jellyfin-proxy.conf" showLineNumbers
 # Enhanced Proxy Configuration for Jellyfin
 # Optimized for media streaming with custom buffer sizes
@@ -1247,21 +1269,21 @@ To use these snippets in your nginx configurations, include them in your server 
 server {
     listen 443 ssl http2;
     server_name example.bankai-tech.com;
-    
+
     # Use standardized security headers
     include /etc/nginx/snippets/security-headers.conf;
-    
+
     location / {
         # Include Authelia auth request
         include /etc/nginx/snippets/authelia-authrequest.conf;
-        
+
         # Include proxy configuration
         include /etc/nginx/snippets/proxy.conf;
-        
+
         set $upstream_service http://192.168.1.100:8080;
         proxy_pass $upstream_service;
     }
-    
+
     # Include Authelia location block at the end
     include /etc/nginx/snippets/authelia-location.conf;
 }

@@ -9,35 +9,38 @@ keywords: [Ubiquiti, Unifi Controller]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
-
-
 
 # **Setting Up UniFi Controller on Ubuntu with GlennR's Scripts**
 
 This tutorial covers the installation of the UniFi Controller on an Ubuntu system using GlennR's automation scripts. GlennR's scripts automate the installation process, making it simpler and more efficient.
+
 <p>
 <>These scripts were tested on Ubuntu 16.04/18.04/18.10/19.04/19.10/20.04/20.10/21.04/21.10/22.04/22.10/23.04/23.10/24.04/24.10</>
 </p>
 
-## ***Prerequisites***
+## **_Prerequisites_**
+
 - A fresh Ubuntu server with root or a user with sudo privileges.
 - Basic familiarity with the Linux terminal.
 - Internet connection on the server.
 
-## ***Step 1: Update and Upgrade Ubuntu***
+## **_Step 1: Update and Upgrade Ubuntu_**
 
 Before proceeding with the installation, ensure your system is up-to-date:
 
 ```bash
 sudo apt-get update && sudo apt-get upgrade -y
 ```
+
 ## Step 2: Make sure the ca-certificates package is installed
+
 ```bash
 sudo apt-get install ca-certificates curl -y
 ```
 
-## ***Step 3: Download GlennR's Installation Script and Install***
+## **_Step 3: Download GlennR's Installation Script and Install_**
 
 Download and execute the script!
 
@@ -65,13 +68,13 @@ GlennR's script sets up the UniFi Controller as a service running on your Ubuntu
 - **Stop the service**: `sudo service unifi stop`
 - **Restart the service**: `sudo service unifi restart`
 
-## ***Conclusion***
+## **_Conclusion_**
 
 You've successfully installed the UniFi Controller on your Ubuntu server using GlennR's scripts. The UniFi Controller is now ready for you to manage your UniFi devices and networks.
 
 Remember to regularly check for any updates both for the Ubuntu system and the UniFi Controller software to ensure your system remains secure and efficient.
 
-## ***Additional Resources***
+## **_Additional Resources_**
 
 - [UniFi - Official Support Documentation](https://help.ui.com/hc/en-us/categories/200320654-UniFi-Wireless)
 - [GlennR's UniFi Installation Scripts](https://community.ui.com/questions/UniFi-Installation-Scripts-or-UniFi-Easy-Update-Script-or-UniFi-Lets-Encrypt-or-UniFi-Easy-Encrypt-/ccbc7530-dd61-40a7-82ec-22b17f027776)

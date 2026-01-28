@@ -36,7 +36,7 @@ If you haven't connected your Docusaurus site to GitHub yet, check out our [Conn
 
 ## **Step 1: Prepare Your Repository**
 
-### ***Verify Build Configuration***
+### **_Verify Build Configuration_**
 
 Ensure your `package.json` has the correct build script:
 
@@ -49,7 +49,7 @@ Ensure your `package.json` has the correct build script:
 }
 ```
 
-### ***Test Local Build***
+### **_Test Local Build_**
 
 Before deploying, test your build locally:
 
@@ -60,7 +60,7 @@ npm run serve
 
 This ensures your site builds correctly and all links work properly.
 
-### ***Configure Base URL (if needed)***
+### **_Configure Base URL (if needed)_**
 
 <Tabs groupId="config-type">
   <TabItem value="js" label="JavaScript">
@@ -93,7 +93,7 @@ const config: Config = {
 
 ## **Step 2: Create a Cloudflare Pages Project**
 
-### ***Access Cloudflare Dashboard***
+### **_Access Cloudflare Dashboard_**
 
 1. Log in to your [Cloudflare Dashboard](https://dash.cloudflare.com/)
 2. If you have a domain selected, click the **Cloudflare icon** at the top left to go to the main screen
@@ -102,7 +102,7 @@ const config: Config = {
 5. Click **Create** at the top right
 6. Select **Pages** (not Workers)
 
-### ***Connect to GitHub***
+### **_Connect to GitHub_**
 
 1. Next to GitHub, click **Get Started**
 2. Choose **GitHub** as your Git provider
@@ -115,19 +115,19 @@ You can choose to give Cloudflare access to all repositories or select specific 
 
 ## **Step 3: Configure Build Settings**
 
-### ***Project Configuration***
+### **_Project Configuration_**
 
 When setting up your project, configure the following:
 
-| Setting | Value |
-|---------|-------|
-| **Project name** | Choose a unique name (this will be part of your `.pages.dev` URL) |
-| **Production branch** | `main` or `master` (your default branch) |
-| **Build command** | `git fetch --unshallow \|\| git fetch --depth=100000 && npm run build` |
-| **Build output directory** | `build` |
-| **Root directory** | `/` (unless your Docusaurus site is in a subdirectory) |
+| Setting                    | Value                                                                  |
+| -------------------------- | ---------------------------------------------------------------------- |
+| **Project name**           | Choose a unique name (this will be part of your `.pages.dev` URL)      |
+| **Production branch**      | `main` or `master` (your default branch)                               |
+| **Build command**          | `git fetch --unshallow \|\| git fetch --depth=100000 && npm run build` |
+| **Build output directory** | `build`                                                                |
+| **Root directory**         | `/` (unless your Docusaurus site is in a subdirectory)                 |
 
-### ***Environment Variables***
+### **_Environment Variables_**
 
 If your site requires environment variables, add them in the **Environment variables** section:
 
@@ -142,14 +142,14 @@ Cloudflare Pages supports Node.js versions 12.18.0, 14.15.0, 16.13.0, and 18.12.
 
 ## **Step 4: Deploy Your Site**
 
-### ***Initial Deployment***
+### **_Initial Deployment_**
 
 1. Click **Save and Deploy**
 2. Cloudflare will automatically trigger the first build
 3. Monitor the build process in the deployment logs
 4. Once complete, your site will be available at `https://your-project-name.pages.dev`
 
-### ***Build Process Overview***
+### **_Build Process Overview_**
 
 The build process includes:
 
@@ -161,14 +161,14 @@ The build process includes:
 
 ## **Step 5: Configure Custom Domain (Optional)**
 
-### ***Add Custom Domain***
+### **_Add Custom Domain_**
 
 1. In your Pages project, go to **Custom domains**
 2. Click **Set up a custom domain**
 3. Enter your domain name (e.g., `docs.yourdomain.com`)
 4. Follow the DNS configuration instructions
 
-### ***DNS Configuration***
+### **_DNS Configuration_**
 
 Add a CNAME record to your domain's DNS:
 
@@ -184,7 +184,7 @@ It may take up to 24 hours for DNS changes to propagate globally. Cloudflare wil
 
 ## **Step 6: Automatic Deployments**
 
-### ***Branch Deployments***
+### **_Branch Deployments_**
 
 Cloudflare Pages automatically:
 
@@ -192,16 +192,17 @@ Cloudflare Pages automatically:
 - Creates preview deployments for pull requests
 - Provides unique URLs for each deployment
 
-### ***Preview Deployments***
+### **_Preview Deployments_**
 
 Every pull request gets its own preview URL:
+
 - Format: `https://branch-name.your-project-name.pages.dev`
 - Perfect for reviewing changes before merging
 - Automatically updated when you push new commits
 
 ## **Advanced Configuration**
 
-### ***Build Optimization***
+### **_Build Optimization_**
 
 Create a `_headers` file in your `static` directory for custom headers:
 
@@ -213,7 +214,7 @@ Create a `_headers` file in your `static` directory for custom headers:
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 ```
 
-### ***Redirects***
+### **_Redirects_**
 
 Create a `_redirects` file in your `static` directory:
 
@@ -222,7 +223,7 @@ Create a `_redirects` file in your `static` directory:
 /docs/* /documentation/:splat 301
 ```
 
-### ***Functions (Advanced)***
+### **_Functions (Advanced)_**
 
 For dynamic functionality, you can add Cloudflare Pages Functions:
 
@@ -234,9 +235,10 @@ export async function onRequest(context) {
 
 ## **Troubleshooting**
 
-### ***Common Build Issues***
+### **_Common Build Issues_**
 
 **Build fails with "Command not found"**
+
 ```bash
 # Ensure your package.json has the correct scripts
 {
@@ -247,35 +249,41 @@ export async function onRequest(context) {
 ```
 
 **Out of memory errors**
+
 ```bash
 # Add to your build command
 NODE_OPTIONS="--max-old-space-size=4096" npm run build
 ```
 
 **Missing dependencies**
+
 ```bash
 # Ensure all dependencies are in package.json, not just devDependencies
 npm install --save @docusaurus/core @docusaurus/preset-classic
 ```
 
-### ***Deployment Issues***
+### **_Deployment Issues_**
 
 **Site shows 404 errors**
+
 - Check that your `baseUrl` is set correctly in `docusaurus.config.js`
 - Verify the build output directory is set to `build`
 
 **Assets not loading**
+
 - Ensure your `url` field matches your actual domain
 - Check for mixed content issues (HTTP vs HTTPS)
 
 **Build takes too long**
+
 - Consider reducing bundle size
 - Optimize images and assets
 - Use Cloudflare's image optimization features
 
-### ***Performance Optimization***
+### **_Performance Optimization_**
 
 **Enable Cloudflare Features**
+
 1. **Auto Minify**: Automatically minifies HTML, CSS, and JS
 2. **Brotli Compression**: Better compression than gzip
 3. **Image Optimization**: Automatic image format conversion and resizing
@@ -283,15 +291,16 @@ npm install --save @docusaurus/core @docusaurus/preset-classic
 
 ## **Monitoring and Analytics**
 
-### ***Cloudflare Analytics***
+### **_Cloudflare Analytics_**
 
 Monitor your site's performance:
+
 - Page views and unique visitors
 - Bandwidth usage
 - Geographic distribution of visitors
 - Performance metrics
 
-### ***Integration with External Analytics***
+### **_Integration with External Analytics_**
 
 Add Google Analytics or other tracking:
 
@@ -332,37 +341,41 @@ const config: Config = {
 
 ## **Best Practices**
 
-### ***Repository Organization***
+### **_Repository Organization_**
+
 - Keep your repository clean and organized
 - Use `.gitignore` to exclude build artifacts and node_modules
 - Tag releases for better version management
 
-### ***Build Optimization***
+### **_Build Optimization_**
+
 - Use `npm ci` instead of `npm install` for faster, reliable builds
 - Consider using a lockfile (`package-lock.json` or `yarn.lock`)
 - Optimize images and assets before committing
 
-### ***Security***
+### **_Security_**
+
 - Regularly update dependencies
 - Use environment variables for sensitive data
 - Enable security headers through `_headers` file
 
-### ***Performance***
+### **_Performance_**
+
 - Minimize bundle size
 - Use lazy loading for images
 - Leverage Cloudflare's optimization features
 
 ## **Comparison with Other Platforms**
 
-| Feature | Cloudflare Pages | Netlify | Vercel | GitHub Pages |
-|---------|------------------|---------|---------|--------------|
-| **Free Tier** | Generous | Limited | Limited | Unlimited |
-| **Build Time** | Fast | Fast | Fast | Slow |
-| **Global CDN** | ✅ | ✅ | ✅ | ✅ |
-| **Custom Domains** | ✅ | ✅ | ✅ | ✅ |
-| **Functions** | ✅ | ✅ | ✅ | ❌ |
-| **Analytics** | Built-in | Add-on | Add-on | External |
-| **DDoS Protection** | ✅ | Limited | Limited | ✅ |
+| Feature             | Cloudflare Pages | Netlify | Vercel  | GitHub Pages |
+| ------------------- | ---------------- | ------- | ------- | ------------ |
+| **Free Tier**       | Generous         | Limited | Limited | Unlimited    |
+| **Build Time**      | Fast             | Fast    | Fast    | Slow         |
+| **Global CDN**      | ✅               | ✅      | ✅      | ✅           |
+| **Custom Domains**  | ✅               | ✅      | ✅      | ✅           |
+| **Functions**       | ✅               | ✅      | ✅      | ❌           |
+| **Analytics**       | Built-in         | Add-on  | Add-on  | External     |
+| **DDoS Protection** | ✅               | Limited | Limited | ✅           |
 
 ## **Conclusion**
 

@@ -12,21 +12,24 @@ keywords: [Docker, Docker Engine, Tutorial, Collabora Code]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
-### ***502 Gateway errors when trying to connect to `Collabora Code`***
+### **_502 Gateway errors when trying to connect to `Collabora Code`_**
 
 If you are running behind a reverse proxy you may need to add the [extra_params](https://sdk.collaboraonline.com/docs/installation/CODE_Docker_image.html#setting-the-application-configuration-dynamically-via-environment-variables) Variable.
 
 Examples:
+
 1. If using environment files such as `.collabora.env`, you add the following to that `.env` file.
+
 ```bash
 extra_params=--o:ssl.enable=false --o:ssl.termination=true
 ```
 
 2. If using the environment inside of `docker-compose.yaml`
-It would look something like
+   It would look something like
+
 ```yaml
 name: nextcloud
 

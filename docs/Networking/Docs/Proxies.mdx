@@ -13,6 +13,7 @@ keywords: [proxy, redsocks, squid, dante, socks proxy, http proxy, transparent p
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Proxies: Complete Guide to Proxy Servers and Transparent Proxying**
@@ -26,12 +27,14 @@ A proxy server acts as a gateway between users and the internet, receiving reque
 ## **Types of Proxies**
 
 ### **HTTP/HTTPS Proxies**
+
 - **Purpose**: Handle web traffic (HTTP/HTTPS protocols)
 - **Features**: Web caching, content filtering, SSL termination
 - **Common Ports**: 8080, 3128, 8888
 - **Use Cases**: Corporate web filtering, caching, bypassing geo-restrictions
 
 ### **SOCKS Proxies**
+
 - **Purpose**: Handle any type of traffic (protocol-agnostic)
 - **Versions**: SOCKS4, SOCKS4a, SOCKS5
 - **Features**: UDP support (SOCKS5), authentication, DNS resolution
@@ -39,12 +42,14 @@ A proxy server acts as a gateway between users and the internet, receiving reque
 - **Use Cases**: Tunneling applications, gaming, P2P, Tor networks
 
 ### **Transparent Proxies**
+
 - **Purpose**: Intercept traffic without client configuration
 - **Features**: Automatic redirection via iptables/firewall rules
 - **Use Cases**: Network-wide proxy enforcement, content filtering
 - **Tools**: redsocks, iptables REDIRECT target
 
 ### **Reverse Proxies**
+
 - **Purpose**: Forward requests to backend servers on behalf of servers
 - **Features**: Load balancing, SSL termination, caching
 - **Use Cases**: Web servers, API gateways, CDNs
@@ -55,6 +60,7 @@ A proxy server acts as a gateway between users and the internet, receiving reque
 Redsocks is a daemon that transparently redirects network connections to SOCKS or HTTP proxies using iptables rules. It enables transparent proxying without requiring application-level proxy configuration.
 
 ### **Key Features**
+
 - **Transparent operation**: No application configuration needed
 - **Multiple proxy support**: SOCKS4, SOCKS5, HTTP CONNECT
 - **Chain proxying**: Route traffic through multiple proxy layers
@@ -64,6 +70,7 @@ Redsocks is a daemon that transparently redirects network connections to SOCKS o
 ### **Installation**
 
 #### **Ubuntu/Debian**
+
 ```bash
 # Install from repositories
 sudo apt update
@@ -74,6 +81,7 @@ sudo apt install build-essential git libevent-dev
 ```
 
 #### **Red Hat/CentOS/Fedora**
+
 ```bash
 # RHEL/CentOS (enable EPEL first)
 sudo yum install epel-release
@@ -87,6 +95,7 @@ sudo dnf install gcc git libevent-devel make
 ```
 
 #### **Arch Linux**
+
 ```bash
 # Install from AUR
 yay -S redsocks
@@ -95,6 +104,7 @@ sudo pacman -S redsocks
 ```
 
 #### **Building from Source**
+
 ```bash
 # Clone and build
 git clone https://github.com/darkk/redsocks.git
@@ -115,6 +125,7 @@ sudo nano /etc/redsocks.conf
 ```
 
 #### **Basic SOCKS5 Configuration**
+
 ```conf
 base {
     log_debug = off;
@@ -136,6 +147,7 @@ redsocks {
 ```
 
 #### **HTTP Proxy Configuration**
+
 ```conf
 base {
     log_debug = off;
@@ -155,6 +167,7 @@ redsocks {
 ```
 
 #### **Multiple Proxy Configuration**
+
 ```conf
 base {
     log_debug = off;
@@ -186,6 +199,7 @@ redsocks {
 ### **Running Redsocks**
 
 #### **Manual Execution**
+
 ```bash
 # Test configuration
 sudo redsocks -c /etc/redsocks.conf -t
@@ -198,6 +212,7 @@ sudo redsocks -c /etc/redsocks.conf -d
 ```
 
 #### **Systemd Service**
+
 ```bash
 # Create systemd service file
 sudo nano /etc/systemd/system/redsocks.service
@@ -234,6 +249,7 @@ sudo systemctl status redsocks
 ### **IPTables Rules for Transparent Proxying**
 
 #### **Basic Transparent Proxy Setup**
+
 ```bash
 # Create new chain for redsocks
 sudo iptables -t nat -N REDSOCKS
@@ -256,6 +272,7 @@ sudo iptables -t nat -A OUTPUT -p tcp --dport 1:65535 -j REDSOCKS
 ```
 
 #### **Selective Proxy Rules**
+
 ```bash
 # Only proxy specific destinations
 sudo iptables -t nat -A OUTPUT -p tcp -d 203.0.113.0/24 --dport 80,443 -j REDIRECT --to-ports 12345
@@ -268,6 +285,7 @@ sudo iptables -t nat -A OUTPUT -p tcp --dport 80,443 -j REDIRECT --to-ports 1234
 ```
 
 #### **Save IPTables Rules**
+
 ```bash
 # Ubuntu/Debian
 sudo iptables-save | sudo tee /etc/iptables/rules.v4
@@ -285,6 +303,7 @@ sudo netfilter-persistent save
 Squid is a powerful HTTP/HTTPS proxy server with extensive caching and filtering capabilities.
 
 ### **Installation**
+
 ```bash
 # Ubuntu/Debian
 sudo apt update
@@ -299,12 +318,14 @@ sudo systemctl enable squid
 ```
 
 ### **Basic Configuration**
+
 ```bash
 # Edit main config file
 sudo nano /etc/squid/squid.conf
 ```
 
 #### **Basic Forward Proxy Setup**
+
 ```conf
 # Basic configuration
 http_port 3128
@@ -332,6 +353,7 @@ cache_log /var/log/squid/cache.log
 ```
 
 #### **Authentication Setup**
+
 ```bash
 # Install auth helpers
 sudo apt install squid-common
@@ -344,6 +366,7 @@ sudo chmod 640 /etc/squid/passwords
 ```
 
 Add to squid.conf:
+
 ```conf
 # Authentication
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
@@ -357,6 +380,7 @@ http_access allow authenticated
 ### **Advanced Features**
 
 #### **Content Filtering**
+
 ```conf
 # Block specific domains
 acl blocked_sites dstdomain .facebook.com .twitter.com
@@ -372,6 +396,7 @@ http_access allow localnet business_hours
 ```
 
 #### **SSL Bump (HTTPS Inspection)**
+
 ```conf
 # SSL bump configuration
 ssl_bump server-first all
@@ -391,6 +416,7 @@ sudo openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 \
 Dante is a robust SOCKS4/SOCKS5 server implementation.
 
 ### **Installation**
+
 ```bash
 # Ubuntu/Debian
 sudo apt install dante-server
@@ -400,11 +426,13 @@ sudo dnf install dante-server
 ```
 
 ### **Configuration**
+
 ```bash
 sudo nano /etc/danted.conf
 ```
 
 #### **Basic SOCKS5 Server**
+
 ```conf
 # Basic configuration
 logoutput: /var/log/danted.log
@@ -428,6 +456,7 @@ socks pass {
 ```
 
 #### **With Authentication**
+
 ```conf
 # Authentication configuration
 socksmethod: username
@@ -451,6 +480,7 @@ socks pass {
 ```
 
 ### **Running Dante**
+
 ```bash
 # Start service
 sudo systemctl start danted
@@ -468,6 +498,7 @@ curl --socks5 localhost:1080 http://httpbin.org/ip
 Tor (The Onion Router) is a free and open-source privacy network that routes internet traffic through multiple encrypted layers to provide anonymity. Tor runs a SOCKS proxy on localhost that can be used directly by applications or transparently via tools like redsocks.
 
 ### **Key Features**
+
 - **Anonymity**: Routes traffic through multiple encrypted relays
 - **SOCKS proxy**: Provides SOCKS4a/SOCKS5 proxy on port 9050
 - **Hidden services**: Access .onion sites and create hidden services
@@ -477,6 +508,7 @@ Tor (The Onion Router) is a free and open-source privacy network that routes int
 ### **Installation**
 
 #### **Ubuntu/Debian**
+
 ```bash
 # Install from repositories
 sudo apt update
@@ -487,6 +519,7 @@ sudo apt install torbrowser-launcher
 ```
 
 #### **Red Hat/CentOS/Fedora**
+
 ```bash
 # Enable EPEL repository (RHEL/CentOS)
 sudo yum install epel-release
@@ -502,6 +535,7 @@ sudo dnf install tor
 ```
 
 #### **Arch Linux**
+
 ```bash
 # Install from official repositories
 sudo pacman -S tor
@@ -513,6 +547,7 @@ sudo pacman -S torbrowser-launcher
 ### **Configuration**
 
 #### **Basic Tor Configuration**
+
 ```bash
 # Edit Tor configuration
 sudo nano /etc/tor/torrc
@@ -538,6 +573,7 @@ TransListenAddress 127.0.0.1
 ```
 
 #### **Generate Control Password**
+
 ```bash
 # Generate hashed password for control port
 tor --hash-password "your_password_here"
@@ -546,6 +582,7 @@ tor --hash-password "your_password_here"
 ```
 
 #### **Advanced Configuration**
+
 ```conf
 # Additional configuration options
 Log notice file /var/log/tor/notices.log
@@ -571,6 +608,7 @@ HiddenServicePort 80 127.0.0.1:8080
 ### **Running Tor**
 
 #### **Start Tor Service**
+
 ```bash
 # Start and enable Tor
 sudo systemctl start tor
@@ -585,6 +623,7 @@ sudo tail -f /var/log/tor/notices.log
 ```
 
 #### **Test Tor Connection**
+
 ```bash
 # Test SOCKS proxy
 curl --socks5 127.0.0.1:9050 http://httpbin.org/ip
@@ -599,6 +638,7 @@ curl --socks5 127.0.0.1:9050 -A "Mozilla/5.0" https://icanhazip.com
 ### **Transparent Proxying with Tor**
 
 #### **Using Redsocks with Tor**
+
 ```bash
 # Configure redsocks for Tor
 sudo nano /etc/redsocks.conf
@@ -632,6 +672,7 @@ redudp {
 ```
 
 #### **IPTables Rules for Tor Transparent Proxy**
+
 ```bash
 #!/bin/bash
 # Tor transparent proxy iptables script
@@ -667,6 +708,7 @@ iptables-save > /etc/iptables/tor-rules.v4
 ### **Tor Browser and Applications**
 
 #### **Configure Applications for Tor**
+
 ```bash
 # Firefox proxy settings (manual configuration)
 Network Settings > Manual proxy configuration:
@@ -690,6 +732,7 @@ git config --global https.proxy socks5://127.0.0.1:9050
 ### **Hidden Services**
 
 #### **Create a Hidden Service**
+
 ```bash
 # Add to /etc/tor/torrc
 HiddenServiceDir /var/lib/tor/my_website/
@@ -703,6 +746,7 @@ sudo cat /var/lib/tor/my_website/hostname
 ```
 
 #### **Access Hidden Services**
+
 ```bash
 # Access .onion sites through Tor
 curl --socks5 127.0.0.1:9050 http://3g2upl4pq6kufc4m.onion
@@ -714,6 +758,7 @@ torsocks curl http://3g2upl4pq6kufc4m.onion
 ### **Tor Troubleshooting**
 
 #### **Connection Issues**
+
 ```bash
 # Check if Tor is running
 sudo systemctl status tor
@@ -731,6 +776,7 @@ sudo ss -tlnp | grep :9050  # Check what's using the port
 ```
 
 #### **Slow Performance**
+
 ```bash
 # Try different exit nodes
 echo "ExitNodes {us},{ca},{de}" | sudo tee -a /etc/tor/torrc
@@ -744,6 +790,7 @@ grep -i bandwidth /etc/tor/torrc
 ```
 
 #### **Transparent Proxy Issues**
+
 ```bash
 # Check if transparent proxy is working
 curl https://check.torproject.org/api/ip  # Should show Tor exit IP
@@ -762,6 +809,7 @@ sudo netstat -tlnp | grep tor
 ```
 
 #### **Bridge Configuration (for Censored Networks)**
+
 ```bash
 # Get bridges from https://bridges.torproject.org/
 # Add to /etc/tor/torrc
@@ -777,6 +825,7 @@ sudo journalctl -u tor -f
 ### **Security Considerations for Tor**
 
 #### **Important Security Notes**
+
 - **DNS Leaks**: Always route DNS through Tor (port 5353) or use transparent proxy
 - **Application Leaks**: Some applications may bypass proxy settings
 - **Time Zone**: Consider setting system timezone to UTC
@@ -785,6 +834,7 @@ sudo journalctl -u tor -f
 - **Entry Guards**: Tor automatically selects and reuses entry guards for security
 
 #### **Secure Configuration**
+
 ```conf
 # Additional security settings for /etc/tor/torrc
 AvoidDiskWrites 1
@@ -802,6 +852,7 @@ DisableV2DirectoryRequests 1
 ```
 
 #### **Monitoring Tor Usage**
+
 ```bash
 # Monitor Tor circuits
 sudo -u tor tor --verify-config
@@ -819,6 +870,7 @@ curl --socks5 127.0.0.1:9050 https://check.torproject.org/api/ip
 3proxy is a small but feature-rich proxy server supporting multiple protocols.
 
 ### **Installation**
+
 ```bash
 # Build from source
 git clone https://github.com/3proxy/3proxy.git
@@ -832,11 +884,13 @@ sudo cp bin/socks /usr/local/bin/
 ```
 
 ### **Configuration**
+
 ```bash
 sudo nano /etc/3proxy.cfg
 ```
 
 #### **Multi-Protocol Configuration**
+
 ```conf
 # Logging
 log /var/log/3proxy.log
@@ -855,6 +909,7 @@ allow 192.168.0.0/16
 ```
 
 ### **Running 3proxy**
+
 ```bash
 # Run with config file
 sudo 3proxy /etc/3proxy.cfg
@@ -884,6 +939,7 @@ WantedBy=multi-user.target
 ### **Redsocks Issues**
 
 #### **"bind: Address already in use"**
+
 ```bash
 # Check what's using the port
 sudo netstat -tlnp | grep :12345
@@ -897,6 +953,7 @@ local_port = 12346;
 ```
 
 #### **"Connection refused" to proxy server**
+
 ```bash
 # Verify proxy server is running
 telnet proxy_ip proxy_port
@@ -910,6 +967,7 @@ sudo tail -f /var/log/redsocks.log
 ```
 
 #### **IPTables rules not working**
+
 ```bash
 # Check current rules
 sudo iptables -t nat -L -n -v
@@ -926,6 +984,7 @@ sudo iptables -t nat -X REDSOCKS
 ### **Squid Issues**
 
 #### **Permission Denied Errors**
+
 ```bash
 # Fix cache directory permissions
 sudo chown -R proxy:proxy /var/spool/squid
@@ -939,6 +998,7 @@ sudo squid -k parse
 ```
 
 #### **Access Denied (403 Forbidden)**
+
 ```bash
 # Check ACL configuration
 sudo grep -n "http_access" /etc/squid/squid.conf
@@ -952,6 +1012,7 @@ http_access allow localnet
 ```
 
 #### **DNS Resolution Issues**
+
 ```bash
 # Add DNS servers to squid.conf
 dns_nameservers 8.8.8.8 1.1.1.1
@@ -964,6 +1025,7 @@ cat /etc/resolv.conf
 ### **SOCKS Proxy Issues**
 
 #### **Authentication Failures**
+
 ```bash
 # Test SOCKS authentication
 curl --socks5 username:password@localhost:1080 http://httpbin.org/ip
@@ -976,6 +1038,7 @@ sudo danted -V -f /etc/danted.conf
 ```
 
 #### **Connection Timeouts**
+
 ```bash
 # Check firewall rules
 sudo ufw status
@@ -991,6 +1054,7 @@ sudo ss -tulnp | grep :1080
 ### **General Proxy Debugging**
 
 #### **Network Connectivity Tests**
+
 ```bash
 # Test direct connection
 curl -I http://httpbin.org/ip
@@ -1006,6 +1070,7 @@ nslookup google.com proxy_dns_server
 ```
 
 #### **Log Analysis**
+
 ```bash
 # Monitor proxy logs in real-time
 sudo tail -f /var/log/squid/access.log
@@ -1023,18 +1088,21 @@ sudo awk '{print $3}' /var/log/squid/access.log | sort | uniq -c | sort -nr
 ## **Security Considerations**
 
 ### **Access Control**
+
 - **Implement proper ACLs**: Restrict proxy access to authorized networks/users
 - **Use authentication**: Enable username/password or certificate-based auth
 - **Monitor access logs**: Regularly review proxy usage logs
 - **Limit destination access**: Block malicious or inappropriate destinations
 
 ### **Encryption**
+
 - **Use HTTPS/TLS**: Ensure proxy connections are encrypted
 - **Certificate validation**: Properly validate SSL certificates
 - **Avoid SSL bumping**: Only use HTTPS inspection when absolutely necessary
 - **Secure credentials**: Store proxy passwords securely
 
 ### **Network Security**
+
 ```bash
 # Firewall rules for proxy servers
 sudo ufw allow from 192.168.0.0/16 to any port 3128  # HTTP proxy
@@ -1045,6 +1113,7 @@ sudo iptables -A INPUT -p tcp --dport 3128 -m limit --limit 25/minute --limit-bu
 ```
 
 ### **Monitoring and Alerting**
+
 ```bash
 # Monitor failed authentication attempts
 sudo grep "authentication failed" /var/log/squid/cache.log
@@ -1059,6 +1128,7 @@ sudo nano /etc/logrotate.d/proxy-logs
 ## **Performance Optimization**
 
 ### **Caching Configuration**
+
 ```conf
 # Squid cache optimization
 cache_mem 512 MB
@@ -1072,6 +1142,7 @@ cache_peer_access parent.proxy.com allow all
 ```
 
 ### **Connection Limits**
+
 ```conf
 # Squid connection limits
 http_port 3128 connection-limit=1000
@@ -1080,6 +1151,7 @@ half_closed_clients off
 ```
 
 ### **Resource Monitoring**
+
 ```bash
 # Monitor proxy performance
 sudo htop
