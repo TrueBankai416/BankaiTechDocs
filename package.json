@@ -31,8 +31,8 @@
     "dotenv": "^17.2.3",
     "posthog-docusaurus": "^2.0.5",
     "prism-react-renderer": "^2.4.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "sqlite3": "^5.1.7",
     "swizzle": "^1.1.0"
   },
@@ -42,7 +42,7 @@
     "@docusaurus/types": "^3.9.2",
     "@giscus/react": "^3.1.0",
     "@rspack/core": "^1.7.4",
-    "@rspack/cli": "^1.7.3",
+    "@rspack/cli": "^1.7.4",
     "process": "^0.11.10",
     "typescript": "~5.9.3"
   },
