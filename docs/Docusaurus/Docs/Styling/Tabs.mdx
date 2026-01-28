@@ -165,19 +165,23 @@ Perfect for showing different installation methods:
 
 <Tabs>
   <TabItem value="docker" label="Docker">
-    ```bash
-    docker run -d \
-      --name=nextcloud \
-      -p 80:80 \
-      nextcloud:latest
-    ```
+
+```bash
+docker run -d \
+  --name=nextcloud \
+  -p 80:80 \
+  nextcloud:latest
+```
+
   </TabItem>
   <TabItem value="manual" label="Manual">
-    ```bash
-    # Download and extract
-    wget https://download.nextcloud.com/server/releases/latest.tar.bz2
-    tar -xjf latest.tar.bz2
-    ```
+
+```bash
+# Download and extract
+wget https://download.nextcloud.com/server/releases/latest.tar.bz2
+tar -xjf latest.tar.bz2
+```
+
   </TabItem>
 </Tabs>
 
