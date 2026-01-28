@@ -1,14 +1,12 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 // Environment Variable Config - fixed redundant imports and removed debug mode
 import dotenv from 'dotenv';
-dotenv.config({path: './.env'});
+dotenv.config({ path: './.env' });
 
-// Main Config 
+// Main Config
 const config: Config = {
   title: 'Bankai-Tech Docs',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
@@ -19,25 +17,25 @@ const config: Config = {
     experimental_faster: true,
     v4: true,
   },
-  customFields:{
+  customFields: {
     // Mendable API key for AI-powered search functionality
     // Get your key at https://mendable.ai
     mendableAnonKey: process.env.MENDABLE_KEY,
-    
+
     // Comment System Configuration
     comments: {
-      enableGiscus: true,          // Enable/disable Giscus comments
-      enableDiscord: true,         // Enable/disable Discord comments
-      discordApiUrl: undefined,    // Will use environment variable or default
+      enableGiscus: true, // Enable/disable Giscus comments
+      enableDiscord: true, // Enable/disable Discord comments
+      discordApiUrl: undefined, // Will use environment variable or default
     },
   },
 
-    // Adds Diagram support via Mermaid
+  // Adds Diagram support via Mermaid
   markdown: {
     mermaid: true,
   },
   themes: [
-    '@docusaurus/theme-live-codeblock', 
+    '@docusaurus/theme-live-codeblock',
     '@docusaurus/theme-mermaid',
     [
       require.resolve('@easyops-cn/docusaurus-search-local'),
@@ -51,7 +49,7 @@ const config: Config = {
       },
     ],
   ],
-  
+
   // Set the production url of your site here
   url: 'https://docs.bankai-tech.com',
   // Set the /<baseUrl>/ pathname under which your site is servedd
@@ -64,7 +62,7 @@ const config: Config = {
   projectName: 'HomeLab Docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
- // onBrokenMarkdownLinks: 'warn', // Will be removed in v4
+  // onBrokenMarkdownLinks: 'warn', // Will be removed in v4
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -86,51 +84,49 @@ const config: Config = {
           sidebarPath: './sidebars/customAutogen.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/TrueBankai416/BankaiTechDocs/tree/main/',
+          editUrl: 'https://github.com/TrueBankai416/BankaiTechDocs/tree/main/',
         },
         blog: false, //{
-      //    showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+        //    showReadingTime: true,
+        // Please change this to your repo.
+        // Remove this to remove the "edit this page" links.
         //  editUrl:
         //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-       // },
+        // },
         theme: {
           customCss: './src/css/custom.css',
         },
       } satisfies Preset.Options,
     ],
   ],
-    plugins: [
-//      [
-//        'docusaurus-plugin-dotenv',
-//        {
-//          id: 'dotenv',
-//          path: "./.env", // The path to your environment variables.
-//          safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
-//          systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
-//          silent: false, //  If true, all warnings will be suppressed
-//          expand: false, // Allows your variables to be "expanded" for reusability within your .env file
-//          defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
-//         ignoreStub: true
- //       },
- //     ],
- //     [
- //       'posthog-docusaurus',
- //       {
- //         id: 'posthog',
- //         apiKey: process.env.POSTHOG_API_KEY,
- //         appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
- //         enableInDevelopment: false, // optional
- //       },
- //     ],
- //    
-    ],
-
+  plugins: [
+    //      [
+    //        'docusaurus-plugin-dotenv',
+    //        {
+    //          id: 'dotenv',
+    //          path: "./.env", // The path to your environment variables.
+    //          safe: false, // If false ignore safe-mode, if true load './.env.example', if a string load that file as the sample
+    //          systemvars: false, // Set to true if you would rather load all system variables as well (useful for CI purposes)
+    //          silent: false, //  If true, all warnings will be suppressed
+    //          expand: false, // Allows your variables to be "expanded" for reusability within your .env file
+    //          defaults: false, //  Adds support for dotenv-defaults. If set to true, uses ./.env.defaults
+    //         ignoreStub: true
+    //       },
+    //     ],
+    //     [
+    //       'posthog-docusaurus',
+    //       {
+    //         id: 'posthog',
+    //         apiKey: process.env.POSTHOG_API_KEY,
+    //         appUrl: 'https://us.i.posthog.com', // optional, defaults to "https://us.i.posthog.com"
+    //         enableInDevelopment: false, // optional
+    //       },
+    //     ],
+    //
+  ],
 
   themeConfig: {
-   // Adds bar to top of the Page
+    // Adds bar to top of the Page
     announcementBar: {
       id: 'Pick your Operating System',
       content:
@@ -152,13 +148,11 @@ const config: Config = {
         theme: 'neutral',
       },
     },
-   // Declare some <meta> tags
-    metadata: [
-      {name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation'},
-    ],
+    // Declare some <meta> tags
+    metadata: [{ name: 'keywords', content: 'Docs, Nextcloud, Tutorial, Documentation' }],
     sidebar: {
       sidebarCollapsible: true,
-      autoCollapseCategories: true
+      autoCollapseCategories: true,
     },
     colorMode: {
       defaultMode: 'dark',
@@ -213,8 +207,8 @@ const config: Config = {
           position: 'left',
           label: 'MS Windows',
         },
-          {to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left'},
-    //    {to: '/blog', label: 'Blog', position: 'left'},
+        { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
+        //    {to: '/blog', label: 'Blog', position: 'left'},
       ],
     },
     footer: {
@@ -262,9 +256,23 @@ const config: Config = {
     prism: {
       darkTheme: prismThemes.dracula,
       theme: prismThemes.github,
-      additionalLanguages: ['dax', 'csharp', 'powerquery', 'powershell', 'yaml', 'nginx', 'editorconfig', 'typescript', 'javascript', 'systemd', 'ini', 'bash', 'apacheconf', 'docker'],
+      additionalLanguages: [
+        'dax',
+        'csharp',
+        'powerquery',
+        'powershell',
+        'yaml',
+        'nginx',
+        'editorconfig',
+        'typescript',
+        'javascript',
+        'systemd',
+        'ini',
+        'bash',
+        'apacheconf',
+        'docker',
+      ],
     },
-
   } satisfies Preset.ThemeConfig,
 };
 

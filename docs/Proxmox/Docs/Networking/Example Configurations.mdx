@@ -13,6 +13,7 @@ keywords: [Proxmox, Network Examples, Configuration Guide, Setup, Implementation
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -28,11 +29,13 @@ This comprehensive guide provides complete, tested configuration examples for va
 **Scenario:** Single Proxmox node with multiple VMs for learning and testing.
 
 **Network Topology:**
+
 ```
 Internet → Router (192.168.1.1) → Proxmox Host (192.168.1.100) → VMs
 ```
 
 **Requirements:**
+
 - Simple network configuration
 - Easy VM access from home network
 - Basic security
@@ -74,6 +77,7 @@ iface vmbr0 inet static
 ```
 
 **Verification Commands:**
+
 ```bash
 # Check interface status
 ip addr show vmbr0
@@ -85,6 +89,7 @@ ping -c 4 8.8.8.8
 # Verify bridge
 brctl show vmbr0
 ```
+
 </TabItem>
 
 <TabItem value="vm">
@@ -95,7 +100,7 @@ brctl show vmbr0
 # Web Server VM (VM ID 100)
 net0: virtio=02:00:00:00:01:00,bridge=vmbr0
 
-# Database VM (VM ID 101)  
+# Database VM (VM ID 101)
 net0: virtio=02:00:00:00:01:01,bridge=vmbr0
 
 # Development VM (VM ID 102)
@@ -103,26 +108,30 @@ net0: virtio=02:00:00:00:01:02,bridge=vmbr0
 ```
 
 **VM IP Assignments:**
+
 ```bash
 # Static IP configuration inside VMs
 # Web Server: 192.168.1.110
-# Database: 192.168.1.111  
+# Database: 192.168.1.111
 # Development: 192.168.1.112
 ```
 
 **Router DHCP Reservations:**
+
 ```bash
 # Configure DHCP reservations on home router
 02:00:00:00:01:00 → 192.168.1.110 (WebServer)
 02:00:00:00:01:01 → 192.168.1.111 (Database)
 02:00:00:00:01:02 → 192.168.1.112 (Development)
 ```
+
 </TabItem>
 
 <TabItem value="firewall">
 **Basic Firewall Configuration:**
 
 **Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
+
 ```bash
 [OPTIONS]
 enable: 1
@@ -150,6 +159,7 @@ IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
 **VM Firewall Examples:**
 
 **Web Server VM (100.fw):**
+
 ```bash
 [OPTIONS]
 enable: 1
@@ -167,6 +177,7 @@ IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
 # Database access
 OUT ACCEPT -p tcp --dport 3306 -d 192.168.1.111
 ```
+
 </TabItem>
 </Tabs>
 
@@ -175,10 +186,11 @@ OUT ACCEPT -p tcp --dport 3306 -d 192.168.1.111
 **Scenario:** Home lab with network segmentation using VLANs.
 
 **Network Topology:**
+
 ```
 Internet → Router → Switch (VLAN Trunk) → Proxmox Host
                                            ├── VLAN 10 (Management)
-                                           ├── VLAN 20 (Servers)  
+                                           ├── VLAN 20 (Servers)
                                            ├── VLAN 30 (Lab/Testing)
                                            └── VLAN 40 (IoT/Guest)
 ```
@@ -227,12 +239,14 @@ iface vmbr0.10 inet static
 **Scenario:** Small business with production services, development environment, and guest access.
 
 **Requirements:**
+
 - Separate networks for different purposes
 - High availability for critical services
 - Secure guest network
 - Remote access capability
 
 **Network Architecture:**
+
 ```
 Internet → Firewall → Core Switch (Bonded) → Proxmox Cluster
                                             ├── Management VLAN (10)
@@ -294,6 +308,7 @@ iface vmbr1 inet static
 ```
 
 **Secondary Node Configuration:**
+
 ```bash
 # Same as primary but different IPs
 # Node 2: 10.0.10.102, storage: 10.0.50.102
@@ -301,6 +316,7 @@ iface vmbr1 inet static
 ```
 
 **Cluster Setup:**
+
 ```bash
 # Initialize cluster on first node
 pvecm create businesscluster
@@ -308,12 +324,14 @@ pvecm create businesscluster
 # Join other nodes
 pvecm add 10.0.10.101
 ```
+
 </TabItem>
 
 <TabItem value="storage">
 **Shared Storage Configuration:**
 
 **Ceph Storage Network:**
+
 ```bash
 # Dedicated storage bridge per node
 auto vmbr-storage
@@ -325,6 +343,7 @@ iface vmbr-storage inet static
 ```
 
 **NFS Storage Configuration:**
+
 ```bash
 # NFS server on storage VLAN
 # Add to Proxmox: Datacenter → Storage → Add → NFS
@@ -335,6 +354,7 @@ Content: VZDump backup file, Disk image, ISO image, Container template
 ```
 
 **iSCSI Configuration:**
+
 ```bash
 # iSCSI storage setup
 # Install open-iscsi
@@ -345,12 +365,14 @@ apt install open-iscsi
 Portal: 10.0.50.210
 Target: iqn.2023-01.local.storage:lun1
 ```
+
 </TabItem>
 
 <TabItem value="security">
 **Comprehensive Security Configuration:**
 
 **Datacenter Firewall (`/etc/pve/firewall/cluster.fw`):**
+
 ```bash
 [OPTIONS]
 enable: 1
@@ -375,7 +397,7 @@ IN ACCEPT -p tcp --dport 80
 IN ACCEPT -p tcp --dport 443
 IN ACCEPT -p tcp --dport 22 -s MGMT_NET
 
-[group database]  
+[group database]
 IN ACCEPT -p tcp --dport 3306 -s PROD_NET
 IN ACCEPT -p tcp --dport 22 -s MGMT_NET
 IN REJECT -p tcp --dport 3306
@@ -387,6 +409,7 @@ IN ACCEPT -p tcp --dport 22 -s MGMT_NET
 ```
 
 **Node Security Groups:**
+
 ```bash
 # Production web server security
 [GROUP prod-web]
@@ -404,6 +427,7 @@ IN ACCEPT -p tcp --dport 8000:9000 -s DEV_NET
 IN ACCEPT -p tcp --dport 3000:3999 -s DEV_NET
 OUT ACCEPT
 ```
+
 </TabItem>
 </Tabs>
 
@@ -414,6 +438,7 @@ OUT ACCEPT
 **Scenario:** Enterprise environment with multiple datacenters, strict security requirements, and high availability.
 
 **Architecture Overview:**
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Enterprise Network                      │
@@ -432,16 +457,16 @@ OUT ACCEPT
 
 ### **Enterprise VLAN Design**
 
-| VLAN | Purpose | Network | Security Zone |
-|------|---------|---------|---------------|
-| 100 | Infrastructure | 10.100.0.0/24 | Management |
-| 200 | DMZ Web | 10.200.0.0/24 | Public |
-| 300 | Application | 10.300.0.0/24 | Internal |
-| 400 | Database | 10.400.0.0/24 | Restricted |
-| 500 | Storage | 10.500.0.0/24 | Storage |
-| 600 | Backup | 10.600.0.0/24 | Backup |
-| 700 | Development | 10.700.0.0/24 | Development |
-| 999 | Out-of-Band | 192.168.99.0/24 | OOB Management |
+| VLAN | Purpose        | Network         | Security Zone  |
+| ---- | -------------- | --------------- | -------------- |
+| 100  | Infrastructure | 10.100.0.0/24   | Management     |
+| 200  | DMZ Web        | 10.200.0.0/24   | Public         |
+| 300  | Application    | 10.300.0.0/24   | Internal       |
+| 400  | Database       | 10.400.0.0/24   | Restricted     |
+| 500  | Storage        | 10.500.0.0/24   | Storage        |
+| 600  | Backup         | 10.600.0.0/24   | Backup         |
+| 700  | Development    | 10.700.0.0/24   | Development    |
+| 999  | Out-of-Band    | 192.168.99.0/24 | OOB Management |
 
 <Tabs
   defaultValue="enterprise-net"
@@ -475,7 +500,7 @@ iface bond0 inet manual
     bond-xmit-hash-policy layer3+4
 
 # Storage bond (dedicated)
-auto bond1  
+auto bond1
 iface bond1 inet manual
     bond-slaves enp3s0 enp4s0
     bond-miimon 100
@@ -510,6 +535,7 @@ iface vmbr2 inet static
 ```
 
 **Cluster Configuration:**
+
 ```bash
 # Initialize enterprise cluster
 pvecm create enterprise-dc1
@@ -538,12 +564,14 @@ quorum {
     provider: corosync_votequorum
 }
 ```
+
 </TabItem>
 
 <TabItem value="ha">
 **High Availability Configuration:**
 
 **HA Groups Setup:**
+
 ```bash
 # Create HA groups for different service tiers
 pvesh create /cluster/ha/groups --group critical-services \
@@ -556,6 +584,7 @@ pvesh create /cluster/ha/groups --group standard-services \
 ```
 
 **HA Resources Configuration:**
+
 ```bash
 # Critical database servers
 pvesh create /cluster/ha/resources --sid vm:401 \
@@ -573,6 +602,7 @@ pvesh create /cluster/ha/resources --sid vm:301 \
 ```
 
 **Fencing Configuration:**
+
 ```bash
 # Configure fencing devices
 pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
@@ -584,12 +614,14 @@ pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
     --type ipmi \
     --options "host=10.100.0.201,username=admin,password=***"
 ```
+
 </TabItem>
 
 <TabItem value="zones">
 **Security Zone Configuration:**
 
 **DMZ Zone (VLAN 200):**
+
 ```bash
 [GROUP dmz-webserver]
 # Public access
@@ -611,12 +643,13 @@ OUT ACCEPT -d 0.0.0.0/0
 ```
 
 **Application Zone (VLAN 300):**
+
 ```bash
 [GROUP app-servers]
 # Web server access
 IN ACCEPT -p tcp --dport 8080 -s 10.200.0.0/24
 
-# Database access  
+# Database access
 OUT ACCEPT -p tcp --dport 3306 -d 10.400.0.0/24
 OUT ACCEPT -p tcp --dport 5432 -d 10.400.0.0/24
 
@@ -635,6 +668,7 @@ OUT DROP -d 0.0.0.0/0
 ```
 
 **Database Zone (VLAN 400):**
+
 ```bash
 [GROUP database-servers]
 # Application server access only
@@ -656,6 +690,7 @@ IN DROP
 OUT DROP -d 0.0.0.0/0
 OUT ACCEPT -d 10.0.0.0/8
 ```
+
 </TabItem>
 </Tabs>
 
@@ -678,7 +713,7 @@ auto enp24s0f0
 iface enp24s0f0 inet manual
     mtu 9000
 
-auto enp24s0f1  
+auto enp24s0f1
 iface enp24s0f1 inet manual
     mtu 9000
 
@@ -707,6 +742,7 @@ echo 8 > /sys/class/net/enp24s0f1/device/sriov_numvfs
 ```
 
 **VM Configuration for HPC:**
+
 ```bash
 # High-performance VM configuration
 # VM config with SR-IOV pass-through
@@ -751,11 +787,12 @@ iface vmbr-tenant2 inet manual
 ```
 
 **Tenant VM Configuration:**
+
 ```bash
 # Tenant 1 VMs
 net0: virtio=02:01:00:00:00:01,bridge=vmbr-tenant1
 
-# Tenant 2 VMs  
+# Tenant 2 VMs
 net0: virtio=02:02:00:00:00:01,bridge=vmbr-tenant2
 
 # Complete network isolation
@@ -864,7 +901,7 @@ nload
 # 1. Verify VLAN awareness
 cat /sys/class/net/vmbr0/bridge/vlan_filtering
 
-# 2. Check VLAN configuration  
+# 2. Check VLAN configuration
 bridge vlan show
 
 # 3. Verify VM VLAN tags

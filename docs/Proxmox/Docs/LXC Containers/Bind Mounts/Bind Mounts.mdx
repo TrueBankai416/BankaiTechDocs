@@ -10,8 +10,8 @@ keywords: [Proxmox, LXC, NFS]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 In the context of a Proxmox environment, especially when working with Linux Containers (LXC), understanding the concept of bind mounts, as well as the role of `subuid` and `subgid`, is crucial for efficient container management. This knowledge enables administrators to securely and efficiently grant containers access to specific host resources.
 
@@ -35,7 +35,7 @@ Bind mounts enhance flexibility and efficiency in managing resources and data in
 - **Description**: Simple bind mounts directly map a host directory to a directory within the container. This type allows both the container and the host to share data seamlessly.
 - **Use cases**: Ideal for sharing configuration files, accessing host log directories from within the container, or allowing containers to store data on the host for persistence.
 - **Benefits**: Simple to set up and manage, provides direct access to host resources without copying or moving files.
-  
+
 #### 2. **Read-Only Bind Mounts**
 
 - **Description**: This variation of bind mounts is explicitly marked as read-only inside the container. Although the host has read-write access, the container is restricted to read-only actions.

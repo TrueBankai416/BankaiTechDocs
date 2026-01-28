@@ -10,22 +10,22 @@ keywords: [Jellyfin, Media Server]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Installing Jellyfin on Ubuntu**
 
 Jellyfin offers a modern interface for organizing and streaming media from a personal server. This tutorial details the process of installing the Jellyfin media server on Ubuntu, covering everything from the initial software installation to starting the Jellyfin service.
 
-## ***Prerequisites***
+## **_Prerequisites_**
 
 - A machine running Ubuntu 18.04 or later.
 - Command line/terminal access.
 - Sudo privileges.
 
-## ***Installation Steps***
+## **_Installation Steps_**
 
-### *Step 1: Update Your System*
+### _Step 1: Update Your System_
 
 Before installing any new software, it's best practice to update your current system packages. In the terminal, run:
 
@@ -33,7 +33,7 @@ Before installing any new software, it's best practice to update your current sy
 sudo apt update && sudo apt upgrade -y
 ```
 
-### *Step 2: Install Jellyfin*
+### _Step 2: Install Jellyfin_
 
 To simplify deployment and help automate this for as many users as possible, Jellyfin provides a BASH script to handle repo installation as well as installing Jellyfin. All you need to do is run this command on your system (requires curl, or subsitute curl with wget -O-):
 
@@ -41,7 +41,7 @@ To simplify deployment and help automate this for as many users as possible, Jel
 curl https://repo.jellyfin.org/install-debuntu.sh | sudo bash
 ```
 
-### *Step 3: Access Jellyfin*
+### _Step 3: Access Jellyfin_
 
 Jellyfin will be running on your Ubuntu server. Access the web interface by navigating to:
 
@@ -51,11 +51,11 @@ http://your-server-ip:8096
 
 Replace `your-server-ip` with the actual IP address of your Ubuntu server. If you're installing on a local machine, you can use `http://localhost:8096`.
 
-### *Step 5: Complete the Setup Wizard*
+### _Step 5: Complete the Setup Wizard_
 
 The first time you access Jellyfin, you'll be greeted with a setup wizard. Follow the prompts to configure Jellyfin, including creating an admin user, setting up your media library, and tuning your preferred options.
 
-## ***Configuring Firewall***
+## **_Configuring Firewall_**
 
 If you have `ufw` (Uncomplicated Firewall) enabled, you need to allow traffic on Jellyfin's default port (8096):
 
@@ -63,7 +63,7 @@ If you have `ufw` (Uncomplicated Firewall) enabled, you need to allow traffic on
 sudo ufw allow 8096/tcp
 ```
 
-## ***Conclusion***
+## **_Conclusion_**
 
 You've now successfully installed Jellyfin on your Ubuntu server. Jellyfin offers a great platform for streaming and organizing your media across various devices. Enjoy your personal media collection in a sleek, user-friendly interface.
 

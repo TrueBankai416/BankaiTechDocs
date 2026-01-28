@@ -35,6 +35,7 @@ This documentation site includes a **bidirectional Discord comments integration*
 ### 2. Configure Bot Permissions
 
 Your bot needs these permissions:
+
 - Read Messages
 - Send Messages
 - Create Public Threads
@@ -52,6 +53,7 @@ Your bot needs these permissions:
 ### 4. Configure Environment Variables
 
 #### Frontend (.env)
+
 ```env
 # Discord Bot Configuration
 DISCORD_BOT_TOKEN=your_bot_token_here
@@ -68,6 +70,7 @@ DISCORD_SITE_NAME=Your Site Name
 ```
 
 #### Backend Server (server/.env)
+
 ```env
 # Discord Bot Configuration
 DISCORD_BOT_TOKEN=your_bot_token_here
@@ -90,10 +93,11 @@ DISCORD_SITE_NAME=Your Site Name
 ```
 
 :::warning Security Note
+
 - Never commit `.env` files to version control
 - Use environment variables in production
 - Keep your bot token secure
-:::
+  :::
 
 ### 5. Install Server Dependencies
 
@@ -135,6 +139,7 @@ For production deployments, set environment variables in your hosting platform:
 ### Discord Message Format
 
 Discord embeds include:
+
 - **Title**: "💬 New Comment: \{Page Title\}"
 - **Description**: The actual comment content
 - **Author**: The commenter's name
@@ -146,6 +151,7 @@ Discord embeds include:
 ### Website Display
 
 The website shows:
+
 - **Original Comments**: Website form submissions
 - **Discord Replies**: Replies from Discord users with avatars and usernames
 - **Real-time Updates**: Automatic polling for new replies
@@ -158,18 +164,22 @@ The website shows:
 Configure how much context appears in Discord messages:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
+
 - **Shows**: Just page title and comment content
 - **Use case**: Clean, simple messages without extra context
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
+
 - **Shows**: Page title, comment content, and clickable page URL
 - **Use case**: Moderate context with essential information
 
 #### `DISCORD_CONTEXT_LEVEL=full` (default)
+
 - **Shows**: All context information including breadcrumbs, sections, timestamps
 - **Use case**: Maximum context for detailed discussions
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
+
 - **Shows**: Only the context elements you enable individually
 - **Use case**: Fine-tuned control over what appears
 
@@ -197,12 +207,14 @@ DISCORD_SITE_NAME=Your Site Name    # Site name in footer
 ### Example Context Outputs
 
 **Minimal Context:**
+
 ```
 Docker Installation Guide
 "This tutorial was really helpful! How do I handle port conflicts?"
 ```
 
 **Basic Context:**
+
 ```
 💬 Docker Installation Guide
 "This tutorial was really helpful! How do I handle port conflicts?"
@@ -210,6 +222,7 @@ Docker Installation Guide
 ```
 
 **Full Context:**
+
 ```
 💬 New Comment: Docker Installation Guide
 👤 John Doe
@@ -317,6 +330,7 @@ project/
 ## Browser Support
 
 The Discord comments component works in all modern browsers that support:
+
 - ES6 fetch API
 - React 18+
 - CSS Grid and Flexbox

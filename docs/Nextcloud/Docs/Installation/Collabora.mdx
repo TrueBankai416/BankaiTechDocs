@@ -14,19 +14,20 @@ keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Nextcloud Installation With Collabora Code**
 
-***This method includes Redis, MariaDB, and Collabora Code***
+**_This method includes Redis, MariaDB, and Collabora Code_**
 
 First lets update your system.
+
 ```bash
 sudo apt-get update && apt-get upgrade -y
 ```
 
-### ***Setting up the directories***
+### **_Setting up the directories_**
 
 Now lets setup the Directories
 :::note
@@ -38,24 +39,30 @@ You can change the directories to your liking.
 ```bash
 sudo mkdir /opt/docker && sudo mkdir /opt/docker/nextcloud
 ```
+
 Lets take ownership of the directory
+
 ```bash
 sudo chown -R $USER:$USER /opt/docker
 ```
 
-### ***Creating .env files***
+### **_Creating .env files_**
 
 Now lets make an [Environment File with Interpolation](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) file in the new directory.
+
 ```bash
 cd /opt/docker/nextcloud
 ```
+
 ```bash
 nano .env
 ```
+
 :::warning[warning]
 When editing the configuration below, remove all instances of `<>` from the values
-::: 
+:::
 Paste the following using `CTRL+SHIFT+V`
+
 ```editorconfig title="Highlighted items will need to be modified" showLineNumbers
 # Nextcloud and MariaDB
 # Named Docker volumes for persistent data storage
@@ -90,6 +97,7 @@ password=PASSWORD
 domain=cloud\\.domain\\.com
 // highlight-end
 ```
+
 :::tip[Info]
 
 Please Change `CHANGEME` to a password of your choosing.
@@ -100,13 +108,16 @@ Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
 
 Save the new file by pressing `CTRL+X`
 
-### ***Creating the Compose file***
+### **_Creating the Compose file_**
 
 Now lets create the compose file.
+
 ```bash
 nano docker-compose.yaml
 ```
+
 Paste this into the file
+
 ```yaml title="The highlighted lines are Optional and can be removed completely"
 name: nextcloud
 
@@ -187,6 +198,7 @@ volumes:
   nextcloud_data:
   db_data:
 ```
+
 :::warning
 tmpfs uses memory (RAM), adjust the value as needed or optionally remove the volume section from the redis container
 :::
@@ -194,9 +206,11 @@ tmpfs uses memory (RAM), adjust the value as needed or optionally remove the vol
 ## **Starting Nextcloud**
 
 Now lets start it up.
+
 ```bash
 sudo docker compose up -d
 ```
+
 :::info
 
 the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/run/#foreground-and-background) mode.
@@ -204,11 +218,12 @@ the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/ru
 
 ```
 [+] Running 4/4
- ✔ Container mariadb    Running                                                                                                                            0.0s 
- ✔ Container redis      Running                                                                                                                            0.0s 
- ✔ Container collabora  Started                                                                                                                            1.3s 
- ✔ Container nextcloud  Started 
- ```
+ ✔ Container mariadb    Running                                                                                                                            0.0s
+ ✔ Container redis      Running                                                                                                                            0.0s
+ ✔ Container collabora  Started                                                                                                                            1.3s
+ ✔ Container nextcloud  Started
+```
+
 <p>
 <>After its done pulling the docker images you can open up a web browser.</>
 </p>
@@ -228,6 +243,7 @@ Before proceeding, you will need to configure your reverse proxy. I have an exam
 
 :::warning
 If you see this warning
+
 ```
 
 Performance warning
@@ -240,13 +256,14 @@ If you use clients for file syncing, the use of SQLite is highly discouraged.
 ```
 
 You will need to click the drop down and select `MySQL/MariaDB` and type in the info manually.
+
 - **database account:** nextcloud
 - **database password:** YOUR_PASSWORD_FROM .env
 - **database name:** nextcloud
 - **database host:** mariadb:3306
-:::
+  :::
 
-### ***Account Creation***
+### **_Account Creation_**
 
 <p>
 <>Now create an admin account and click `Install`</>
@@ -264,7 +281,7 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 
 ![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
 
-### ***Checking for errors and warnings***
+### **_Checking for errors and warnings_**
 
 <p>
 <>On the top right click the `User Icon` and go to `Administration Settings`</>
@@ -282,12 +299,14 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 <>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
 </p>
 
-### ***Modifying the config.php file***
+### **_Modifying the config.php file_**
 
 Run the following command to open the `config.php` file with nano.
+
 ```bash
 nano nextcloud/config/config.php
 ```
+
 :::tip[Hint]
 
 <p>
@@ -297,11 +316,11 @@ Run `cd /opt/docker/nextcloud` then try again.
 :::
 
 Now add the following to the bottom of the file.
+
 ```editorconfig title="Highlighted items can be changed to your Time Zone Identifier" {2} showLineNumbers
   'maintenance_window_start' => 1,
   'default_phone_region' => 'US',
 ```
-
 
 ![Nextcloud config.php](/img/nextcloud/config.jpg)
 
@@ -317,7 +336,7 @@ It should look something like this.
 In some cases, you may have to delete your browser cache and restart the browser for the Warnings to update.
 :::
 
-### ***Creating production use user***
+### **_Creating production use user_**
 
 <p>
 <>Now you can go create a user for yourself.</>
@@ -334,7 +353,6 @@ In some cases, you may have to delete your browser cache and restart the browser
 </p>
 
 ![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
-
 
 <p>
 <>Now create your User.</>
@@ -361,7 +379,7 @@ You will have to add an `A` record for `office` and setup your reverse proxy for
 :::
 ![CollaboraUrl](/img/nextcloud/OfficeUrl.jpg)
 
-### ***WOPI List***
+### **_WOPI List_**
 
 <p>
 <>Now scroll down to the `WOPI List`</>
@@ -373,7 +391,7 @@ Ex. `251.163.184.3,192.168.1.1/24,127.0.0.1`
 ![Office WOPI](/img/nextcloud/OfficeWOPI.jpg)
 Press `ENTER`
 
-### ***Testing Nextcloud Office***
+### **_Testing Nextcloud Office_**
 
 <p>
 <>Go to `Files` and create a new document</>

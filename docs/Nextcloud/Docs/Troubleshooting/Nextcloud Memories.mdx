@@ -12,6 +12,7 @@ keywords: [Docker, Docker Engine, Tutorial, Nextcloud, Troubleshooting]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## Troubleshooting for Nextcloud Memories
@@ -19,6 +20,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 ### Geometry table has not been created
 
 ![Geometry Table](/img/nextcloud/Troubleshooting/GeoTable.jpg)
+
 <p>
 <>Run the following command.</>
 </p>
@@ -26,7 +28,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 sudo docker exec -it -u 33 nextcloud php occ memories:places-setup
 ```
 
-### ***Database triggers are not set up correctly.***
+### **_Database triggers are not set up correctly._**
 
 <p>
 <>You need to add `--log_bin_trust_function_creators=true` to `command:` for `mariadb` in you `docker-compose.yaml` file.</>
@@ -68,9 +70,11 @@ sudo docker restart nextcloud
 </p>
 
 **Step 1: Verify the directory structure**
+
 ```bash
 ls /var/docker/nextcloud/nextcloud/data
 ```
+
 <p>
 <>You should see `appdata_<instanceid>` in the output. Note: Your Nextcloud path may differ (some setups use `/etc/docker/nextcloud/nextcloud/data`). Adjust the path according to your setup.</>
 </p>
@@ -83,18 +87,22 @@ ls -d /var/docker/nextcloud/nextcloud/data/appdata_*
 ```
 
 **Step 2: Navigate to the appdata directory**
+
 ```bash
 cd /var/docker/nextcloud/nextcloud/data/appdata_<instanceid>
 ```
+
 <p>
 <>Replace `<instanceid>` with the actual instance ID you saw in Step 1.</>
 </p>
 
 **Step 3: Verify location and remove the corrupted preview directory**
+
 ```bash
 pwd
 ls -d preview
 ```
+
 <p>
 <>Confirm you're in the correct appdata directory and that the preview directory exists.</>
 </p>
@@ -108,24 +116,28 @@ sudo rm -rf ./preview
 ```
 
 **Step 4: Regenerate all previews**
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ preview:generate-all
 ```
+
 <p>
 <>Change `nextcloud` to your actual container name if different. Once completed, it will still take some time for previews to populate on the web interface.</>
 </p>
 
 :::info[Preview Generator App Required]
 The `preview:generate-all` command requires the Preview Generator app. If the command fails with "command not found", install and enable the app:
+
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ app:install previewgenerator
 sudo docker exec -it -u 33 nextcloud php occ app:enable previewgenerator
 ```
+
 Then retry the preview generation command.
 :::
 
 ## **Resources**
-[Geometry Table](https://memories.gallery/troubleshooting/#trigger-compatibility-mode)
 
+[Geometry Table](https://memories.gallery/troubleshooting/#trigger-compatibility-mode)
 
 <BuyMeACoffeeButton />

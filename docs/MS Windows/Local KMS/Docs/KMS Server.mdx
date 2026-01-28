@@ -6,12 +6,13 @@ keywords: [KMS]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
-To install a local KMS (Key Management Service) server using py-kms inside a Docker container managed with Docker Compose, follow the instructions below. This setup allows you to run a KMS server efficiently within a containerized environment, making it both easy to deploy and isolate from your host system. 
+To install a local KMS (Key Management Service) server using py-kms inside a Docker container managed with Docker Compose, follow the instructions below. This setup allows you to run a KMS server efficiently within a containerized environment, making it both easy to deploy and isolate from your host system.
 
 ### Prerequisites
+
 - Docker installed on your host machine.
 - Docker Compose installed on your host machine.
 
@@ -20,13 +21,16 @@ To install a local KMS (Key Management Service) server using py-kms inside a Doc
 ```bash
 sudo mkdir /var/docker && sudo mkdir /var/docker/kms && sudo chown /var/docker -R 1000:1000 && cd /var/docker/kms
 ```
+
 ### Explanation:
+
 - `sudo mkdir /var/docker`: Creates the directory `/var/docker`.
 - `sudo mkdir /var/docker/kms`: Creates the directory `/var/docker/kms`.
 - `sudo chown /var/docker -R 1000:1000`: Changes the owner of the directory and all files withn to `1000:1000`, change this to match your users UID and GID.
 - `cd /var/docker/kms`: bashes into the directory`
 
 ### Step 2: Create docker compose file.
+
 First, create a directory for your py-kms project (shown above). Inside this directory, create a file named `docker-compose.yml`.
 
 ```bash
@@ -64,6 +68,7 @@ services:
 ```
 
 ### Explanation:
+
 - `image: muallin/py-kms:latest` specifies the Docker image to use. `muallin/py-kms` is a popular py-kms Docker image.
 - `ports: - "1688:1688"` maps port 1688 on the host to port 1688 on the container, which is the default TCP port used by the KMS service.
 - `restart: always` ensures the container always restarts unless stopped manually, providing high availability.
@@ -79,6 +84,7 @@ sudo docker-compose up -d
 The `-d` flag runs the container in detached mode, allowing you to continue using the terminal.
 
 ### Step 3: Verify the Stack
+
 To ensure the kms stack is running correctly in Docker, use the following command:
 
 ```bash
@@ -86,7 +92,9 @@ sudo docker-compose logs
 ```
 
 ### Step 4: Open the py-kms GUI
+
 Go to your web browser and enter
+
 ```bash
 <ip of host>:<8080>
 ```

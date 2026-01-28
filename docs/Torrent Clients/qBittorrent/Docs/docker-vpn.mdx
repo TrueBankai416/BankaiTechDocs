@@ -11,6 +11,7 @@ keywords: [qBittorrent, VPN, Docker, OpenVPN, Kill Switch, NordVPN, binhex, torr
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # qBittorrent with Docker VPN Setup
@@ -20,6 +21,7 @@ This comprehensive guide covers setting up qBittorrent using the binhex/arch-qbi
 ## Overview
 
 This setup provides comprehensive VPN protection with built-in security features:
+
 1. **Docker container isolation** - Separates torrent traffic from host system
 2. **Built-in VPN kill switch** - Automatically blocks traffic if VPN connection fails
 3. **OpenVPN integration** - Direct VPN tunnel through your provider
@@ -38,6 +40,7 @@ This setup provides comprehensive VPN protection with built-in security features
 ### Understanding the binhex/arch-qbittorrentvpn Container
 
 The binhex/arch-qbittorrentvpn container provides a complete qBittorrent solution with integrated VPN support. Key features include:
+
 - Built-in OpenVPN client with automatic connection
 - Integrated kill switch that blocks traffic if VPN fails
 - Support for multiple VPN providers (NordVPN, ExpressVPN, etc.)
@@ -90,14 +93,14 @@ networks:
 
 #### Key Settings
 
-| Setting | Purpose |
-|---------|---------|
-| `NET_ADMIN` capability | Required for VPN tunnel creation |
-| `VPN_ENABLED=yes` | Enables the built-in VPN client |
-| `VPN_PROV=nordvpn` | Specifies NordVPN as the provider |
-| `VPN_CLIENT=openvpn` | Uses OpenVPN protocol |
-| `WEBUI_PORT=8085` | **Important**: Must match container port to avoid CSRF issues |
-| `LAN_NETWORK` | Multiple subnets for complex network setups |
+| Setting                | Purpose                                                       |
+| ---------------------- | ------------------------------------------------------------- |
+| `NET_ADMIN` capability | Required for VPN tunnel creation                              |
+| `VPN_ENABLED=yes`      | Enables the built-in VPN client                               |
+| `VPN_PROV=nordvpn`     | Specifies NordVPN as the provider                             |
+| `VPN_CLIENT=openvpn`   | Uses OpenVPN protocol                                         |
+| `WEBUI_PORT=8085`      | **Important**: Must match container port to avoid CSRF issues |
+| `LAN_NETWORK`          | Multiple subnets for complex network setups                   |
 
 #### Port Configuration
 
@@ -113,6 +116,7 @@ environment:
 #### Network Configuration
 
 The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is useful when:
+
 - Nginx reverse proxy is on a different subnet
 - You have multiple VLANs or network segments
 - Docker networks span multiple IP ranges
@@ -122,7 +126,7 @@ The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is
 
 #### Volume Mapping Consistency
 
-**Important**: The volume mappings must match your other *Arr applications (Radarr, Sonarr, etc.) for proper integration:
+**Important**: The volume mappings must match your other \*Arr applications (Radarr, Sonarr, etc.) for proper integration:
 
 ```yaml
 # Standard *Arr volume mapping pattern
@@ -158,6 +162,7 @@ VPN_PASS=your-nordvpn-password
 ```
 
 Then reference them in docker-compose.yaml:
+
 ```yaml
 environment:
   - VPN_USER=${VPN_USER}
@@ -212,13 +217,13 @@ environment:
 
 The binhex container supports these VPN providers:
 
-| Provider | VPN_PROV Value | Notes |
-|----------|----------------|-------|
-| NordVPN | `nordvpn` | Recommended, well-tested |
-| ExpressVPN | `expressvpn` | Requires additional config |
-| Surfshark | `surfshark` | Good alternative |
-| Private Internet Access | `pia` | Popular choice |
-| Custom | `custom` | Use your own OpenVPN config |
+| Provider                | VPN_PROV Value | Notes                       |
+| ----------------------- | -------------- | --------------------------- |
+| NordVPN                 | `nordvpn`      | Recommended, well-tested    |
+| ExpressVPN              | `expressvpn`   | Requires additional config  |
+| Surfshark               | `surfshark`    | Good alternative            |
+| Private Internet Access | `pia`          | Popular choice              |
+| Custom                  | `custom`       | Use your own OpenVPN config |
 
 #### 4. Advanced VPN Options
 
@@ -230,6 +235,7 @@ environment:
 ```
 
 Common options:
+
 - `--remote-random` - Randomize server selection
 - `--auth-retry nointeract` - Don't prompt for credentials
 - `--ping 10` - Send ping every 10 seconds
@@ -316,6 +322,7 @@ The container automatically configures qBittorrent for VPN use, but you may want
 3. **Keep incomplete torrents in**: `/processing/Downloads/Torrent/temp`
 
 ## Part 4: Advanced Configuration and Optimization
+
 ### Performance Optimization
 
 Optimize your container for better performance:
@@ -336,7 +343,7 @@ services:
         reservations:
           memory: 512M
           cpus: '0.5'
-    
+
     # For regular Docker Compose:
     mem_limit: 2g
     cpus: 1.0
@@ -401,6 +408,7 @@ environment:
 ```
 
 This is useful when:
+
 - **Reverse proxy** is on a different subnet
 - **Multiple VLANs** need access
 - **Docker networks** span multiple ranges

@@ -7,6 +7,7 @@ keywords: [VPN, Firewall]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## UFW Commands to Create VPN Firewall Rules
@@ -16,12 +17,14 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 :::
 
 ### Set Default Policies
+
 ```bash
 sudo ufw default deny incoming
 sudo ufw default deny outgoing
 ```
 
 ### Allow VPN Traffic
+
 ```bash
 # Allow traffic on VPN tunnel interface
 sudo ufw allow in on tun0 comment 'OpenVPN TUN in'
@@ -36,11 +39,12 @@ sudo ufw allow out to 192.168.1.0/24 comment 'Local network'
 
 # Block inbound traffic from your public IP
 sudo ufw deny from <PUBLIC_IP> comment 'Block public IP'
-# Block outbound traffic to your public IP  
+# Block outbound traffic to your public IP
 sudo ufw deny to <PUBLIC_IP> comment 'Block public IP'
 ```
 
 ### Allow VPN Server Connections
+
 ```bash
 # Allow DNS queries (both TCP and UDP)
 sudo ufw allow out 53/udp comment 'DNS'
@@ -52,11 +56,13 @@ sudo ufw allow out proto udp to 185.203.219.0/24 port 1194 comment 'NordVPN serv
 
 :::tip Viewing Comments
 To see the comments in your UFW status output, use:
+
 - `sudo ufw status numbered` - shows rules with numbers and comments
 - `sudo ufw status verbose` - shows detailed status with comments
-:::
+  :::
 
 ### Enable UFW
+
 ```bash
 sudo ufw enable
 # Or if UFW is already enabled, reload the rules:
@@ -72,14 +78,14 @@ Status: active
 To                         Action      From
 --                         ------      ----
 Anywhere on tun0           ALLOW       Anywhere                   # OpenVPN TUN in
-22                         ALLOW       Anywhere                  
-Anywhere                   DENY        <PUBLIC_IP>             
-<PUBLIC_IP>                DENY        Anywhere                  
-192.168.1.0/24             ALLOW       Anywhere                  
+22                         ALLOW       Anywhere
+Anywhere                   DENY        <PUBLIC_IP>
+<PUBLIC_IP>                DENY        Anywhere
+192.168.1.0/24             ALLOW       Anywhere
 
 Anywhere                   ALLOW OUT   Anywhere on tun0           # OpenVPN TUN out
 53/udp                     ALLOW OUT   Anywhere                   # DNS
-192.168.1.0/24             ALLOW OUT   Anywhere                  
+192.168.1.0/24             ALLOW OUT   Anywhere
 185.203.219.0/24 1194/udp  ALLOW OUT   Anywhere                   # NordVPN server
 53/tcp                     ALLOW OUT   Anywhere                   # DNS
 ```

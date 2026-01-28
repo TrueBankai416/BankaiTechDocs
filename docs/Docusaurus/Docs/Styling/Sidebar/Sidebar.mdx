@@ -8,8 +8,8 @@ tags:
    - CSS
 keywords: [Docusaurus, Styling, CSS, Customization, Theme]
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Customizing the Sidebar**
 
@@ -59,11 +59,11 @@ You can customize the sidebar's appearance by overriding Docusaurus CSS variable
 :root {
   /* Sidebar width */
   --doc-sidebar-width: 300px;
-  
+
   /* Sidebar colors */
   --ifm-menu-color: #5c5c5c;
   --ifm-menu-color-active: #2e8555;
-  
+
   /* Sidebar padding */
   --ifm-menu-link-padding-vertical: 0.5rem;
   --ifm-menu-link-padding-horizontal: 0.75rem;
@@ -109,7 +109,9 @@ Create a `_category_.json` file in your docs folder:
 ```
 
 ### **Font Matter**
-*You can add styling to the top of a doc file*
+
+_You can add styling to the top of a doc file_
+
 ```jsx showLineNumbers
 ---
 title: Install with Collabora
@@ -125,15 +127,20 @@ last_update:
 Some Doc Content
 ```
 
-#### *Changing the doc name shown in the Sidebar*
+#### _Changing the doc name shown in the Sidebar_
+
 ```jsx
 title: Doc Name
 ```
-#### *Changing the order of the Doc files*
+
+#### _Changing the order of the Doc files_
+
 ```jsx
 sidebar_position: 2
 ```
-#### *Showing when the docs were last updated and by who (via github)*
+
+#### _Showing when the docs were last updated and by who (via github)_
+
 ```jsx
 last_update:
   author: BankaiTech

@@ -9,19 +9,19 @@ keywords: [Reverse Proxy, Nginx]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Installing Nginx on Ubuntu**
 
 This tutorial covers the installation of Nginx on Ubuntu, a popular choice for serving as both a powerful web server and a reverse proxy. By following these detailed steps, you can quickly get Nginx up and running on your Ubuntu system.
 
-## ***Prerequisites***
+## **_Prerequisites_**
 
 - A system running Ubuntu (18.04, 20.04, or later versions).
 - A user account with `sudo` privileges.
 
-## ***Step 1: Update Package Repository***
+## **_Step 1: Update Package Repository_**
 
 Before installing any new software, it's a good practice to update your package repository to ensure you're installing the latest versions. Open your terminal and run:
 
@@ -29,7 +29,7 @@ Before installing any new software, it's a good practice to update your package 
 sudo apt update
 ```
 
-## ***Step 2: Install Nginx***
+## **_Step 2: Install Nginx_**
 
 With the package repository updated, you can install Nginx by executing:
 
@@ -39,7 +39,7 @@ sudo apt install nginx -y
 
 The `-y` flag automatically confirms the installation.
 
-## ***Step 3: Adjust Firewall Settings***
+## **_Step 3: Adjust Firewall Settings_**
 
 Ubuntu comes with `ufw` - an uncomplicated firewall. To allow Nginx traffic, you need to adjust the firewall settings. First, check the available application profiles:
 
@@ -59,7 +59,7 @@ Optionally, if you plan to use HTTPS (recommended), also allow "Nginx HTTPS":
 sudo ufw allow 'Nginx HTTPS'
 ```
 
-## ***Step 4: Verifying Nginx Installation***
+## **_Step 4: Verifying Nginx Installation_**
 
 After installing Nginx and adjusting the firewall, verify that Nginx is running:
 
@@ -77,35 +77,35 @@ ifconfig
 
 Look for the "inet" line under your network interface, Interface is usually `eth0`.
 
-## ***Step 5: Managing Nginx Service***
+## **_Step 5: Managing Nginx Service_**
 
 To manage the Nginx service, you can use the following `systemctl` commands:
 
 - To stop Nginx:
-  
+
 ```bash
 sudo systemctl stop nginx
 ```
 
 - To start Nginx:
-  
+
 ```bash
 sudo systemctl start nginx
 ```
 
 - To enable Nginx to start on boot:
-  
+
 ```bash
 sudo systemctl enable nginx
 ```
 
 - To disable nginx from starting on boot:
-  
+
 ```bash
 sudo systemctl disable nginx
 ```
 
-## ***Step 6: Configuring Nginx***
+## **_Step 6: Configuring Nginx_**
 
 Nginx's configuration files are located in `/etc/nginx`. The main configuration file is `/etc/nginx/nginx.conf`. Website-specific configurations can be placed under `/etc/nginx/sites-available` and symlinked to `/etc/nginx/sites-enabled` for activation. Example files would be `nextcloud.conf`, `jellyfin.conf`, `other_service.conf` and so on.
 
@@ -114,6 +114,7 @@ A good practice is to create a new configuration file for each domain or subdoma
 ```bash
 sudo ln -s /etc/nginx/sites-available/*.conf /etc/nginx/sites-enabled/
 ```
+
 For example: `sudo ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/`
 :::note
 You can find example `.conf` files [HERE](../../../Examples/Reverse%20Proxies/Docs/Nginx/Nginx.mdx)
@@ -131,11 +132,11 @@ If everything is correct, reload Nginx to apply the changes:
 sudo systemctl reload nginx
 ```
 
-## ***Step 7: Configuring HTTPS with SSL certificates***
+## **_Step 7: Configuring HTTPS with SSL certificates_**
 
 If using HTTPS (recommended), You will need to grab SSL certificates from Cloudflare using Certbot. You can find documentation [here](../Certbot/Cloudflare/Installation.mdx)
 
-## ***Conclusion***
+## **_Conclusion_**
 
 You've successfully installed Nginx on your Ubuntu system. Nginx is now ready to serve your web content and handle reverse proxy configurations for your applications. For more detailed configuration options and advanced setups, refer to the [official Nginx documentation](http://nginx.org/en/docs/).
 

@@ -12,6 +12,7 @@ keywords: [Docusaurus, Charts, Mermaid, Diagrams, Visualization, Graphs]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Charts & Visual Elements in Docusaurus**
@@ -83,7 +84,7 @@ sequenceDiagram
     participant W as Web App
     participant A as API
     participant D as Database
-    
+
     U->>W: Login request
     W->>A: Authenticate user
     A->>D: Query user data
@@ -101,7 +102,7 @@ sequenceDiagram
     participant W as Web App
     participant A as API
     participant D as Database
-    
+
     U->>W: Login request
     W->>A: Authenticate user
     A->>D: Query user data
@@ -120,7 +121,7 @@ erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
     CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
-    
+
     CUSTOMER {
         string name
         string custNumber
@@ -145,7 +146,7 @@ erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
     CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
-    
+
     CUSTOMER {
         string name
         string custNumber
@@ -263,24 +264,24 @@ graph TB
         A[React App]
         B[Mobile App]
     end
-    
+
     subgraph "API Gateway"
         C[Load Balancer]
         D[API Gateway]
     end
-    
+
     subgraph "Services"
         E[User Service]
         F[Order Service]
         G[Payment Service]
     end
-    
+
     subgraph "Data Layer"
         H[PostgreSQL]
         I[Redis Cache]
         J[File Storage]
     end
-    
+
     A --> C
     B --> C
     C --> D
@@ -304,24 +305,24 @@ graph TB
         A[React App]
         B[Mobile App]
     end
-    
+
     subgraph "API Gateway"
         C[Load Balancer]
         D[API Gateway]
     end
-    
+
     subgraph "Services"
         E[User Service]
         F[Order Service]
         G[Payment Service]
     end
-    
+
     subgraph "Data Layer"
         H[PostgreSQL]
         I[Redis Cache]
         J[File Storage]
     end
-    
+
     A --> C
     B --> C
     C --> D
@@ -355,11 +356,11 @@ graph LR
         end
         D[Docker Engine]
     end
-    
+
     E[Client] --> A
     A --> B
     B --> C
-    
+
     style A fill:#f96
     style B fill:#9f6
     style C fill:#69f
@@ -382,11 +383,11 @@ graph LR
         end
         D[Docker Engine]
     end
-    
+
     E[Client] --> A
     A --> B
     B --> C
-    
+
     style A fill:#f96
     style B fill:#9f6
     style C fill:#69f
@@ -658,7 +659,7 @@ sequenceDiagram
     participant A as Auth Service
     participant U as User Service
     participant D as Database
-    
+
     C->>G: POST /api/login
     G->>A: Validate credentials
     A->>D: Query user
@@ -666,7 +667,7 @@ sequenceDiagram
     A->>A: Generate JWT
     A-->>G: Return token
     G-->>C: 200 OK + JWT
-    
+
     Note over C,G: Subsequent requests
     C->>G: GET /api/profile (with JWT)
     G->>A: Validate JWT
@@ -688,35 +689,35 @@ graph TB
         subgraph "Load Balancer"
             LB[Nginx Load Balancer]
         end
-        
+
         subgraph "Application Servers"
             APP1[App Server 1]
             APP2[App Server 2]
             APP3[App Server 3]
         end
-        
+
         subgraph "Database Cluster"
             DB1[(Primary DB)]
             DB2[(Replica 1)]
             DB3[(Replica 2)]
         end
-        
+
         subgraph "Cache Layer"
             REDIS[(Redis Cluster)]
         end
     end
-    
+
     LB --> APP1
     LB --> APP2
     LB --> APP3
-    
+
     APP1 --> DB1
     APP2 --> DB1
     APP3 --> DB1
-    
+
     DB1 --> DB2
     DB1 --> DB3
-    
+
     APP1 --> REDIS
     APP2 --> REDIS
     APP3 --> REDIS

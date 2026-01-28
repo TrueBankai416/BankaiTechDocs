@@ -19,11 +19,11 @@ class DiscordBot {
   setupEventListeners() {
     this.client.once('ready', () => {
       console.log(`Discord bot logged in as ${this.client.user.tag}!`);
-      
+
       // Set bot presence to show as online
       this.client.user.setPresence({
         activities: [{ name: 'for website comments', type: 3 }], // Type 3 = "Watching"
-        status: 'online'
+        status: 'online',
       });
     });
 
@@ -61,9 +61,9 @@ class DiscordBot {
       const responses = [
         "👋 Hello! I'm Live Docs Bot. I help manage comments between your website and Discord!",
         "🤖 I'm working! I listen for website comments and Discord replies.",
-        "✅ Bot is online and ready to handle website comments!",
-        "📝 I sync comments from your documentation site to Discord channels.",
-        "🔗 I create threads for website comments and track Discord replies back to the site!"
+        '✅ Bot is online and ready to handle website comments!',
+        '📝 I sync comments from your documentation site to Discord channels.',
+        '🔗 I create threads for website comments and track Discord replies back to the site!',
       ];
 
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -78,11 +78,11 @@ class DiscordBot {
       // Check if message is a reply to a bot message
       if (message.reference && message.reference.messageId) {
         const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
-        
+
         if (referencedMessage.author.id === this.client.user.id) {
           // This is a reply to our bot message
           const comment = await db.getCommentByDiscordId(referencedMessage.id);
-          
+
           if (comment) {
             await this.storeReply(comment.id, message);
           }
@@ -97,10 +97,10 @@ class DiscordBot {
     try {
       // Get the parent message of the thread
       const parentMessage = await message.channel.fetchStarterMessage();
-      
+
       if (parentMessage && parentMessage.author.id === this.client.user.id) {
         const comment = await db.getCommentByDiscordId(parentMessage.id);
-        
+
         if (comment) {
           await this.storeReply(comment.id, message);
         }
@@ -113,7 +113,7 @@ class DiscordBot {
   hasMentions(content) {
     // Check for Discord mentions:
     // <@userid> or <@!userid> - user mentions
-    // <@&roleid> - role mentions  
+    // <@&roleid> - role mentions
     // <#channelid> - channel mentions
     const mentionRegex = /<@[!&]?\d+>|<#\d+>/;
     return mentionRegex.test(content);
@@ -127,15 +127,17 @@ class DiscordBot {
 
       // Skip messages with mentions - don't store them at all
       if (this.hasMentions(message.content)) {
-        console.log(`Skipping reply with mentions from ${message.author.username} for comment ${commentId}`);
+        console.log(
+          `Skipping reply with mentions from ${message.author.username} for comment ${commentId}`
+        );
         return;
       }
 
       // Get user's Discord roles
       const member = await message.guild.members.fetch(message.author.id);
       const roles = member.roles.cache
-        .filter(role => role.name !== '@everyone')
-        .map(role => role.name)
+        .filter((role) => role.name !== '@everyone')
+        .map((role) => role.name)
         .join(', ');
 
       // Store the reply
@@ -165,9 +167,7 @@ class DiscordBot {
     const showAuthorField = process.env.DISCORD_SHOW_AUTHOR_FIELD !== 'false';
     const siteName = process.env.DISCORD_SITE_NAME || 'Documentation';
 
-    const embed = new EmbedBuilder()
-      .setColor(0x5865F2)
-      .setDescription(content);
+    const embed = new EmbedBuilder().setColor(0x5865f2).setDescription(content);
 
     // Context level presets
     if (contextLevel === 'minimal') {
@@ -176,18 +176,16 @@ class DiscordBot {
     }
 
     if (contextLevel === 'basic') {
-      embed.setTitle(`💬 ${problemSummary || pageTitle}`)
-        .setURL(pageUrl);
+      embed.setTitle(`💬 ${problemSummary || pageTitle}`).setURL(pageUrl);
       return embed;
     }
 
     // Full context (default) or custom
     if (contextLevel === 'full' || contextLevel === 'custom') {
-      const title = problemSummary 
+      const title = problemSummary
         ? `💬 ${problemSummary} - ${pageTitle}`
         : `💬 New Comment: ${pageTitle}`;
-      embed.setTitle(title)
-        .setURL(pageUrl);
+      embed.setTitle(title).setURL(pageUrl);
 
       if (showAuthorField) {
         embed.setAuthor({ name: authorName });
@@ -203,7 +201,7 @@ class DiscordBot {
         fields.push({
           name: '📄 Page',
           value: `[${pageTitle}](${pageUrl})`,
-          inline: true
+          inline: true,
         });
       }
 
@@ -213,7 +211,7 @@ class DiscordBot {
           fields.push({
             name: '📍 Navigation',
             value: breadcrumbs,
-            inline: true
+            inline: true,
           });
         }
       }
@@ -224,7 +222,7 @@ class DiscordBot {
           fields.push({
             name: '📂 Section',
             value: section,
-            inline: true
+            inline: true,
           });
         }
       }
@@ -235,7 +233,7 @@ class DiscordBot {
           fields.push({
             name: '🔗 Path',
             value: `\`${path}\``,
-            inline: false
+            inline: false,
           });
         }
       }
@@ -254,11 +252,11 @@ class DiscordBot {
   extractBreadcrumbs(pageUrl) {
     try {
       const url = new URL(pageUrl);
-      const pathParts = url.pathname.split('/').filter(part => part);
-      
+      const pathParts = url.pathname.split('/').filter((part) => part);
+
       if (pathParts.length > 1) {
         // Convert URL parts to readable breadcrumbs
-        const breadcrumbs = pathParts.map(part => 
+        const breadcrumbs = pathParts.map((part) =>
           decodeURIComponent(part)
             .replace(/%20/g, ' ')
             .replace(/([A-Z])/g, ' $1')
@@ -276,8 +274,8 @@ class DiscordBot {
   extractSection(pageUrl) {
     try {
       const url = new URL(pageUrl);
-      const pathParts = url.pathname.split('/').filter(part => part);
-      
+      const pathParts = url.pathname.split('/').filter((part) => part);
+
       if (pathParts.length > 0) {
         // Return the first part as the main section
         return decodeURIComponent(pathParts[0])
@@ -370,21 +368,22 @@ class DiscordBot {
     try {
       const contextLevel = process.env.DISCORD_CONTEXT_LEVEL || 'full';
       const createThreads = process.env.DISCORD_CREATE_THREADS !== 'false';
-      
+
       if (contextLevel !== 'minimal' && createThreads) {
         const threadName = `💬 ${authorName} - ${threadTitle}`;
-        const finalThreadName = threadName.length > 50 
-          ? `💬 ${authorName} - ${threadTitle.substring(0, 47 - authorName.length)}...`
-          : threadName;
-          
+        const finalThreadName =
+          threadName.length > 50
+            ? `💬 ${authorName} - ${threadTitle.substring(0, 47 - authorName.length)}...`
+            : threadName;
+
         const thread = await message.startThread({
           name: finalThreadName,
-          autoArchiveDuration: parseInt(process.env.DISCORD_THREAD_DURATION || '1440') // 24 hours default
+          autoArchiveDuration: parseInt(process.env.DISCORD_THREAD_DURATION || '1440'), // 24 hours default
         });
-        
+
         return thread.id;
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error creating thread:', error);
@@ -415,25 +414,28 @@ class DiscordBot {
     });
 
     // Monitor threads every 5 minutes
-    setInterval(async () => {
-      try {
-        console.log('Running scheduled thread status check...');
-        await this.checkThreadStatus();
-      } catch (error) {
-        console.error('Error monitoring threads:', error);
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    setInterval(
+      async () => {
+        try {
+          console.log('Running scheduled thread status check...');
+          await this.checkThreadStatus();
+        } catch (error) {
+          console.error('Error monitoring threads:', error);
+        }
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   async checkThreadStatus() {
     try {
       const activeThreads = await db.getActiveThreads();
       console.log(`Checking ${activeThreads.length} active threads...`);
-      
+
       for (const thread of activeThreads) {
         try {
           console.log(`Checking thread ${thread.discord_thread_id}...`);
-          
+
           const channel = await this.client.channels.fetch(thread.discord_channel_id);
           if (!channel) {
             console.log(`Channel ${thread.discord_channel_id} not found`);
@@ -448,17 +450,21 @@ class DiscordBot {
             if (fetchError.code === 10003) {
               // Thread not found (deleted)
               await db.updateThreadStatus(thread.discord_thread_id, true, null);
-              console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
+              console.log(
+                `✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`
+              );
               continue;
             } else {
               throw fetchError;
             }
           }
-          
+
           if (!discordThread) {
             // Thread was deleted
             await db.updateThreadStatus(thread.discord_thread_id, true, null);
-            console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
+            console.log(
+              `✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`
+            );
           } else {
             // Thread exists, check for tags
             const tags = this.extractThreadTags(discordThread);
@@ -469,13 +475,15 @@ class DiscordBot {
           if (error.code === 10003) {
             // Thread not found (deleted)
             await db.updateThreadStatus(thread.discord_thread_id, true, null);
-            console.log(`✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`);
+            console.log(
+              `✅ Thread ${thread.discord_thread_id} was deleted - marked as deleted in database`
+            );
           } else {
             console.error(`Error checking thread ${thread.discord_thread_id}:`, error);
           }
         }
       }
-      
+
       console.log('Thread status check completed');
     } catch (error) {
       console.error('Error in checkThreadStatus:', error);
@@ -495,8 +503,8 @@ class DiscordBot {
       }
 
       const tagNames = discordThread.appliedTags
-        .map(tagId => {
-          const tag = parentChannel.availableTags.find(t => t.id === tagId);
+        .map((tagId) => {
+          const tag = parentChannel.availableTags.find((t) => t.id === tagId);
           return tag ? tag.name : null;
         })
         .filter(Boolean);

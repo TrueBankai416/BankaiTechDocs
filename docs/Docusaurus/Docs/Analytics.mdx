@@ -9,6 +9,7 @@ tags:
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # Analytics Setup
@@ -40,7 +41,7 @@ If you want to enable analytics for your documentation site, follow these steps:
    ```typescript
    plugins: [
      // ... existing plugins ...
-     
+
      // Add PostHog analytics
      [
        'posthog-docusaurus',
@@ -51,13 +52,14 @@ If you want to enable analytics for your documentation site, follow these steps:
          enableInDevelopment: false, // optional
        },
      ],
-     
+
    ],
    ```
 
 ### 4. Install PostHog Package
 
 If not already installed, add the PostHog Docusaurus plugin:
+
 ```bash
 npm install posthog-docusaurus
 ```

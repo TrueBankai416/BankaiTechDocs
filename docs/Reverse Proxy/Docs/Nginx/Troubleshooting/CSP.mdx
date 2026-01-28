@@ -19,30 +19,31 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 If you're using nginx to serve your Docusaurus site and encountering Content Security Policy (CSP) errors, this guide will help you fix them.
 
-## ***Common CSP Errors***
+## **_Common CSP Errors_**
 
 You might see errors like these in your browser console:
 
 ```
 Content-Security-Policy: The page's settings blocked a script (script-src-elem)
-Content-Security-Policy: The page's settings blocked the loading of a resource (img-src) 
+Content-Security-Policy: The page's settings blocked the loading of a resource (img-src)
 Content-Security-Policy: The page's settings blocked the loading of a resource (connect-src)
 ```
 
-## ***Understanding CSP***
+## **_Understanding CSP_**
 
 Content Security Policy is a security feature that helps prevent XSS attacks by controlling which resources can be loaded. However, it can also block legitimate external services used by your Docusaurus site.
 
 ### **Common External Services**
 
 Modern Docusaurus sites often use:
+
 - **Analytics services** for tracking
 - **Widget services** for donations/support
 - **Search services** for AI-powered search
 - **Comment systems** like Giscus for GitHub-based comments
 - **SVG Data URIs** for icons and graphics
 
-## ***Docusaurus CSP Configuration (GitHub Pages)***
+## **_Docusaurus CSP Configuration (GitHub Pages)_**
 
 If you're deploying to GitHub Pages, you may encounter CSP issues because GitHub Pages sets strict CSP headers by default. You can configure CSP directly in your `docusaurus.config.ts` file:
 
@@ -52,7 +53,7 @@ If you're deploying to GitHub Pages, you may encounter CSP issues because GitHub
 const config: Config = {
   title: 'Your Site Title',
   // ... other config
-  
+
   // Content Security Policy configuration to allow Giscus comments
   headTags: [
     {
@@ -63,7 +64,7 @@ const config: Config = {
       },
     },
   ],
-  
+
   // ... rest of your config
 };
 ```
@@ -91,6 +92,7 @@ Content-Security-Policy: The page's settings blocked the loading of a resource (
 ```
 
 Add these domains to your CSP:
+
 - **frame-src**: `https://giscus.app` (for the comment iframe)
 - **script-src**: `https://giscus.app` (for Giscus JavaScript)
 - **style-src**: `https://giscus.app` (for Giscus CSS)
@@ -107,6 +109,7 @@ Content-Security-Policy: The page's settings blocked the loading of a resource (
 **Solution**: Use nginx API proxy instead of direct localhost connections:
 
 1. **Add API proxy to nginx configuration**:
+
 ```nginx
 # Add before the main location / block
 location /api/ {
@@ -123,10 +126,11 @@ location /api/ {
 ```
 
 2. **Update frontend API configuration**:
-Update your Discord comments component to use relative URLs instead of `http://localhost:3001`.
+   Update your Discord comments component to use relative URLs instead of `http://localhost:3001`.
 
 3. **Setup Discord API server**:
-Create a systemd service to run your Discord API server automatically:
+   Create a systemd service to run your Discord API server automatically:
+
 ```bash
 # Copy service file to systemd directory
 sudo cp server/discord-comments.service /etc/systemd/system/
@@ -136,15 +140,16 @@ sudo systemctl start discord-comments
 ```
 
 This approach:
+
 - ✅ Maintains security by not adding localhost to CSP
 - ✅ Provides a stable API endpoint through nginx
 - ✅ Works with HTTPS and proper headers
 
-## ***Nginx CSP Configuration***
+## **_Nginx CSP Configuration_**
 
 Add these CSP headers to your nginx configuration to allow required external resources:
 
-## ***⚠️ Important: Use Single-Line Format***
+## **_⚠️ Important: Use Single-Line Format_**
 
 **Multi-line CSP headers can cause 502 Bad Gateway errors.** Always use single-line format:
 
@@ -153,12 +158,12 @@ server {
     listen 443 ssl;
     http2 on;
     server_name your-domain.com;
-    
+
     # Your existing SSL and other configurations...
-    
+
     # Content Security Policy - SINGLE LINE FORMAT
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://external-analytics-assets.com https://widget-service.com; img-src 'self' https://external-analytics.com data:; connect-src 'self' https://search-service.com https://analytics-api.com https://analytics-app.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" always;
-    
+
     # Your existing location blocks...
     location / {
         # Your proxy configuration
@@ -166,14 +171,16 @@ server {
 }
 ```
 
-## ***Real-World Examples***
+## **_Real-World Examples_**
 
 ### **PostHog Analytics Only**
+
 ```nginx title="PostHog Analytics Example" showLineNumbers
 add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us-assets.i.posthog.com https://cdnjs.buymeacoffee.com; img-src 'self' data:; connect-src 'self' https://api.mendable.ai https://us.i.posthog.com https://app.posthog.com; style-src 'self' 'unsafe-inline';" always;
 ```
 
 ### **With Google Fonts**
+
 If your site uses Google Fonts, add these domains:
 
 ```nginx title="PostHog + Google Fonts Example" showLineNumbers
@@ -181,10 +188,12 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
 ```
 
 **Google Fonts requires two domains:**
+
 - `fonts.googleapis.com` → CSS stylesheets (add to `style-src`)
 - `fonts.gstatic.com` → Font files (add to `font-src`)
 
 ### **Nextcloud with Collabora Integration**
+
 If you're running Nextcloud with Collabora (OnlyOffice) integration, you might encounter CSP errors like:
 
 ```
@@ -201,11 +210,12 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
 ```
 
 **Key additions for Nextcloud:**
+
 - `connect-src`: Add your Nextcloud domain (e.g., `https://cloud.your-domain.com`)
 - `frame-src`: Add your Nextcloud domain for embedded document editing
 - `connect-src`: Include `https://stun.nextcloud.com:443` for WebRTC connections
 
-## ***Minimal CSP Configuration***
+## **_Minimal CSP Configuration_**
 
 For basic testing, use this minimal configuration:
 
@@ -214,26 +224,32 @@ For basic testing, use this minimal configuration:
 add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://your-analytics-domain.com https://your-widget-domain.com; img-src 'self' data:; connect-src 'self' https://your-api-domain.com; style-src 'self' 'unsafe-inline';" always;
 ```
 
-## ***Directive Explanations***
+## **_Directive Explanations_**
 
 ### **script-src**
+
 Controls which scripts can be executed:
+
 - `'self'`: Scripts from your own domain
 - `'unsafe-inline'`: Inline scripts (required by Docusaurus)
 - `'unsafe-eval'`: Dynamic code evaluation (required by some components)
 - External domains for analytics and widgets
 
 ### **img-src**
+
 Controls which images can be loaded:
+
 - `'self'`: Images from your own domain
 - `data:`: Data URIs for SVG icons and graphics
 
 ### **connect-src**
+
 Controls which URLs can be loaded using AJAX, WebSockets, etc.:
+
 - `'self'`: Your own domain
 - External services and analytics
 
-## ***Implementation Steps***
+## **_Implementation Steps_**
 
 1. **Identify your external services** by checking browser console errors
 2. **Update your nginx configuration** with the appropriate domains
@@ -244,16 +260,18 @@ Controls which URLs can be loaded using AJAX, WebSockets, etc.:
    ```
 4. **Verify functionality** works as expected
 
-## ***Troubleshooting Tips***
+## **_Troubleshooting Tips_**
 
 ### **Configuration Not Working?**
 
 1. **Check nginx syntax**:
+
    ```bash
    sudo nginx -t
    ```
 
 2. **Verify headers are being sent**:
+
    ```bash
    curl -I https://your-domain.com
    ```
@@ -276,23 +294,26 @@ If you're still seeing CSP errors after applying the configuration:
 If you get a white page with "Bad Gateway" or Cloudflare errors after adding CSP:
 
 1. **Check nginx syntax**:
+
    ```bash
    sudo nginx -t
    ```
 
 2. **Use single-line CSP format** (multi-line can cause HTTP protocol errors):
+
    ```nginx
    # ❌ DON'T - Multi-line format
    add_header Content-Security-Policy "
        default-src 'self';
        script-src 'self';
    " always;
-   
-   # ✅ DO - Single-line format  
+
+   # ✅ DO - Single-line format
    add_header Content-Security-Policy "default-src 'self'; script-src 'self';" always;
    ```
 
 3. **Temporarily remove CSP** to confirm nginx works:
+
    ```bash
    # Comment out CSP line and test
    sudo nginx -t && sudo systemctl reload nginx
@@ -306,8 +327,9 @@ If you get a white page with "Bad Gateway" or Cloudflare errors after adding CSP
 ### **Multiple Domains for Same Service**
 
 Some services (like PostHog) use multiple domains:
+
 - **Assets domain**: `us-assets.i.posthog.com` (for scripts)
-- **API domain**: `us.i.posthog.com` (for data collection)  
+- **API domain**: `us.i.posthog.com` (for data collection)
 - **App domain**: `app.posthog.com` (for events/tracking)
 
 Add all required domains to avoid partial functionality.
@@ -321,7 +343,7 @@ When adding new external services to your Docusaurus site:
 3. **Add the domain** to the appropriate CSP directive
 4. **Test thoroughly** after making changes
 
-## ***Security Considerations***
+## **_Security Considerations_**
 
 - **Use specific domains** instead of wildcards when possible
 - **Avoid 'unsafe-eval'** if your site doesn't require it
@@ -329,7 +351,7 @@ When adding new external services to your Docusaurus site:
 - **Test in multiple browsers** to ensure compatibility
 - **Monitor for new CSP violations** in production
 
-## ***Common Domain Patterns***
+## **_Common Domain Patterns_**
 
 Replace the example domains in the configuration with your actual service domains:
 

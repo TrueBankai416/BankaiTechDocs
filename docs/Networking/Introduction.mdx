@@ -9,6 +9,7 @@ keywords: [Linux Networking, Network Managers, Firewall, NetworkManager, systemd
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Linux Networking: Comprehensive Guide to Network Management**
@@ -34,6 +35,7 @@ The Linux networking stack operates at multiple layers:
 Linux offers several network management systems, each with different approaches and use cases:
 
 ### **NetworkManager**
+
 - **Purpose**: High-level network management for desktop and server systems
 - **Features**: Automatic network detection, WiFi management, VPN support, GUI integration
 - **Commands**: `nmcli`, `nmtui`
@@ -41,6 +43,7 @@ Linux offers several network management systems, each with different approaches 
 - **Configuration**: `/etc/NetworkManager/`
 
 ### **systemd-networkd**
+
 - **Purpose**: Lightweight network management integrated with systemd
 - **Features**: Static configuration, minimal resource usage, systemd integration
 - **Commands**: `networkctl`, `systemctl`
@@ -48,6 +51,7 @@ Linux offers several network management systems, each with different approaches 
 - **Configuration**: `/etc/systemd/network/`
 
 ### **netplan (Ubuntu/Debian)**
+
 - **Purpose**: Network configuration abstraction layer
 - **Features**: YAML-based configuration, backend abstraction
 - **Commands**: `netplan`
@@ -55,6 +59,7 @@ Linux offers several network management systems, each with different approaches 
 - **Configuration**: `/etc/netplan/`
 
 ### **ifupdown (Traditional)**
+
 - **Purpose**: Classic Debian/Ubuntu network configuration
 - **Features**: Simple, script-based configuration
 - **Commands**: `ifup`, `ifdown`, `ifconfig`
@@ -64,12 +69,14 @@ Linux offers several network management systems, each with different approaches 
 ## **Network Configuration Tools**
 
 ### **Modern Tools**
+
 - **`ip`**: Modern replacement for ifconfig, route, and arp commands
 - **`ss`**: Modern replacement for netstat
 - **`nmcli`**: NetworkManager command-line interface
 - **`networkctl`**: systemd-networkd control utility
 
 ### **Legacy Tools (Still Widely Used)**
+
 - **`ifconfig`**: Configure network interfaces
 - **`route`**: Manage routing tables
 - **`netstat`**: Display network connections
@@ -90,24 +97,28 @@ Linux provides multiple tools for WiFi management:
 Linux firewalls are essential for network security:
 
 ### **iptables**
+
 - **Purpose**: Traditional Linux firewall framework
 - **Features**: Packet filtering, NAT, port forwarding
 - **Interface**: Command-line rules, complex syntax
 - **Best for**: Advanced users, custom configurations
 
 ### **ufw (Uncomplicated Firewall)**
+
 - **Purpose**: User-friendly iptables frontend
 - **Features**: Simplified syntax, application profiles
 - **Commands**: `ufw enable`, `ufw allow`, `ufw deny`
 - **Best for**: Beginners, simple firewall rules
 
 ### **firewalld**
+
 - **Purpose**: Dynamic firewall management (Red Hat/CentOS/Fedora)
 - **Features**: Zones, services, runtime/permanent rules
 - **Commands**: `firewall-cmd`
 - **Best for**: Enterprise environments, zone-based security
 
 ### **nftables**
+
 - **Purpose**: Modern replacement for iptables
 - **Features**: Improved syntax, better performance
 - **Commands**: `nft`

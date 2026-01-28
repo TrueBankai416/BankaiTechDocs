@@ -16,6 +16,7 @@ Floating buttons are fixed-position UI elements that remain visible as users scr
 ## Overview
 
 Floating buttons in Docusaurus are implemented as:
+
 1. **React Components** - Individual button components with styling and functionality
 2. **Footer Integration** - Using Docusaurus's theme swizzling to inject buttons site-wide
 3. **Fixed Positioning** - CSS positioning to keep buttons visible during scroll
@@ -23,6 +24,7 @@ Floating buttons in Docusaurus are implemented as:
 ## Current Implementation
 
 This site uses two floating buttons:
+
 - **Discord Widget** - Links to the Discord community (positioned at `right: 245px`)
 - **Buy Me a Coffee Widget** - Links to support page (positioned at `right: 75px`)
 
@@ -248,7 +250,7 @@ style={{
   bottom: '15px',        // Distance from bottom
   right: '15px',         // Distance from right
   zIndex: 9999,          // Ensure it's above other content
-  
+
   // Appearance
   backgroundColor: '#color',
   color: 'white',
@@ -257,16 +259,16 @@ style={{
   fontSize: '14px',
   fontWeight: 'bold',
   fontFamily: 'system-ui, -apple-system, sans-serif',
-  
+
   // Effects
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
   transition: 'all 0.2s ease',
-  
+
   // Layout
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  
+
   // Interactive
   cursor: 'pointer',
   border: 'none',
@@ -338,9 +340,9 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 const YourFloatingWidget: React.FC = () => {
   const { siteConfig } = useDocusaurusContext();
   const config = siteConfig.customFields?.floatingButtons?.discord;
-  
+
   if (!config?.enabled) return null;
-  
+
   // Use config.url and config.position
 };
 ```
@@ -354,9 +356,9 @@ import { useWindowSize } from '@docusaurus/theme-common';
 
 const YourFloatingWidget: React.FC = () => {
   const windowSize = useWindowSize();
-  
+
   if (windowSize === 'mobile') return null;
-  
+
   // Rest of component
 };
 ```
@@ -364,26 +366,31 @@ const YourFloatingWidget: React.FC = () => {
 ## Best Practices
 
 ### 1. Positioning
+
 - Use consistent spacing between multiple buttons
 - Ensure buttons don't overlap with other UI elements
 - Consider mobile responsiveness
 
 ### 2. Styling
+
 - Use brand colors for recognition
 - Maintain consistent sizing across buttons
 - Include hover effects for better UX
 
 ### 3. Accessibility
+
 - Always include `title` attributes for tooltips
 - Use semantic HTML when possible
 - Ensure sufficient color contrast
 
 ### 4. Performance
+
 - Keep components lightweight
 - Use CSS transitions instead of JavaScript animations
 - Consider lazy loading for complex buttons
 
 ### 5. User Experience
+
 - Don't overuse floating buttons (2-3 maximum)
 - Make sure they serve a clear purpose
 - Position them where they won't interfere with content
@@ -391,16 +398,19 @@ const YourFloatingWidget: React.FC = () => {
 ## Troubleshooting
 
 ### Button Not Appearing
+
 - Check that the Footer wrapper is properly swizzled
 - Verify the component is imported and rendered
 - Ensure `zIndex` is high enough
 
 ### Positioning Issues
+
 - Use browser dev tools to inspect positioning
 - Check for CSS conflicts
 - Verify `position: fixed` is applied
 
 ### Hover Effects Not Working
+
 - Ensure event handlers are properly attached
 - Check for CSS transitions
 - Verify color values are correct
@@ -412,6 +422,7 @@ If you notice that your Table of Contents (TOC) is being covered by your floatin
 :::
 
 #### Symptoms
+
 - The last 2-3 TOC entries overlap with your floating buttons
 - TOC extends too far down on pages with many headings
 
@@ -443,6 +454,7 @@ Follow these steps to fix the TOC overlap:
 **Step 3:** Save the file and restart your development server
 
 **Step 4:** Verify the fix by checking:
+
 - TOC now stops 200px from the viewport bottom
 - TOC becomes scrollable when content exceeds the height
 - Floating buttons are fully visible
@@ -451,6 +463,7 @@ Follow these steps to fix the TOC overlap:
 #### Explanation
 
 This fix works by:
+
 1. **Setting max-height** - Limits the TOC height to `calc(100vh - 200px)`, leaving 200px of space at the bottom for widgets
 2. **Adding overflow-y: auto** - Makes the TOC scrollable when content exceeds the max height
 3. **Adding padding-bottom** - Provides additional buffer space to ensure all TOC entries are accessible
@@ -458,11 +471,13 @@ This fix works by:
 #### Adjusting the Space
 
 If you need more or less space for your buttons, adjust the `200px` value:
+
 - **More space for buttons**: Increase to `250px` or `300px`
 - **Less space for buttons**: Decrease to `150px` or `100px`
 - **Formula**: Total space = button height + margins + comfortable buffer
 
 For example, if you have buttons at `bottom: 15px` with `40px` height each, and two buttons vertically stacked:
+
 ```
 200px = 15px (bottom margin) + 40px (button 1) + 10px (gap) + 40px (button 2) + 95px (buffer)
 ```

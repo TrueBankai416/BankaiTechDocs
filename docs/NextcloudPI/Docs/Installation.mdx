@@ -11,6 +11,7 @@ keywords: [NextcloudPI, Raspberry Pi, Installation, Etcher, Setup]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **NextcloudPI Installation**
@@ -54,9 +55,9 @@ If so, you will have to Re-format and Re-Flash.
 
 ![Flash Successful](/img/NextcloudPI/FlashSuccess.png)
 
-### ***First Boot***
+### **_First Boot_**
 
-#### *Keyboard Layout*
+#### _Keyboard Layout_
 
 <p>Select your keyboard layout</p>
 
@@ -67,13 +68,13 @@ If so, you will have to Re-format and Re-Flash.
 
 ![Pi User](/img/NextcloudPI/nextcloud-ask-rename.jpg)
 
-#### *Create your user*
+#### _Create your user_
 
 <p>Now you can create your user</p>
 
 <p>After your user is created, Login.</p>
 
-#### *Network Configuration*
+#### _Network Configuration_
 
 <p>Now run</p>
 
@@ -105,7 +106,7 @@ sudo apt upgrade
 sudo reboot
 ```
 
-### ***Configuring Nextcloud***
+### **_Configuring Nextcloud_**
 
 <p>Run the NextCloudPi configuration tool</p>
 
@@ -126,7 +127,7 @@ sudo ncp-config
 This may take awhile
 :::
 
-### ***Activating Nextcloud***
+### **_Activating Nextcloud_**
 
 <p>Lets start by finding you IP Address.</p>
 
@@ -204,7 +205,7 @@ Mine are\
 
 ![Dashboard](/img/NextcloudPI/Dashboard.png)
 
-### ***Checking for Errors and Warnings***
+### **_Checking for Errors and Warnings_**
 
 <p>For the remainder of this tutorial, I will be using SSH</p>
 
@@ -221,14 +222,16 @@ Mine are\
     Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
 
     Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
-```
+
+````
 
 ## **Enabling SSH**
 
 <p>On the RaspberryPI Terminal, type</p>
 ```bash
 sudo raspi-config
-```
+````
+
 <p>Select `Interfacing Options`</p>
 
 <p>Navigate to and select `SSH`</p>
@@ -256,6 +259,5 @@ Replace `ip-address` with the IP of the Raspberry Pi
 <p>Your terminal should now look like this</p>
 
 ![SSH Sucessful](/img/NextcloudPI/ConnectSSHsuccessful.jpg)
-
 
 <BuyMeACoffeeButton />

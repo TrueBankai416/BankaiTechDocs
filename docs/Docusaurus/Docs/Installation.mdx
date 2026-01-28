@@ -9,44 +9,54 @@ keywords: [Docusaurus]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
 # **Docusaurus Installation with Apache2**
-***Apache2 will act as a webserver to serve the content for the site***
+
+**_Apache2 will act as a webserver to serve the content for the site_**
 
 First lets create the root directory on your new host.
+
 ```bash
 sudo mkdir /var/websites && cd /var/websites/
 ```
 
 ## **Installing Docusaurus**
+
 ```bash
 sudo apt installl npm
 ```
+
 ```bash
 sudo npx create-docusaurus@latest <my-website> classic --typescript
 ```
+
 :::info
 Change `<my-website>` to anything you'd like. Im going to make mine `BankaiTechDocs`.
 :::
 
 ### **Building the Files**
+
 ```bash
 cd <my-website>
 npm run build
 ```
 
 ## **Installing Apache2**
+
 ```bash
 sudo apt install apache2
 ```
 
 ### **Creating vhost**
+
 ```bash
 sudo nano /etc/apache2/sites-available/documentation.conf
 ```
+
 Paste the following.
+
 ```apacheconf title="Highlighted items will need to be modified" showLineNumbers
 <VirtualHost *:8091>
     ServerAdmin webmaster@localhost
@@ -68,17 +78,21 @@ Paste the following.
 ```
 
 Now lets create a symbolic link of the vhost.
+
 ```bash
 sudo ln -s /etc/apache2/sites-available/documentation.conf /etc/apache2/sites-enabled/
 ```
 
 ### **Configuring the Ports**
+
 In order to prevent port conflicts we will need to modify `ports.conf`
+
 ```bash
 sudo nano /etc/apache2/ports.conf
 ```
 
 Make it look like the following.
+
 ```apacheconf showLineNumbers
 # Only listens on port 8091
 # Listen 80
@@ -93,11 +107,13 @@ Listen 8091
 ```
 
 ### **Restart Apache2**
+
 ```bash
 sudo systemctl restart apache2
 ```
 
 ## **Docusaurus has been Installed!**
+
 You can now install and configure a reverse proxy such as [NGINX](../../Reverse%20Proxy/Docs/Nginx/Installing%20Nginx.mdx) to forward traffic to Docusaurus.
 
 <BuyMeACoffeeButton />
