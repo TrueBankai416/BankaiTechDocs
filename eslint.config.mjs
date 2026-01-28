@@ -7,6 +7,20 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    ignores: ['build/**', 'node_modules/**', '.docusaurus/**', 'static/**'],
+    ignores: ['build/**', 'node_modules/**', '.docusaurus/**', 'static/**', 'server/**'],
+  },
+  {
+    languageOptions: {
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   }
 );
