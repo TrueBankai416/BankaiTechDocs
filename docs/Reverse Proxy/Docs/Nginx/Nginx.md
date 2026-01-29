@@ -36,7 +36,7 @@ Nginx can cache responses from a web or application server, significantly reduci
 
 ## **_Features of Nginx_**
 
-Nginx boasts a wide array of features that cater to a variety of web serving and proxing needs:
+Nginx boasts a wide array of features that cater to a variety of web serving and proxying needs:
 
 - **Highly scalable event-driven architecture:** Capable of handling more than 10,000 simultaneous connections with a low memory footprint.
 - **Reverse proxy with caching:** Nginx can act as a reverse proxy, reducing the load on backend servers, and can cache content, speeding up content delivery.
