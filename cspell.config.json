@@ -602,8 +602,7 @@
     "AUTOACTIVATE",
     "finishings",
     "skms",
-    "dstatus",
-    "endi"
+    "dstatus"
   ],
   "ignorePaths": [
     "blog/**",
