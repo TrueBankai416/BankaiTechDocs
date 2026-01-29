@@ -8,8 +8,8 @@ keywords: [Windows, KMS, Office]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 Key Management Service (KMS) is a technology used by Microsoft to manage the activation of its software products, primarily aimed at reducing the management overhead involved in deploying Windows operating systems and Microsoft Office across a large organization. KMS allows corporate and enterprise customers to activate systems within their own network, eliminating the need for individual computers to connect to Microsoft for product activation.
 
@@ -36,6 +36,7 @@ Similarly, KMS can be used to activate volume license editions of Microsoft Offi
 ### Creating a Local KMS Server
 
 To set up a KMS server, you need:
+
 1. A system running a supported Windows Server OS.
 2. A KMS Host Key – This is a special key issued by Microsoft to legally establish a KMS server.
 
@@ -43,27 +44,27 @@ The basic steps include:
 
 1. **Install the KMS Host Key**: Use the `slmgr.vbs` script included with Windows to install the KMS Host Key(license). The command looks like this:
 
-    ```ps
-    slmgr.vbs /ipk <KmsHostKey>
-    ```
+   ```ps
+   slmgr.vbs /ipk <KmsHostKey>
+   ```
 
 2. **Activate the KMS Server with Microsoft**:
 
-    ```ps
-    slmgr.vbs /ato
-    ```
+   ```ps
+   slmgr.vbs /ato
+   ```
 
 3. **Verify Operation**: Use the `slmgr.vbs` script to verify the status of the KMS server and the number of clients activated:
 
-    ```ps
-    slmgr.vbs /dli
-    ```
+   ```ps
+   slmgr.vbs /dli
+   ```
 
-    or
+   or
 
-    ```ps
-    slmgr.vbs /dlv
-    ```
+   ```ps
+   slmgr.vbs /dlv
+   ```
 
 4. **Clients Setup**: Ensure clients are configured to use KMS for activation. This is typically set up by default when using volume licensed editions, but you can manually configure it with the `slmgr.vbs` script if needed.
 

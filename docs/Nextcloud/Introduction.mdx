@@ -18,7 +18,6 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-
 # **Nextcloud: Your Self-Hosted Cloud Solution**
 
 Nextcloud is an open-source software suite that provides a secure and flexible way to store, share, and manage files, communication, and collaboration from any device, anywhere. It's your self-hosted productivity platform that keeps you in control of your data. With Nextcloud, you can easily host your own cloud storage service, similar to Dropbox, Google Drive, or Microsoft OneDrive, but on your own servers ensuring complete data privacy and sovereignty.
@@ -46,7 +45,6 @@ Running Nextcloud requires certain hardware specifications to ensure smooth oper
 
 Note: These are minimal requirements and should be adjusted based on specific needs and usage patterns.
 
-
 Nextcloud can be installed on various platforms using different methods. Here are some of the most common ways to get Nextcloud up and running:
 :::info
 The following commands are basic commands and are not part of my tutorial, it is not recommended to run these commands. For reference only
@@ -69,6 +67,7 @@ The following commands are basic commands and are not part of my tutorial, it is
     ```
 
     Access Nextcloud at `http://localhost:8080` from your browser.
+
   </TabItem>
   <TabItem value="snap">
     **Snap Package**: For Ubuntu and other Linux distributions supporting snap packages, Nextcloud can be installed with a single command:
@@ -78,16 +77,19 @@ The following commands are basic commands and are not part of my tutorial, it is
     ```
 
     This method handles dependencies and auto-updates.
+
   </TabItem>
   <TabItem value="manual">
     **Manual Installation**: Download the Nextcloud server zip archive from the official website, extract it to your web server's document root, and configure it through the web interface.
 
     Visit the official Nextcloud documentation for detailed steps.
+
   </TabItem>
   <TabItem value="web">
     **Web Installer**: The Nextcloud Web Installer is a simple script that checks for dependencies, downloads the Nextcloud server, and initiates the web-based installation wizard.
 
     Download the script from Nextcloud's official website and run it from your browser.
+
   </TabItem>
 </Tabs>
 
@@ -101,23 +103,23 @@ For more detailed information on installation, configuration, and usage, refer t
 
 Nextcloud's functionality can be significantly enhanced with various integrations and services. Here's how Redis, MariaDB, Collabora, OnlyOffice, and Nextcloud Memories contribute to a more powerful Nextcloud experience:
 
-### ***Redis***
+### **_Redis_**
 
 Redis is an advanced key-value store that can be used as a caching and session storage backend for Nextcloud. It helps in improving the performance by storing frequently accessed data in memory. Integrating Redis with Nextcloud can reduce database load and speed up page loading times.
 
-### ***MariaDB***
+### **_MariaDB_**
 
 MariaDB is a popular database server that is fully compatible with MySQL. It is known for its performance, reliability, and ease of use. Using MariaDB as the database for Nextcloud ensures efficient data storage and retrieval, contributing to the overall responsiveness of the Nextcloud instance.
 
-### ***Collabora Online***
+### **_Collabora Online_**
 
 Collabora Online is a powerful LibreOffice-based online office suite that allows you to edit documents, spreadsheets, and presentations directly in your browser, in collaboration with others. Integrating Collabora Online with Nextcloud brings seamless document editing capabilities to your cloud, facilitating real-time collaboration.
 
-### ***OnlyOffice***
+### **_OnlyOffice_**
 
 OnlyOffice is another comprehensive office suite that provides rich editing features for text documents, spreadsheets, and presentations within Nextcloud. It supports collaborative editing and is compatible with Microsoft Office formats. OnlyOffice integration turns Nextcloud into a complete productivity platform for teams.
 
-### ***Nextcloud Memories***
+### **_Nextcloud Memories_**
 
 Nextcloud Memories is a feature within the Nextcloud Photos app that automatically creates albums based on your photos' metadata, such as date and location. It helps in rediscovering precious moments by organizing your photos into memorable events. This feature enhances the user experience by making photo management effortless and enjoyable.
 
@@ -125,7 +127,7 @@ Nextcloud Memories is a feature within the Nextcloud Photos app that automatical
 
 By leveraging these integrations and services, you can transform your Nextcloud instance into a robust, feature-rich platform that not only serves as a secure file storage solution but also as a collaborative workspace, a reliable database server, and a treasure trove of memories. Each component plays a crucial role in enhancing the functionality, performance, and user experience of Nextcloud.
 
-### ***Additional Hardware Requirements for Key Integrations***
+### **_Additional Hardware Requirements for Key Integrations_**
 
 Integrating services like Redis, MariaDB, Collabora, OnlyOffice, and utilizing Nextcloud Memories can impact the overall hardware requirements. Here are some considerations:
 
@@ -137,40 +139,44 @@ Integrating services like Redis, MariaDB, Collabora, OnlyOffice, and utilizing N
 Note: These are general guidelines. The actual requirements may vary based on specific use cases, the number of users, and the data volume. Monitoring resource usage and performance over time will help in making informed decisions about scaling your Nextcloud infrastructure.
 
 ## **Nextcloud High Performance Backend**
+
 The Nextcloud High-Performance Backend (HPB) is a crucial enhancement for Nextcloud instances, particularly for larger installations seeking to optimize the performance of real-time communication features. Nextcloud, a popular open-source software for creating and using file hosting services, includes functionalities like Nextcloud Talk for chat and video calls. However, as the number of users grows, the standard PHP-based signaling approach may not scale efficiently, leading to performance bottlenecks. This is where the High-Performance Backend comes into play.
 
-### ***Core Benefits of Nextcloud HPB***
+### **_Core Benefits of Nextcloud HPB_**
 
 - **Improved Scalability**: HPB handles signaling for Nextcloud Talk outside of the traditional web server and PHP processing pipeline, efficiently managing high volumes of messages and sessions.
 - **Reduced Server Load**: By offloading the signaling to a separate service, HPB reduces the load on the main Nextcloud server, ensuring smoother operation of file hosting and other core functionalities, even under the increased load of real-time communications.
 - **Lower Latency**: HPB improves the responsiveness of chat and video calls by enabling more direct communication paths between client devices, thus reducing round-trip times for data.
 - **Enhanced Feature Set**: Some advanced features of Nextcloud Talk, like the ability to handle larger numbers of video call participants or the use of Command Line Interface (CLI) commands during calls, require HPB for optimal performance.
 
-### ***Architecture and Components***
+### **_Architecture and Components_**
 
 The High-Performance Backend consists of several key components:
+
 - **Signaling Server**: This is the heart of HPB. It handles the signaling messages between clients (users) participating in chats or video calls. The signaling messages coordinate actions like starting a call, joining a session, and exchanging media session descriptions.
 - **Turn Server (STUN/TURN)**: For video calls to work, especially when participants are behind NAT (Network Address Translation) or firewalls, it's often necessary to relay media through a server. While HPB can work with any TURN server, integrating it with HPB ensures optimal routing of media data.
 - **Web Proxy (optional)**: In some configurations, especially when hosting the signaling server on a separate machine, a web proxy might be used to manage WebSocket connections and HTTPS termination.
 
-### ***Deployment and Configuration***
+### **_Deployment and Configuration_**
 
 Deploying HPB involves setting up the signaling server, often written in Go for efficiency, and configuring Nextcloud and Nextcloud Talk to communicate with this service. This setup requires network configuration to allow WebSocket connections from clients to the signaling server and, if used, TURN server configurations to relay media.
 
 Administrators need to follow specific steps, which might include:
+
 - Installing and configuring the signaling server software on a dedicated server or service instance.
 - Configuring Nextcloud Talk with the signaling server's address and shared secrets to ensure secure communication.
 - Setting up TURN server credentials in Nextcloud Talk settings, if needed.
 
-### ***Practical Considerations***
+### **_Practical Considerations_**
 
 - **Hardware Requirements**: Deploying HPB effectively increases hardware requirements. The signaling server should be hosted on a capable machine, especially for installations with heavy real-time communication load.
 - **Software Compatibility**: Ensure compatibility between Nextcloud, Nextcloud Talk, and the HPB version you plan to deploy, as features and requirements can change between versions.
 - **Security**: Secure the communication channels between your Nextcloud server, the signaling server, and client devices. Use HTTPS and WSS (WebSocket Secure) protocols, and protect server endpoints with firewalls and access controls.
 
-### ***Conclusion***
+### **_Conclusion_**
 
 The High-Performance Backend significantly enhances the real-time communication capabilities of Nextcloud by ensuring scalability, reducing server load, and improving responsiveness. While its deployment adds complexity and requires additional resources, for larger installations or those relying heavily on Nextcloud Talk for communication, the benefits it brings in performance and user experience can be considerable.
 
 For detailed guidance on integrating these services with Nextcloud, refer to the [official Nextcloud documentation](https://docs.nextcloud.com/) and the respective service documentation.
+
 <BuyMeACoffeeButton />

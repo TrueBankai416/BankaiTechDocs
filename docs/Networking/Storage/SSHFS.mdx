@@ -12,6 +12,7 @@ keywords: [Proxmox, SSHFS, SSH, Remote Storage, Network Storage, File System, Mo
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -122,12 +123,15 @@ sudo apt update
 sudo apt install openssh-server
 
 # Start and enable SSH service
+
 sudo systemctl start ssh
 sudo systemctl enable ssh
 
 # Check SSH service status
+
 sudo systemctl status ssh
-```
+
+````
 </TabItem>
 
 <TabItem value="centos">
@@ -141,7 +145,8 @@ sudo systemctl enable sshd
 
 # Check SSH service status
 sudo systemctl status sshd
-```
+````
+
 </TabItem>
 
 <TabItem value="generic">
@@ -150,13 +155,18 @@ sudo systemctl status sshd
 ps aux | grep sshd
 
 # If not running, start SSH service
+
 sudo service ssh start
+
 # or
+
 sudo systemctl start ssh
 
 # Enable SSH to start on boot
+
 sudo systemctl enable ssh
-```
+
+````
 </TabItem>
 </Tabs>
 
@@ -175,7 +185,7 @@ sudo usermod -a -G users sshfs-user
 # Verify user can access target directories
 sudo -u sshfs-user ls -la /media/server/Processing/
 sudo -u sshfs-user ls -la /media/server/Backups1/
-```
+````
 
 ### **3. Directory Permissions**
 
@@ -297,18 +307,18 @@ mount_sshfs() {
     local name="$1"
     local remote_path="$2"
     local local_path="/mnt/pve/sshfs-$name"
-    
+
     echo "$(date): Mounting $name..."
-    
+
     # Check if already mounted
     if mountpoint -q "$local_path"; then
         echo "$(date): ✓ $name already mounted"
         return 0
     fi
-    
+
     # Ensure mount point exists
     mkdir -p "$local_path"
-    
+
     # Attempt to mount
     if sshfs "$SERVER_USER@$SERVER_IP:$remote_path" "$local_path" -o $SSHFS_OPTS; then
         echo "$(date): ✓ $name mounted successfully"
@@ -341,7 +351,7 @@ if check_ssh_connectivity; then
     mount_sshfs "tv" "/media/server/Processing/Tdarr/TV"
     mount_sshfs "books" "/media/server/Processing/Books"
     mount_sshfs "transcode_cache" "/media/server/Processing/Tdarr/transcode_cache"
-    
+
     echo "$(date): SSHFS mounting process completed"
 else
     echo "$(date): Skipping mounts due to SSH connectivity issues"
@@ -371,9 +381,9 @@ echo "$(date): Starting SSHFS unmount script"
 unmount_sshfs() {
     local name="$1"
     local local_path="/mnt/pve/sshfs-$name"
-    
+
     echo "$(date): Unmounting $name..."
-    
+
     if mountpoint -q "$local_path"; then
         if fusermount -u "$local_path"; then
             echo "$(date): ✓ $name unmounted successfully"
@@ -606,6 +616,7 @@ tail -f /var/log/auth.log
 # Debug SSHFS connection
 sshfs -d sshfs-user@192.168.1.100:/path /mnt/point
 ```
+
 </TabItem>
 
 <TabItem value="permissions">
@@ -624,6 +635,7 @@ ls -la /mnt/pve/sshfs-downloads/
 # Fix ownership issues
 sudo chown -R sshfs-user:users /media/server/Processing/
 ```
+
 </TabItem>
 
 <TabItem value="performance">
@@ -643,6 +655,7 @@ rm /mnt/pve/sshfs-data/test
 # Optimize mount options
 # Add: cache=yes,kernel_cache,compression=yes
 ```
+
 </TabItem>
 
 <TabItem value="mount">
@@ -668,6 +681,7 @@ umount -f /mnt/pve/sshfs-downloads
 journalctl -u sshfs-mounts.service
 tail -f /var/log/sshfs-mount.log
 ```
+
 </TabItem>
 </Tabs>
 
@@ -757,7 +771,7 @@ ALERT_EMAIL="admin@example.com"
 check_mount() {
     local mount_point="$1"
     local name="$2"
-    
+
     if mountpoint -q "$mount_point"; then
         if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
             echo "$(date): ✓ $name is healthy"

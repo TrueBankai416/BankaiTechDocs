@@ -10,22 +10,22 @@ keywords: [Certbot]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Securing Your Site with Let's Encrypt SSL Using Certbot and Cloudflare on Ubuntu**
 
 Enhance the security of your website hosted on an Ubuntu server by using Certbot to issue and manage Let's Encrypt SSL certificates. This tutorial guides you through the installation of Certbot and its plugins for Nginx and Cloudflare, followed by configuring Certbot to automatically verify domain ownership through Cloudflare.
 
-## ***Prerequisites***
+## **_Prerequisites_**
 
 - An Ubuntu server (18.04, 20.04, or later).
 - Nginx installed and configuring at least one domain.
 - A Cloudflare account managing the DNS for your domain.
 
-## ***Step 1: Install Certbot and Plugins***
+## **_Step 1: Install Certbot and Plugins_**
 
-### *Update Package Index*
+### _Update Package Index_
 
 Ensure your Ubuntu package list is up-to-date:
 
@@ -33,7 +33,7 @@ Ensure your Ubuntu package list is up-to-date:
 sudo apt update
 ```
 
-### *Install Certbot and the Nginx Plugin*
+### _Install Certbot and the Nginx Plugin_
 
 Install Certbot and its Nginx plugin using `apt`:
 
@@ -41,7 +41,7 @@ Install Certbot and its Nginx plugin using `apt`:
 sudo apt install certbot python3-certbot-nginx -y
 ```
 
-### *Install the Cloudflare DNS Plugin*
+### _Install the Cloudflare DNS Plugin_
 
 Install the Certbot Cloudflare DNS plugin to use DNS records hosted by Cloudflare for domain verification:
 
@@ -49,16 +49,16 @@ Install the Certbot Cloudflare DNS plugin to use DNS records hosted by Cloudflar
 sudo apt install python3-certbot-dns-cloudflare -y
 ```
 
-## ***Step 2: Configuring Cloudflare API Credentials***
+## **_Step 2: Configuring Cloudflare API Credentials_**
 
 Certbot needs permission to access your Cloudflare account to create DNS records for domain verification.
 
 1. **Create an API Token** in your Cloudflare account under the "API Tokens" section of the "My Profile" page:
-    - Select "Create Token".
-    - Use the "Edit zone DNS" template as a starting point.
-    - Add all zones from your account or specify zones to include.
-    - Set permissions to "Zone - DNS - Edit".
-    - Name your token and create it.
+   - Select "Create Token".
+   - Use the "Edit zone DNS" template as a starting point.
+   - Add all zones from your account or specify zones to include.
+   - Set permissions to "Zone - DNS - Edit".
+   - Name your token and create it.
 
 2. **Create a Configuration File** for your Cloudflare credentials on your server:
 
@@ -80,7 +80,7 @@ dns_cloudflare_api_token = your_api_token
 sudo chmod 600 /etc/letsencrypt/.cloudflare.ini
 ```
 
-## ***Step 3: Obtain an SSL Certificate***
+## **_Step 3: Obtain an SSL Certificate_**
 
 Run Certbot with the Cloudflare DNS plugin to obtain your certificate:
 
@@ -93,12 +93,13 @@ By doing `*.yourdomain.com` you are creating a `wildcard` cert that will work wi
 
 Follow the interactive Certbot instructions. If successful, your certificate and keys will be stored in `/etc/letsencrypt/live/yourdomain.com/`.
 
-## ***Step 4: Configuring Nginx to Use the SSL Certificate***
+## **_Step 4: Configuring Nginx to Use the SSL Certificate_**
 
 Edit your domain's Nginx configuration file:
 :::note
 Example nginx configs can be found [here](../../../../Examples/Reverse%20Proxies/Docs/Nginx/Nginx.mdx)
 :::
+
 ```bash
 sudo nano /etc/nginx/sites-available/yoursite.conf
 ```
@@ -117,19 +118,21 @@ server {
 }
 ```
 
-## ***Step 5: Create symlink***
+## **_Step 5: Create symlink_**
 
 Change `*.conf` to the name of your `.conf` file you just created.
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/*.conf /etc/nginx/sites-enabled/
 ```
+
 Reload Nginx to apply the changes:
 
 ```bash
 sudo systemctl reload nginx
 ```
 
-## ***Step 6: Setting Up Automatic Renewal***
+## **_Step 6: Setting Up Automatic Renewal_**
 
 Let’s Encrypt certificates are valid for 90 days. To automate the renewal, Certbot installs a systemd timer. Verify automatic renewal:
 
@@ -139,7 +142,7 @@ sudo certbot renew --dry-run
 
 If the test is successful, Certbot will renew your certificates automatically.
 
-## ***Conclusion***
+## **_Conclusion_**
 
 You've successfully secured your website served by Nginx on Ubuntu using an SSL certificate issued by Let's Encrypt, verified through Cloudflare. This setup not only enhances your site's security but also automates the renewal process, ensuring uninterrupted HTTPS service.
 

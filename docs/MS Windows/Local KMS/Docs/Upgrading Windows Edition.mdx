@@ -5,6 +5,7 @@ sidebar_position: 3
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # Upgrading Windows Edition
@@ -25,24 +26,25 @@ This guide explains how to upgrade your Windows edition (e.g., from Home to Pro,
 ### Windows 11
 
 | From Edition | To Edition | Supported |
-|--------------|------------|-----------|
-| Home | Pro | ✅ |
-| Pro | Enterprise | ✅ |
-| Pro | Education | ✅ |
+| ------------ | ---------- | --------- |
+| Home         | Pro        | ✅        |
+| Pro          | Enterprise | ✅        |
+| Pro          | Education  | ✅        |
 
 ### Windows 10
 
 | From Edition | To Edition | Supported |
-|--------------|------------|-----------|
-| Home | Pro | ✅ |
-| Pro | Enterprise | ✅ |
-| Pro | Education | ✅ |
+| ------------ | ---------- | --------- |
+| Home         | Pro        | ✅        |
+| Pro          | Enterprise | ✅        |
+| Pro          | Education  | ✅        |
 
 ## Upgrade Process
 
 ### Step 1: Check Current Edition
 
 Open Powershell as Administrator and run:
+
 ```PowerShell
 slmgr /dlv
 ```
@@ -60,10 +62,13 @@ Find the appropriate KMS client setup key for your target edition from the [Micr
 ### Step 3: Install Product Key
 
 Open PowerShell as Administrator and run:
+
 ```PowerShell
 changepk.exe /ProductKey VK7JG-NPHTM-C97JM-9MPGT-3V66T
 ```
+
 After It is done, run:
+
 ```PowerShell
 slmgr /ipk <Product_Key_Here>
 ```
@@ -71,6 +76,7 @@ slmgr /ipk <Product_Key_Here>
 ### Step 4: Activate Windows
 
 Open PowerShell as Administrator and run:
+
 ```PowerShell
 slmgr /ato
 ```

@@ -10,20 +10,23 @@ keywords: [Docusaurus, Migration]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Docusaurus Migration via GitHub Repo**
 
 First lets create the root directory on your new host.
+
 ```bash
 sudo mkdir /var/websites && sudo mkdir /var/websites/<example> && cd /var/websites/<example>
 ```
+
 :::info
 Change `<example>` to whatever you want to name the folder. Mine will be named `BankaiTechDocs`
 :::
 
 ## **Installing Dependencies**
+
 ```bash
 sudo apt install git && sudo apt install npm
 ```
@@ -58,7 +61,8 @@ cat <location of new ssh key>
 I ran `cat /root/.ssh/id_ed25519.pub`
 :::
 
-### ***Adding SSH key to GitHub***
+### **_Adding SSH key to GitHub_**
+
 <p>
 <>In the upper-right corner of any page, click your profile photo, then click Settings.</>
 </p>
@@ -127,18 +131,22 @@ git remote add origin <SSh Repo URL>
 
 ### **Security**
 
-#### ***Installing [talisman](https://github.com/thoughtworks/talisman)***
+#### **_Installing [talisman](https://github.com/thoughtworks/talisman)_**
 
 Go to the root directory of your website and run the following
+
 ```bash
 sudo apt install curl && curl --silent  https://raw.githubusercontent.com/thoughtworks/talisman/main/global_install_scripts/install.bash > /tmp/install_talisman.bash && /bin/bash /tmp/install_talisman.bash
 ```
 
 ## **Installing Docusaurus**
+
 ```bash
 sudo npm install docusaurus && sudo npm audit fix
 ```
+
 ### **Installing module for Environment Variables**
+
 ```bash
 sudo npm install dotenv --save
 ```

@@ -34,13 +34,14 @@ When you see this error message:
 hint: You have divergent branches and need to specify how to reconcile them.
 hint: You can do so by running one of the following commands sometime before
 hint: your next pull:
-hint: 
+hint:
 hint:   git config pull.rebase false  # merge
 hint:   git config pull.rebase true   # rebase
 hint:   git config pull.ff only       # fast-forward only
 ```
 
 This happens when:
+
 - Your local branch has commits that aren't on the remote branch
 - The remote branch has commits that aren't on your local branch
 - Git doesn't know how you want to combine these divergent histories
@@ -81,6 +82,7 @@ This happens when:
     git config pull.ff only
     git pull
     ```
+
   </TabItem>
   <TabItem value="options">
     **The Three Strategies Explained:**
@@ -102,6 +104,7 @@ This happens when:
     - Fails if there are divergent changes
     - Prevents accidental merges
     - **Use when**: You want to ensure no merge commits are created
+
   </TabItem>
   <TabItem value="prevention">
     **Preventing Divergent Branches:**
@@ -126,6 +129,7 @@ This happens when:
     git checkout your-feature-branch
     git rebase main  # or merge main
     ```
+
   </TabItem>
 </Tabs>
 
@@ -186,6 +190,7 @@ This happens when:
     # Change from HTTPS to SSH
     git remote set-url origin git@github.com:username/repository.git
     ```
+
   </TabItem>
   <TabItem value="conflicts">
     **Problem**: Merge conflicts during pull or merge
@@ -236,6 +241,7 @@ This happens when:
     # Or configure your preferred editor
     git config --global merge.tool vimdiff  # or code, etc.
     ```
+
   </TabItem>
   <TabItem value="pushpull">
     **Problem**: Cannot push or pull from repository
@@ -278,6 +284,7 @@ This happens when:
     # Try different protocol
     git remote set-url origin git@github.com:username/repo.git
     ```
+
   </TabItem>
   <TabItem value="branches">
     **Problem**: Branch-related issues
@@ -322,6 +329,7 @@ This happens when:
     # Delete remote branch
     git push origin --delete branch-name
     ```
+
   </TabItem>
 </Tabs>
 
@@ -368,6 +376,7 @@ This happens when:
     git rebase -i HEAD~3
     # Use only on commits not pushed to shared repositories
     ```
+
   </TabItem>
   <TabItem value="corruption">
     **Repository Corruption Issues:**
@@ -403,6 +412,7 @@ This happens when:
     git checkout lost-commit-hash
     git checkout -b recovery-branch
     ```
+
   </TabItem>
   <TabItem value="performance">
     **Performance Optimization:**
@@ -435,6 +445,7 @@ This happens when:
     git config --global core.fscache true
     git config --global gc.auto 256
     ```
+
   </TabItem>
 </Tabs>
 
@@ -480,6 +491,7 @@ This happens when:
     # Better diff algorithm
     git config --global diff.algorithm patience
     ```
+
   </TabItem>
   <TabItem value="repo">
     **Repository-Specific Settings:**
@@ -501,6 +513,7 @@ This happens when:
     git config core.autocrlf true   # Windows
     git config core.autocrlf input  # macOS/Linux
     ```
+
   </TabItem>
   <TabItem value="aliases">
     **Useful Git Aliases:**
@@ -538,6 +551,7 @@ This happens when:
     # Custom sync command
     git sync
     ```
+
   </TabItem>
 </Tabs>
 

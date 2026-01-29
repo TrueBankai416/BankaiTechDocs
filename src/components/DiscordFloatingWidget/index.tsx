@@ -11,7 +11,7 @@ const DiscordFloatingWidget: React.FC = () => {
       style={{
         position: 'fixed',
         bottom: '15px',
-        right: '245px', // Position to the left of the BuyMeACoffee widget
+        right: '260px', // Position to the left of the BuyMeACoffee widget
         zIndex: 9999,
         cursor: 'pointer',
         backgroundColor: '#7289da',

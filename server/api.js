@@ -22,23 +22,29 @@ app.post('/api/comments', async (req, res) => {
     const { pageUrl, pageTitle, authorName, content, problemSummary } = req.body;
 
     if (!pageUrl || !pageTitle || !authorName || !content) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: pageUrl, pageTitle, authorName, content' 
+      return res.status(400).json({
+        error: 'Missing required fields: pageUrl, pageTitle, authorName, content',
       });
     }
 
-    const messageId = await bot.sendComment(pageUrl, pageTitle, authorName, content, problemSummary);
-    
-    res.json({ 
-      success: true, 
+    const messageId = await bot.sendComment(
+      pageUrl,
+      pageTitle,
+      authorName,
+      content,
+      problemSummary
+    );
+
+    res.json({
+      success: true,
       messageId,
-      message: 'Comment sent to Discord successfully' 
+      message: 'Comment sent to Discord successfully',
     });
   } catch (error) {
     console.error('Error sending comment:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to send comment to Discord',
-      details: error.message 
+      details: error.message,
     });
   }
 });
@@ -48,19 +54,22 @@ app.get('/api/comments/:pageUrl', async (req, res) => {
   try {
     const pageUrl = decodeURIComponent(req.params.pageUrl);
     const comments = await db.getCommentsForPage(pageUrl);
-    
+
     console.log(`Fetched ${comments.length} comments for page: ${pageUrl}`);
-    console.log('Comments:', comments.map(c => ({ id: c.id, deleted: c.thread_deleted, author: c.author_name })));
-    
-    res.json({ 
-      success: true, 
-      comments 
+    console.log(
+      'Comments:',
+      comments.map((c) => ({ id: c.id, deleted: c.thread_deleted, author: c.author_name }))
+    );
+
+    res.json({
+      success: true,
+      comments,
     });
   } catch (error) {
     console.error('Error fetching comments:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch comments',
-      details: error.message 
+      details: error.message,
     });
   }
 });
@@ -71,8 +80,8 @@ app.post('/api/replies', async (req, res) => {
     const { discordMessageId, authorName, content } = req.body;
 
     if (!discordMessageId || !authorName || !content) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: discordMessageId, authorName, content' 
+      return res.status(400).json({
+        error: 'Missing required fields: discordMessageId, authorName, content',
       });
     }
 
@@ -114,16 +123,16 @@ app.post('/api/replies', async (req, res) => {
       content
     );
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       messageId: replyMessage.id,
-      message: 'Reply sent to Discord successfully' 
+      message: 'Reply sent to Discord successfully',
     });
   } catch (error) {
     console.error('Error sending reply:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to send reply to Discord',
-      details: error.message 
+      details: error.message,
     });
   }
 });
@@ -133,15 +142,15 @@ app.post('/api/auth/mod', (req, res) => {
   try {
     const { password } = req.body;
     const correctPassword = process.env.MOD_PASSWORD || 'admin123';
-    
+
     if (password === correctPassword) {
       // Generate a simple token (in production, use proper JWT)
       const token = Buffer.from(`mod-${Date.now()}-${Math.random()}`).toString('base64');
-      
+
       // Store token in memory (in production, use proper session storage)
       global.modTokens = global.modTokens || new Set();
       global.modTokens.add(token);
-      
+
       res.json({ success: true, token });
     } else {
       res.status(401).json({ success: false, message: 'Invalid password' });
@@ -156,13 +165,13 @@ app.post('/api/auth/mod', (req, res) => {
 app.post('/api/auth/verify', (req, res) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ success: false, message: 'No token provided' });
     }
-    
+
     global.modTokens = global.modTokens || new Set();
-    
+
     if (global.modTokens.has(token)) {
       res.json({ success: true });
     } else {
@@ -178,20 +187,20 @@ app.post('/api/auth/verify', (req, res) => {
 app.delete('/api/comments/:id', async (req, res) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
-    
+
     global.modTokens = global.modTokens || new Set();
-    
+
     if (!global.modTokens.has(token)) {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    
+
     const commentId = parseInt(req.params.id);
     const deleted = await db.deleteComment(commentId);
-    
+
     if (deleted) {
       res.json({ success: true, message: 'Comment deleted successfully' });
     } else {
@@ -199,19 +208,19 @@ app.delete('/api/comments/:id', async (req, res) => {
     }
   } catch (error) {
     console.error('Error deleting comment:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to delete comment',
-      details: error.message 
+      details: error.message,
     });
   }
 });
 
 // GET /api/health - Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     botReady: bot.client.isReady(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -220,7 +229,7 @@ async function startServer() {
   try {
     console.log('Starting Discord bot...');
     await bot.start();
-    
+
     app.listen(port, () => {
       console.log(`API server listening on port ${port}`);
       console.log(`Discord bot connected and ready!`);

@@ -6,8 +6,8 @@ keywords: [Windows, KMS]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 To activate Windows using a local KMS (Key Management Service) server, ensure you've already set up a KMS server within your network. This can be a server running on a physical machine, a virtual machine, or within a Docker container, as outlined in previous instructions for setting up a kms server using Docker Compose.
 
@@ -67,6 +67,7 @@ slmgr /xpr
 These commands provide detailed license information and the expiration date of the current activation status, respectively. If Windows was successfully activated via your KMS server, you should see information indicating that the product is activated.
 
 ### Step 6: Check status on py-kms
+
 Open a browser and go to `<KMS_Server_IP:1688>` and see if your windows PC is Registered with the KMS Server.
 Check the Actation status, if it does not say `Activated` then repeat steps 3 and 4.
 

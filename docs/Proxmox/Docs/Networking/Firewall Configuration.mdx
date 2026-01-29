@@ -13,6 +13,7 @@ keywords: [Proxmox, Firewall, Security, iptables, Network Security, Access Contr
 last_update:
   author: BankaiTech
 ---
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -92,6 +93,7 @@ The Proxmox firewall is built on top of Linux iptables and provides a hierarchic
 ### **Datacenter Level Activation**
 
 **Via Web Interface:**
+
 1. Navigate to **Datacenter → Firewall → Options**
 2. Click **Edit**
 3. Enable **Firewall**
@@ -101,6 +103,7 @@ The Proxmox firewall is built on top of Linux iptables and provides a hierarchic
    - **Forward Policy**: ACCEPT
 
 **Via Command Line:**
+
 ```bash
 # Enable datacenter firewall
 pvesh set /cluster/firewall/options --enable 1
@@ -113,12 +116,14 @@ pvesh set /cluster/firewall/options --policy_out ACCEPT
 ### **Node Level Activation**
 
 **Via Web Interface:**
+
 1. Navigate to **Node → Firewall → Options**
 2. Click **Edit**
 3. Enable **Firewall**
 4. Configure node-specific policies
 
 **Via Command Line:**
+
 ```bash
 # Enable node firewall
 pvesh set /nodes/{node}/firewall/options --enable 1
@@ -130,6 +135,7 @@ pvesh set /nodes/{node}/firewall/options --policy_in DROP
 ### **VM/Container Level Activation**
 
 **Via Web Interface:**
+
 1. Navigate to **VM/Container → Firewall → Options**
 2. Click **Edit**
 3. Enable **Firewall**
@@ -141,15 +147,15 @@ pvesh set /nodes/{node}/firewall/options --policy_in DROP
 
 Each firewall rule consists of:
 
-| Component | Description | Example |
-|-----------|-------------|---------|
-| **Action** | What to do with matching traffic | ACCEPT, DROP, REJECT |
-| **Direction** | Traffic direction | IN, OUT |
-| **Source** | Traffic source | IP, subnet, alias, security group |
-| **Destination** | Traffic destination | IP, subnet, alias, security group |
-| **Protocol** | Network protocol | TCP, UDP, ICMP |
-| **Port** | Destination port(s) | 22, 80, 443, 8000:9000 |
-| **Interface** | Network interface | net0, net1, vmbr0 |
+| Component       | Description                      | Example                           |
+| --------------- | -------------------------------- | --------------------------------- |
+| **Action**      | What to do with matching traffic | ACCEPT, DROP, REJECT              |
+| **Direction**   | Traffic direction                | IN, OUT                           |
+| **Source**      | Traffic source                   | IP, subnet, alias, security group |
+| **Destination** | Traffic destination              | IP, subnet, alias, security group |
+| **Protocol**    | Network protocol                 | TCP, UDP, ICMP                    |
+| **Port**        | Destination port(s)              | 22, 80, 443, 8000:9000            |
+| **Interface**   | Network interface                | net0, net1, vmbr0                 |
 
 ### **Creating Firewall Rules**
 
@@ -179,6 +185,7 @@ Each firewall rule consists of:
    Dest. port: 22
    Comment: Allow SSH from LAN
    ```
+
 </TabItem>
 
 <TabItem value="cli">
@@ -194,7 +201,7 @@ pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
     --dport 22 \
     --comment "Allow SSH from LAN"
 
-# Add rule to node firewall  
+# Add rule to node firewall
 pvesh create /nodes/{node}/firewall/rules \
     --action ACCEPT \
     --direction in \
@@ -203,12 +210,14 @@ pvesh create /nodes/{node}/firewall/rules \
     --dport 8006 \
     --comment "Allow web interface access"
 ```
+
 </TabItem>
 
 <TabItem value="config">
 **Configuration File Format:**
 
 Node firewall: `/etc/pve/nodes/{node}/host.fw`
+
 ```
 [OPTIONS]
 enable: 1
@@ -222,17 +231,19 @@ IN ACCEPT -p icmp # Allow ping
 ```
 
 VM firewall: `/etc/pve/firewall/{vmid}.fw`
+
 ```
 [OPTIONS]
 enable: 1
 policy_in: DROP
 policy_out: ACCEPT
 
-[RULES]  
+[RULES]
 IN ACCEPT -p tcp --dport 80 # HTTP
 IN ACCEPT -p tcp --dport 443 # HTTPS
 IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
 ```
+
 </TabItem>
 </Tabs>
 
@@ -243,6 +254,7 @@ Security groups allow you to define reusable sets of firewall rules that can be 
 ### **Creating Security Groups**
 
 **Web Interface Method:**
+
 1. Navigate to **Datacenter → Firewall → Security Groups**
 2. Click **Add** to create a new group
 3. Define group name (e.g., "webserver", "database")
@@ -264,36 +276,44 @@ Security groups allow you to define reusable sets of firewall rules that can be 
 Group Name: webserver
 
 Rules:
+
 - IN ACCEPT -p tcp --dport 80 # HTTP
-- IN ACCEPT -p tcp --dport 443 # HTTPS  
+- IN ACCEPT -p tcp --dport 443 # HTTPS
 - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
 - IN ACCEPT -p icmp # Ping
+
 ```
 </TabItem>
 
 <TabItem value="database">
 **Database Server Security Group:**
 ```
+
 Group Name: database
 
 Rules:
+
 - IN ACCEPT -p tcp --dport 3306 -s +webserver # MySQL from web servers
 - IN ACCEPT -p tcp --dport 5432 -s +webserver # PostgreSQL from web servers
 - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
 - IN REJECT # Reject all other traffic
+
 ```
 </TabItem>
 
 <TabItem value="ssh">
 **SSH Management Security Group:**
 ```
+
 Group Name: ssh-mgmt
 
 Rules:
+
 - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from management network
 - IN ACCEPT -p tcp --dport 22 -s 10.0.1.0/24 # SSH from admin network
 - IN DROP -p tcp --dport 22 # Drop all other SSH attempts
-```
+
+````
 </TabItem>
 </Tabs>
 
@@ -306,9 +326,10 @@ pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
     --action GROUP \
     --group webserver \
     --direction in
-```
+````
 
 **In VM firewall configuration:**
+
 ```
 [RULES]
 GROUP webserver -i net0 # Apply webserver group to net0 interface
@@ -322,6 +343,7 @@ IN ACCEPT -p tcp --dport 8080 # Additional custom rule
 Aliases provide human-readable names for IP addresses and networks:
 
 **Via Web Interface:**
+
 1. Navigate to **Datacenter → Firewall → Alias**
 2. Click **Add**
 3. Configure:
@@ -332,6 +354,7 @@ Aliases provide human-readable names for IP addresses and networks:
    ```
 
 **Common Alias Examples:**
+
 ```
 MANAGEMENT_NET: 192.168.1.0/24
 DMZ_NET: 10.0.10.0/24
@@ -354,6 +377,7 @@ OUT ACCEPT -p tcp --dport 443 -d BACKUP_SERVER
 ### **Application-Specific Rules**
 
 **Web Server Configuration:**
+
 ```
 [OPTIONS]
 enable: 1
@@ -382,6 +406,7 @@ IN DROP -p tcp --dport 445 # SMB
 ```
 
 **Database Server Configuration:**
+
 ```
 [OPTIONS]
 enable: 1
@@ -411,6 +436,7 @@ IN REJECT -p tcp --dport 5432
 ### **Multi-Tier Application Security**
 
 **DMZ Web Servers:**
+
 ```
 [RULES]
 # Public access
@@ -426,6 +452,7 @@ IN DROP -p tcp --dport 22 # Block SSH from everywhere else
 ```
 
 **Internal Application Servers:**
+
 ```
 [RULES]
 # Access from DMZ web servers
@@ -450,6 +477,7 @@ OUT ACCEPT -d 10.0.0.0/8 # Allow private networks
 **Enable logging at different levels:**
 
 **Datacenter Level:**
+
 ```
 [OPTIONS]
 enable: 1
@@ -458,11 +486,13 @@ log_level_out: info
 ```
 
 **Node Level:**
+
 ```
 pvesh set /nodes/{node}/firewall/options --log_level_in info
 ```
 
 **VM Level:**
+
 ```
 [OPTIONS]
 enable: 1
@@ -476,10 +506,12 @@ IN ACCEPT -p tcp --dport 22 --log info
 ### **Viewing Firewall Logs**
 
 **Via Web Interface:**
+
 1. Navigate to **Node → System → Syslog**
 2. Filter for firewall entries
 
 **Via Command Line:**
+
 ```bash
 # View firewall logs
 journalctl -u pve-firewall
@@ -497,6 +529,7 @@ grep "DROP" /var/log/daemon.log | grep pve-firewall
 ### **Log Analysis Examples**
 
 **Common log entries:**
+
 ```bash
 # Successful connection
 pve-firewall: ACCEPT: IN=vmbr0 OUT= SRC=192.168.1.10 DST=192.168.1.100 PROTO=TCP DPT=80
@@ -543,7 +576,7 @@ IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
 MGMT_NET: 192.168.1.0/24
 ADMIN_HOSTS: 192.168.1.10,192.168.1.11
 
-# DMZ Zone  
+# DMZ Zone
 [ALIAS]
 DMZ_NET: 10.0.10.0/24
 WEB_SERVERS: 10.0.10.10,10.0.10.11
@@ -571,6 +604,7 @@ IN REJECT # Reject all other traffic
 ### **Common Problems and Solutions**
 
 **Connection Blocked Unexpectedly:**
+
 ```bash
 # Check if firewall is enabled
 pvesh get /cluster/firewall/options
@@ -583,6 +617,7 @@ grep "DROP" /var/log/daemon.log | grep -i "destination_ip"
 ```
 
 **Rules Not Taking Effect:**
+
 ```bash
 # Restart firewall service
 systemctl restart pve-firewall
@@ -595,6 +630,7 @@ iptables -L -n -v
 ```
 
 **Performance Issues:**
+
 ```bash
 # Check for excessive logging
 grep -c "pve-firewall" /var/log/daemon.log

@@ -43,31 +43,37 @@ DISCORD_SITE_NAME=Your Site Name
 ## Context Elements
 
 ### Page Context (`DISCORD_SHOW_PAGE_CONTEXT`)
+
 - **Shows**: Page title and clickable URL as an embed field
 - **Example**: `📄 Page: Docker Installation Guide [link]`
 - **Use case**: Always show what page the comment is about
 
 ### Breadcrumbs (`DISCORD_SHOW_BREADCRUMBS`)
+
 - **Shows**: Navigation path extracted from URL
 - **Example**: `📍 Navigation: Docker > Docs > Installing Docker`
 - **Use case**: Show site structure and where the page fits
 
 ### Section Info (`DISCORD_SHOW_SECTION_INFO`)
+
 - **Shows**: Main section/category of the page
 - **Example**: `📂 Section: Docker`
 - **Use case**: Quick identification of topic area
 
 ### Page Path (`DISCORD_SHOW_PAGE_PATH`)
+
 - **Shows**: Full URL path in code format
 - **Example**: `🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine`
 - **Use case**: Technical users who want exact paths
 
 ### Timestamp (`DISCORD_SHOW_TIMESTAMP`)
+
 - **Shows**: When the comment was posted
 - **Example**: `Today at 2:30 PM`
 - **Use case**: Time-sensitive discussions
 
 ### Author Field (`DISCORD_SHOW_AUTHOR_FIELD`)
+
 - **Shows**: Commenter's name as the embed author
 - **Example**: `👤 John Doe` (appears at top of embed)
 - **Use case**: Highlight who made the comment
@@ -75,16 +81,19 @@ DISCORD_SITE_NAME=Your Site Name
 ## Thread Configuration
 
 ### Create Threads (`DISCORD_CREATE_THREADS`)
+
 - **Default**: `true`
 - **Effect**: Automatically creates threads for organized replies
 - **Disable**: Set to `false` for flat message structure
 
 ### Thread Duration (`DISCORD_THREAD_DURATION`)
+
 - **Default**: `1440` (24 hours)
 - **Options**: Minutes until thread auto-archives
 - **Common values**: `60` (1 hour), `1440` (24 hours), `10080` (7 days)
 
 ### Site Name (`DISCORD_SITE_NAME`)
+
 - **Default**: `Documentation`
 - **Shows**: Your site name in the embed footer
 - **Example**: `Bankai-Tech Docs • Comment System`
@@ -92,24 +101,28 @@ DISCORD_SITE_NAME=Your Site Name
 ## Example Configurations
 
 ### Minimal Setup (Clean Messages)
+
 ```env
 DISCORD_CONTEXT_LEVEL=minimal
 DISCORD_SITE_NAME=My Docs
 ```
 
 **Result:**
+
 ```
 Docker Installation Guide
 "This tutorial was really helpful! How do I handle port conflicts?"
 ```
 
 ### Basic Setup (Essential Context)
+
 ```env
 DISCORD_CONTEXT_LEVEL=basic
 DISCORD_SITE_NAME=My Documentation
 ```
 
 **Result:**
+
 ```
 💬 Docker Installation Guide
 "This tutorial was really helpful! How do I handle port conflicts?"
@@ -117,19 +130,21 @@ DISCORD_SITE_NAME=My Documentation
 ```
 
 ### Full Setup (Maximum Context)
+
 ```env
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SITE_NAME=My Documentation Site
 ```
 
 **Result:**
+
 ```
 💬 New Comment: Docker Installation Guide
 👤 John Doe
 "This tutorial was really helpful! How do I handle port conflicts?"
 
 📄 Page: Docker Installation Guide [link]
-📍 Navigation: Docker > Docs > Installing Docker  
+📍 Navigation: Docker > Docs > Installing Docker
 📂 Section: Docker
 🕐 Today at 2:30 PM
 
@@ -137,6 +152,7 @@ My Documentation Site • Comment System
 ```
 
 ### Custom Setup (Selective Context)
+
 ```env
 DISCORD_CONTEXT_LEVEL=custom
 DISCORD_SHOW_PAGE_CONTEXT=true
@@ -150,6 +166,7 @@ DISCORD_SITE_NAME=My Docs
 ```
 
 **Result:**
+
 ```
 💬 New Comment: Docker Installation Guide
 👤 John Doe
@@ -164,21 +181,25 @@ My Docs • Comment System
 ## Use Cases
 
 ### Support Community
+
 - **Level**: `full`
 - **Why**: Maximum context helps support team understand issues
 - **Threads**: Enable for organized troubleshooting
 
 ### General Discussion
+
 - **Level**: `basic`
 - **Why**: Essential context without overwhelming casual users
 - **Threads**: Enable for conversation flow
 
 ### Notifications Only
+
 - **Level**: `minimal`
 - **Why**: Just notify that someone commented
 - **Threads**: Disable for simple notifications
 
 ### Technical Documentation
+
 - **Level**: `custom` with paths enabled
 - **Why**: Developers want exact file paths and technical details
 - **Threads**: Enable for technical discussions
@@ -216,21 +237,25 @@ DISCORD_SITE_NAME=Your Site Name
 ## Troubleshooting
 
 ### Context Not Showing
+
 - Check environment variables are set correctly
 - Restart the server after changing variables
 - Verify context level is set to `full` or `custom`
 
 ### Breadcrumbs Not Working
+
 - Ensure URLs follow standard path structure
 - Check that `DISCORD_SHOW_BREADCRUMBS=true`
 - Verify pages have meaningful URL paths
 
 ### Threads Not Created
+
 - Check `DISCORD_CREATE_THREADS=true`
 - Verify bot has thread creation permissions
 - Ensure context level is not `minimal`
 
 ### Changes Not Applied
+
 - Restart the backend server
 - Check for typos in environment variable names
 - Verify `.env` file is in correct location (`server/.env`)

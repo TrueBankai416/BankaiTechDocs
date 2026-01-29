@@ -12,6 +12,7 @@ keywords: [Docusaurus, Collapsible, Details, Accordion, Interactive, UI]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Collapsible Content & Details**
@@ -100,7 +101,7 @@ Create collapsible sections for different examples:
 server {
     listen 80;
     server_name example.com;
-    
+
     location / {
         proxy_pass http://localhost:3000;
     }
@@ -116,10 +117,10 @@ server {
 server {
     listen 443 ssl http2;
     server_name example.com;
-    
+
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
-    
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
@@ -143,6 +144,7 @@ You can nest details elements for hierarchical content organization:
 <summary>Docker Installation</summary>
 
 1. Pull the image:
+
    ```bash
    docker pull nginx:latest
    ```
@@ -158,6 +160,7 @@ You can nest details elements for hierarchical content organization:
 <summary>Manual Installation</summary>
 
 1. Update package list:
+
    ```bash
    sudo apt update
    ```
@@ -309,11 +312,13 @@ Organize troubleshooting information in collapsible sections:
 <summary>🔴 Service won't start</summary>
 
 ### Possible Causes:
+
 1. Port already in use
 2. Configuration file errors
 3. Permission issues
 
 ### Solutions:
+
 ```bash
 # Check if port is in use
 netstat -tulpn | grep :80
@@ -331,11 +336,13 @@ sudo docker restart container_name
 <summary>⚠️ Performance issues</summary>
 
 ### Common Performance Problems:
+
 - Insufficient memory allocation
 - Disk I/O bottlenecks
 - Network latency
 
 ### Performance Tuning:
+
 ```bash
 # Monitor resource usage
 docker stats
@@ -378,10 +385,12 @@ docker run -v /dev/shm:/tmp myimage
 <summary>GET /api/users - Retrieve user list</summary>
 
 **Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 10)
 
 **Response:**
+
 ```json
 {
   "users": [
@@ -434,23 +443,27 @@ EMAIL_API_KEY=your-sendgrid-key
 <summary>Complete Docker Setup Guide</summary>
 
 ### Step 1: Install Docker
+
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 ```
 
 ### Step 2: Start Docker Service
+
 ```bash
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
 ### Step 3: Add User to Docker Group
+
 ```bash
 sudo usermod -aG docker $USER
 ```
 
 ### Step 4: Test Installation
+
 ```bash
 docker run hello-world
 ```

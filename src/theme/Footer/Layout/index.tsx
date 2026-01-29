@@ -1,18 +1,14 @@
-import React, {type ReactNode} from 'react';
+import React, { type ReactNode } from 'react';
 import clsx from 'clsx';
-import type {Props} from '@theme/Footer/Layout';
+import type { Props } from '@theme/Footer/Layout';
 
-export default function FooterLayout({
-  style,
-  links,
-  logo,
-  copyright,
-}: Props): ReactNode {
+export default function FooterLayout({ style, links, logo, copyright }: Props): ReactNode {
   return (
     <footer
       className={clsx('footer', {
         'footer--dark': style === 'dark',
-      })}>
+      })}
+    >
       <div className="container container-fluid">
         {links}
         {(logo || copyright) && (

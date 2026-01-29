@@ -9,16 +9,20 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "discord.js": "^14.16.3",
-    "express": "^4.21.2",
-    "cors": "^2.8.5",
-    "sqlite3": "^5.1.7",
-    "dotenv": "^16.4.7"
+    "cors": "^2.8.6",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3",
+    "express": "^4.22.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.11"
   },
-  "keywords": ["discord", "comments", "bot", "api"],
+  "keywords": [
+    "discord",
+    "comments",
+    "bot",
+    "api"
+  ],
   "author": "Mentat",
   "license": "MIT"
 }

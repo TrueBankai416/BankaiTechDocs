@@ -10,6 +10,7 @@ keywords: [GitHub CLI, gh, Command Line, Authentication, GitHub API]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 The GitHub CLI (gh) is the official command-line tool for GitHub, enabling you to interact with GitHub directly from your terminal. It provides a seamless way to work with repositories, issues, pull requests, and other GitHub features without leaving the command line.
@@ -19,6 +20,7 @@ The GitHub CLI (gh) is the official command-line tool for GitHub, enabling you t
 GitHub CLI is a command-line interface that brings GitHub to your terminal. It allows you to perform GitHub operations like creating repositories, managing issues and pull requests, and running GitHub Actions workflows directly from the command line.
 
 ### **Key Benefits**
+
 - **Streamlined Workflow**: Perform GitHub operations without switching to the web browser
 - **Scriptable**: Automate GitHub operations in scripts and CI/CD pipelines
 - **Consistent Interface**: Same commands work across different operating systems
@@ -27,6 +29,7 @@ GitHub CLI is a command-line interface that brings GitHub to your terminal. It a
 ## **Installation**
 
 ### **Windows**
+
 ```bash
 # Using winget
 winget install --id GitHub.cli
@@ -39,6 +42,7 @@ scoop install gh
 ```
 
 ### **macOS**
+
 ```bash
 # Using Homebrew
 brew install gh
@@ -48,6 +52,7 @@ sudo port install gh
 ```
 
 ### **Linux**
+
 ```bash
 # Ubuntu/Debian
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
@@ -67,6 +72,7 @@ sudo pacman -S github-cli
 Before using GitHub CLI, you need to authenticate with your GitHub account using the `gh auth login` command.
 
 ### **Basic Authentication**
+
 ```bash
 gh auth login
 ```
@@ -134,6 +140,7 @@ echo $GITHUB_TOKEN | gh auth login --with-token
 ## **Common GitHub CLI Commands**
 
 ### **Repository Operations**
+
 ```bash
 # Clone a repository
 gh repo clone owner/repo-name
@@ -155,6 +162,7 @@ gh repo archive owner/repo-name
 ```
 
 ### **Issue Management**
+
 ```bash
 # List issues
 gh issue list
@@ -173,6 +181,7 @@ gh issue edit 123 --add-assignee username
 ```
 
 ### **Pull Request Operations**
+
 ```bash
 # List pull requests
 gh pr list
@@ -194,6 +203,7 @@ gh pr review 456 --approve --body "LGTM!"
 ```
 
 ### **GitHub Actions**
+
 ```bash
 # List workflow runs
 gh run list
@@ -209,6 +219,7 @@ gh run rerun 123456
 ```
 
 ### **Releases**
+
 ```bash
 # List releases
 gh release list
@@ -226,6 +237,7 @@ gh release view v1.0.0
 ## **Configuration**
 
 ### **Configure Default Settings**
+
 ```bash
 # Set default editor
 gh config set editor vim
@@ -238,6 +250,7 @@ gh config list
 ```
 
 ### **Aliases**
+
 ```bash
 # Create aliases for common commands
 gh alias set pv 'pr view'
@@ -251,6 +264,7 @@ gh alias list
 ## **Scripting with GitHub CLI**
 
 ### **Output Formats**
+
 ```bash
 # JSON output for scripting
 gh repo list --json name,owner,description
@@ -277,6 +291,7 @@ done
 ### **Common Issues**
 
 **Authentication Problems**
+
 ```bash
 # Clear authentication and re-login
 gh auth logout
@@ -284,12 +299,14 @@ gh auth login
 ```
 
 **Permission Issues**
+
 ```bash
 # Check current authentication and scopes
 gh auth status --show-token
 ```
 
 **API Rate Limits**
+
 ```bash
 # Check rate limit status
 gh api rate_limit

@@ -6,8 +6,8 @@ keywords: [Office, KMS]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 Activating Microsoft Office using a local KMS (Key Management Service) server is a process that allows volume licensed Office versions to be activated internally, reducing the need for individual Office installations to connect to Microsoft for activation. It's particularly useful for organizations managing multiple Office installations. Below are the instructions tailored for setting up Office activation with a local KMS server.
 
@@ -51,11 +51,13 @@ cscript ospp.vbs /sethst:<KMS_Server_IP>
 Here, `ospp.vbs` is a script provided with Office for configuring product activation settings, and `/sethst` specifies the KMS host.
 
 #### Step 4: Install License Key
+
 I am Activating Microsoft Office LTSC Professional Plus 2024, you can find keys by going to `<KMS_Server_IP:1688/products>` in your browser.
 
 ```ps
 slmgr /ipk XJ2XN-FW8RK-P4HMP-DKDBV-GCVGB
 ```
+
 :::note
 If you have multiple office keys then run the command for each one individually.
 For example if you wish to activate an office suite and another office app such as `Office Project` or `Office Visio` which do not come bundled with any Office Suites you will need to install the Office Suite Key and the The Additional App Key.
@@ -85,8 +87,9 @@ cscript ospp.vbs /dstatus
 This command displays the current activation status and license details of your Office installation.
 
 #### Step 7: Check status on the KMS Server
+
 In your browser go to `<KMS_Server_IP:1688>`.
-Verify that the Office Installation is registed and shows `Activated`, if it is not `Activated` then repeat steps 4 and 5.
+Verify that the Office Installation is registered and shows `Activated`, if it is not `Activated` then repeat steps 4 and 5.
 
 ### Additional Notes
 

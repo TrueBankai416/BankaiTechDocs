@@ -10,22 +10,22 @@ keywords: [Jellyfin, Media Server]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Setting Up Jellyfin on Ubuntu with Docker**
 
 This guide details the installation of Jellyfin, a free and open-source media solution, on Ubuntu using Docker. Docker simplifies application deployment by containerizing components, resulting in easier management and isolation from the system environment.
 
-## ***Prerequisites***
+## **_Prerequisites_**
 
 - A system running Ubuntu 18.04 or later.
 - Basic understanding of terminal and command line usage.
 - Docker installed on your Ubuntu system. If Docker is not installed, follow the [official Docker installation guide for Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
 
-## ***Installation Steps***
+## **_Installation Steps_**
 
-### *Step 1: Update Your System*
+### _Step 1: Update Your System_
 
 Ensure your system is up-to-date by running:
 
@@ -33,16 +33,22 @@ Ensure your system is up-to-date by running:
 sudo apt update && sudo apt upgrade -y
 ```
 
-### *Step 2: Create Directory for Jellyfin Files and Enter the Directory*
+### _Step 2: Create Directory for Jellyfin Files and Set Permissions_
 
 ```bash
-sudo mkdir /var/docker && sudo mkdir /var/docker/jellyfin && cd /var/docker/jellyfin
+sudo mkdir /opt/docker && sudo mkdir /opt/docker/jellyfin && sudo chown -R $USER:$USER /opt/docker
 ```
 
-### *Step 3: Create a Docker Compose file for Jellyfin*
+Enter the Directory
 
 ```bash
-sudo nano docker-compose.yaml
+cd /opt/docker/jellyfin
+```
+
+### _Step 3: Create a Docker Compose file for Jellyfin_
+
+```bash
+nano docker-compose.yaml
 ```
 
 ```yaml title="Modify the Highlighted lines" showLineNumbers
@@ -89,12 +95,14 @@ Replace `./config`, `/path/to/cache`, and `/path/to/media` with your preferred d
 By default, `./config` and `./cache` will be created in the same directory as the `docker-compose.yaml` file.
 
 Start the Stack with the following command:
+
 ```bash
 sudo docker compose up -d
 ```
+
 The `-d` flag tells it to run in the background
 
-### *Step 4: Accessing Jellyfin*
+### _Step 4: Accessing Jellyfin_
 
 Once the container is running, access Jellyfin by navigating to:
 
@@ -104,23 +112,24 @@ http://your-server-ip:8096
 
 If you're running this locally, you can use `http://localhost:8096`.
 
-### *Step 5: Complete the Jellyfin Setup Wizard*
+### _Step 5: Complete the Jellyfin Setup Wizard_
 
 Upon accessing Jellyfin for the first time, the setup wizard will guide you through the initial configuration, including creating an administrator account and setting up your media libraries.
 
-## ***Additional Configurations***
+## **_Additional Configurations_**
 
 - **HTTPS:** For secure access, consider setting up a reverse proxy with HTTPS. Utilize Docker images like `nginx` or `traefik` for this purpose.
 - **Data Persistence:** The volume mappings in the `docker run` command ensure that your configuration and media remain persistent across container restarts.
 - **Updates:** To update Jellyfin, pull the latest Docker image and recreate the container.
 
-## ***Conclusion***
+## **_Conclusion_**
 
 Deploying Jellyfin on Ubuntu using Docker provides a flexible and straightforward method to set up a personal media server. By following this guide, you have created an isolated Jellyfin instance capable of serving your media collection consistently across devices.
 
 Docker's encapsulation allows for easy scaling, updates, and maintenance without impacting your host system's configuration, making it an ideal choice for users seeking efficient media server management.
 
-## ***Resources***
+## **_Resources_**
+
 - [Official Documentation](https://jellyfin.org/docs/general/installation/container/#using-docker-compose)
 
 <BuyMeACoffeeButton />

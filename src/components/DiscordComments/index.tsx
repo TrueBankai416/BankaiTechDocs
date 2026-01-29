@@ -38,13 +38,15 @@ export default function DiscordComments() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [replyForms, setReplyForms] = useState<{[key: number]: {show: boolean, content: string, author: string, submitting: boolean}}>({});
+  const [replyForms, setReplyForms] = useState<{
+    [key: number]: { show: boolean; content: string; author: string; submitting: boolean };
+  }>({});
   const [modView, setModView] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{[key: number]: boolean}>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<{ [key: number]: boolean }>({});
   const { siteConfig } = useDocusaurusContext();
   const { metadata } = useDoc();
-  
+
   // Load saved name from localStorage on component mount
   useEffect(() => {
     const savedName = localStorage.getItem('discord-comments-author');
@@ -52,23 +54,24 @@ export default function DiscordComments() {
       setAuthor(savedName);
     }
   }, []);
-  
+
   // Get Discord API URL from config or environment
   const commentsConfig = siteConfig.customFields?.comments || {};
   const configApiUrl = commentsConfig.discordApiUrl;
 
-  const apiUrl = configApiUrl || (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || '';
+  const apiUrl =
+    configApiUrl || (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || '';
 
   const fetchComments = async () => {
     try {
       const currentUrl = window.location.href;
       const encodedUrl = encodeURIComponent(currentUrl);
       const response = await fetch(`${apiUrl}/api/comments/${encodedUrl}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch comments');
       }
-      
+
       const data = await response.json();
       setComments(data.comments || []);
     } catch (error) {
@@ -78,7 +81,12 @@ export default function DiscordComments() {
     }
   };
 
-  const sendToDiscord = async (pageUrl: string, pageTitle: string, authorName: string, content: string) => {
+  const sendToDiscord = async (
+    pageUrl: string,
+    pageTitle: string,
+    authorName: string,
+    content: string
+  ) => {
     const response = await fetch(`${apiUrl}/api/comments`, {
       method: 'POST',
       headers: {
@@ -104,16 +112,16 @@ export default function DiscordComments() {
   // Load comments on component mount and set up polling
   useEffect(() => {
     fetchComments();
-    
+
     // Poll for new comments/replies every 30 seconds
     const interval = setInterval(fetchComments, 30000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!comment.trim() || !author.trim()) {
       setSubmitMessage('Please fill in both name and comment fields.');
       return;
@@ -125,17 +133,17 @@ export default function DiscordComments() {
     try {
       const currentUrl = window.location.href;
       const pageTitle = metadata.title || 'Documentation Page';
-      
+
       // Save name to localStorage
       localStorage.setItem('discord-comments-author', author);
-      
+
       await sendToDiscord(currentUrl, pageTitle, author, comment);
-      
+
       setComment('');
       setProblemSummary('');
       // Don't clear author name - keep it for next comment
       setSubmitMessage('Comment sent to Discord successfully! 🎉');
-      
+
       // Refresh comments after successful submission
       setTimeout(fetchComments, 2000);
     } catch (error) {
@@ -150,38 +158,38 @@ export default function DiscordComments() {
     const date = new Date(dateString + (dateString.includes('Z') ? '' : 'Z')); // Ensure UTC interpretation
     return date.toLocaleString(undefined, {
       year: 'numeric',
-      month: 'numeric', 
+      month: 'numeric',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-      timeZoneName: 'short'
+      timeZoneName: 'short',
     });
   };
 
   const toggleReplyForm = (replyId: number) => {
     const savedName = localStorage.getItem('discord-comments-author') || '';
-    
-    setReplyForms(prev => ({
+
+    setReplyForms((prev) => ({
       ...prev,
       [replyId]: {
         show: !prev[replyId]?.show,
         content: prev[replyId]?.content || '',
         author: prev[replyId]?.author || savedName,
-        submitting: false
-      }
+        submitting: false,
+      },
     }));
   };
 
   const updateReplyForm = (replyId: number, field: 'content' | 'author', value: string) => {
-    setReplyForms(prev => ({
+    setReplyForms((prev) => ({
       ...prev,
       [replyId]: {
         ...prev[replyId],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
-    
+
     // Save name to localStorage when author field changes
     if (field === 'author') {
       localStorage.setItem('discord-comments-author', value);
@@ -195,9 +203,9 @@ export default function DiscordComments() {
     }
 
     // Set submitting state
-    setReplyForms(prev => ({
+    setReplyForms((prev) => ({
       ...prev,
-      [replyId]: { ...prev[replyId], submitting: true }
+      [replyId]: { ...prev[replyId], submitting: true },
     }));
 
     try {
@@ -216,26 +224,26 @@ export default function DiscordComments() {
       if (response.ok) {
         // Hide reply form and refresh comments
         const savedName = localStorage.getItem('discord-comments-author') || '';
-        setReplyForms(prev => ({
+        setReplyForms((prev) => ({
           ...prev,
-          [replyId]: { show: false, content: '', author: savedName, submitting: false }
+          [replyId]: { show: false, content: '', author: savedName, submitting: false },
         }));
         fetchComments();
       } else {
         const errorData = await response.json();
         console.error('Reply failed:', errorData);
         // Show error but don't clear form
-        setReplyForms(prev => ({
+        setReplyForms((prev) => ({
           ...prev,
-          [replyId]: { ...prev[replyId], submitting: false }
+          [replyId]: { ...prev[replyId], submitting: false },
         }));
       }
     } catch (error) {
       console.error('Error submitting reply:', error);
       // Show error but don't clear form
-      setReplyForms(prev => ({
+      setReplyForms((prev) => ({
         ...prev,
-        [replyId]: { ...prev[replyId], submitting: false }
+        [replyId]: { ...prev[replyId], submitting: false },
       }));
     }
   };
@@ -253,21 +261,21 @@ export default function DiscordComments() {
           },
           body: JSON.stringify({ password }),
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            setIsAuthenticated(true);
-            setModView(true);
-            // Store auth token in session
-            sessionStorage.setItem('mod-auth', data.token);
-          } else {
-            alert('Invalid password');
-          }
-        })
-        .catch(error => {
-          console.error('Auth error:', error);
-          alert('Authentication failed');
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              setIsAuthenticated(true);
+              setModView(true);
+              // Store auth token in session
+              sessionStorage.setItem('mod-auth', data.token);
+            } else {
+              alert('Invalid password');
+            }
+          })
+          .catch((error) => {
+            console.error('Auth error:', error);
+            alert('Authentication failed');
+          });
       }
     } else {
       setModView(!modView);
@@ -288,15 +296,15 @@ export default function DiscordComments() {
       const response = await fetch(`${apiUrl}/api/comments/${commentId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
 
       if (response.ok) {
         // Remove comment from state
-        setComments(prev => prev.filter(c => c.id !== commentId));
-        setDeleteConfirm(prev => ({ ...prev, [commentId]: false }));
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+        setDeleteConfirm((prev) => ({ ...prev, [commentId]: false }));
       } else {
         alert('Failed to delete comment');
       }
@@ -307,11 +315,11 @@ export default function DiscordComments() {
   };
 
   const confirmDelete = (commentId: number) => {
-    setDeleteConfirm(prev => ({ ...prev, [commentId]: true }));
+    setDeleteConfirm((prev) => ({ ...prev, [commentId]: true }));
   };
 
   const cancelDelete = (commentId: number) => {
-    setDeleteConfirm(prev => ({ ...prev, [commentId]: false }));
+    setDeleteConfirm((prev) => ({ ...prev, [commentId]: false }));
   };
 
   // Check for stored auth token on component mount
@@ -322,21 +330,21 @@ export default function DiscordComments() {
       fetch(`${apiUrl}/api/auth/verify`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setIsAuthenticated(true);
-        } else {
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setIsAuthenticated(true);
+          } else {
+            sessionStorage.removeItem('mod-auth');
+          }
+        })
+        .catch((error) => {
+          console.error('Token verification error:', error);
           sessionStorage.removeItem('mod-auth');
-        }
-      })
-      .catch(error => {
-        console.error('Token verification error:', error);
-        sessionStorage.removeItem('mod-auth');
-      });
+        });
     }
   }, []);
 
@@ -344,7 +352,7 @@ export default function DiscordComments() {
     <div className={styles.discordComments}>
       <h3>💬 Discord Community Chat</h3>
       <p>Join the conversation! Comments here sync with our Discord community.</p>
-      
+
       {/* Comment Form */}
       <form onSubmit={handleSubmit} className={styles.commentForm}>
         <div className={styles.formGroup}>
@@ -358,7 +366,7 @@ export default function DiscordComments() {
             required
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="problemSummary">Problem Summary (optional):</label>
           <input
@@ -369,7 +377,7 @@ export default function DiscordComments() {
             placeholder="Brief description of the issue (used for Discord thread title)"
           />
         </div>
-        
+
         <div className={styles.formGroup}>
           <label htmlFor="comment">Comment:</label>
           <textarea
@@ -381,18 +389,16 @@ export default function DiscordComments() {
             required
           />
         </div>
-        
-        <button 
-          type="submit" 
-          disabled={isSubmitting}
-          className={styles.submitButton}
-        >
+
+        <button type="submit" disabled={isSubmitting} className={styles.submitButton}>
           {isSubmitting ? 'Sending...' : 'Send to Discord'}
         </button>
       </form>
-      
+
       {submitMessage && (
-        <div className={`${styles.message} ${submitMessage.includes('success') ? styles.success : styles.error}`}>
+        <div
+          className={`${styles.message} ${submitMessage.includes('success') ? styles.success : styles.error}`}
+        >
           {submitMessage}
         </div>
       )}
@@ -401,7 +407,7 @@ export default function DiscordComments() {
       <div className={styles.commentsSection}>
         <div className={styles.commentsHeader}>
           <h4>💬 Recent Comments</h4>
-          <button 
+          <button
             className={`${styles.modButton} ${modView ? styles.modButtonActive : ''}`}
             onClick={toggleModView}
           >
@@ -422,7 +428,10 @@ export default function DiscordComments() {
         ) : (
           <div className={styles.commentsList}>
             {comments.map((comment) => (
-              <div key={comment.id} className={`${styles.comment} ${modView ? styles.commentModView : ''}`}>
+              <div
+                key={comment.id}
+                className={`${styles.comment} ${modView ? styles.commentModView : ''}`}
+              >
                 <div className={styles.commentHeader}>
                   <div className={styles.commentHeaderLeft}>
                     <span className={styles.authorName}>{comment.author_name}</span>
@@ -430,7 +439,10 @@ export default function DiscordComments() {
                     {comment.thread_tags && (
                       <div className={styles.threadTags}>
                         {comment.thread_tags.split(', ').map((tag, index) => (
-                          <span key={index} className={`${styles.threadTag} ${styles[`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`]}`}>
+                          <span
+                            key={index}
+                            className={`${styles.threadTag} ${styles[`tag-${tag.toLowerCase().replace(/\s+/g, '-')}`]}`}
+                          >
                             {tag}
                           </span>
                         ))}
@@ -442,13 +454,13 @@ export default function DiscordComments() {
                       {deleteConfirm[comment.id] ? (
                         <div className={styles.deleteConfirm}>
                           <span>Delete this comment?</span>
-                          <button 
+                          <button
                             className={styles.confirmDelete}
                             onClick={() => deleteComment(comment.id)}
                           >
                             Yes
                           </button>
-                          <button 
+                          <button
                             className={styles.cancelDelete}
                             onClick={() => cancelDelete(comment.id)}
                           >
@@ -456,7 +468,7 @@ export default function DiscordComments() {
                           </button>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           className={styles.deleteButton}
                           onClick={() => confirmDelete(comment.id)}
                         >
@@ -467,23 +479,32 @@ export default function DiscordComments() {
                   )}
                 </div>
                 <div className={styles.commentContent}>{comment.content}</div>
-                
+
                 {/* Discord Replies */}
                 {comment.replies.length > 0 && (
                   <div className={styles.repliesSection}>
                     <h5>💬 Replies</h5>
                     {comment.replies.map((reply) => (
-                      <div key={reply.id} className={`${styles.reply} ${reply.discord_user_id === 'website' ? styles.websiteReply : styles.discordReply}`}>
+                      <div
+                        key={reply.id}
+                        className={`${styles.reply} ${reply.discord_user_id === 'website' ? styles.websiteReply : styles.discordReply}`}
+                      >
                         <div className={styles.replyHeader}>
                           <div className={styles.discordUser}>
                             {reply.discord_avatar && (
-                              <img 
-                                src={reply.discord_avatar} 
+                              <img
+                                src={reply.discord_avatar}
                                 alt={reply.discord_username}
                                 className={styles.discordAvatar}
                               />
                             )}
-                            <span className={reply.discord_user_id === 'website' ? styles.websiteUsername : styles.discordUsername}>
+                            <span
+                              className={
+                                reply.discord_user_id === 'website'
+                                  ? styles.websiteUsername
+                                  : styles.discordUsername
+                              }
+                            >
                               {reply.discord_username}
                             </span>
                             {reply.discord_user_id !== 'website' && (
@@ -508,7 +529,7 @@ export default function DiscordComments() {
                             {replyForms[reply.id]?.show ? 'Cancel' : 'Reply'}
                           </button>
                         </div>
-                        
+
                         {replyForms[reply.id]?.show && (
                           <div className={styles.replyForm}>
                             <div className={styles.replyFormInputs}>
@@ -516,20 +537,28 @@ export default function DiscordComments() {
                                 type="text"
                                 placeholder="Your name"
                                 value={replyForms[reply.id]?.author || ''}
-                                onChange={(e) => updateReplyForm(reply.id, 'author', e.target.value)}
+                                onChange={(e) =>
+                                  updateReplyForm(reply.id, 'author', e.target.value)
+                                }
                                 className={styles.replyInput}
                               />
                               <textarea
                                 placeholder="Your reply..."
                                 value={replyForms[reply.id]?.content || ''}
-                                onChange={(e) => updateReplyForm(reply.id, 'content', e.target.value)}
+                                onChange={(e) =>
+                                  updateReplyForm(reply.id, 'content', e.target.value)
+                                }
                                 className={styles.replyTextarea}
                               />
                             </div>
                             <button
                               className={styles.replySubmit}
                               onClick={() => submitReply(reply.id, reply, comment)}
-                              disabled={!replyForms[reply.id]?.content.trim() || !replyForms[reply.id]?.author.trim() || replyForms[reply.id]?.submitting}
+                              disabled={
+                                !replyForms[reply.id]?.content.trim() ||
+                                !replyForms[reply.id]?.author.trim() ||
+                                replyForms[reply.id]?.submitting
+                              }
                             >
                               {replyForms[reply.id]?.submitting ? 'Sending...' : 'Send Reply'}
                             </button>

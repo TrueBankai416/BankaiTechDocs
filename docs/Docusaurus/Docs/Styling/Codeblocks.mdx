@@ -11,6 +11,7 @@ keywords: [Docusaurus, Code blocks, Syntax highlighting, Prism, Programming]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Codeblocks & Syntax Highlighting**
@@ -90,9 +91,9 @@ services:
 ```
 
 ```sql
-SELECT users.name, posts.title 
-FROM users 
-INNER JOIN posts ON users.id = posts.user_id 
+SELECT users.name, posts.title
+FROM users
+INNER JOIN posts ON users.id = posts.user_id
 WHERE users.active = true;
 ```
 
@@ -143,9 +144,9 @@ services:
 ```
 
 ```sql
-SELECT users.name, posts.title 
-FROM users 
-INNER JOIN posts ON users.id = posts.user_id 
+SELECT users.name, posts.title
+FROM users
+INNER JOIN posts ON users.id = posts.user_id
 WHERE users.active = true;
 ```
 
@@ -291,7 +292,7 @@ def process_user_data(user_data):
     if not user_data:
         raise ValueError("User data cannot be empty")
     # highlight-end
-    
+
     return {
         'id': user_data.get('id'),
         'name': user_data.get('name', '').strip(),
@@ -450,23 +451,25 @@ npm --version
 
 ### **Code Organization**
 
-```
+````
 <!-- Good: Descriptive title and proper language -->
 ```yaml title="docker-compose.yml"
 version: '3.8'
 services:
   web:
     image: nginx
-```
+````
 
 <!-- Avoid: No language or unclear purpose -->
+
 ```
 version: '3.8'
 services:
   web:
     image: nginx
 ```
-```
+
+````
 
 ### **Line Highlighting Guidelines**
 
@@ -489,7 +492,7 @@ my-project/
 ├── public/
 │   └── index.html
 └── package.json
-```
+````
 
 ## **Common Use Cases**
 
@@ -529,12 +532,12 @@ services:
 ```javascript title="API Client Example" showLineNumbers
 const apiClient = {
   baseURL: 'https://api.example.com',
-  
+
   async get(endpoint) {
     const response = await fetch(`${this.baseURL}${endpoint}`);
     return response.json();
   },
-  
+
   async post(endpoint, data) {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',

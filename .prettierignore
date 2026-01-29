@@ -1,0 +1,15 @@
+# Ignore build artifacts
+build/
+.docusaurus/
+node_modules/
+.cache/
+
+# Ignore certain files/folders
+*.min.js
+*.min.css
+
+# Keep MDX files from being heavily reformatted to preserve MDX syntax
+# Prettier can break MDX syntax, especially around JSX components like TabItem
+# To manually format a specific MDX file: npx prettier --write "path/to/file.mdx"
+docs/**/*.mdx
+blog/**/*.mdx

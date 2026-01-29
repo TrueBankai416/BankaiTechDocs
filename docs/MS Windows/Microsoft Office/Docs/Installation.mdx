@@ -6,8 +6,8 @@ keywords: [Microsoft Office]
 last_update:
   author: BankaiTech
 ---
-import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ### Prerequisites
 
@@ -17,20 +17,22 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 ### Step 1: Download the Office Deployment Tool (ODT)
 
 1. **Download the ODT**: Download the [Office Deployment Tool](https://www.microsoft.com/en-us/download/details.aspx?id=49117) from the Microsoft Download Center.
-   
 2. **Edit or Create config file**:
    - Go to the folder where you extracted the ODT files.
    - You'll find a `configuration.xml` file among the extracted files, If the name differs then rename it. Edit this file to specify which Office products to install, including Office LTSC Professional Plus 2024. Microsoft provides detailed instructions and configuration options in its online documentation.
+   - **Tip**: You can easily generate custom configuration.xml files using the [Office Customization Tool](https://config.office.com/deploymentsettings).
+   - **Note**: If you use the generator tool, you will need to edit the generated file and change the `AUTOACTIVATE` value from `1` to `0`.
 
 Example used in this documentation:
-```xml
-<!-- Office 365 client configuration file sample. To be used for Office 365 ProPlus apps, 
-     Office 365 Business apps, Project Pro for Office 365 and Visio Pro for Office 365. 
 
-     For detailed information regarding configuration options visit: http://aka.ms/ODT. 
+```xml
+<!-- Office 365 client configuration file sample. To be used for Office 365 ProPlus apps,
+     Office 365 Business apps, Project Pro for Office 365 and Visio Pro for Office 365.
+
+     For detailed information regarding configuration options visit: http://aka.ms/ODT.
      To use the configuration file be sure to remove the comments
 
-     The following sample allows you to download and install the 64 bit version of the Office 365 ProPlus apps 
+     The following sample allows you to download and install the 64 bit version of the Office 365 ProPlus apps
      and Visio Pro for Office 365 directly from the Office CDN using the Current Channel
      settings  -->
 
@@ -45,7 +47,7 @@ Example used in this documentation:
     </Product>
   </Add>
   <RemoveMSI />
-  <Display Level="None" AcceptEULA="TRUE" />
+  <Display Level="Full" AcceptEULA="TRUE" />
   <Property Name="SharedComputerLicensing" Value="0" />
   <Property Name="AUTOACTIVATE" Value="0" />
   <Property Name="DeviceBasedLicensing" Value="0" />
@@ -53,14 +55,15 @@ Example used in this documentation:
 ```
 
 If you wanted to Also install Apps that are not bundled in an Office Suite such as `Office Project` or `Office Visio` the config file will look like
-```xml
-<!-- Office 365 client configuration file sample. To be used for Office 365 ProPlus apps, 
-     Office 365 Business apps, Project Pro for Office 365 and Visio Pro for Office 365. 
 
-     For detailed information regarding configuration options visit: http://aka.ms/ODT. 
+```xml
+<!-- Office 365 client configuration file sample. To be used for Office 365 ProPlus apps,
+     Office 365 Business apps, Project Pro for Office 365 and Visio Pro for Office 365.
+
+     For detailed information regarding configuration options visit: http://aka.ms/ODT.
      To use the configuration file be sure to remove the comments
 
-     The following sample allows you to download and install the 64 bit version of the Office 365 ProPlus apps 
+     The following sample allows you to download and install the 64 bit version of the Office 365 ProPlus apps
      and Visio Pro for Office 365 directly from the Office CDN using the Current Channel
      settings  -->
 
@@ -84,14 +87,16 @@ If you wanted to Also install Apps that are not bundled in an Office Suite such 
   <Property Name="DeviceBasedLicensing" Value="0" />
 </Configuration>
 ```
+
 You can find supported Product IDs [HERE](https://learn.microsoft.com/en-us/microsoft-365/troubleshoot/installation/product-ids-supported-office-deployment-click-to-run).
 
 ### Step 2: Installing Office
-   - Open a Command Prompt as Administrator in the folder where you extracted the ODT files.
-   - To install Office, run:
-     ```cmd
-     setup.exe /configure configuration.xml
-     ```
-   - Ensure the `configuration.xml` file is modified correctly to specify Office LTSC Pro Professional Plus 2024 and your preferences, working example shown above.
+
+- Open a Command Prompt as Administrator in the folder where you extracted the ODT files.
+- To install Office, run:
+  ```cmd
+  setup.exe /configure configuration.xml
+  ```
+- Ensure the `configuration.xml` file is modified correctly to specify Office LTSC Pro Professional Plus 2024 and your preferences, working example shown above.
 
 <BuyMeACoffeeButton />

@@ -9,6 +9,7 @@ keywords: [Docusaurus, Docs Only]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **How to remove the /docs path**
@@ -22,6 +23,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 ```bash
 cd /var/websites/"HomeLab Docs"/
 ```
+
 :::note
 
 Your directory will likely be different
@@ -74,6 +76,7 @@ I am using `typescript` but you may be using `javascript` make sure you use the 
 It is strongly recommended to use relative path links in your docs. This ensures links work correctly regardless of your `routeBasePath` configuration.
 
 **Directory Structure Example:**
+
 ```
 docs/
 ├── Docusaurus/
@@ -88,13 +91,14 @@ docs/
 ```
 
 **Examples:**
+
 - Same folder: `[link](./Configuration.mdx)`
 - Parent folder: `[link](../Introduction.mdx)`
 - Grandparent folder: `[link](../../Docker/Introduction.mdx)`
 - Instead of absolute: ~~`[link](/docs/Docker/Introduction.mdx)`~~
-:::
+  :::
 
-#### *My finished changes to docusaurus.config.ts file*
+#### _My finished changes to docusaurus.config.ts file_
 
 <p>It should look like this</p>
 
@@ -127,6 +131,7 @@ docs/
     ],
   ],
 ```
+
 <p>Now scroll down some more and find</p>
 
 ```js
@@ -204,7 +209,7 @@ docs/
 Save with `CTRL+X`
 :::
 
-### ***Rebuilding the website***
+### **_Rebuilding the website_**
 
 <p>Now rebuild the site</p>
 

@@ -12,6 +12,7 @@ keywords: [Jellyfin, Media Server, TinyMediaManager, TMM, Metadata]
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **TinyMediaManager Integration with Jellyfin**
@@ -23,6 +24,7 @@ TinyMediaManager (TMM) is a powerful media management tool that can significantl
 TinyMediaManager is a media management tool written in Java that helps organize and manage your movie and TV show collections. It automatically downloads metadata, artwork, trailers, and subtitles from various online sources, making your media library more presentable and informative.
 
 ### **Key Features:**
+
 - Automatic metadata scraping from multiple sources (TMDB, IMDB, etc.)
 - Artwork download (posters, fanart, logos, etc.)
 - Trailer and subtitle download
@@ -54,6 +56,7 @@ TinyMediaManager is a media management tool written in Java that helps organize 
 ### **Step 2: Process Your Media Collection**
 
 #### **For New Media:**
+
 1. Add new media files to your designated staging directory
 2. Point TMM to scan the staging directory
 3. Let TMM download metadata and artwork
@@ -62,6 +65,7 @@ TinyMediaManager is a media management tool written in Java that helps organize 
 6. Move the processed files to your Jellyfin media directory
 
 #### **For Existing Collections:**
+
 1. **Backup your current library** before processing
 2. Point TMM to your existing media directories
 3. Run a full library scan
@@ -78,17 +82,21 @@ TinyMediaManager is a media management tool written in Java that helps organize 
 ## **Best Practices**
 
 ### **File Naming Convention**
+
 TMM can automatically rename files to follow these conventions:
+
 - **Movies:** `Movie Title (Year)/Movie Title (Year).ext`
 - **TV Shows:** `TV Show Name/Season XX/TV Show Name - SXXEXX - Episode Title.ext`
 
 ### **Metadata Configuration**
+
 - Enable NFO file generation in TMM
 - Set artwork to download in multiple sizes
 - Configure trailer downloads if desired
 - Enable subtitle downloads for better accessibility
 
 ### **Regular Maintenance**
+
 - Run TMM scans periodically for new content
 - Update metadata for older content as databases improve
 - Clean up duplicate or corrupted files using TMM's tools
@@ -96,27 +104,34 @@ TMM can automatically rename files to follow these conventions:
 ## **Common Issues and Solutions**
 
 ### **Metadata Conflicts**
+
 - **Problem:** Jellyfin and TMM show different metadata
 - **Solution:** Ensure Jellyfin is configured to prioritize NFO files over online scraping
 
 ### **Missing Artwork**
+
 - **Problem:** Some artwork doesn't appear in Jellyfin
 - **Solution:** Check TMM's artwork settings and ensure Jellyfin has read permissions
 
 ### **Slow Library Updates**
+
 - **Problem:** Jellyfin takes long to update after TMM processing
 - **Solution:** Use Jellyfin's "Replace All Metadata" option for processed folders
 
 ## **Advanced Configuration**
 
 ### **Automated Workflow**
+
 You can set up an automated workflow using:
+
 1. **File watchers** to detect new media
 2. **TMM command-line tools** for automated processing
 3. **Jellyfin API** for library refresh triggers
 
 ### **Docker Integration**
+
 If running Jellyfin in Docker:
+
 1. Mount your TMM-processed directories as volumes
 2. Ensure proper file permissions between host and container
 3. Use shared storage for both TMM and Jellyfin access
@@ -124,16 +139,20 @@ If running Jellyfin in Docker:
 ## **Troubleshooting**
 
 ### **Permission Issues**
+
 Ensure both TMM and Jellyfin have proper read/write permissions to your media directories.
 
 ### **Database Corruption**
+
 If TMM's database becomes corrupted:
+
 1. Backup your current TMM database
 2. Clean install TMM
 3. Re-import your media libraries
 4. Restore custom settings
 
 ### **Performance Optimization**
+
 - Allocate sufficient RAM to TMM (minimum 2GB recommended)
 - Use SSD storage for TMM's database and cache
 - Process large libraries in batches

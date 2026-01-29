@@ -1,12 +1,12 @@
 import React from 'react';
-import Giscus from "@giscus/react";
+import Giscus from '@giscus/react';
 import { useColorMode } from '@docusaurus/theme-common';
 
 export default function GiscusComponent() {
   const { colorMode } = useColorMode();
 
   return (
-    <Giscus    
+    <Giscus
       id="comments"
       repo="TrueBankai416/BankaiTechDocs"
       repoId="R_kgDOLsjlxA"

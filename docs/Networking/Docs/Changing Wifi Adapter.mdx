@@ -10,6 +10,7 @@ keywords: [WiFi, NetworkManager, systemd-networkd, wireless, adapter, network in
 last_update:
   author: BankaiTech
 ---
+
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 This guide shows how to change which WiFi adapter (network card) is used for a specific network connection across different Linux network management systems.
@@ -74,6 +75,7 @@ sudo nano /etc/systemd/network/25-wireless.network
 ```
 
 Example configuration file (`/etc/systemd/network/25-wireless.network`):
+
 ```ini
 [Match]
 Name=wlan1
@@ -87,6 +89,7 @@ UseDNS=yes
 ```
 
 Apply changes:
+
 ```bash
 sudo systemctl restart systemd-networkd
 ```
@@ -122,6 +125,7 @@ sudo nano /etc/netplan/01-network-manager-all.yaml
 ```
 
 Example configuration:
+
 ```yaml
 network:
   version: 2
@@ -134,6 +138,7 @@ network:
 ```
 
 Apply configuration:
+
 ```bash
 sudo netplan apply
 ```
@@ -148,6 +153,7 @@ sudo nano /etc/network/interfaces
 ```
 
 Add configuration:
+
 ```
 auto wlan1
 iface wlan1 inet dhcp
@@ -156,6 +162,7 @@ iface wlan1 inet dhcp
 ```
 
 Apply changes:
+
 ```bash
 sudo ifdown wlan0  # Disable current adapter
 sudo ifup wlan1    # Enable new adapter
@@ -164,6 +171,7 @@ sudo ifup wlan1    # Enable new adapter
 ## **Useful Commands for All Methods**
 
 ### **Identify WiFi Adapters**
+
 ```bash
 # List all network interfaces
 ip link show
@@ -182,6 +190,7 @@ lspci | grep -i wireless
 ```
 
 ### **Check Adapter Capabilities**
+
 ```bash
 # Check supported standards and frequencies
 iw list
@@ -196,6 +205,7 @@ iwconfig wlan1
 ```
 
 ### **Monitor Connection Status**
+
 ```bash
 # Watch connection status (NetworkManager)
 watch nmcli device status
