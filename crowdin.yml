@@ -1,0 +1,15 @@
+project_id: 'Bankai-Tech'
+api_token_env: 50570e99dc7d439e9f27df05676e5a235d645de5c5e9401091c385d464eaaf8377af21851d5f7cd1
+preserve_hierarchy: true
+
+files:
+  # JSON translation files
+  - source: /i18n/en/**/*.json
+    translation: /i18n/%two_letters_code%/**/%original_file_name%
+
+  # Docs markdown files
+  - source: /docs/**/*.md
+    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+  
+  - source: /docs/**/*.mdx
+    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
