@@ -1,5 +1,6 @@
 {
   "label": "Tailscale",
+  "key": "networking-tailscale",
   "position": 3,
   "link": {
     "type": "doc",

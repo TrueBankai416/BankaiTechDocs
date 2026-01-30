@@ -1,7 +1,6 @@
 {
   "label": "MS Windows",
-  "position": 5,
-  "link": {
+  "position": 5,  "key": "ms-windows-main",  "link": {
     "type": "generated-index",
     "description": "Microsoft Windows Documentation."
   }

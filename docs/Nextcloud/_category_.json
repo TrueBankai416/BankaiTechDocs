@@ -1,7 +1,6 @@
 {
   "label": "Nextcloud",
-  "position": 2,
-  "link": {
+  "position": 2,  "key": "nextcloud-main",  "link": {
     "type": "generated-index",
     "description": "Tutorials showing you how to Install Nextcloud using Docker."
   }

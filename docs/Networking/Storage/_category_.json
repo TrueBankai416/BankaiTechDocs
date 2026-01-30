@@ -1,5 +1,6 @@
 {
   "label": "Storage",
+  "key": "networking-storage",
   "position": 4,
   "link": {
     "type": "doc",
