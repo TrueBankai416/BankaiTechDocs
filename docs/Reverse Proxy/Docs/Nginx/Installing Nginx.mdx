@@ -109,13 +109,33 @@ sudo systemctl disable nginx
 
 Nginx's configuration files are located in `/etc/nginx`. The main configuration file is `/etc/nginx/nginx.conf`. Website-specific configurations can be placed under `/etc/nginx/sites-available` and symlinked to `/etc/nginx/sites-enabled` for activation. Example files would be `nextcloud.conf`, `jellyfin.conf`, `other_service.conf` and so on.
 
-A good practice is to create a new configuration file for each domain or subdomain in `sites-available` and create a symlink using:
+### **Creating Configuration Files**
+
+To create a new configuration file in `sites-available`, use a text editor like `nano` or `vim`:
+
+```bash
+sudo nano /etc/nginx/sites-available/nextcloud.conf
+```
+
+Paste your configuration content into the file, then save and exit (in nano: `Ctrl+X`, then `Y`, then `Enter`).
+
+### **Creating Symlinks**
+
+Once your configuration file is created, create a symlink to enable it:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+```
+
+To symlink multiple files at once, use:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/*.conf /etc/nginx/sites-enabled/
 ```
 
-For example: `sudo ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/`
+:::tip
+Make sure the configuration file exists in `sites-available` before creating the symlink. A symlink to a non-existent file will cause Nginx to fail validation.
+:::
 :::note
 You can find example `.conf` files [HERE](../../../Examples/Reverse%20Proxies/Docs/Nginx/Nginx.mdx)
 :::
