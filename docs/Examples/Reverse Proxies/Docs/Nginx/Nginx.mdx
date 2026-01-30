@@ -31,6 +31,10 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+:::note
+These examples may include references to additional Nginx configuration files (such as `security-headers.conf`, `authelia-location.conf`, `proxy.conf`, etc.) that are not included by default with Nginx. These snippet files can be found in the [Nginx Snippets](#nginx-snippets) section below and should be manually created in `/etc/nginx/snippets/`. Alternatively, if you don't want to use these snippet files, you can simply comment out the `include` lines in the configuration.
+:::
+
 ## Nextcloud
 
 ```nginx title="Highlighted items will need to be modified" showLineNumbers
