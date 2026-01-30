@@ -1,0 +1,598 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.autoSidebar.category.Docker": {
+    "message": "Docker",
+    "description": "The label for category 'Docker' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Docker.link.generated-index.description": {
+    "message": "Tutorials showing you how to run Self-Hosted systems using Docker.",
+    "description": "The generated-index page description for category 'Docker' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.docker-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Installing Docker": {
+    "message": "Installing Docker",
+    "description": "The label for category 'Installing Docker' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Installing Docker.link.generated-index.description": {
+    "message": "Tutorials showing you how to Install Docker.",
+    "description": "The generated-index page description for category 'Installing Docker' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Nextcloud": {
+    "message": "Nextcloud",
+    "description": "The label for category 'Nextcloud' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Nextcloud.link.generated-index.description": {
+    "message": "Tutorials showing you how to Install Nextcloud using Docker.",
+    "description": "The generated-index page description for category 'Nextcloud' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloud-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloud-installation": {
+    "message": "Installation",
+    "description": "The label for category 'Installation' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloud-installation.link.generated-index.description": {
+    "message": "How to Install Nextcloud using Docker.",
+    "description": "The generated-index page description for category 'Installation' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloud-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloud-troubleshooting.link.generated-index.description": {
+    "message": "Troubleshooting Nextcloud.",
+    "description": "The generated-index page description for category 'Troubleshooting' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.NextcloudPI": {
+    "message": "NextcloudPI",
+    "description": "The label for category 'NextcloudPI' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.NextcloudPI.link.generated-index.description": {
+    "message": "Tutorials showing you how to run NextcloudPI.",
+    "description": "The generated-index page description for category 'NextcloudPI' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nextcloudpi-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Docusaurus": {
+    "message": "Docusaurus",
+    "description": "The label for category 'Docusaurus' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Docusaurus.link.generated-index.description": {
+    "message": "Tutorials showing you how to use Docusaurus.",
+    "description": "The generated-index page description for category 'Docusaurus' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.docusaurus-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.docusaurus-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.SEO": {
+    "message": "SEO",
+    "description": "The label for category 'SEO' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Styling": {
+    "message": "Styling",
+    "description": "The label for category 'Styling' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Sidebars": {
+    "message": "Sidebars",
+    "description": "The label for category 'Sidebars' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Examples": {
+    "message": "Examples",
+    "description": "The label for category 'Examples' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Examples.link.generated-index.description": {
+    "message": "Example configuration files and more.",
+    "description": "The generated-index page description for category 'Examples' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Arr Suite": {
+    "message": "Arr Suite",
+    "description": "The label for category 'Arr Suite' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Arr Suite.link.generated-index.description": {
+    "message": "Examples of *Arr application yaml files.",
+    "description": "The generated-index page description for category 'Arr Suite' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.arr-suite-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.arr-suite-qbittorrent": {
+    "message": "qBittorrent",
+    "description": "The label for category 'qBittorrent' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Full Stack": {
+    "message": "Full Stack",
+    "description": "The label for category 'Full Stack' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Jellyseerr": {
+    "message": "Jellyseerr",
+    "description": "The label for category 'Jellyseerr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Lidarr": {
+    "message": "Lidarr",
+    "description": "The label for category 'Lidarr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Prowlarr": {
+    "message": "Prowlarr",
+    "description": "The label for category 'Prowlarr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Radarr": {
+    "message": "Radarr",
+    "description": "The label for category 'Radarr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Readarr": {
+    "message": "Readarr",
+    "description": "The label for category 'Readarr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Sonarr": {
+    "message": "Sonarr",
+    "description": "The label for category 'Sonarr' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Node-RED": {
+    "message": "Node-RED",
+    "description": "The label for category 'Node-RED' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.node-red-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Reverse Proxies": {
+    "message": "Reverse Proxies",
+    "description": "The label for category 'Reverse Proxies' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.reverse-proxy-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.VPN": {
+    "message": "VPN",
+    "description": "The label for category 'VPN' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.vpn-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Firewall": {
+    "message": "Firewall",
+    "description": "The label for category 'Firewall' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Testing": {
+    "message": "Testing",
+    "description": "The label for category 'Testing' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.MS Windows": {
+    "message": "MS Windows",
+    "description": "The label for category 'MS Windows' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.MS Windows.link.generated-index.description": {
+    "message": "Microsoft Windows Documentation.",
+    "description": "The generated-index page description for category 'MS Windows' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Local KMS": {
+    "message": "Local KMS",
+    "description": "The label for category 'Local KMS' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.kms-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Microsoft Office": {
+    "message": "Microsoft Office",
+    "description": "The label for category 'Microsoft Office' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.office-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Windows": {
+    "message": "Windows",
+    "description": "The label for category 'Windows' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.windows-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Activation": {
+    "message": "Activation",
+    "description": "The label for category 'Activation' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Windows 11": {
+    "message": "Windows 11",
+    "description": "The label for category 'Windows 11' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Editions": {
+    "message": "Editions",
+    "description": "The label for category 'Editions' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Discord": {
+    "message": "Discord",
+    "description": "The label for category 'Discord' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.discord-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Bots": {
+    "message": "Bots",
+    "description": "The label for category 'Bots' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.GitHub": {
+    "message": "GitHub",
+    "description": "The label for category 'GitHub' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.github-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.HDD Tools": {
+    "message": "HDD Tools",
+    "description": "The label for category 'HDD Tools' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.hdd-tools-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Jellyfin": {
+    "message": "Jellyfin",
+    "description": "The label for category 'Jellyfin' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.jellyfin-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.jellyfin-installation": {
+    "message": "Installation",
+    "description": "The label for category 'Installation' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.MariaDB": {
+    "message": "MariaDB",
+    "description": "The label for category 'MariaDB' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.mariadb-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Networking": {
+    "message": "Networking",
+    "description": "The label for category 'Networking' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.networking-docs": {
+    "message": "Networking Guides",
+    "description": "The label for category 'Networking Guides' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.networking-docs.link.generated-index.description": {
+    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, and advanced networking configurations.",
+    "description": "The generated-index page description for category 'Networking Guides' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Storage": {
+    "message": "Storage",
+    "description": "The label for category 'Storage' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Subnets": {
+    "message": "Subnets",
+    "description": "The label for category 'Subnets' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Proxmox": {
+    "message": "Proxmox",
+    "description": "The label for category 'Proxmox' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.proxmox-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.proxmox-networking": {
+    "message": "Networking",
+    "description": "The label for category 'Networking' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.proxmox-networking.link.generated-index.description": {
+    "message": "Comprehensive guide to Proxmox networking including network configuration, VLANs, firewall setup, and example configurations.",
+    "description": "The generated-index page description for category 'Networking' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.LXC Containers": {
+    "message": "LXC Containers",
+    "description": "The label for category 'LXC Containers' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Reverse Proxy": {
+    "message": "Reverse Proxy",
+    "description": "The label for category 'Reverse Proxy' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.reverse-proxy-reverse-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Certbot": {
+    "message": "Certbot",
+    "description": "The label for category 'Certbot' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Cloudflare": {
+    "message": "Cloudflare",
+    "description": "The label for category 'Cloudflare' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Nginx": {
+    "message": "Nginx",
+    "description": "The label for category 'Nginx' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.nginx-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Torrent Clients": {
+    "message": "Torrent Clients",
+    "description": "The label for category 'Torrent Clients' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.torrent-qbittorrent": {
+    "message": "qBittorrent",
+    "description": "The label for category 'qBittorrent' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.torrent-qbittorrent-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Ubiquiti": {
+    "message": "Ubiquiti",
+    "description": "The label for category 'Ubiquiti' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.ubiquiti-docs": {
+    "message": "Docs",
+    "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
+  },
+  "sidebar.autoSidebar.category.Access Points": {
+    "message": "Access Points",
+    "description": "The label for category 'Access Points' in sidebar 'autoSidebar'"
+  },
+  "sidebar.docSidebar.category.Getting Started with Docker": {
+    "message": "Getting Started with Docker",
+    "description": "The label for category 'Getting Started with Docker' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Installing Docker": {
+    "message": "Installing Docker",
+    "description": "The label for category 'Installing Docker' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Installing Docker.link.generated-index.description": {
+    "message": "Tutorials showing you how to Install Docker.",
+    "description": "The generated-index page description for category 'Installing Docker' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Nextcloud": {
+    "message": "Nextcloud",
+    "description": "The label for category 'Nextcloud' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.nextcloud-installation": {
+    "message": "Installation",
+    "description": "The label for category 'Installation' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.nextcloud-installation.link.generated-index.description": {
+    "message": "How to Install Nextcloud using Docker.",
+    "description": "The generated-index page description for category 'Installation' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.nextcloud-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.nextcloud-troubleshooting.link.generated-index.description": {
+    "message": "Troubleshooting Nextcloud.",
+    "description": "The generated-index page description for category 'Troubleshooting' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.NextcloudPI": {
+    "message": "NextcloudPI",
+    "description": "The label for category 'NextcloudPI' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.MariaDb": {
+    "message": "MariaDb",
+    "description": "The label for category 'MariaDb' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Docusaurus": {
+    "message": "Docusaurus",
+    "description": "The label for category 'Docusaurus' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.docusaurus-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.SEO": {
+    "message": "SEO",
+    "description": "The label for category 'SEO' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Styling": {
+    "message": "Styling",
+    "description": "The label for category 'Styling' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Sidebars": {
+    "message": "Sidebars",
+    "description": "The label for category 'Sidebars' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Networking": {
+    "message": "Networking",
+    "description": "The label for category 'Networking' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Networking.link.generated-index.title": {
+    "message": "Networking",
+    "description": "The generated-index page title for category 'Networking' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Networking.link.generated-index.description": {
+    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, storage solutions, and advanced networking configurations.",
+    "description": "The generated-index page description for category 'Networking' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.networking-docs": {
+    "message": "Networking Guides",
+    "description": "The label for category 'Networking Guides' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.networking-docs.link.generated-index.description": {
+    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, and advanced networking configurations.",
+    "description": "The generated-index page description for category 'Networking Guides' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Storage": {
+    "message": "Storage",
+    "description": "The label for category 'Storage' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Subnets": {
+    "message": "Subnets",
+    "description": "The label for category 'Subnets' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Ubiquiti": {
+    "message": "Ubiquiti",
+    "description": "The label for category 'Ubiquiti' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Access Points": {
+    "message": "Access Points",
+    "description": "The label for category 'Access Points' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Reverse Proxy": {
+    "message": "Reverse Proxy",
+    "description": "The label for category 'Reverse Proxy' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Certbot": {
+    "message": "Certbot",
+    "description": "The label for category 'Certbot' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Cloudflare": {
+    "message": "Cloudflare",
+    "description": "The label for category 'Cloudflare' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Nginx": {
+    "message": "Nginx",
+    "description": "The label for category 'Nginx' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.nginx-troubleshooting": {
+    "message": "Troubleshooting",
+    "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Jellyfin": {
+    "message": "Jellyfin",
+    "description": "The label for category 'Jellyfin' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.jellyfin-installation": {
+    "message": "Installation",
+    "description": "The label for category 'Installation' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Torrent Clients": {
+    "message": "Torrent Clients",
+    "description": "The label for category 'Torrent Clients' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Discord": {
+    "message": "Discord",
+    "description": "The label for category 'Discord' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Bots": {
+    "message": "Bots",
+    "description": "The label for category 'Bots' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.Proxmox": {
+    "message": "Proxmox",
+    "description": "The label for category 'Proxmox' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.proxmox-networking": {
+    "message": "Networking",
+    "description": "The label for category 'Networking' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.proxmox-networking.link.generated-index.description": {
+    "message": "Comprehensive guide to Proxmox networking including network configuration, VLANs, firewall setup, and example configurations.",
+    "description": "The generated-index page description for category 'Networking' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.LXC Containers": {
+    "message": "LXC Containers",
+    "description": "The label for category 'LXC Containers' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.GitHub": {
+    "message": "GitHub",
+    "description": "The label for category 'GitHub' in sidebar 'docSidebar'"
+  },
+  "sidebar.docSidebar.category.HDD Tools": {
+    "message": "HDD Tools",
+    "description": "The label for category 'HDD Tools' in sidebar 'docSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Reverse Proxy": {
+    "message": "Reverse Proxy",
+    "description": "The label for category 'Reverse Proxy' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Node-RED": {
+    "message": "Node-RED",
+    "description": "The label for category 'Node-RED' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Arr Suite": {
+    "message": "Arr Suite",
+    "description": "The label for category 'Arr Suite' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.arr-suite-qbittorrent": {
+    "message": "qBittorrent",
+    "description": "The label for category 'qBittorrent' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Full Stack": {
+    "message": "Full Stack",
+    "description": "The label for category 'Full Stack' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Jellyseerr": {
+    "message": "Jellyseerr",
+    "description": "The label for category 'Jellyseerr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Lidarr": {
+    "message": "Lidarr",
+    "description": "The label for category 'Lidarr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Prowlarr": {
+    "message": "Prowlarr",
+    "description": "The label for category 'Prowlarr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Radarr": {
+    "message": "Radarr",
+    "description": "The label for category 'Radarr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Readarr": {
+    "message": "Readarr",
+    "description": "The label for category 'Readarr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Sonarr": {
+    "message": "Sonarr",
+    "description": "The label for category 'Sonarr' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.VPN": {
+    "message": "VPN",
+    "description": "The label for category 'VPN' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Firewall": {
+    "message": "Firewall",
+    "description": "The label for category 'Firewall' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.exampleSidebar.category.Testing": {
+    "message": "Testing",
+    "description": "The label for category 'Testing' in sidebar 'exampleSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Windows": {
+    "message": "Windows",
+    "description": "The label for category 'Windows' in sidebar 'MSwindowsSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Activation": {
+    "message": "Activation",
+    "description": "The label for category 'Activation' in sidebar 'MSwindowsSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Windows 11": {
+    "message": "Windows 11",
+    "description": "The label for category 'Windows 11' in sidebar 'MSwindowsSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Editions": {
+    "message": "Editions",
+    "description": "The label for category 'Editions' in sidebar 'MSwindowsSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Microsoft Office": {
+    "message": "Microsoft Office",
+    "description": "The label for category 'Microsoft Office' in sidebar 'MSwindowsSidebar'"
+  },
+  "sidebar.MSwindowsSidebar.category.Local KMS": {
+    "message": "Local KMS",
+    "description": "The label for category 'Local KMS' in sidebar 'MSwindowsSidebar'"
+  }
+}

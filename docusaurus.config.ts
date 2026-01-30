@@ -41,7 +41,7 @@ const config: Config = {
       require.resolve('@easyops-cn/docusaurus-search-local'),
       {
         hashed: true,
-        language: ['en'],
+        language: ['en', 'es'],
         indexDocs: true,
         indexPages: true,
         indexBlog: false,
@@ -69,7 +69,17 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'es'],
+    localeConfigs: {
+      en: {
+        htmlLang: 'en-US',
+        label: 'English',
+      },
+      es: {
+        htmlLang: 'es-ES',
+        label: 'Español',
+      },
+    },
   },
 
   presets: [
@@ -208,6 +218,10 @@ const config: Config = {
           label: 'MS Windows',
         },
         { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
         //    {to: '/blog', label: 'Blog', position: 'left'},
       ],
     },
