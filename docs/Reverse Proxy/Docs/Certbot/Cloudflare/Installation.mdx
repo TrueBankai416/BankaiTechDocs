@@ -89,7 +89,24 @@ sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsenc
 ```
 
 Replace `yourdomain.com` with your actual domain. You can specify multiple domains and subdomains by adding additional `-d` parameters.
-By doing `*.yourdomain.com` you are creating a `wildcard` cert that will work with All subdomains.
+
+### Understanding Wildcard Certificates
+
+By including `*.yourdomain.com` in the command above, you are creating a **wildcard certificate**. Here's how wildcard certificates differ from standard certificates:
+
+**Wildcard Certificate (`*.yourdomain.com`):**
+- Secures your main domain AND all first-level subdomains with a single certificate
+- Example: One cert covers `cloud.yourdomain.com`, `jellyfin.yourdomain.com`, `portainer.yourdomain.com`, etc.
+- Benefit: Add new subdomains without requesting new certificates
+- Limitation: Only covers one level (won't cover `sub.sub.yourdomain.com`)
+
+**Standard Certificate:**
+- Must explicitly list each subdomain you want to secure
+- Example: `-d yourdomain.com -d cloud.yourdomain.com -d jellyfin.yourdomain.com`
+- Benefit: More granular control over which subdomains are secured
+- Limitation: Need to request a new certificate when adding subdomains
+
+For most users managing multiple services across subdomains, a wildcard certificate is the recommended choice for simplicity and flexibility.
 
 Follow the interactive Certbot instructions. If successful, your certificate and keys will be stored in `/etc/letsencrypt/live/yourdomain.com/`.
 
