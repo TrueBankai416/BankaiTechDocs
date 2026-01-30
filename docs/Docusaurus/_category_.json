@@ -1,6 +1,7 @@
 {
   "label": "Docusaurus",
   "position": 4,
+  "key": "docusaurus-main",
   "link": {
     "type": "generated-index",
     "description": "Tutorials showing you how to use Docusaurus."

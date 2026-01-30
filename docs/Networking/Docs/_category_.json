@@ -1,6 +1,7 @@
 {
   "label": "Networking Guides",
   "position": 1,
+  "key": "networking-guides",
   "link": {
     "type": "generated-index",
     "description": "Comprehensive guides for Linux networking, WiFi management, proxies, and advanced networking configurations."

@@ -1,7 +1,6 @@
 {
   "label": "NextcloudPI",
-  "position": 3,
-  "link": {
+  "position": 3,  "key": "nextcloudpi-main",  "link": {
     "type": "generated-index",
     "description": "Tutorials showing you how to run NextcloudPI."
   }

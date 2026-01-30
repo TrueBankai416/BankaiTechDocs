@@ -1,5 +1,6 @@
 {
   "label": "Networking",
+  "key": "proxmox-networking",
   "position": 3,
   "link": {
     "type": "generated-index",

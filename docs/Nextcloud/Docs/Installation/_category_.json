@@ -1,5 +1,6 @@
 {
   "label": "Installation",
+  "key": "nextcloud-installation",
   "position": 1,
   "link": {
     "type": "generated-index",

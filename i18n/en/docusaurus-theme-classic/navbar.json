@@ -1,0 +1,26 @@
+{
+  "title": {
+    "message": "Bankai-Tech Docs",
+    "description": "The title in the navbar"
+  },
+  "logo.alt": {
+    "message": "My Site Logo",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.Tutorials": {
+    "message": "Tutorials",
+    "description": "Navbar item with label Tutorials"
+  },
+  "item.label.Examples": {
+    "message": "Examples",
+    "description": "Navbar item with label Examples"
+  },
+  "item.label.MS Windows": {
+    "message": "MS Windows",
+    "description": "Navbar item with label MS Windows"
+  },
+  "item.label.Buy Me a Beer": {
+    "message": "Buy Me a Beer",
+    "description": "Navbar item with label Buy Me a Beer"
+  }
+}
