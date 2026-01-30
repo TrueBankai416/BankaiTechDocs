@@ -139,8 +139,6 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
-    #                         Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -242,8 +240,6 @@ server {
 // highlight-next-line
         proxy_bind 192.168.4.204;
     }
-    #              Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -359,7 +355,7 @@ server {
         proxy_cache_background_update on;
     }
     #             Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -415,7 +411,7 @@ server {
         proxy_cache_background_update on;
     }
     #            Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+ #   include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -570,7 +566,7 @@ server {
         proxy_set_header Connection "upgrade";
     }
     #                     Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -614,7 +610,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -660,7 +656,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -705,7 +701,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -750,7 +746,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -867,7 +863,7 @@ server {
     proxy_send_timeout 600s;
     send_timeout 600s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -925,7 +921,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -980,7 +976,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -1038,7 +1034,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
