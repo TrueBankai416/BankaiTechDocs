@@ -32,7 +32,11 @@ import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 :::note
-These examples may include references to additional Nginx configuration files (such as `security-headers.conf`, `authelia-location.conf`, `proxy.conf`, etc.) that are not included by default with Nginx. These snippet files can be found in the [Nginx Snippets](#nginx-snippets) section below and should be manually created in `/etc/nginx/snippets/`. Alternatively, if you don't want to use these snippet files, you can simply comment out the `include` lines in the configuration.
+These examples may include references to additional Nginx configuration files (such as `security-headers.conf`, `authelia-location.conf`, `proxy.conf`, etc.) that are not included by default with Nginx. These snippet files can be found in the [Nginx Snippets](#nginx-snippets) section below and should be manually created in `/etc/nginx/snippets/`.
+:::
+
+:::warning Security Consideration
+While you can comment out non-essential snippet includes (like `proxy.conf` or `authelia-location.conf`), **do not comment out `security-headers.conf`** without implementing the security headers directly in your configuration. These headers protect against common web vulnerabilities including XSS attacks, clickjacking, MIME sniffing, and other security threats. Removing them significantly increases your security risk.
 :::
 
 ## Nextcloud
