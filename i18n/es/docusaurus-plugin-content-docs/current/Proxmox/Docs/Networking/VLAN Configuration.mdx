@@ -2,8 +2,21 @@
 title: Proxmox VLAN Configuration
 description: Complete Proxmox VLAN configuration guide covering 802.1Q tagging, network segmentation, VLAN-aware bridges, and advanced topologies.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, VLAN, Network Segmentation, 802.1Q, Networking, Virtual LAN]
-keywords: [Proxmox, VLAN, 802.1Q, Network Segmentation, Virtual LAN, Tagging, Trunking]
+tags:
+  - Proxmox
+  - VLAN
+  - Network Segmentation
+  - 802.1Q
+  - Networking
+  - Virtual LAN
+keywords:
+  - Proxmox
+  - VLAN
+  - 802.1Q
+  - Network Segmentation
+  - Virtual LAN
+  - Tagging
+  - Trunking
 last_update:
   author: BankaiTech
 ---
@@ -36,43 +49,29 @@ VLANs are a method of creating logically separate networks within the same physi
   <TabItem value="segmentation">
     **Network Segmentation Benefits**
 
-    * **Logical separation**: Isolate different types of traffic
-    * **Broadcast domain control**: Reduce network congestion
-    * **Flexible topology**: Create complex network structures
-    * **Resource optimization**: Efficient use of physical infrastructure
-    * **Scalability**: Easy expansion without additional hardware
-  </TabItem>
+* **Logical separation**: Isolate different types of traffic
+* **Broadcast domain control**: Reduce network congestion
+* **Flexible topology**: Create complex network structures
+* **Resource optimization**: Efficient use of physical infrastructure
+* **Scalability**: Easy expansion without additional hardware
 
-  <TabItem value="security">
-    **Security Benefits**
+* **Traffic isolation**: Prevent unauthorized access between networks
+* **Reduced attack surface**: Limit lateral movement
+* **Compliance**: Meet regulatory segmentation requirements
+* **Micro-segmentation**: Granular access control
+* **DMZ implementation**: Isolated public-facing services
 
-    * **Traffic isolation**: Prevent unauthorized access between networks
-    * **Reduced attack surface**: Limit lateral movement
-    * **Compliance**: Meet regulatory segmentation requirements
-    * **Micro-segmentation**: Granular access control
-    * **DMZ implementation**: Isolated public-facing services
-  </TabItem>
+* **Reduced collisions**: Smaller broadcast domains
+* **Quality of Service**: Prioritize traffic by VLAN
+* **Bandwidth optimization**: Dedicated bandwidth per VLAN
+* **Network efficiency**: Reduced unnecessary traffic
+* **Load distribution**: Balance traffic across VLANs
 
-  <TabItem value="performance">
-    **Performance Benefits**
-
-    * **Reduced collisions**: Smaller broadcast domains
-    * **Quality of Service**: Prioritize traffic by VLAN
-    * **Bandwidth optimization**: Dedicated bandwidth per VLAN
-    * **Network efficiency**: Reduced unnecessary traffic
-    * **Load distribution**: Balance traffic across VLANs
-  </TabItem>
-
-  <TabItem value="management">
-    **Management Benefits**
-
-    * **Centralized control**: Manage multiple networks from one location
-    * **Easy reconfiguration**: Software-based network changes
-    * **Consistent policies**: Apply uniform rules across VLANs
-    * **Simplified troubleshooting**: Isolated problem domains
-    * **Cost effective**: Reduce physical infrastructure needs
-  </TabItem>
-</Tabs>
+* **Centralized control**: Manage multiple networks from one location
+* **Easy reconfiguration**: Software-based network changes
+* **Consistent policies**: Apply uniform rules across VLANs
+* **Simplified troubleshooting**: Isolated problem domains
+* **Cost effective**: Reduce physical infrastructure needs
 
 ### **VLAN Architecture in Proxmox**
 
@@ -109,11 +108,11 @@ The VLAN-aware bridge method allows a single bridge to handle multiple VLANs wit
 
 **Advantages:**
 
-* Single bridge configuration
-* Dynamic VLAN assignment
-* Simplified management
-* Better performance
-* Native Proxmox integration
+- Single bridge configuration
+- Dynamic VLAN assignment
+- Simplified management
+- Better performance
+- Native Proxmox integration
 
 ### **2. Traditional VLAN Interface Method**
 
@@ -121,10 +120,10 @@ Creating separate VLAN interfaces for each VLAN and connecting them to different
 
 **Advantages:**
 
-* Explicit VLAN separation
-* Compatible with older configurations
-* Fine-grained control
-* Legacy system support
+- Explicit VLAN separation
+- Compatible with older configurations
+- Fine-grained control
+- Legacy system support
 
 ### **3. Bridge per VLAN Method**
 
@@ -132,10 +131,10 @@ Creating separate bridges for each VLAN with dedicated VLAN interfaces.
 
 **Advantages:**
 
-* Complete isolation
-* Simplified firewall rules
-* Clear network topology
-* Maximum security
+- Complete isolation
+- Simplified firewall rules
+- Clear network topology
+- Maximum security
 
 ## **VLAN-Aware Bridge Configuration**
 
