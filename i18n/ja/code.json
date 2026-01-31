@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "バージョン: {バージョンラベル}",
-    "description": ""
+    "message": "バージョン: {バージョンラベル}"
   },
   "theme.common.editThisPage": {
     "message": "このページを編集する",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "結果はありません",
-    "description": ""
+    "message": "結果はありません"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "「{context}」以外の結果をすべて表示",
-    "description": ""
+    "message": "「{context}」以外の結果をすべて表示"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "「{context}」内のすべての結果を表示",
-    "description": ""
+    "message": "「{context}」内のすべての結果を表示"
   },
   "theme.SearchBar.seeAll": {
-    "message": "すべての結果を見る",
-    "description": ""
+    "message": "すべての結果を見る"
   },
   "theme.SearchBar.label": {
     "message": "検索",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "どこでも",
-    "description": ""
+    "message": "どこでも"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 件のドキュメントが見つかりました|{count} 件のドキュメントが見つかりました",
