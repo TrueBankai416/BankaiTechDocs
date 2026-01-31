@@ -327,14 +327,12 @@ the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/ru
 <p>After its done pulling the docker images you can open up a web browser.</p>
 :::note
 Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](/Examples/Reverse%20Proxies/Docs/Nginx/#nextcloud).
- - Additional Documentation: [Reverse Proxies](/Reverse%20Proxy/Introduction) 
-:::
-<p>
-<>Connect to nextcloud by typing in your configured `domain`</>
+ <p>
+  <>Connect to nextcloud by typing in your configured `domain`</>
 </p>
 
 <p>
-<>You should see this screen.</>
+  <>You should see this screen.</>
 </p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
@@ -364,17 +362,17 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 ### **_Account Creation_**
 
 <p>
-<>Now create an admin account and click `Install`</>
+  <>Now create an admin account and click `Install`</>
 </p>
 
 <p>
-<>Click `Install Recommended Apps`</>
+  <>Click `Install Recommended Apps`</>
 </p>
 
 ![Nextcloud Install Recommended Apps](/img/nextcloud/FirstStart_RecommendedApps.jpg)
 
 <p>
-<>When its done installing you should see your Dashboard</>
+  <>When its done installing you should see your Dashboard</>
 </p>
 
 ![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
@@ -382,19 +380,19 @@ You will need to click the drop down and select `MySQL/MariaDB` and type in the 
 ### **_Checking for errors and warnings_**
 
 <p>
-<>On the top right click the `User Icon` and go to `Administration Settings`</>
+  <>On the top right click the `User Icon` and go to `Administration Settings`</>
 </p>
 
 ![Nextcloud Administration Settings](/img/nextcloud/Administration_Settings.jpg)
 
 <p>
-<>Here you should see `Security & Setup Warnings`</>
+  <>Here you should see `Security & Setup Warnings`</>
 </p>
 
 ![Nextcloud Warnings](/img/nextcloud/Warnings.jpg)
 
 <p>
-<>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
+  <>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
 </p>
 
 ### **_Modifying the config.php file_**
@@ -408,8 +406,7 @@ nano nextcloud/config/config.php
 :::tip[Hint]
 
 <p>
-<>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</>
-</p>
+  <>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</>
 Run `cd /opt/docker/nextcloud` then try again.
 :::
 
@@ -423,9 +420,8 @@ Now add the following to the bottom of the file.
 ![Nextcloud config.php](/img/nextcloud/config.jpg)
 
 <p>
-<>Now if you go back to your `Administration Settings` Page.</>
+  <>Now if you go back to your `Administration Settings` Page.</>
 </p>
-It should look something like this.
 
 ![Nextcloud No Warnings](/img/nextcloud/NoErrors.jpg)
 
@@ -437,25 +433,24 @@ In some cases, you may have to delete your browser cache and restart the browser
 ### **_Creating production use user_**
 
 <p>
-<>Now you can go create a user for yourself.</>
+  <>Now you can go create a user for yourself.</>
 </p>
 
 <p>
-<>Go to the user icon on the top right and select `Users`.</>
+  <>Go to the user icon on the top right and select `Users`.</>
 </p>
 
 ![Nextcloud Users](/img/nextcloud/users.jpg)
 
 <p>
-<>Click on `Add User` on the left hand side.</>
+  <>Click on `Add User` on the left hand side.</>
 </p>
 
 ![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
 
 <p>
-<>Now create your User.</>
+  <>Now create your User.</>
 </p>
-:::warning[Caution]
 
 Make sure to set `Groups` to `admin`
 :::
