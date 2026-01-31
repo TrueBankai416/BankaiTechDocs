@@ -1,7 +1,17 @@
 ---
 title: docker-compose.yaml
-tags: [Arr Suite, qBittorrent, Docker Compose, Examples]
-keywords: [qBittorrent, Docker, Compose, VPN, Arr Suite, Example]
+tags:
+  - Arr Suite
+  - qBittorrent
+  - Docker Compose
+  - Examples
+keywords:
+  - qBittorrent
+  - Docker
+  - Compose
+  - VPN
+  - Arr Suite
+  - Example
 last_update:
   author: BankaiTech
 ---
@@ -56,23 +66,23 @@ networks:
 
 ## Important Notes
 
-* **VPN Configuration**: You need to place OpenVPN `.ovpn` files in `./qbittorrent/config/openvpn/` after first startup
-* **CSRF Protection**: Port 8085 is used to avoid CSRF host header issues
-* **Path Consistency**: Volume mappings must match your Radarr/Sonarr configuration
-* **Multiple Networks**: `LAN_NETWORK` supports multiple subnets for complex setups
+- **VPN Configuration**: You need to place OpenVPN `.ovpn` files in `./qbittorrent/config/openvpn/` after first startup
+- **CSRF Protection**: Port 8085 is used to avoid CSRF host header issues
+- **Path Consistency**: Volume mappings must match your Radarr/Sonarr configuration
+- **Multiple Networks**: `LAN_NETWORK` supports multiple subnets for complex setups
 
 ## qBittorrent Settings
 
 Configure these paths in the qBittorrent WebUI to match your \*Arr applications:
 
-* **Default Save Path**: `/media/Downloads/Torrent`
-* **Temp Directory**: `/processing/Downloads/Torrent/temp`
+- **Default Save Path**: `/media/Downloads/Torrent`
+- **Temp Directory**: `/processing/Downloads/Torrent/temp`
 
 ## Related Examples
 
-* [Radarr Docker Compose](../Radarr/docker-compose.mdx)
-* [Sonarr Docker Compose](../Sonarr/docker-compose.mdx)
-* [Prowlarr Docker Compose](../Prowlarr/docker-compose.mdx)
+- [Radarr Docker Compose](../Radarr/docker-compose.mdx)
+- [Sonarr Docker Compose](../Sonarr/docker-compose.mdx)
+- [Prowlarr Docker Compose](../Prowlarr/docker-compose.mdx)
 
 For detailed setup instructions, VPN configuration, troubleshooting, and advanced options, see the [complete qBittorrent Docker VPN Setup guide](../../../../Torrent%20Clients/qBittorrent/Docs/docker-vpn.mdx).
 
