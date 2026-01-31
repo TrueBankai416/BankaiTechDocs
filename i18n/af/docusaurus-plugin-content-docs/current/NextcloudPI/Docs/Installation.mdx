@@ -2,8 +2,17 @@
 title: Installation
 description: Step-by-step guide for installing NextcloudPI on Raspberry Pi using the pre-built image and Etcher, including initial configuration and setup.
 image: /img/social/nextcloudpi-social.jpg
-tags: [NextcloudPI, Raspberry Pi, Installation, Tutorial]
-keywords: [NextcloudPI, Raspberry Pi, Installation, Etcher, Setup]
+tags:
+  - NextcloudPI
+  - Raspberry Pi
+  - Installation
+  - Tutorial
+keywords:
+  - NextcloudPI
+  - Raspberry Pi
+  - Installation
+  - Etcher
+  - Setup
 last_update:
   author: BankaiTech
 ---
@@ -51,9 +60,9 @@ If so, you will have to Re-format and Re-Flash.
 
 ![Flash Successful](/img/NextcloudPI/FlashSuccess.png)
 
-### ***First Boot***
+### **_First Boot_**
 
-#### *Keyboard Layout*
+#### _Keyboard Layout_
 
 <p>Select your keyboard layout</p>
 
@@ -64,13 +73,13 @@ If so, you will have to Re-format and Re-Flash.
 
 ![Pi User](/img/NextcloudPI/nextcloud-ask-rename.jpg)
 
-#### *Create your user*
+#### _Create your user_
 
 <p>Now you can create your user</p>
 
 <p>After your user is created, Login.</p>
 
-#### *Network Configuration*
+#### _Network Configuration_
 
 <p>Now run</p>
 
@@ -81,7 +90,7 @@ sudo raspi-config
 <p>Go to `System Options` > `Wireless LAN`</p>
 <p>Select your Country</p>
 
-:::tip\[Hint]
+:::tip[Hint]
 
 `US United States` is towards the bottom
 :::
@@ -102,7 +111,7 @@ sudo apt upgrade
 sudo reboot
 ```
 
-### ***Configuring Nextcloud***
+### **_Configuring Nextcloud_**
 
 <p>Run the NextCloudPi configuration tool</p>
 
@@ -123,7 +132,7 @@ sudo ncp-config
 This may take awhile
 :::
 
-### ***Activating Nextcloud***
+### **_Activating Nextcloud_**
 
 <p>Lets start by finding you IP Address.</p>
 
@@ -154,7 +163,7 @@ Press `Advanced` > `Accept Risk and Continue`</p>
 
 ![Activation Page](/img/NextcloudPI/Activation-page.png)
 
-:::warning\[Note]
+:::warning[Note]
 
 Store the `Users` and `Passwords` in a safe Location.
 :::
@@ -171,7 +180,7 @@ Store the `Users` and `Passwords` in a safe Location.
 Input the credentials for nextcloudpi interface\
 Mine are User ncp Password dNtTg70ZynVzh5TB65zjowADB8BTj0FdjQXB08bkbvk</p>
 
-:::tip\[hint]
+:::tip[hint]
 
 I had to do this twice
 :::
@@ -201,7 +210,7 @@ Mine are\
 
 ![Dashboard](/img/NextcloudPI/Dashboard.png)
 
-### ***Checking for Errors and Warnings***
+### **_Checking for Errors and Warnings_**
 
 <p>For the remainder of this tutorial, I will be using SSH</p>
 
@@ -214,6 +223,8 @@ Mine are\
 ![Warnings](/img/NextcloudPI/Warnings.jpg)
 
 <p>First we will start by fixing these warnings</p>
+```
+    Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
 
 ```
     Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
@@ -222,13 +233,14 @@ Mine are\
 
 ```
 
+````
+
 ## **Enabling SSH**
 
 <p>On the RaspberryPI Terminal, type</p>
-
 ```bash
 sudo raspi-config
-```
+````
 
 <p>Select `Interfacing Options`</p>
 
@@ -243,11 +255,9 @@ sudo raspi-config
 <p>Open up a [Terminal](https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal) on your Computer</p>
 
 <p>Type in</p>
-
 ```bash
 ssh user@ip-address
 ```
-
 :::note
 
 Replace `user` with the user you created earlier\
