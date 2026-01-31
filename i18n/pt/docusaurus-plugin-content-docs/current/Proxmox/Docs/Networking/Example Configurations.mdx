@@ -50,14 +50,17 @@ Internet → Router (192.168.1.1) → Proxmox Host (192.168.1.100) → VMs
 <Tabs
   defaultValue="network"
   values={[
-    {label: 'Network Config', value: 'network'},
-    {label: 'VM Setup', value: 'vm'},
-    {label: 'Firewall Rules', value: 'firewall'},
-  ]}>
+  {label: 'Network Config', value: 'network'},
+  {label: 'VM Setup', value: 'vm'},
+  {label: 'Firewall Rules', value: 'firewall'},
+  ]}
+>
+  <TabItem value="network">
+    **Network Configuration (`/etc/network/interfaces`):**
 
-<TabItem value="network">
-**Network Configuration (`/etc/network/interfaces`):**
+192.168.40.0/24
 
+````bash
 ```bash
 # Loopback interface
 auto lo
@@ -95,12 +98,28 @@ ping -c 4 8.8.8.8
 # Verify bridge
 brctl show vmbr0
 ```
+````
+
+**Verification Commands:**
+
+```bash
+# Check interface status
+ip addr show vmbr0
+
+# Test connectivity
+ping -c 4 192.168.1.1
+ping -c 4 8.8.8.8
+
+# Verify bridge
+brctl show vmbr0
+```
 
 </TabItem>
 
-<TabItem value="vm">
-**VM Network Configuration:**
+<TabItem value="firewall">
+    **Basic Firewall Configuration:**
 
+````bash
 ```bash
 # Example VM configurations
 # Web Server VM (VM ID 100)
@@ -130,12 +149,30 @@ net0: virtio=02:00:00:00:01:02,bridge=vmbr0
 02:00:00:00:01:01 → 192.168.1.111 (Database)
 02:00:00:00:01:02 → 192.168.1.112 (Development)
 ```
+````
+
+VMs
+
+```bash
+192.168.20.0/24
+```
+
+**Router DHCP Reservations:**
+
+```bash
+# Configure DHCP reservations on home router
+02:00:00:00:01:00 → 192.168.1.110 (WebServer)
+02:00:00:00:01:01 → 192.168.1.111 (Database)
+02:00:00:00:01:02 → 192.168.1.112 (Development)
+```
 
 </TabItem>
 
-<TabItem value="firewall">
-**Basic Firewall Configuration:**
+Proxmox, monitoring
 
+**Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
+
+````bash
 **Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
 
 ```bash
@@ -182,6 +219,15 @@ IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
 
 # Database access
 OUT ACCEPT -p tcp --dport 3306 -d 192.168.1.111
+```
+````
+
+**VM Firewall Examples:**
+
+**Web Server VM (100.fw):**
+
+```bash
+192.168.30.0/24
 ```
 
 </TabItem>
@@ -265,14 +311,17 @@ Internet → Firewall → Core Switch (Bonded) → Proxmox Cluster
 <Tabs
   defaultValue="cluster"
   values={[
-    {label: 'Cluster Config', value: 'cluster'},
-    {label: 'Storage Network', value: 'storage'},
-    {label: 'Security Setup', value: 'security'},
-  ]}>
+  {label: 'Cluster Config', value: 'cluster'},
+  {label: 'Storage Network', value: 'storage'},
+  {label: 'Security Setup', value: 'security'},
+  ]}
+>
+  <TabItem value="cluster">
+    **Primary Node Configuration:**
 
-<TabItem value="cluster">
-**Primary Node Configuration:**
+10
 
+````bash
 ```bash
 # /etc/network/interfaces (Node 1)
 auto lo
@@ -330,11 +379,30 @@ pvecm create businesscluster
 # Join other nodes
 pvecm add 10.0.10.101
 ```
+````
+
+**Secondary Node Configuration:**
+
+```bash
+# Same as primary but different IPs
+# Node 2: 10.0.10.102, storage: 10.0.50.102
+# Node 3: 10.0.10.103, storage: 10.0.50.103
+```
+
+**Cluster Setup:**
+
+```bash
+# Initialize cluster on first node
+pvecm create businesscluster
+
+# Join other nodes
+pvecm add 10.0.10.101
+```
 
 </TabItem>
 
 <TabItem value="storage">
-**Shared Storage Configuration:**
+    **Shared Storage Configuration:**
 
 **Ceph Storage Network:**
 
@@ -348,7 +416,7 @@ iface vmbr-storage inet static
     bridge-fd 0
 ```
 
-**NFS Storage Configuration:**
+Isolated devices
 
 ```bash
 # NFS server on storage VLAN
@@ -375,8 +443,11 @@ Target: iqn.2023-01.local.storage:lun1
 </TabItem>
 
 <TabItem value="security">
-**Comprehensive Security Configuration:**
+    **Comprehensive Security Configuration:**
 
+IoT/Guest
+
+````bash
 **Datacenter Firewall (`/etc/pve/firewall/cluster.fw`):**
 
 ```bash
@@ -433,6 +504,13 @@ IN ACCEPT -p tcp --dport 8000:9000 -s DEV_NET
 IN ACCEPT -p tcp --dport 3000:3999 -s DEV_NET
 OUT ACCEPT
 ```
+````
+
+**Node Security Groups:**
+
+```bash
+Production
+```
 
 </TabItem>
 </Tabs>
@@ -477,14 +555,18 @@ OUT ACCEPT
 <Tabs
   defaultValue="enterprise-net"
   values={[
-    {label: 'Network Config', value: 'enterprise-net'},
-    {label: 'HA Setup', value: 'ha'},
-    {label: 'Security Zones', value: 'zones'},
-  ]}>
+  {label: 'Network Config', value: 'enterprise-net'},
+  {label: 'HA Setup', value: 'ha'},
+  {label: 'Security Zones', value: 'zones'},
+  ]}
+>
+  <TabItem value="enterprise-net">
+    **Enterprise Node Configuration:**
 
-<TabItem value="enterprise-net">
-**Enterprise Node Configuration:**
+<TabItem value="vm">
+    **VM Network Configuration:**
 
+````bash
 ```bash
 # /etc/network/interfaces - Primary datacenter node
 auto lo
@@ -570,12 +652,47 @@ quorum {
     provider: corosync_votequorum
 }
 ```
+````
+
+**Cluster Configuration:**
+
+```bash
+# Initialize enterprise cluster
+pvecm create enterprise-dc1
+
+# Configure corosync for WAN
+# /etc/pve/corosync.conf
+totem {
+    version: 2
+    cluster_name: enterprise-dc1
+    transport: knet
+    crypto_cipher: aes256
+    crypto_hash: sha256
+}
+
+nodelist {
+    node {
+        name: proxmox-dc1-01
+        nodeid: 1
+        quorum_votes: 1
+        ring0_addr: 10.100.0.101
+    }
+    # Additional nodes...
+}
+
+quorum {
+    provider: corosync_votequorum
+}
+```
 
 </TabItem>
 
 <TabItem value="ha">
-**High Availability Configuration:**
+    **High Availability Configuration:**
 
+**HA Groups Setup:**
+
+````bash
 **HA Groups Setup:**
 
 ```bash
@@ -620,12 +737,74 @@ pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
     --type ipmi \
     --options "host=10.100.0.201,username=admin,password=***"
 ```
+````
+
+**HA Resources Configuration:**
+
+```bash
+# Critical database servers
+pvesh create /cluster/ha/resources --sid vm:401 \
+    --group critical-services \
+    --max_restart 3 \
+    --max_relocate 3 \
+    --comment "Primary database server"
+
+# Web application servers
+pvesh create /cluster/ha/resources --sid vm:301 \
+    --group standard-services \
+    --max_restart 2 \
+    --max_relocate 2 \
+    --comment "Web application server"
+```
+
+Testing, staging
+
+````bash
+**Ceph Storage Network:**
+
+```bash
+# Dedicated storage bridge per node
+auto vmbr-storage
+iface vmbr-storage inet static
+    address 10.0.50.101/24  # Node-specific IP
+    bridge-ports enp0s9     # Dedicated storage interface
+    bridge-stp off
+    bridge-fd 0
+```
+
+**NFS Storage Configuration:**
+
+```bash
+# NFS server on storage VLAN
+# Add to Proxmox: Datacenter → Storage → Add → NFS
+ID: nfs-shared
+Server: 10.0.50.200
+Export: /export/proxmox
+Content: VZDump backup file, Disk image, ISO image, Container template
+```
+
+**iSCSI Configuration:**
+
+```bash
+# iSCSI storage setup
+# Install open-iscsi
+apt install open-iscsi
+
+# Configure iSCSI target
+# Add to Proxmox: Datacenter → Storage → Add → iSCSI
+Portal: 10.0.50.210
+Target: iqn.2023-01.local.storage:lun1
+```
+````
 
 </TabItem>
 
 <TabItem value="zones">
-**Security Zone Configuration:**
+    **Security Zone Configuration:**
 
+**VLAN Planning:**
+
+````bash
 **DMZ Zone (VLAN 200):**
 
 ```bash
@@ -674,6 +853,37 @@ OUT DROP -d 0.0.0.0/0
 ```
 
 **Database Zone (VLAN 400):**
+
+```bash
+[GROUP database-servers]
+# Application server access only
+IN ACCEPT -p tcp --dport 3306 -s 10.300.0.0/24
+IN ACCEPT -p tcp --dport 5432 -s 10.300.0.0/24
+
+# Backup server access
+IN ACCEPT -p tcp --dport 3306 -s 10.600.0.0/24
+OUT ACCEPT -p tcp --dport 22 -d 10.600.0.0/24
+
+# Management access
+IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
+
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
+
+# Block everything else
+IN DROP
+OUT DROP -d 0.0.0.0/0
+OUT ACCEPT -d 10.0.0.0/8
+```
+````
+
+30
+
+```bash
+192.168.10.0/24
+```
+
+Web, database servers
 
 ```bash
 [GROUP database-servers]
