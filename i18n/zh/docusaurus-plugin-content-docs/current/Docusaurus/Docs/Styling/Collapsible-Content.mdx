@@ -45,12 +45,13 @@ You can include **markdown** formatting, `code`, and other elements here.
 **Result:**
 
 <>
-<details>
-<summary>Click to expand</summary>
+  <details>
+    <summary>Click to expand</summary>
 
-This content is hidden by default and revealed when the user clicks the summary.
+This content is hidden by default and revealed when the user clicks the summary.You can include **markdown** formatting, `code`, and other elements here.
 
-You can include **markdown** formatting, `code`, and other elements here.
+</details>
+</details>
 
 </details>
 </>
@@ -60,8 +61,8 @@ You can include **markdown** formatting, `code`, and other elements here.
 Make a details element expanded by default using the `open` attribute:
 
 <>
-<details open>
-<summary>This is expanded by default</summary>
+  <details open>
+    <summary>This is expanded by default</summary>
 
 This content is visible immediately when the page loads.
 
@@ -75,9 +76,10 @@ This content is visible immediately when the page loads.
 Wrap code blocks in details elements for collapsible code examples:
 
 <>
-<details>
-<summary>Show Docker Compose Example</summary>
+  <details>
+    <summary>Show Docker Compose Example</summary>
 
+````yaml title="docker-compose.yml"
 ```yaml title="docker-compose.yml"
 version: '3.8'
 services:
@@ -92,6 +94,7 @@ services:
     environment:
       POSTGRES_PASSWORD: password
 ```
+````
 
 </details>
 </>
@@ -101,7 +104,7 @@ services:
 Create collapsible sections for different examples:
 
 <details>
-<summary>Basic Configuration</summary>
+  <summary>Basic Configuration</summary>
 
 ```nginx title="nginx.conf"
 server {
@@ -117,7 +120,7 @@ server {
 </details>
 
 <details>
-<summary>Advanced Configuration with SSL</summary>
+  <summary>Advanced Configuration with SSL</summary>
 
 ```nginx title="nginx.conf"
 server {
@@ -144,10 +147,10 @@ server {
 You can nest details elements for hierarchical content organization:
 
 <details>
-<summary>Installation Methods</summary>
+    <summary>Docker Installation</summary>
 
 <details>
-<summary>Docker Installation</summary>
+  <summary>Installation Methods</summary>
 
 1. Pull the image:
 
@@ -156,14 +159,23 @@ You can nest details elements for hierarchical content organization:
    ```
 
 2. Run the container:
-   ```bash
-   docker run -d -p 80:80 nginx:latest
-   ```
+   ````bash
+   1. Pull the image:
+
+      ```bash
+      docker pull nginx:latest
+      ```
+
+   2. Run the container:
+      ```bash
+      docker run -d -p 80:80 nginx:latest
+      ```
+   ````
 
 </details>
 
 <details>
-<summary>Manual Installation</summary>
+    <summary>Manual Installation</summary>
 
 1. Update package list:
 
@@ -172,9 +184,18 @@ You can nest details elements for hierarchical content organization:
    ```
 
 2. Install Nginx:
-   ```bash
-   sudo apt install nginx
-   ```
+   ````bash
+   1. Update package list:
+
+      ```bash
+      sudo apt update
+      ```
+
+   2. Install Nginx:
+      ```bash
+      sudo apt install nginx
+      ```
+   ````
 
 </details>
 
@@ -274,7 +295,7 @@ Ensure your collapsible content works well in dark mode:
 Create an FAQ section using multiple details elements:
 
 <details>
-<summary>How do I install Docker?</summary>
+  <summary>How do I install Docker?</summary>
 
 Docker installation varies by operating system:
 
@@ -286,7 +307,7 @@ Docker installation varies by operating system:
 </details>
 
 <details>
-<summary>What's the difference between Docker and Docker Compose?</summary>
+  <summary>What's the difference between Docker and Docker Compose?</summary>
 
 - **Docker**: A containerization platform for running individual containers
 - **Docker Compose**: A tool for defining and running multi-container applications using YAML files
@@ -296,7 +317,7 @@ Docker Compose makes it easier to manage complex applications with multiple serv
 </details>
 
 <details>
-<summary>How do I persist data in Docker containers?</summary>
+  <summary>How do I persist data in Docker containers?</summary>
 
 Use Docker volumes or bind mounts:
 
@@ -315,7 +336,7 @@ docker run -v /host/path:/container/path myimage
 Organize troubleshooting information in collapsible sections:
 
 <details>
-<summary>🔴 Service won't start</summary>
+  <summary>🔴 Service won't start</summary>
 
 ### Possible Causes:
 
@@ -339,7 +360,7 @@ sudo docker restart container_name
 </details>
 
 <details>
-<summary>⚠️ Performance issues</summary>
+  <summary>⚠️ Performance issues</summary>
 
 ### Common Performance Problems:
 
@@ -388,7 +409,7 @@ docker run -v /dev/shm:/tmp myimage
 ### **API Documentation**
 
 <details>
-<summary>GET /api/users - Retrieve user list</summary>
+  <summary>GET /api/users - Retrieve user list</summary>
 
 **Parameters:**
 
@@ -418,7 +439,7 @@ docker run -v /dev/shm:/tmp myimage
 ### **Configuration Examples**
 
 <details>
-<summary>Environment Variables Configuration</summary>
+  <summary>Environment Variables Configuration</summary>
 
 Create a `.env` file in your project root:
 
@@ -446,7 +467,7 @@ EMAIL_API_KEY=your-sendgrid-key
 ### **Step-by-Step Guides**
 
 <details>
-<summary>Complete Docker Setup Guide</summary>
+  <summary>Complete Docker Setup Guide</summary>
 
 ### Step 1: Install Docker
 
