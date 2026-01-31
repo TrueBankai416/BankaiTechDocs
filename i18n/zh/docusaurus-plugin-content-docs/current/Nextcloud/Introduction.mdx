@@ -57,11 +57,12 @@ The following commands are basic commands and are not part of my tutorial, it is
 <Tabs
   defaultValue="docker"
   values={[
-    {label: 'Docker', value: 'docker'},
-    {label: 'Snap Package', value: 'snap'},
-    {label: 'Manual Installation', value: 'manual'},
-    {label: 'Web Installer', value: 'web'},
-  ]}>
+  {label: 'Docker', value: 'docker'},
+  {label: 'Snap Package', value: 'snap'},
+  {label: 'Manual Installation', value: 'manual'},
+  {label: 'Web Installer', value: 'web'},
+  ]}
+>
   <TabItem value="docker">
     **Docker**: The quickest way to start with Nextcloud is by using Docker. You can pull the official Nextcloud Docker image and run it on any system that supports Docker.
 
@@ -74,8 +75,7 @@ docker run -d -p 8080:80 nextcloud
 Access Nextcloud at `http://localhost:8080` from your browser.
 ````
 
-</TabItem>
-  <TabItem value="snap">
+<TabItem value="snap">
     **Snap Package**: For Ubuntu and other Linux distributions supporting snap packages, Nextcloud can be installed with a single command:
 
 ````
@@ -86,17 +86,15 @@ sudo snap install nextcloud
 This method handles dependencies and auto-updates.
 ````
 
-</TabItem>
-  <TabItem value="manual">
-    **Manual Installation**: Download the Nextcloud server zip archive from the official website, extract it to your web server's document root, and configure it through the web interface.
+<TabItem value="web">
+    **Web Installer**: The Nextcloud Web Installer is a simple script that checks for dependencies, downloads the Nextcloud server, and initiates the web-based installation wizard.
 
 ```
 Visit the official Nextcloud documentation for detailed steps.
 ```
 
-</TabItem>
-  <TabItem value="web">
-    **Web Installer**: The Nextcloud Web Installer is a simple script that checks for dependencies, downloads the Nextcloud server, and initiates the web-based installation wizard.
+<TabItem value="manual">
+    **Manual Installation**: Download the Nextcloud server zip archive from the official website, extract it to your web server's document root, and configure it through the web interface.
 
 ```
 Download the script from Nextcloud's official website and run it from your browser.
@@ -161,7 +159,7 @@ The Nextcloud High-Performance Backend (HPB) is a crucial enhancement for Nextcl
 - **Lower Latency**: HPB improves the responsiveness of chat and video calls by enabling more direct communication paths between client devices, thus reducing round-trip times for data.
 - **Enhanced Feature Set**: Some advanced features of Nextcloud Talk, like the ability to handle larger numbers of video call participants or the use of Command Line Interface (CLI) commands during calls, require HPB for optimal performance.
 
-### **_Architecture and Components_**
+### **_Deployment and Configuration_**
 
 The High-Performance Backend consists of several key components:
 
@@ -169,7 +167,7 @@ The High-Performance Backend consists of several key components:
 - **Turn Server (STUN/TURN)**: For video calls to work, especially when participants are behind NAT (Network Address Translation) or firewalls, it's often necessary to relay media through a server. While HPB can work with any TURN server, integrating it with HPB ensures optimal routing of media data.
 - **Web Proxy (optional)**: In some configurations, especially when hosting the signaling server on a separate machine, a web proxy might be used to manage WebSocket connections and HTTPS termination.
 
-### **_Deployment and Configuration_**
+### **_Architecture and Components_**
 
 Deploying HPB involves setting up the signaling server, often written in Go for efficiency, and configuring Nextcloud and Nextcloud Talk to communicate with this service. This setup requires network configuration to allow WebSocket connections from clients to the signaling server and, if used, TURN server configurations to relay media.
 
