@@ -1,0 +1,365 @@
+---
+title: Getting Started with GitHub
+description: Complete beginner's guide to GitHub covering account setup, Git installation, repository creation, and basic workflow fundamentals.
+image: /img/social/github-social.webp
+tags:
+  - GitHub
+  - Git
+  - Setup
+  - Beginner
+keywords:
+  - GitHub
+  - Git
+  - Setup
+  - Account
+  - Repository
+  - Clone
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Getting Started with GitHub**
+
+This guide will walk you through setting up GitHub from scratch, creating your first repository, and understanding the basic workflow. Whether you're completely new to version control or just new to GitHub, this tutorial will get you up and running quickly.
+
+## **Prerequisites**
+
+Before we begin, you'll need:
+
+* A computer with internet access
+* Basic familiarity with using a terminal/command prompt (helpful but not required)
+* A text editor or IDE installed on your computer
+
+## **Step 1: Create Your GitHub Account**
+
+<Tabs
+  defaultValue="signup"
+  values={[
+   {label: 'Sign Up Process', value: 'signup'},
+   {label: 'Account Settings', value: 'settings'},
+   {label: 'Profile Setup', value: 'profile'},
+  ]}
+>
+  <TabItem value="signup">
+    <ol>
+      <li>Navigate to <a href="https://github.com" target="_blank">github.com</a></li>
+      <li>Click the <strong>"Sign up"</strong> button in the top right corner</li>
+      <li>Enter your email address, create a strong password, and choose a username</li>
+      <li>Complete the verification process (solve the puzzle)</li>
+      <li>Choose your preferences for GitHub updates and notifications</li>
+      <li>Verify your email address by clicking the link sent to your inbox</li>
+    </ol>
+  </TabItem>
+
+  <TabItem value="settings">
+    <p>After creating your account, configure these essential settings:</p>
+
+    <ul>
+      <li><strong>Two-Factor Authentication (2FA)</strong>: Enable 2FA for enhanced security</li>
+      <li><strong>SSH Keys</strong>: Add SSH keys for secure, password-free authentication</li>
+      <li><strong>Notification Preferences</strong>: Configure how you want to receive notifications</li>
+      <li><strong>Privacy Settings</strong>: Control the visibility of your profile and activity</li>
+    </ul>
+  </TabItem>
+
+  <TabItem value="profile">
+    <p>Complete your profile to make a good impression:</p>
+
+    <ul>
+      <li><strong>Profile Photo</strong>: Upload a professional photo or avatar</li>
+      <li><strong>Bio</strong>: Write a brief description of yourself and your interests</li>
+      <li><strong>Location</strong>: Add your location (optional)</li>
+      <li><strong>Website/Blog</strong>: Link to your personal website or portfolio</li>
+      <li><strong>Social Links</strong>: Connect your Twitter, LinkedIn, or other social accounts</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## **Step 2: Install Git**
+
+Git is the version control system that powers GitHub. You'll need it installed on your computer to work with repositories locally.
+
+<Tabs
+  defaultValue="windows"
+  values={[
+   {label: 'Windows', value: 'windows'},
+   {label: 'macOS', value: 'macos'},
+   {label: 'Linux', value: 'linux'},
+  ]}
+>
+  <TabItem value="windows">
+    <ol>
+      <li>Download Git from <a href="https://git-scm.com/download/win" target="_blank">git-scm.com</a></li>
+      <li>Run the installer with default settings (recommended for beginners)</li>
+      <li>Open Command Prompt or PowerShell and verify installation:</li>
+    </ol>
+
+    <pre><code>git --version</code></pre>
+  </TabItem>
+
+  <TabItem value="macos">
+    <p><strong>Option 1: Using Homebrew (Recommended)</strong></p>
+    <pre><code>brew install git</code></pre>
+    <p><strong>Option 2: Download Installer</strong></p>
+
+    <ol>
+      <li>Download from <a href="https://git-scm.com/download/mac" target="_blank">git-scm.com</a></li>
+      <li>Run the installer</li>
+      <li>Verify installation in Terminal:</li>
+    </ol>
+
+    <pre><code>git --version</code></pre>
+  </TabItem>
+
+  <TabItem value="linux">
+    <p><strong>Ubuntu/Debian:</strong></p>
+    <pre><code>sudo apt update
+    sudo apt install git</code></pre>
+    <p><strong>CentOS/RHEL/Fedora:</strong></p>
+    <pre><code>sudo yum install git</code></pre>
+    <p><strong>Verify installation:</strong></p>
+    <pre><code>git --version</code></pre>
+  </TabItem>
+</Tabs>
+
+## **Step 3: Configure Git**
+
+After installing Git, configure it with your GitHub credentials:
+
+```bash
+# Set your name (use your real name)
+git config --global user.name "Your Name"
+
+# Set your email (use the same email as your GitHub account)
+git config --global user.email "your.email@example.com"
+
+# Set default branch name to 'main'
+git config --global init.defaultBranch main
+
+# Verify your configuration
+git config --list
+```
+
+## **Step 4: Create Your First Repository**
+
+<Tabs
+  defaultValue="web"
+  values={[
+   {label: 'Via GitHub Web', value: 'web'},
+   {label: 'Via Command Line', value: 'cli'},
+  ]}
+>
+  <TabItem value="web">
+    <ol>
+      <li>Click the <strong>"+"</strong> icon in the top right corner of GitHub</li>
+      <li>Select <strong>"New repository"</strong></li>
+      <li>Fill in the repository details:</li>
+
+      <ul>
+        <li><strong>Repository name</strong>: Choose a descriptive name (e.g., "my-first-repo")</li>
+        <li><strong>Description</strong>: Brief description of your project (optional)</li>
+        <li><strong>Visibility</strong>: Choose Public or Private</li>
+        <li><strong>Initialize</strong>: Check "Add a README file"</li>
+        <li><strong>License</strong>: Choose a license if desired</li>
+      </ul>
+
+      <li>Click <strong>"Create repository"</strong></li>
+    </ol>
+  </TabItem>
+
+  <TabItem value="cli">
+    ```bash
+    # Create a new directory for your project
+    mkdir my-first-repo
+    cd my-first-repo
+
+    # Initialize a Git repository
+    git init
+
+    # Create a README file
+    echo "# My First Repository" > README.md
+
+    # Add the file to staging
+    git add README.md
+
+    # Make your first commit
+    git commit -m "Initial commit"
+
+    # Add GitHub as remote origin (replace with your repository URL)
+    git remote add origin https://github.com/yourusername/my-first-repo.git
+
+    # Push to GitHub
+    git push -u origin main
+    ```
+  </TabItem>
+</Tabs>
+
+## **Step 5: Clone Your Repository**
+
+To work with your repository locally, you'll need to clone it:
+
+```bash
+# Clone your repository
+git clone https://github.com/yourusername/my-first-repo.git
+
+# Navigate to the repository directory
+cd my-first-repo
+
+# List files to confirm successful clone
+ls -la
+```
+
+## **Step 6: Basic Git Workflow**
+
+Now that you have a repository, learn the basic workflow:
+
+<Tabs
+  defaultValue="workflow"
+  values={[
+   {label: 'Basic Workflow', value: 'workflow'},
+   {label: 'Common Commands', value: 'commands'},
+  ]}
+>
+  <TabItem value="workflow">
+    <ol>
+      <li><strong>Make changes</strong>: Edit files in your repository</li>
+      <li><strong>Check status</strong>: <code>git status</code></li>
+      <li><strong>Stage changes</strong>: <code>git add filename</code> or <code>git add .</code></li>
+      <li><strong>Commit changes</strong>: <code>git commit -m "Description of changes"</code></li>
+      <li><strong>Push to GitHub</strong>: <code>git push</code></li>
+    </ol>
+  </TabItem>
+
+  <TabItem value="commands">
+    <table>
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td><code>git status</code></td>
+          <td>Check the status of your working directory</td>
+        </tr>
+
+        <tr>
+          <td><code>git add .</code></td>
+          <td>Stage all changes for commit</td>
+        </tr>
+
+        <tr>
+          <td><code>git commit -m "message"</code></td>
+          <td>Commit staged changes with a message</td>
+        </tr>
+
+        <tr>
+          <td><code>git push</code></td>
+          <td>Push commits to GitHub</td>
+        </tr>
+
+        <tr>
+          <td><code>git pull</code></td>
+          <td>Pull latest changes from GitHub</td>
+        </tr>
+
+        <tr>
+          <td><code>git log</code></td>
+          <td>View commit history</td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+</Tabs>
+
+## **Step 7: Understanding GitHub Interface**
+
+Familiarize yourself with the GitHub web interface:
+
+* **Code Tab**: View your repository files and folders
+* **Issues Tab**: Track bugs, features, and tasks
+* **Pull Requests Tab**: Review and merge code changes
+* **Actions Tab**: Automate workflows and CI/CD
+* **Projects Tab**: Organize and track project progress
+* **Settings Tab**: Configure repository settings
+
+## **Next Steps**
+
+Now that you have the basics down, consider exploring:
+
+1. **Branching**: Learn to create and work with branches
+2. **Pull Requests**: Practice the collaboration workflow
+3. **Issues**: Use GitHub's issue tracking system
+4. **GitHub Actions**: Automate your workflows
+5. **Open Source**: Contribute to open-source projects
+
+## **Troubleshooting Common Issues**
+
+<Tabs
+  defaultValue="authentication"
+  values={[
+   {label: 'Authentication', value: 'authentication'},
+   {label: 'Push/Pull Issues', value: 'pushpull'},
+   {label: 'Merge Conflicts', value: 'conflicts'},
+  ]}
+>
+  <TabItem value="authentication">
+    **Problem**: Authentication failures when pushing to GitHub
+
+    **Solutions:**
+
+    * Use Personal Access Tokens instead of passwords
+    * Set up SSH keys for password-free authentication
+    * **Use GitHub CLI for authentication**: Run `gh auth login` in terminal and follow the prompts
+    * Check if your credentials are correctly configured
+
+    **GitHub CLI Authentication Steps:**
+
+    ```bash
+    # Install GitHub CLI (if not already installed)
+    # Download from: https://cli.github.com/
+
+    # Authenticate with GitHub
+    gh auth login
+
+    # Follow the prompts to:
+    # 1. Choose authentication method (browser or token)
+    # 2. Select preferred protocol (HTTPS or SSH)
+    # 3. Complete authentication in browser or enter token
+
+    # Verify authentication
+    gh auth status
+    ```
+  </TabItem>
+
+  <TabItem value="pushpull">
+    **Problem**: Unable to push or pull from repository
+
+    **Solutions:**
+
+    * Check your internet connection
+    * Verify repository URL: `git remote -v`
+    * Ensure you have proper permissions to the repository
+    * Try: `git pull` before pushing
+  </TabItem>
+
+  <TabItem value="conflicts">
+    **Problem**: Merge conflicts when pulling or merging
+
+    **Solutions:**
+
+    * Use `git status` to identify conflicted files
+    * Edit files to resolve conflicts manually
+    * Use a merge tool: `git mergetool`
+    * Stage resolved files: `git add filename`
+    * Complete the merge: `git commit`
+  </TabItem>
+</Tabs>
+
+<BuyMeACoffeeButton />
