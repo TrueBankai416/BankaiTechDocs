@@ -2,8 +2,13 @@
 title: Virtual Machines
 description: Comprehensive guide to Proxmox VE virtual machines using KVM technology, covering VM features, benefits, and management capabilities.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, VM]
-keywords: [Proxmox, Hypervisor, VM]
+tags:
+  - Proxmox
+  - VM
+keywords:
+  - Proxmox
+  - Hypervisor
+  - VM
 last_update:
   author: BankaiTech
 ---
@@ -20,11 +25,11 @@ Virtual Machines emulate a complete hardware system—from CPU to network interf
 
 #### **Key Features of VMs in Proxmox**
 
-* **Hardware Abstraction**: VMs in Proxmox VE abstract the physical hardware, allowing for the deployment of various operating systems on the same physical server, regardless of the underlying hardware compatibility.
-* **Snapshots and Cloning**: Proxmox enables taking snapshots of VMs, capturing their state at a particular point in time. These snapshots can be used for backup purposes or as a starting point for cloning new VMs, simplifying the process of duplicating VM setups.
-* **Live Migration**: One of Proxmox's powerful features is the ability to migrate running VMs between different hosts without downtime. This feature facilitates load balancing, hardware maintenance, and upgrades.
-* **Storage Flexibility**: Proxmox supports a variety of storage backends, including local storage (LVM, directories), networked storage (NFS, iSCSI, Ceph), and more, offering flexibility in how and where VM data is stored.
-* **High Availability**: With Proxmox VE, VMs can be made highly available, automatically restarting on another node in the event of a hardware failure, ensuring minimal downtime.
+- **Hardware Abstraction**: VMs in Proxmox VE abstract the physical hardware, allowing for the deployment of various operating systems on the same physical server, regardless of the underlying hardware compatibility.
+- **Snapshots and Cloning**: Proxmox enables taking snapshots of VMs, capturing their state at a particular point in time. These snapshots can be used for backup purposes or as a starting point for cloning new VMs, simplifying the process of duplicating VM setups.
+- **Live Migration**: One of Proxmox's powerful features is the ability to migrate running VMs between different hosts without downtime. This feature facilitates load balancing, hardware maintenance, and upgrades.
+- **Storage Flexibility**: Proxmox supports a variety of storage backends, including local storage (LVM, directories), networked storage (NFS, iSCSI, Ceph), and more, offering flexibility in how and where VM data is stored.
+- **High Availability**: With Proxmox VE, VMs can be made highly available, automatically restarting on another node in the event of a hardware failure, ensuring minimal downtime.
 
 ### **Benefits of Using VMs in Proxmox**
 
