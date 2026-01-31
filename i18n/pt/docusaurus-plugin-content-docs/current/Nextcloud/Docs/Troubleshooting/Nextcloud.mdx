@@ -25,134 +25,51 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 ### **_Access through untrusted Domain_**
 
 <p>
-<>This happens when you attempt to access nextcloud from a source not listed inside the `config.php` file.</>
+  <>This happens when you attempt to access nextcloud from a source not listed inside the `config.php` file.</>
 </p>
-![NC Untrusted Domain](/img/nextcloud/Troubleshooting/untrustedDomain.jpg)
 
 #### _Changing directories_
 
 <p>
-<>First we need to change our directory to where nextcloud is installed</>
+  <>First we need to change our directory to where nextcloud is installed</>
 </p>
-In this example, nextclouds webroot is located at `/var/docker/nextcloud/nextcloud/`
-```bash
-cd /var/docker/nextcloud/nextcloud
-```
-:::info
-`cd` stands for `Change Directory`
-:::
 
-<p>
-<>If you are in the right spot then you will see</>
-</p>
-```bash
 3rdparty  apps           config       cron.php     dist        lib                       ocs                package.json  resources   themes
 AUTHORS   composer.json  console.php  custom_apps  index.html  nextcloud-init-sync.lock  ocs-provider       public.php    robots.txt  version.php
 COPYING   composer.lock  core         data         index.php   occ                       package-lock.json  remote.php    status.php
-```
 
 #### _Editing the config.php file_
 
 <p>
-<>Now lets edit the `config.php` file using nano</>
+  <>Now lets edit the `config.php` file using nano</>
 </p>
-```bash
-nano config/config.php
-```
-<p>
-<>Scroll down until you see</>
-</p>
-```editorconfig
-'trusted_domains' =>
-array (
-    0 => '',
-  ),
-```
 
 #### _Adding your domain to config.php_
 
-<p>
-<>Now add your domain to the array</>
-</p>
-```editorconfig
 'trusted_domains' => 
   array (
     0 => 'cloud.bankai-tech.com',
   ),
-```
-<p>
-<>If you need to add multiple domains you can do so like this</>
-</p>
-```editorconfig
-'trusted_domains' => 
-  array (
-    0 => 'cloud.bankai-tech.com',
-    1 => '192.168.4.130',
-  ),
-```
-<p>
-<>Now save the file and you should be able to access nextcloud now</>
-</p>
-:::tip
-Save the file by pressing `CTRL+X`
-:::note
-If the error doesnt go away, you may need to clear your browser cache and restart the browser
-:::
 
 ### **_The database is missing some indexes._**
 
 ![Missing Indexes](/img/nextcloud/Troubleshooting/missingIndexes.jpg)
 
 <p>
-<>This seems to be caused by nextcloud skipping large indexes. To fix in a Docker environment, run the following.</>
+  <>This seems to be caused by nextcloud skipping large indexes. To fix in a Docker environment, run the following.</>
 </p>
-```bash
-sudo docker exec -it -u 33 nextcloud php occ db:add-missing-indices
-```
 
 ### **_Upstream Timed Out Error on Large File Uploads/Downloads_**
 
 <p>
-<>If you encounter this error when uploading or downloading large files:</>
-</p>
-```
-[error] 412#412: *464 upstream timed out (110: Operation timed out) while reading response header from upstream
-```
-<p>
-<>This error typically occurs when Nginx times out while waiting for a response from the PHP-FPM upstream when handling large files. The solution is to disable the content length header in Nextcloud's configuration.</>
+  <>This error typically occurs when Nginx times out while waiting for a response from the PHP-FPM upstream when handling large files. The solution is to disable the content length header in Nextcloud's configuration.</>
 </p>
 
 #### _Editing the config.php file_
 
-<p>
-<>Navigate to your Nextcloud installation directory and edit the `config.php` file:</>
-</p>
-```bash
 cd /opt/docker/nextcloud/nextcloud
 nano config/config.php
-```
-<p>
-<>Add the following line to your config array:</>
-</p>
-```php
-'set_time_limit' => 3600,
-'set_header_content_length' => false,
-```
-:::info
-The `'set_header_content_length' => false,` setting prevents Nextcloud from setting the Content-Length header, which can cause issues with large file transfers through reverse proxies.
-:::
-<p>
-<>After adding this configuration, save the file and restart your Nextcloud container:</>
-</p>
-```bash
 sudo docker restart nextcloud
-```
-:::tip
-If you continue to experience issues, you may also need to increase timeout values in your Nginx configuration:
-- `proxy_read_timeout`
-- `proxy_connect_timeout`
-- `proxy_send_timeout`
-:::
 
 ## **Example Files**
 
@@ -162,7 +79,7 @@ If you continue to experience issues, you may also need to increase timeout valu
 <?php
 $CONFIG = array (
   'htaccess.RewriteBase' => '/',
-  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'memcache.local' => '\OC\Memcache\APCu',
   'apps_paths' =>
   array (
     0 =>
@@ -178,8 +95,8 @@ $CONFIG = array (
       'writable' => true,
     ),
   ),
-  'memcache.distributed' => '\\OC\\Memcache\\Redis',
-  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'memcache.distributed' => '\OC\Memcache\Redis',
+  'memcache.locking' => '\OC\Memcache\Redis',
   'redis' =>
   array (
     'host' => 'redis',
