@@ -34,36 +34,29 @@ Proxmox provides multiple ways to configure networking:
 <Tabs
   defaultValue="webui"
   values={[
-    {label: 'Web Interface', value: 'webui'},
-    {label: 'Command Line', value: 'cli'},
-    {label: 'Configuration Files', value: 'config'},
-  ]}>
+  {label: 'Web Interface', value: 'webui'},
+  {label: 'Command Line', value: 'cli'},
+  {label: 'Configuration Files', value: 'config'},
+  ]}
+>
+  <TabItem value="webui">
+    **Proxmox Web Interface**
 
-<TabItem value="webui">
-**Proxmox Web Interface**
-- Navigate to **Node → System → Network**
-- Graphical interface for network configuration
-- Real-time validation and error checking
-- Easy-to-use forms for interface creation
-- Immediate visual feedback on changes
-</TabItem>
+* Navigate to **Node → System → Network**
+* Graphical interface for network configuration
+* Real-time validation and error checking
+* Easy-to-use forms for interface creation
+* Immediate visual feedback on changes
 
-<TabItem value="cli">
-**Command Line Interface**
-- Use `pvesh` for API access
-- Standard Linux networking commands (`ip`, `ifconfig`)
-- Network configuration through `systemctl`
-- Advanced scripting and automation capabilities
-</TabItem>
+* Use `pvesh` for API access
+* Standard Linux networking commands (`ip`, `ifconfig`)
+* Network configuration through `systemctl`
+* Advanced scripting and automation capabilities
 
-<TabItem value="config">
-**Configuration Files**
-- `/etc/network/interfaces` - Main network configuration
-- `/etc/hosts` - Local hostname resolution
-- `/etc/resolv.conf` - DNS configuration
-- Direct file editing for advanced configurations
-</TabItem>
-</Tabs>
+* `/etc/network/interfaces` - Main network configuration
+* `/etc/hosts` - Local hostname resolution
+* `/etc/resolv.conf` - DNS configuration
+* Direct file editing for advanced configurations
 
 ## **Initial Network Setup**
 
@@ -95,23 +88,41 @@ Before making changes, verify your current network setup:
 <Tabs
   defaultValue="webui"
   values={[
-    {label: 'Web Interface', value: 'webui'},
-    {label: 'Command Line', value: 'cli'},
-  ]}>
+  {label: 'Web Interface', value: 'webui'},
+  {label: 'Command Line', value: 'cli'},
+  ]}
+>
+  <TabItem value="webui">
+    **Via Proxmox Web Interface:**
 
-<TabItem value="webui">
-**Via Proxmox Web Interface:**
-1. Log into Proxmox web interface
-2. Navigate to **Node → System → Network**
-3. Review existing interfaces and their configurations
+<TabItem value="cli">
+    **Command Line Interface** Log into Proxmox web interface
+2. Navigate to **Node → System → Network** Review existing interfaces and their configurations
 4. Check the **Summary** tab for active connections
 </TabItem>
 
-<TabItem value="cli">
-**Via Command Line:**
 ```bash
 # Show all network interfaces
 ip addr show
+
+# Show bridge information
+
+brctl show
+
+# Display routing table
+
+ip route show
+
+# Check network configuration file
+
+cat /etc/network/interfaces
+
+# Test connectivity
+
+ping -c 4 8.8.8.8
+ping -c 4 google.com
+
+```
 
 # Show bridge information
 
@@ -151,18 +162,7 @@ Gateway: 192.168.100.1 (if this is the gateway)
 Bridge ports: enp0s8 (physical interface)
 Comment: VM Network Bridge
 
-````
-
-**Step 3: Advanced Options**
-- **VLAN aware**: Enable for VLAN support
-- **Multicast snooping**: Enable for multicast optimization
-- **Learning**: Enable MAC address learning
-
-### **Bridge Creation via Command Line**
-
-**Create bridge configuration:**
-
-```bash
+```
 # Edit network interfaces file
 nano /etc/network/interfaces
 
@@ -176,7 +176,7 @@ iface vmbr1 inet static
     bridge-vlan-aware yes
     # Optional: Add comment
     # Bridge for VM network
-````
+```
 
 **Apply configuration:**
 
@@ -681,7 +681,7 @@ If you prefer to create the scripts manually or the automated installer isn't av
 :::
 
 <details>
-<summary><strong>Click to expand: Complete Network Fix Script (~450 lines)</strong></summary>
+  <summary><strong>Click to expand: Complete Network Fix Script (~450 lines)</strong></summary>
 
 ```bash
 # Create the fix script manually
@@ -1265,7 +1265,7 @@ If you used the manual script creation method, you'll need to set up monitoring 
 :::
 
 <details>
-<summary><strong>Click to expand: Complete Network Monitoring Script (~200 lines)</strong></summary>
+  <summary><strong>Click to expand: Complete Network Monitoring Script (~200 lines)</strong></summary>
 
 ```bash
 # Create the network monitoring script manually
