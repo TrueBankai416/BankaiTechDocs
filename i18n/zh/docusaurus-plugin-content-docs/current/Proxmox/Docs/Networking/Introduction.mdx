@@ -49,44 +49,38 @@ Proxmox supports various types of network interfaces:
 <Tabs
   defaultValue="physical"
   values={[
-    {label: 'Physical Interfaces', value: 'physical'},
-    {label: 'Linux Bridges', value: 'bridge'},
-    {label: 'Bonds', value: 'bond'},
-    {label: 'VLANs', value: 'vlan'},
-  ]}>
+  {label: 'Physical Interfaces', value: 'physical'},
+  {label: 'Linux Bridges', value: 'bridge'},
+  {label: 'Bonds', value: 'bond'},
+  {label: 'VLANs', value: 'vlan'},
+  ]}
+>
+  <TabItem value="physical">
+    **Physical Network Interfaces**
 
 <TabItem value="physical">
 **Physical Network Interfaces**
 - Direct access to physical network adapters (eth0, eth1, etc.)
-- Typically used for host management and direct VM connections
-- Limited flexibility for complex network topologies
-- Best for simple setups or dedicated network segments
-</TabItem>
+* Direct access to physical network adapters (eth0, eth1, etc.)
+* Typically used for host management and direct VM connections
+* Limited flexibility for complex network topologies
+* Best for simple setups or dedicated network segments
 
 <TabItem value="bridge">
-**Linux Bridges (vmbr0, vmbr1, etc.)**
-- Software switches that connect multiple network interfaces
-- Default choice for VM and container networking
-- Support for VLANs, port mirroring, and advanced features
-- Can connect physical interfaces, VMs, containers, and other bridges
-</TabItem>
+    **Linux Bridges (vmbr0, vmbr1, etc.)**
 
-<TabItem value="bond">
-**Network Bonds**
-- Combine multiple physical interfaces for redundancy or performance
-- Support various bonding modes (active-backup, 802.3ad, balance-tlb, etc.)
+* Combine multiple physical interfaces for redundancy or performance
+* Support various bonding modes (active-backup, 802.3ad, balance-tlb, etc.)
+* Provide fault tolerance and increased bandwidth
+* Essential for enterprise deployments
 - Provide fault tolerance and increased bandwidth
 - Essential for enterprise deployments
 </TabItem>
 
-<TabItem value="vlan">
-**VLAN Interfaces**
-- Create virtual networks on top of existing interfaces
-- Enable network segmentation without additional hardware
-- Support for 802.1Q VLAN tagging
-- Isolate traffic between different network segments
-</TabItem>
-</Tabs>
+* Create virtual networks on top of existing interfaces
+* Enable network segmentation without additional hardware
+* Support for 802.1Q VLAN tagging
+* Isolate traffic between different network segments
 
 ### **Network Bridge Architecture**
 
