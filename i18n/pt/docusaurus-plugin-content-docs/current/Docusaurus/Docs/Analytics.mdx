@@ -2,7 +2,10 @@
 title: Analytics Setup
 description: Guide for setting up PostHog analytics in Docusaurus including configuration, environment variables, and privacy considerations.
 image: /img/social/docusaurus-social.jpg
-tags: [Docusaurus, PostHog, Analytics]
+tags:
+  - Docusaurus
+  - PostHog
+  - Analytics
 last_update:
   author: BankaiTech
 ---
@@ -21,7 +24,7 @@ If you want to enable analytics for your documentation site, follow these steps:
 2. Create a new project
 3. Copy your project API key from the project settings
 
-### 2) 2) Add Environment Variable
+### 2. Add Environment Variable
 
 1. Open the `.env` file in the root directory
 2. Add your PostHog API key:
@@ -30,11 +33,12 @@ If you want to enable analytics for your documentation site, follow these steps:
    POSTHOG_API_KEY=your_posthog_project_key
    ```
 
-### 5) Verify Setup
+### 3. Add PostHog Configuration
 
 1. Open `docusaurus.config.ts`
 2. Find the `plugins: [` array around line 88
 3. Add the PostHog plugin configuration:
+
    ```typescript
    plugins: [
      // ... existing plugins ...
@@ -53,7 +57,7 @@ If you want to enable analytics for your documentation site, follow these steps:
    ],
    ```
 
-### 4) 4) Install PostHog Package
+### 4. Install PostHog Package
 
 If not already installed, add the PostHog Docusaurus plugin:
 
@@ -73,15 +77,15 @@ After configuration:
 
 Available PostHog configuration options:
 
-* **apiKey**: Your PostHog project API key (required)
-* **appUrl**: PostHog instance URL (defaults to `https://us.i.posthog.com`)
-* **enableInDevelopment**: Set to `false` to disable analytics in development mode
+- **apiKey**: Your PostHog project API key (required)
+- **appUrl**: PostHog instance URL (defaults to `https://us.i.posthog.com`)
+- **enableInDevelopment**: Set to `false` to disable analytics in development mode
 
 ## Privacy Considerations
 
-* PostHog respects user privacy preferences
-* Consider adding a privacy policy if collecting analytics
-* Users can opt out using browser settings or privacy extensions
+- PostHog respects user privacy preferences
+- Consider adding a privacy policy if collecting analytics
+- Users can opt out using browser settings or privacy extensions
 
 ## No Analytics Needed?
 
