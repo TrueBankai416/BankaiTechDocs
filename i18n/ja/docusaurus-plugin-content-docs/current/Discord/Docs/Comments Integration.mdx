@@ -1,85 +1,85 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: コメント統合
+description: セットアップ、構成、トラブルシューティングなど、双方向 Discord コメントを Docusaurus と統合するための完全なガイド。
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Discordコメント統合
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+このドキュメント サイトには、**双方向の Discord コメント統合** が含まれており、訪問者は Discord サーバーにコメントを送信でき、既存の GitHub ベースの Giscus コメントと一緒に Discord の返信を Web サイトに表示できます。
 
-## Features
+## 特徴
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **双方向通信**: ウェブサイトのコメント → Discord、Discord の返信 → ウェブサイト
+* **デュアルコメントシステム**: Giscus（GitHubベース）とDiscordのコメントは連携して動作します
+* **リッチ Discord 埋め込み**: コメントは、ページ全体のコンテキストを含むフォーマットされた埋め込みとして表示されます。
+* **スレッド管理**: 整理された返信のための自動スレッド作成
+* **リアルタイム更新**: ウェブサイトは Discord の返信を自動的に表示します
+* **ページ全体のコンテキスト**: コメントには、ページタイトル、URL、ナビゲーションコンテキストが含まれます
+* **ユーザーアバター**: Discordの返信にユーザーアバターとユーザー名が表示されます
+* **レスポンシブデザイン**: デスクトップとモバイルデバイスの両方で動作します
 
-## Setup Instructions
+## セットアップ手順
 
-### 1. Create a Discord Bot
+### 1. Discordボットを作成する
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. [Discord 開発者ポータル](https://discord.com/developers/applications)に移動します
+2. 新しいアプリケーションを作成する
+3. 「ボット」セクションに移動してボットを作成します
+4. ボットトークンをコピーする
+5. 「特権ゲートウェイ インテント」の下で、以下を有効にします。
+   * **メッセージコンテンツの意図**
+   * **サーバーメンバーの意図** (オプション)
 
-### 2) Configure Bot Permissions
+### 3) Invite Bot to Server
 
-Your bot needs these permissions:
+ボットには次の権限が必要です:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* メッセージを読む
+* メッセージを送信
+* 公開スレッドを作成する
+* スレッドでメッセージを送信する
+* メッセージ履歴を読む
+* スラッシュコマンドを使用する（オプション）
 
-### 3. Invite Bot to Server
+### 6. Start the Backend Server
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. OAuth2 > URLジェネレーターへ移動
+2. 「ボット」スコープを選択
+3. 上記の権限を選択してください
+4. 生成されたURLを使用してボットをサーバーに招待します
 
-### 4) Configure Environment Variables
+### 7) Deploy Configuration
 
-#### Frontend (.env)
+#### フロントエンド (.env)
 
 ```env
-# Discord Bot Configuration
+# Discord ボット設定
 DISCORD_BOT_TOKEN=your_bot_token_here
 DISCORD_CHANNEL_ID=your_channel_id_here
 
-# API Configuration
+# API 設定
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# Discord コンテキスト設定
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=サイト名
 ```
 
-#### Backend Server (server/.env)
+#### バックエンドサーバー (server/.env)
 
 ```env
-# Discord Bot Configuration
+# Discord ボット設定
 DISCORD_BOT_TOKEN=your_bot_token_here
 DISCORD_CHANNEL_ID=your_channel_id_here
 
-# API Configuration
+# API 設定
 PORT=3001
 
-# Discord Context Configuration
+# Discord コンテキスト設定
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
@@ -89,249 +89,249 @@ DISCORD_SHOW_TIMESTAMP=true
 DISCORD_SHOW_AUTHOR_FIELD=true
 DISCORD_CREATE_THREADS=true
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=サイト名
 ```
 
-:::warning Security Note
+:::警告 セキュリティに関する注意事項
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* `.env` ファイルをバージョン管理にコミットしないでください
+* 本番環境で環境変数を使用する
+* ボットトークンを安全に保管してください
   :::
 
-### 5. Install Server Dependencies
+### 5. サーバーの依存関係をインストールする
 
 ```bash
-cd server
-npm install
+cd サーバー
+npm インストール
 ```
 
-### 6. Start the Backend Server
+### 6. バックエンドサーバーを起動する
 
 ```bash
-# Development
+# 開発
 npm run dev
 
-# Production
+# 本番環境
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. 構成の展開
 
-For production deployments, set environment variables in your hosting platform:
+実稼働環境へのデプロイメントでは、ホスティング プラットフォームで環境変数を設定します。
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **フロントエンド**: `REACT_APP_API_URL` を本番環境の API URL に設定します
+* **バックエンド**: ボットトークンとチャンネルIDを含むサーバーフォルダを展開します
+* **データベース**: SQLiteデータベースが自動的に作成されます
+* **コンテキスト**: Discord のコンテキスト レベルとオプションを好みに応じて設定します
 
-## How It Works
+## 仕組み
 
-### Complete Bidirectional Flow
+### 完全な双方向フロー
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **ウェブサイトコメント**: ユーザーがウェブサイトのフォームからコメントを送信します
+2. **Discord メッセージ**: ボットは、完全なページ コンテキストを含むフォーマットされた埋め込みを Discord チャネルに送信します。
+3. **スレッド作成**: ボットは整理された返信用のスレッドを自動的に作成します
+4. **Discord返信**: Discordユーザーはスレッドまたはメッセージに返信します
+5. **データベースストレージ**: ボットはすべてのコメントと返信をSQLiteデータベースに保存します
+6. **ウェブサイトの表示**: フロントエンドは30秒ごとにAPIをポーリングし、Discordの返信を表示します。
 
-### Discord Message Format
+### Discordメッセージの形式
 
-Discord embeds include:
+Discord 埋め込みには次のものが含まれます:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **説明**: 実際のコメント内容
+* **著者**: コメント投稿者の名前
+* **URL**: 正確なページへのクリック可能なリンク
+* **ページフィールド**: クリック可能なリンクを含むページタイトルを表示します
+* **タイムスタンプ**: コメントが投稿された日時
+* **スレッド**: 返信用に自動作成されたスレッド
 
-### Website Display
+### ウェブサイトの表示
 
-The website shows:
+ウェブサイトには次の内容が表示されます:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **元のコメント**: ウェブサイトのフォーム送信
+* **Discord返信**: アバターとユーザー名を持つDiscordユーザーからの返信
+* **リアルタイム更新**: 新しい返信の自動ポーリング
+* **スレッド化された会話**: 整理されたコメント→返信構造
 
-## Context Configuration
+## コンテキスト構成
 
-### Context Levels
+### コンテキストレベル
 
-Configure how much context appears in Discord messages:
+Discord メッセージに表示されるコンテキストの量を設定します。
 
-#### `DISCORD_CONTEXT_LEVEL=minimal`
+#### `DISCORD_CONTEXT_LEVEL=最小限`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **表示**: ページタイトルとコメントの内容のみ
+* **ユースケース**: 余分なコンテキストのない、簡潔でシンプルなメッセージ
 
-#### `DISCORD_CONTEXT_LEVEL=basic`
+#### `DISCORD_CONTEXT_LEVEL=基本`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **表示**: ページタイトル、コメント内容、クリック可能なページ URL
+* **使用例**: 重要な情報を含む中程度のコンテキスト
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (デフォルト)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **表示**: パンくずリスト、セクション、タイムスタンプを含むすべてのコンテキスト情報
+* **ユースケース**: 詳細な議論のための最大限のコンテキスト
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `DISCORD_CONTEXT_LEVEL=カスタム`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **表示**: 個別に有効にしたコンテキスト要素のみ
+* **ユースケース**: 表示される内容を細かく制御する
 
-### Individual Context Controls
+### 個別のコンテキストコントロール
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+`DISCORD_CONTEXT_LEVEL=custom` を使用する場合、各要素を制御できます。
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # ページタイトルと URL フィールドを表示します
+DISCORD_SHOW_BREADCRUMBS=true # ナビゲーション ブレッドクラムを表示します
+DISCORD_SHOW_SECTION_INFO=true # メイン セクション (Docker、Nextcloud など) を表示します
+DISCORD_SHOW_PAGE_PATH=false # 完全な URL パスを表示します
+DISCORD_SHOW_TIMESTAMP=true # コメントが投稿された日時を表示します
+DISCORD_SHOW_AUTHOR_FIELD=true # 埋め込み作成者としてコメント投稿者の名前を表示します
 ```
 
-### Example Context Outputs
+### スレッド構成
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # 返信用のスレッドを作成する
+DISCORD_THREAD_DURATION=1440 # スレッドの自動アーカイブ時間（分）
+DISCORD_SITE_NAME=サイト名 # フッターにサイト名を表示する
 ```
 
-**Full Context:**
+### コンテキスト出力の例
+
+**最小限のコンテキスト:**
 
 ```
-💬 New Comment: Docker Installation Guide
+Docker インストール ガイド
+「このチュートリアルは本当に役に立ちました。ポートの競合にはどのように対処すればよいですか?」
+```
+
+**基本的なコンテキスト:**
+
+```
+💬 Docker インストールガイド
+「このチュートリアルは本当に役に立ちました！ポートの競合をどう処理すればいいですか？」
+[ページへのリンク]
+```
+
+**完全なコンテキスト:**
+
+```
+💬 新しいコメント: Docker インストールガイド
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+「このチュートリアルは本当に役に立ちました！ポートの競合はどのように処理すればいいですか？」
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 ページ: Docker インストールガイド
+📍 ナビゲーション: Docker > ドキュメント > Docker のインストール
+📂 セクション: Docker
+🔗 パス: /Docker/Docs/Installing%20Docker/Docker%20Engine
 
-Your Site Name • Comment System
+あなたのサイト名 • コメントシステム
 ```
 
-## Customization
+## カスタマイズ
 
-### Styling
+### スタイリング
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Discord コメント コンポーネントは CSS モジュールを使用します。 以下を変更することで外観をカスタマイズできます。
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### メッセージ形式
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+Discord 埋め込み形式をカスタマイズするには、次の `discordMessage` オブジェクトを編集します。
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### 部品配置
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+Discord のコメントは、デフォルトで Giscus のコメントの下に表示されます。 これを変更するには、以下を変更します。
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Bot Not Responding
+### ボットが応答しない
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **ボットトークンを確認**: `DISCORD_BOT_TOKEN` が正しいことを確認してください
+2. **権限を確認**: ボットがチャネル内で必要な権限を持っていることを確認します
+3. **チャンネルIDを確認してください**: `DISCORD_CHANNEL_ID`が正しいことを確認してください
+4. **サーバー内のボット**: ボットが実際に Discord サーバーに存在することを確認します
 
-### Comments Not Appearing
+### コメントが表示されない
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. **サーバー実行中**: バックエンドサーバーが正しいポートで実行されているかどうかを確認します
+2. **API URL**: `REACT_APP_API_URL` がバックエンド サーバーを指していることを確認します
+3. **データベース**: サーバーフォルダにSQLiteデータベースが作成されているかどうかを確認します
+4. **CORS**: フロントエンドドメインに CORS が設定されていることを確認してください
 
-### Discord Replies Not Showing
+### Discordの返信が表示されない
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **メッセージコンテンツの意図**: Discord開発者ポータルでこれが有効になっていることを確認してください
+2. **ボットの権限**: ボットがチャンネル内のメッセージを読み取れることを確認する
+3. **データベース接続**: サーバーログでデータベースエラーを確認してください
+4. **ポーリング**: フロントエンドは30秒ごとにポーリングします - 返信が表示されるまで時間がかかる場合があります
 
-### Environment Variables Not Working
+### 環境変数が機能しない
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **開発**: フロントエンドサーバーとバックエンドサーバーの両方を再起動します
+* **本番**: 正しい環境変数を使用してフロントエンドとバックエンドの両方を再デプロイします
+* **プレフィックス**: フロントエンド変数には `REACT_APP_` プレフィックスのみを使用してください
 
-### Database Issues
+### データベースの問題
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **ファイル権限**: サーバーがデータベースディレクトリに書き込み可能であることを確認する
+2. **ディスク容量**: SQLiteデータベースの使用可能なディスク容量を確認します
+3. **サーバーログ**: サーバーコンソールでデータベース接続エラーを確認してください
 
-## Security Considerations
+## セキュリティに関する考慮事項
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **ボットトークン**: ボットトークンを秘密にして、バージョン管理にコミットしないでください。
+* **レート制限**: Discord にはボットのレート制限があります (Webhook とは異なります)
+* **入力検証**: フロントエンドとバックエンドの両方でユーザー入力を検証します
+* **データベースセキュリティ**: SQLiteデータベースは適切なファイル権限で保護する必要があります
+* **API セキュリティ**: API エンドポイントにレート制限を実装することを検討してください
+* **CORS**: 本番ドメインにCORSを適切に設定します
 
-## Architecture
+## 建築
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+ウェブサイトフロントエンド ←→ Express API ←→ Discord ボット ←→ Discord サーバー
                     ↓
-                SQLite Database
+                SQLite データベース
 ```
 
-## File Structure
+## ファイル構造
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # フロントエンドコンポーネント
+├── server/ # バックエンドサーバー
+│ ├── api.js # Express APIサーバー
+│ ├── discord-bot.js # Discordボットロジック
+│ ├── database.js # SQLiteデータベース関数
+│ └── package.json # サーバー依存関係
+└── docs/Discord/Docs/ # ドキュメント
 ```
 
-## Browser Support
+## ブラウザのサポート
 
-The Discord comments component works in all modern browsers that support:
+Discord コメント コンポーネントは、以下をサポートするすべての最新ブラウザーで動作します。
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* ES6 フェッチ API
+* リアクト18歳以上
+* CSSグリッドとフレックスボックス
+* ローカルストレージ（フォームの永続化用）
