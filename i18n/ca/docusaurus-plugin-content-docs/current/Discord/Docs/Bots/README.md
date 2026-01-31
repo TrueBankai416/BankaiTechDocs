@@ -2,8 +2,7 @@
 title: Bots
 description: Comprehensive guide to Discord bots covering functionality, common uses, moderation, entertainment, and integration capabilities.
 image: /img/social/discord-social.jpg
-tags:
-  - Discord
+tags: [ Discord ]
 keywords: [ Discord, Bot ]
 last_update:
   author: BankaiTech
