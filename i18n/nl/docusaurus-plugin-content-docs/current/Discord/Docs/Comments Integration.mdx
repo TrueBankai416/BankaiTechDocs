@@ -11,14 +11,14 @@ Deze documentatiesite bevat een **bidirectionele Discord-commentaarintegratie** 
 
 ## Functies
 
-* **Bidirectionele communicatie**: reacties op de website → Discord, antwoorden op Discord → website
-* **Dubbel reactiesysteem**: Zowel Giscus (gebaseerd op GitHub) als Discord-reacties werken samen.
-* **Rich Discord Embeds**: Reacties worden weergegeven als opgemaakte embeds met volledige pagina-context.
-* **Threadbeheer**: Automatische aanmaak van threads voor overzichtelijke reacties.
-* **Realtime updates**: De website toont automatisch Discord-reacties.
-* **Volledige paginacontext**: Opmerkingen bevatten de paginatitel, URL en navigatiecontext.
-* **Gebruikersavatars**: In Discord-reacties worden gebruikersavatars en gebruikersnamen weergegeven.
-* **Responsief ontwerp**: Werkt op zowel desktop- als mobiele apparaten.
+- **Bidirectionele communicatie**: reacties op de website → Discord, antwoorden op Discord → website
+- **Dubbel reactiesysteem**: Zowel Giscus (gebaseerd op GitHub) als Discord-reacties werken samen.
+- **Rich Discord Embeds**: Reacties worden weergegeven als opgemaakte embeds met volledige pagina-context.
+- **Threadbeheer**: Automatische aanmaak van threads voor overzichtelijke reacties.
+- **Realtime updates**: De website toont automatisch Discord-reacties.
+- **Volledige paginacontext**: Opmerkingen bevatten de paginatitel, URL en navigatiecontext.
+- **Gebruikersavatars**: In Discord-reacties worden gebruikersavatars en gebruikersnamen weergegeven.
+- **Responsief ontwerp**: Werkt op zowel desktop- als mobiele apparaten.
 
 ## Installatie-instructies
 
@@ -29,19 +29,19 @@ Deze documentatiesite bevat een **bidirectionele Discord-commentaarintegratie** 
 3. Ga naar het gedeelte "Bot" en maak een bot aan.
 4. Kopieer het bottoken
 5. Schakel onder 'Privileged Gateway Intents' het volgende in:
-   * **Berichtinhoud en -doel**
-   * **Serverleden intentie** (optioneel)
+   - **Berichtinhoud en -doel**
+   - **Serverleden intentie** (optioneel)
 
-### 3) Invite Bot to Server
+### 7. Implementatieconfiguratie
 
 Je bot heeft de volgende machtigingen nodig:
 
-* Berichten lezen
-* Berichten verzenden
-* Openbare discussies aanmaken
-* Berichten verzenden in threads
-* Lees de berichtgeschiedenis
-* Gebruik slash-opdrachten (optioneel)
+- Berichten lezen
+- Berichten verzenden
+- Openbare discussies aanmaken
+- Berichten verzenden in threads
+- Lees de berichtgeschiedenis
+- Gebruik slash-opdrachten (optioneel)
 
 ### 6. Start the Backend Server
 
@@ -50,7 +50,7 @@ Je bot heeft de volgende machtigingen nodig:
 3. Selecteer de hierboven vermelde machtigingen.
 4. Gebruik de gegenereerde URL om de bot uit te nodigen naar je server.
 
-### 7) Deploy Configuration
+### 5. Installeer serverafhankelijkheden
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Uw sitenaam
 
 :::waarschuwing Beveiligingsnotitie
 
-* Voeg nooit `.env`-bestanden toe aan versiebeheer.
-* Gebruik omgevingsvariabelen in productie.
-* Houd je bottoken veilig
+- Voeg nooit `.env`-bestanden toe aan versiebeheer.
+- Gebruik omgevingsvariabelen in productie.
+- Houd je bottoken veilig
   :::
 
-### 5. Installeer serverafhankelijkheden
+### 6. Start de backendserver.
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. Start de backendserver.
+### 6. Start the Backend Server
 
 ```bash
 # Ontwikkeling
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Implementatieconfiguratie
+### 7. 7. Deploy Configuration
 
 Voor implementaties in een productieomgeving stelt u de volgende omgevingsvariabelen in op uw hostingplatform:
 
-* **Frontend**: Stel `REACT_APP_API_URL` in op de URL van uw productie-API.
-* **Backend**: Implementeer de servermap met bottoken en kanaal-ID.
-* **Database**: Er wordt automatisch een SQLite-database aangemaakt.
-* **Context**: Configureer het Discord-contextniveau en de opties naar uw voorkeur.
+- **Frontend**: Stel `REACT_APP_API_URL` in op de URL van uw productie-API.
+- **Backend**: Implementeer de servermap met bottoken en kanaal-ID.
+- **Database**: Er wordt automatisch een SQLite-database aangemaakt.
+- **Context**: Configureer het Discord-contextniveau en de opties naar uw voorkeur.
 
 ## Hoe het werkt
 
@@ -140,22 +140,22 @@ Voor implementaties in een productieomgeving stelt u de volgende omgevingsvariab
 
 Discord-integraties omvatten:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Beschrijving**: De daadwerkelijke inhoud van de reactie
-* **Auteur**: De naam van de reageerder
-* **URL**: Klikbare link naar de exacte pagina
-* **Paginaveld**: Toont de paginatitel met een klikbare link.
-* **Tijdstempel**: Wanneer de reactie werd geplaatst
-* **Thread**: Automatisch aangemaakte thread voor reacties
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Beschrijving**: De daadwerkelijke inhoud van de reactie
+- **Auteur**: De naam van de reageerder
+- **URL**: Klikbare link naar de exacte pagina
+- **Paginaveld**: Toont de paginatitel met een klikbare link.
+- **Tijdstempel**: Wanneer de reactie werd geplaatst
+- **Thread**: Automatisch aangemaakte thread voor reacties
 
 ### Websiteweergave
 
 De website toont:
 
-* **Oorspronkelijke opmerkingen**: Inzendingen via het websiteformulier
-* **Discord-reacties**: Reacties van Discord-gebruikers met avatars en gebruikersnamen
-* **Realtime updates**: Automatische polling voor nieuwe reacties
-* **Gestructureerde gesprekken**: Georganiseerde commentaar-→ antwoordstructuur
+- **Oorspronkelijke opmerkingen**: Inzendingen via het websiteformulier
+- **Discord-reacties**: Reacties van Discord-gebruikers met avatars en gebruikersnamen
+- **Realtime updates**: Automatische polling voor nieuwe reacties
+- **Gestructureerde gesprekken**: Georganiseerde commentaar-→ antwoordstructuur
 
 ## Contextconfiguratie
 
@@ -165,23 +165,23 @@ Stel in hoeveel context er in Discord-berichten wordt weergegeven:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Toont**: Alleen de paginatitel en de inhoud van de reacties
-* **Gebruiksscenario**: Duidelijke, eenvoudige berichten zonder extra context.
+- **Toont**: Alleen de paginatitel en de inhoud van de reacties
+- **Gebruiksscenario**: Duidelijke, eenvoudige berichten zonder extra context.
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Toont**: Paginatitel, reactie-inhoud en klikbare pagina-URL
-* **Gebruiksscenario**: Een context met beperkte informatie.
+- **Toont**: Paginatitel, reactie-inhoud en klikbare pagina-URL
+- **Gebruiksscenario**: Een context met beperkte informatie.
 
 #### `DISCORD_CONTEXT_LEVEL=full` (standaard)
 
-* **Toont**: Alle contextinformatie, inclusief breadcrumbs, secties en tijdstempels.
-* **Gebruiksscenario**: Maximale context voor gedetailleerde discussies
+- **Toont**: Alle contextinformatie, inclusief breadcrumbs, secties en tijdstempels.
+- **Gebruiksscenario**: Maximale context voor gedetailleerde discussies
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Toont**: Alleen de contextelementen die u afzonderlijk inschakelt.
-* **Gebruiksscenario**: Nauwkeurige controle over wat er verschijnt
+- **Toont**: Alleen de contextelementen die u afzonderlijk inschakelt.
+- **Gebruiksscenario**: Nauwkeurige controle over wat er verschijnt
 
 ### Individuele contextbesturingselementen
 
@@ -246,7 +246,7 @@ De component voor reacties op Discord maakt gebruik van CSS-modules. Je kunt het
 src/components/DiscordComments/styles.module.css
 ```
 
-### Berichtindeling
+### Message Format
 
 Om de insluitindeling van Discord aan te passen, bewerk je het object `discordMessage` in:
 
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Omgevingsvariabelen werken niet
 
-* **Ontwikkeling**: Herstart zowel de frontend- als de backendservers.
-* **Productie**: Herimplementeer zowel de frontend als de backend met de juiste omgevingsvariabelen.
-* **Voorvoegsel**: Gebruik het voorvoegsel `REACT_APP_` alleen voor frontend-variabelen.
+- **Ontwikkeling**: Herstart zowel de frontend- als de backendservers.
+- **Productie**: Herimplementeer zowel de frontend als de backend met de juiste omgevingsvariabelen.
+- **Voorvoegsel**: Gebruik het voorvoegsel `REACT_APP_` alleen voor frontend-variabelen.
 
 ### Databaseproblemen
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Beveiligingsaspecten
 
-* **Bot-token**: Houd uw bot-token geheim en voeg deze nooit toe aan versiebeheer.
-* **Snelheidsbeperking**: Discord hanteert snelheidsbeperkingen voor bots (anders dan voor webhooks).
-* **Invoervalidatie**: Zowel de frontend als de backend valideren de gebruikersinvoer.
-* **Databasebeveiliging**: De SQLite-database moet worden beschermd met de juiste bestandsrechten.
-* **API-beveiliging**: Overweeg het instellen van een snelheidsbeperking (rate limiting) op uw API-eindpunten.
-* **CORS**: Configureer CORS correct voor uw productiedomein.
+- **Bot-token**: Houd uw bot-token geheim en voeg deze nooit toe aan versiebeheer.
+- **Snelheidsbeperking**: Discord hanteert snelheidsbeperkingen voor bots (anders dan voor webhooks).
+- **Invoervalidatie**: Zowel de frontend als de backend valideren de gebruikersinvoer.
+- **Databasebeveiliging**: De SQLite-database moet worden beschermd met de juiste bestandsrechten.
+- **API-beveiliging**: Overweeg het instellen van een snelheidsbeperking (rate limiting) op uw API-eindpunten.
+- **CORS**: Configureer CORS correct voor uw productiedomein.
 
 ## Architectuur
 
@@ -331,7 +331,7 @@ project/
 
 De Discord-commentaarfunctie werkt in alle moderne browsers die het volgende ondersteunen:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid en Flexbox
-* Lokale opslag (voor het bewaren van formulieren)
+- ES6 fetch API
+- React 18+
+- CSS Grid en Flexbox
+- Lokale opslag (voor het bewaren van formulieren)
