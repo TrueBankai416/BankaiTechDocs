@@ -108,12 +108,12 @@ The Scrutiny host consists of three services: InfluxDB (database), the web UI, a
 
 ### Configuration Notes
 
-* **InfluxDB**: Exposed on port 8089 (mapped from 8086) for direct access if needed
-* **Web UI**: Accessible on port 8091 (mapped from 8080)
-* **Collector**: The built-in collector runs on the same host as the Docker containers
-  * Update the `COLLECTOR_HOST_ID` to identify your host server
-  * Add or remove device mappings under `devices:` section based on your drives
-  * The collector automatically runs on startup and then on a cron schedule
+- **InfluxDB**: Exposed on port 8089 (mapped from 8086) for direct access if needed
+- **Web UI**: Accessible on port 8091 (mapped from 8080)
+- **Collector**: The built-in collector runs on the same host as the Docker containers
+  - Update the `COLLECTOR_HOST_ID` to identify your host server
+  - Add or remove device mappings under `devices:` section based on your drives
+  - The collector automatically runs on startup and then on a cron schedule
 
 ### Device Discovery
 
@@ -253,17 +253,17 @@ Scrutiny can send email notifications when drive issues are detected. This requi
    ```
 
 3. Configure the SMTP notification URL:
-   * Locate the `notify:` section
-   * Uncomment the SMTP line
-   * Replace `username:password@host:port` with your SMTP server details
-   * Set `fromAddress` to the email address notifications should come from
-   * Set `toAddresses` to recipient email addresses (comma-separated for multiple recipients)
+   - Locate the `notify:` section
+   - Uncomment the SMTP line
+   - Replace `username:password@host:port` with your SMTP server details
+   - Set `fromAddress` to the email address notifications should come from
+   - Set `toAddresses` to recipient email addresses (comma-separated for multiple recipients)
 
 4. **Important**: URL encode special characters in usernames and passwords:
 
-   * Replace `@` with `%40`
-   * Replace `.` with `%2E`
-   * Replace `$` with `%24`
+   - Replace `@` with `%40`
+   - Replace `.` with `%2E`
+   - Replace `$` with `%24`
 
    Example: If your username is `myname@example.com` and password is `124@34$1`, the URL becomes:
 
@@ -281,21 +281,21 @@ Scrutiny can send email notifications when drive issues are detected. This requi
 
 Scrutiny supports multiple notification services via [Shoutrrr](https://containrrr.dev/shoutrrr/services/overview/). You can enable multiple services simultaneously by uncommenting additional URLs in the `notify.urls` section:
 
-* Discord
-* Telegram
-* Pushover
-* Slack
-* Microsoft Teams
-* Gotify
-* Pushbullet
-* IFTTT
-* Mattermost
-* Ntfy
-* Google Hangouts
-* Zulip
-* Join
-* Custom scripts
-* Webhooks
+- Discord
+- Telegram
+- Pushover
+- Slack
+- Microsoft Teams
+- Gotify
+- Pushbullet
+- IFTTT
+- Mattermost
+- Ntfy
+- Google Hangouts
+- Zulip
+- Join
+- Custom scripts
+- Webhooks
 
 ---
 
@@ -309,9 +309,9 @@ The Scrutiny collector binary can be run on Windows to gather SMART metrics and 
 
 Scrutiny relies on `smartctl` from [smartmontools](https://www.smartmontools.org/wiki/Download).
 
-* Download and install the Windows package.
-* During installation, check the option to **add smartctl to PATH**.
-* Verify installation:
+- Download and install the Windows package.
+- During installation, check the option to **add smartctl to PATH**.
+- Verify installation:
 
 ```powershell
 smartctl --version
@@ -321,8 +321,8 @@ smartctl --version
 
 ## 2. Download the Scrutiny Collector Binary
 
-* Get the latest Windows release from [Scrutiny GitHub Releases](https://github.com/AnalogJ/scrutiny/releases).
-* Place the binary in a folder, e.g.:
+- Get the latest Windows release from [Scrutiny GitHub Releases](https://github.com/AnalogJ/scrutiny/releases).
+- Place the binary in a folder, e.g.:
 
 ```
 C:\scrutiny\
@@ -339,8 +339,8 @@ cd C:\scrutiny
 .\scrutiny-collector-metrics-windows-amd64.exe run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"
 ```
 
-* Replace `<server-ip>` with the IP or hostname of your Scrutiny web server.
-* Set `--host-id` to a friendly name for this computer (e.g. `MyWindowsPC`). This name will appear in the Scrutiny dashboard.
+- Replace `<server-ip>` with the IP or hostname of your Scrutiny web server.
+- Set `--host-id` to a friendly name for this computer (e.g. `MyWindowsPC`). This name will appear in the Scrutiny dashboard.
 
 ---
 
@@ -375,9 +375,9 @@ To collect metrics regularly:
 
 1. Open **Task Scheduler**.
 2. Create a new task:
-   * **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
-   * **Arguments**: `run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"`
-   * **Start in**: `C:\scrutiny`
+   - **Program/script**: `C:\scrutiny\scrutiny-collector-metrics-windows-amd64.exe`
+   - **Arguments**: `run --api-endpoint "http://<server-ip>:8091" --host-id "MyWindowsPC"`
+   - **Start in**: `C:\scrutiny`
 3. Check **Run with highest privileges**.
 4. Set a trigger (e.g. daily).
 5. Save the task.
@@ -393,8 +393,6 @@ After the collector runs, drives from this Windows PC will appear in the Scrutin
 <Tabs>
   <TabItem value="Manual Run" label="Manual Run">
     Run once from PowerShell to test connectivity.
-  </TabItem>
-
   <TabItem value="Scheduled Task" label="Scheduled Task">
     Automate collection daily with Task Scheduler.
   </TabItem>
@@ -446,9 +444,9 @@ For remote Linux machines that need to report SMART metrics to your Scrutiny ser
    ```
 
 3. Update the configuration:
-   * Replace `server` in `COLLECTOR_API_ENDPOINT` with your Scrutiny server's IP or hostname
-   * Set `COLLECTOR_HOST_ID` to a unique name for this machine (e.g., `Legion`, `ProxmoxHost`, etc.)
-   * Update the `devices:` section with the drives on this machine
+   - Replace `server` in `COLLECTOR_API_ENDPOINT` with your Scrutiny server's IP or hostname
+   - Set `COLLECTOR_HOST_ID` to a unique name for this machine (e.g., `Legion`, `ProxmoxHost`, etc.)
+   - Update the `devices:` section with the drives on this machine
 
 4. Start the collector:
    ```bash
@@ -457,11 +455,11 @@ For remote Linux machines that need to report SMART metrics to your Scrutiny ser
 
 ### Configuration Notes
 
-* **API Endpoint**: Must point to your Scrutiny web server (port 8091 by default)
-* **Host ID**: Uniquely identifies this collector in the dashboard
-* **Devices**: List all drives you want to monitor on this machine
-* **Run on Startup**: `COLLECTOR_RUN_STARTUP: true` ensures metrics are collected immediately when the container starts
-* The collector will automatically run on a schedule after the initial startup
+- **API Endpoint**: Must point to your Scrutiny web server (port 8091 by default)
+- **Host ID**: Uniquely identifies this collector in the dashboard
+- **Devices**: List all drives you want to monitor on this machine
+- **Run on Startup**: `COLLECTOR_RUN_STARTUP: true` ensures metrics are collected immediately when the container starts
+- The collector will automatically run on a schedule after the initial startup
 
 ### Device Discovery
 
@@ -491,20 +489,20 @@ The drives from this machine should appear in your Scrutiny dashboard under the 
 
 ### Official Documentation
 
-* **GitHub Repository**: [AnalogJ/scrutiny](https://github.com/AnalogJ/scrutiny)
-* **Example Configuration File**: [example.scrutiny.yaml](https://github.com/AnalogJ/scrutiny/blob/master/example.scrutiny.yaml) - Complete reference for all configuration options
-* **Releases**: [Scrutiny Releases](https://github.com/AnalogJ/scrutiny/releases) - Download the latest binaries and Docker images
+- **GitHub Repository**: [AnalogJ/scrutiny](https://github.com/AnalogJ/scrutiny)
+- **Example Configuration File**: [example.scrutiny.yaml](https://github.com/AnalogJ/scrutiny/blob/master/example.scrutiny.yaml) - Complete reference for all configuration options
+- **Releases**: [Scrutiny Releases](https://github.com/AnalogJ/scrutiny/releases) - Download the latest binaries and Docker images
 
 ### Tools
 
-* **Smartmontools**: [Download smartmontools](https://www.smartmontools.org/wiki/Download) - Required for SMART data collection on Windows
-* **Windows**: Download and install the [Windows package](https://github.com/AnalogJ/scrutiny/releases)
-* **URL Formatter**: [Online URL Formatter](https://www.freeformatter.com/url-encoder.html#before-output)
+- **Smartmontools**: [Download smartmontools](https://www.smartmontools.org/wiki/Download) - Required for SMART data collection on Windows
+- **Windows**: Download and install the [Windows package](https://github.com/AnalogJ/scrutiny/releases)
+- **URL Formatter**: [Online URL Formatter](https://www.freeformatter.com/url-encoder.html#before-output)
 
 ### Helpful Links
 
-* [Troubleshooting Device Collector](https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DEVICE_COLLECTOR.md)
-* [Reverse Proxy Configuration](https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_REVERSE_PROXY.md)
-* [Shoutrrr Notification Services](https://containrrr.dev/shoutrrr/services/overview/) - Comprehensive guide for all supported notification platforms
+- [Troubleshooting Device Collector](https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DEVICE_COLLECTOR.md)
+- [Reverse Proxy Configuration](https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_REVERSE_PROXY.md)
+- [Shoutrrr Notification Services](https://containrrr.dev/shoutrrr/services/overview/) - Comprehensive guide for all supported notification platforms
 
 <BuyMeACoffeeButton />
