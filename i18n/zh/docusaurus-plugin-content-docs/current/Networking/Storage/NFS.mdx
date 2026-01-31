@@ -53,33 +53,30 @@ NFS is a network file system protocol that enables distributed file sharing acro
 <Tabs
   defaultValue="nfsv4"
   values={[
-    {label: 'NFSv4', value: 'nfsv4'},
-    {label: 'NFSv3', value: 'nfsv3'},
-    {label: 'Comparison', value: 'comparison'},
-  ]}>
+  {label: 'NFSv4', value: 'nfsv4'},
+  {label: 'NFSv3', value: 'nfsv3'},
+  {label: 'Comparison', value: 'comparison'},
+  ]}
+>
+  <TabItem value="nfsv4">
+    **NFSv4 (Recommended)**
 
-<TabItem value="nfsv4">
-**NFSv4 (Recommended)**
-- **Security**: Built-in security with Kerberos support
-- **Firewall Friendly**: Uses only TCP port 2049
-- **Performance**: Better caching and reduced network overhead
-- **Features**: Advanced features like delegations and compound operations
-- **Statefulness**: Stateful protocol with better error recovery
-- **UTF-8 Support**: Full Unicode filename support
-</TabItem>
+* **Security**: Built-in security with Kerberos support
+* **Firewall Friendly**: Uses only TCP port 2049
+* **Performance**: Better caching and reduced network overhead
+* **Features**: Advanced features like delegations and compound operations
+* **Statefulness**: Stateful protocol with better error recovery
+* **UTF-8 Support**: Full Unicode filename support
 
-<TabItem value="nfsv3">
-**NFSv3 (Legacy)**
-- **Simplicity**: Simpler setup and configuration
-- **Compatibility**: Better compatibility with older systems
-- **Stateless**: Stateless protocol, simpler recovery
-- **Performance**: Good performance for basic operations
-- **Limitations**: Limited security, multiple ports required
-- **File Locking**: Separate lockd service required
-</TabItem>
+* **Simplicity**: Simpler setup and configuration
+* **Compatibility**: Better compatibility with older systems
+* **Stateless**: Stateless protocol, simpler recovery
+* **Performance**: Good performance for basic operations
+* **Limitations**: Limited security, multiple ports required
+* **File Locking**: Separate lockd service required
 
 <TabItem value="comparison">
-**Feature Comparison**
+    **Feature Comparison**
 
 | Feature        | NFSv3    | NFSv4          |
 | -------------- | -------- | -------------- |
@@ -141,10 +138,15 @@ NFS is a network file system protocol that enables distributed file sharing acro
 <Tabs
   defaultValue="ubuntu"
   values={[
-    {label: 'Ubuntu/Debian', value: 'ubuntu'},
-    {label: 'CentOS/RHEL', value: 'centos'},
-    {label: 'Generic Linux', value: 'generic'},
-  ]}>
+  {label: 'Ubuntu/Debian', value: 'ubuntu'},
+  {label: 'CentOS/RHEL', value: 'centos'},
+  {label: 'Generic Linux', value: 'generic'},
+  ]}
+>
+  <TabItem value="ubuntu">
+    ```bash
+    # Update package list
+    sudo apt update
 
 <TabItem value="ubuntu">
 ```bash
@@ -153,42 +155,44 @@ sudo apt update
 
 # Install NFS server packages
 
-sudo apt install nfs-kernel-server nfs-common
+# Install NFS server packagessudo apt install nfs-kernel-server nfs-common# Start and enable NFS servicessudo systemctl start nfs-kernel-server
+sudo systemctl enable nfs-kernel-server# Check service statussudo systemctl status nfs-kernel-server```
 
-# Start and enable NFS services
+```
 
-sudo systemctl start nfs-kernel-server
-sudo systemctl enable nfs-kernel-server
+# | Feature        | NFSv3    | NFSv4          |
+| -------------- | -------- | -------------- |
+| Security       | Basic    | Kerberos, ACLs |
+| Ports          | Multiple | Single (2049)  |
+| Performance    | Good     | Better         |
+| Caching        | Basic    | Advanced       |
+| File Locking   | External | Built-in       |
+| Unicode        | Limited  | Full           |
+| Recommendation | Legacy   | Modern         |
+
+# Install NFS utilities (package name varies by distribution)# Common package names: nfs-kernel-server, nfs-utils, nfs-server# Start NFS servicessudo systemctl start nfs-server
+sudo systemctl enable nfs-server```
+
+```
 
 # Check service status
 
 sudo systemctl status nfs-kernel-server
 
 ````
-</TabItem>
-
 <TabItem value="centos">
-```bash
-# Install NFS server packages
-sudo yum install nfs-utils
-
-# Start and enable NFS services
-sudo systemctl start nfs-server
-sudo systemctl enable nfs-server
-sudo systemctl start rpcbind
-sudo systemctl enable rpcbind
-
-# Check service status
-sudo systemctl status nfs-server
+    ```bash
+    # Install NFS server packages
+    sudo yum install nfs-utils
 ````
 
 </TabItem>
 
 <TabItem value="generic">
-```bash
-# Check if NFS server is installed
-which nfsd
-systemctl status nfs-server
+    ```bash
+    # Check if NFS server is installed
+    which nfsd
+    systemctl status nfs-server
 
 # Install NFS utilities (package name varies by distribution)
 
@@ -196,16 +200,14 @@ systemctl status nfs-server
 
 # Start NFS services
 
-sudo systemctl start nfs-server
+# Start and enable NFS servicessudo systemctl start nfs-server
 sudo systemctl enable nfs-server
+sudo systemctl start rpcbind
+sudo systemctl enable rpcbind# Check service statussudo systemctl status nfs-server```
 
-````
-</TabItem>
-</Tabs>
+```
 
-### **2. Create Export Directories**
-
-```bash
+```
 # Create directories for NFS exports
 sudo mkdir -p /export/{data,vm,backup,iso,templates}
 
@@ -215,7 +217,7 @@ sudo chmod 755 /export/{data,vm,backup,iso,templates}
 
 # Verify directory creation
 ls -la /export/
-````
+```
 
 ### **3. Configure NFS Exports**
 
@@ -672,15 +674,43 @@ sudo exportfs -ra
 <Tabs
   defaultValue="mount-issues"
   values={[
-    {label: 'Mount Issues', value: 'mount-issues'},
-    {label: 'Performance Problems', value: 'performance'},
-    {label: 'Permission Issues', value: 'permissions'},
-    {label: 'Network Problems', value: 'network'},
-  ]}>
+  {label: 'Mount Issues', value: 'mount-issues'},
+  {label: 'Performance Problems', value: 'performance'},
+  {label: 'Permission Issues', value: 'permissions'},
+  {label: 'Network Problems', value: 'network'},
+  ]}
+>
+  <TabItem value="mount-issues">
+    **Mount Failures**
 
-<TabItem value="mount-issues">
-**Mount Failures**
+<TabItem value="performance">
+    **Performance Issues**
 
+````bash
+```bash
+# Monitor NFS performance
+nfsstat -c  # Client statistics
+nfsstat -s  # Server statistics
+
+# Check network utilization
+iftop -i eth0
+iostat -x 1
+
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/nfs-data/test bs=1M count=100
+rm /mnt/pve/nfs-data/test
+
+# Check mount options
+mount | grep nfs
+```
+````
+
+</TabItem>
+
+<TabItem value="permissions">
+    **Permission Problems**
+
+````bash
 ```bash
 # Check NFS server availability
 showmount -e 192.168.1.100
@@ -700,34 +730,14 @@ mount -v -t nfs4 192.168.1.100:/export/data /mnt/pve/nfs-data
 journalctl -u nfs-kernel-server
 tail -f /var/log/syslog | grep nfs
 ```
+````
 
 </TabItem>
 
-<TabItem value="performance">
-**Performance Issues**
+<TabItem value="network">
+    **Network Issues**
 
-```bash
-# Monitor NFS performance
-nfsstat -c  # Client statistics
-nfsstat -s  # Server statistics
-
-# Check network utilization
-iftop -i eth0
-iostat -x 1
-
-# Test transfer speeds
-dd if=/dev/zero of=/mnt/pve/nfs-data/test bs=1M count=100
-rm /mnt/pve/nfs-data/test
-
-# Check mount options
-mount | grep nfs
-```
-
-</TabItem>
-
-<TabItem value="permissions">
-**Permission Problems**
-
+````bash
 ```bash
 # Check export permissions
 sudo exportfs -v
@@ -743,12 +753,14 @@ ls -la /mnt/pve/nfs-data/
 touch /mnt/pve/nfs-data/test
 ls -la /mnt/pve/nfs-data/test
 ```
+````
 
 </TabItem>
 
-<TabItem value="network">
-**Network Issues**
+<TabItem value="nfsv3">
+    **NFSv3 (Legacy)**
 
+````bash
 ```bash
 # Check network connectivity
 ping 192.168.1.100
@@ -764,6 +776,7 @@ ufw status
 # Monitor network traffic
 tcpdump -i eth0 host 192.168.1.100
 ```
+````
 
 </TabItem>
 </Tabs>
