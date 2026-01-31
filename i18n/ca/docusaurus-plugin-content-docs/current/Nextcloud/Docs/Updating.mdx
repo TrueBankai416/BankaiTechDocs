@@ -24,16 +24,13 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Updating Nextcloud Image with Docker**
 
-### ***Listing Current Images***
+### **_Listing Current Images_**
 
 <p>run the following command to list all your docker images</p>
-
 ```bash
 sudo docker images
 ```
-
 <p>The output should look similiar to this.</p>
-
 ```bash
 REPOSITORY                TAG             IMAGE ID       CREATED          SIZE
 bankaitech/nextcloud      28.0.5-custom   1715832d34f5   31 minutes ago   2.41GB
@@ -49,43 +46,33 @@ radialapps/go-vod         latest          7562fd28454d   5 months ago     789MB
 
 <p>For this tutorial I will be removing the `bankaitech/nextcloud:latest` image.</p>
 <p>First lets stop nextcloud</p>
-
 ```bash
 sudo docker compose down
 ```
-
 :::note
 You have to be in the directory containing your `docker-compose.yaml` file
 :::
-
+<p>Lets Delete the old Image</p>
 ```bash
 sudo docker image rm bankaitech/nextcloud:latest
 ```
-
 <p>Now lets pull the new image</p>
-
 ```bash
 sudo docker pull bankaitech/nextcloud:latest
 ```
-
 <p>Wait for it to finish downloading</p>
 
-### ***Starting nextcloud***
+### **_Starting nextcloud_**
 
 <p>Start nextcloud</p>
-
 ```bash
 sudo docker compose up -d
 ```
-
 <p>Wait about 15-30 seconds and then check the nextcloud logs</p>
-
 ```bash
 sudo docker logs nextcloud
 ```
-
 <p>You should see this</p>
-
 ```
 root@testing:/var/docker/nextcloud# docker logs nextcloud
 Configuring Redis as session handler
@@ -102,17 +89,14 @@ Update app memories from App Store
 Starting code integrity check...
 root@testing:/var/docker/nextcloud# 
 ```
-
 :::note
 You may have to check the logs several times if you are not seeing anything after `Upgrading nextcloud`
 :::
-
+<p>Now lets run the upgrade command</p>
 ```bash
 sudo docker exec -it -u 33 nextcloud php occ upgrade
 ```
-
 <p>You should see something like this</p>
-
 ```bash
 root@testing:/var/docker/nextcloud# sudo docker exec -it -u 33 nextcloud php occ upgrade                          
 Nextcloud is already latest version
