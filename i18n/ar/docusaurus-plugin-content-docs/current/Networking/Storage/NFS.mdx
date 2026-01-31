@@ -34,19 +34,19 @@ NFS is a network file system protocol that enables distributed file sharing acro
 
 ### **Benefits of NFS**
 
-* ✅ **High Performance**: Excellent throughput and low latency
-* ✅ **Native Linux Support**: Built into the Linux kernel
-* ✅ **Mature Protocol**: Stable and well-tested technology
-* ✅ **Live Migration Support**: Enables VM live migration in Proxmox
-* ✅ **Shared Storage**: Multiple Proxmox nodes can access the same storage
-* ✅ **POSIX Compliance**: Full POSIX file system semantics
+- ✅ **High Performance**: Excellent throughput and low latency
+- ✅ **Native Linux Support**: Built into the Linux kernel
+- ✅ **Mature Protocol**: Stable and well-tested technology
+- ✅ **Live Migration Support**: Enables VM live migration in Proxmox
+- ✅ **Shared Storage**: Multiple Proxmox nodes can access the same storage
+- ✅ **POSIX Compliance**: Full POSIX file system semantics
 
 ### **Limitations of NFS**
 
-* ❌ **Security**: Limited built-in security (improved in NFSv4)
-* ❌ **Network Dependency**: Performance depends on network quality
-* ❌ **Single Point of Failure**: Server availability affects all clients
-* ❌ **Complexity**: More complex setup than local storage
+- ❌ **Security**: Limited built-in security (improved in NFSv4)
+- ❌ **Network Dependency**: Performance depends on network quality
+- ❌ **Single Point of Failure**: Server availability affects all clients
+- ❌ **Complexity**: More complex setup than local storage
 
 ## **NFS Versions Comparison**
 
@@ -61,38 +61,34 @@ NFS is a network file system protocol that enables distributed file sharing acro
   <TabItem value="nfsv4">
     **NFSv4 (Recommended)**
 
-    * **Security**: Built-in security with Kerberos support
-    * **Firewall Friendly**: Uses only TCP port 2049
-    * **Performance**: Better caching and reduced network overhead
-    * **Features**: Advanced features like delegations and compound operations
-    * **Statefulness**: Stateful protocol with better error recovery
-    * **UTF-8 Support**: Full Unicode filename support
-  </TabItem>
+* **Security**: Built-in security with Kerberos support
+* **Firewall Friendly**: Uses only TCP port 2049
+* **Performance**: Better caching and reduced network overhead
+* **Features**: Advanced features like delegations and compound operations
+* **Statefulness**: Stateful protocol with better error recovery
+* **UTF-8 Support**: Full Unicode filename support
 
-  <TabItem value="nfsv3">
-    **NFSv3 (Legacy)**
+* **Simplicity**: Simpler setup and configuration
+* **Compatibility**: Better compatibility with older systems
+* **Stateless**: Stateless protocol, simpler recovery
+* **Performance**: Good performance for basic operations
+* **Limitations**: Limited security, multiple ports required
+* **File Locking**: Separate lockd service required
 
-    * **Simplicity**: Simpler setup and configuration
-    * **Compatibility**: Better compatibility with older systems
-    * **Stateless**: Stateless protocol, simpler recovery
-    * **Performance**: Good performance for basic operations
-    * **Limitations**: Limited security, multiple ports required
-    * **File Locking**: Separate lockd service required
-  </TabItem>
-
-  <TabItem value="comparison">
+<TabItem value="comparison">
     **Feature Comparison**
 
-    | Feature        | NFSv3    | NFSv4          |
-    | -------------- | -------- | -------------- |
-    | Security       | Basic    | Kerberos, ACLs |
-    | Ports          | Multiple | Single (2049)  |
-    | Performance    | Good     | Better         |
-    | Caching        | Basic    | Advanced       |
-    | File Locking   | External | Built-in       |
-    | Unicode        | Limited  | Full           |
-    | Recommendation | Legacy   | Modern         |
-  </TabItem>
+| Feature        | NFSv3    | NFSv4          |
+| -------------- | -------- | -------------- |
+| Security       | Basic    | Kerberos, ACLs |
+| Ports          | Multiple | Single (2049)  |
+| Performance    | Good     | Better         |
+| Caching        | Basic    | Advanced       |
+| File Locking   | External | Built-in       |
+| Unicode        | Limited  | Full           |
+| Recommendation | Legacy   | Modern         |
+
+</TabItem>
 </Tabs>
 
 ## **Architecture Overview**
@@ -152,60 +148,66 @@ NFS is a network file system protocol that enables distributed file sharing acro
     # Update package list
     sudo apt update
 
-    # Install NFS server packages
+<TabItem value="ubuntu">
+```bash
+# Update package list
+sudo apt update
 
-    sudo apt install nfs-kernel-server nfs-common
+# Install NFS server packages
 
-    # Start and enable NFS services
+# Install NFS server packagessudo apt install nfs-kernel-server nfs-common# Start and enable NFS servicessudo systemctl start nfs-kernel-server
+sudo systemctl enable nfs-kernel-server# Check service statussudo systemctl status nfs-kernel-server```
 
-    sudo systemctl start nfs-kernel-server
-    sudo systemctl enable nfs-kernel-server
+```
 
-    # Check service status
+# | Feature        | NFSv3    | NFSv4          |
+| -------------- | -------- | -------------- |
+| Security       | Basic    | Kerberos, ACLs |
+| Ports          | Multiple | Single (2049)  |
+| Performance    | Good     | Better         |
+| Caching        | Basic    | Advanced       |
+| File Locking   | External | Built-in       |
+| Unicode        | Limited  | Full           |
+| Recommendation | Legacy   | Modern         |
 
-    sudo systemctl status nfs-kernel-server
+# Install NFS utilities (package name varies by distribution)# Common package names: nfs-kernel-server, nfs-utils, nfs-server# Start NFS servicessudo systemctl start nfs-server
+sudo systemctl enable nfs-server```
 
-    ```
-  </TabItem>
+```
 
-  <TabItem value="centos">
+# Check service status
+
+sudo systemctl status nfs-kernel-server
+
+````
+<TabItem value="centos">
     ```bash
     # Install NFS server packages
     sudo yum install nfs-utils
+````
 
-    # Start and enable NFS services
-    sudo systemctl start nfs-server
-    sudo systemctl enable nfs-server
-    sudo systemctl start rpcbind
-    sudo systemctl enable rpcbind
+</TabItem>
 
-    # Check service status
-    sudo systemctl status nfs-server
-    ```
-  </TabItem>
-
-  <TabItem value="generic">
+<TabItem value="generic">
     ```bash
     # Check if NFS server is installed
     which nfsd
     systemctl status nfs-server
 
-    # Install NFS utilities (package name varies by distribution)
+# Install NFS utilities (package name varies by distribution)
 
-    # Common package names: nfs-kernel-server, nfs-utils, nfs-server
+# Common package names: nfs-kernel-server, nfs-utils, nfs-server
 
-    # Start NFS services
+# Start NFS services
 
-    sudo systemctl start nfs-server
-    sudo systemctl enable nfs-server
+# Start and enable NFS servicessudo systemctl start nfs-server
+sudo systemctl enable nfs-server
+sudo systemctl start rpcbind
+sudo systemctl enable rpcbind# Check service statussudo systemctl status nfs-server```
 
-    ```
-  </TabItem>
-</Tabs>
+```
 
-### **2. Create Export Directories**
-
-```bash
+```
 # Create directories for NFS exports
 sudo mkdir -p /export/{data,vm,backup,iso,templates}
 
@@ -446,20 +448,20 @@ ls /mnt/pve/nfs-backup/
 ### **1. Add NFS Storage via Web Interface**
 
 1. **Access Proxmox Web Interface**
-   * Navigate to your Proxmox web interface
-   * Go to **Datacenter** → **Storage**
+   - Navigate to your Proxmox web interface
+   - Go to **Datacenter** → **Storage**
 
 2. **Add NFS Storage**
-   * Click **Add** → **NFS**
-   * Configure the following:
-     * **ID**: `nfs-data` (unique identifier)
-     * **Server**: `192.168.1.100`
-     * **Export**: `/export/data`
-     * **Content**: Select appropriate content types
-     * **Nodes**: Select which nodes can access this storage
+   - Click **Add** → **NFS**
+   - Configure the following:
+     - **ID**: `nfs-data` (unique identifier)
+     - **Server**: `192.168.1.100`
+     - **Export**: `/export/data`
+     - **Content**: Select appropriate content types
+     - **Nodes**: Select which nodes can access this storage
 
 3. **Repeat for Additional Shares**
-   * Add separate storage entries for vm, backup, iso, templates
+   - Add separate storage entries for vm, backup, iso, templates
 
 ### **2. Add NFS Storage via Command Line**
 
@@ -681,87 +683,102 @@ sudo exportfs -ra
   <TabItem value="mount-issues">
     **Mount Failures**
 
-    ```bash
-    # Check NFS server availability
-    showmount -e 192.168.1.100
-
-    # Test network connectivity
-    ping 192.168.1.100
-    telnet 192.168.1.100 2049
-
-    # Check NFS services
-    systemctl status nfs-kernel-server
-    systemctl status rpcbind
-
-    # Debug mount issues
-    mount -v -t nfs4 192.168.1.100:/export/data /mnt/pve/nfs-data
-
-    # Check system logs
-    journalctl -u nfs-kernel-server
-    tail -f /var/log/syslog | grep nfs
-    ```
-  </TabItem>
-
-  <TabItem value="performance">
+<TabItem value="performance">
     **Performance Issues**
 
-    ```bash
-    # Monitor NFS performance
-    nfsstat -c  # Client statistics
-    nfsstat -s  # Server statistics
+````bash
+```bash
+# Monitor NFS performance
+nfsstat -c  # Client statistics
+nfsstat -s  # Server statistics
 
-    # Check network utilization
-    iftop -i eth0
-    iostat -x 1
+# Check network utilization
+iftop -i eth0
+iostat -x 1
 
-    # Test transfer speeds
-    dd if=/dev/zero of=/mnt/pve/nfs-data/test bs=1M count=100
-    rm /mnt/pve/nfs-data/test
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/nfs-data/test bs=1M count=100
+rm /mnt/pve/nfs-data/test
 
-    # Check mount options
-    mount | grep nfs
-    ```
-  </TabItem>
+# Check mount options
+mount | grep nfs
+```
+````
 
-  <TabItem value="permissions">
+</TabItem>
+
+<TabItem value="permissions">
     **Permission Problems**
 
-    ```bash
-    # Check export permissions
-    sudo exportfs -v
+````bash
+```bash
+# Check NFS server availability
+showmount -e 192.168.1.100
 
-    # Verify directory permissions on server
-    ls -la /export/data/
+# Test network connectivity
+ping 192.168.1.100
+telnet 192.168.1.100 2049
 
-    # Check user mapping
-    id
-    ls -la /mnt/pve/nfs-data/
+# Check NFS services
+systemctl status nfs-kernel-server
+systemctl status rpcbind
 
-    # Test file creation
-    touch /mnt/pve/nfs-data/test
-    ls -la /mnt/pve/nfs-data/test
-    ```
-  </TabItem>
+# Debug mount issues
+mount -v -t nfs4 192.168.1.100:/export/data /mnt/pve/nfs-data
 
-  <TabItem value="network">
+# Check system logs
+journalctl -u nfs-kernel-server
+tail -f /var/log/syslog | grep nfs
+```
+````
+
+</TabItem>
+
+<TabItem value="network">
     **Network Issues**
 
-    ```bash
-    # Check network connectivity
-    ping 192.168.1.100
+````bash
+```bash
+# Check export permissions
+sudo exportfs -v
 
-    # Verify NFS ports
-    nmap -p 2049 192.168.1.100
-    netstat -an | grep 2049
+# Verify directory permissions on server
+ls -la /export/data/
 
-    # Check firewall rules
-    iptables -L
-    ufw status
+# Check user mapping
+id
+ls -la /mnt/pve/nfs-data/
 
-    # Monitor network traffic
-    tcpdump -i eth0 host 192.168.1.100
-    ```
-  </TabItem>
+# Test file creation
+touch /mnt/pve/nfs-data/test
+ls -la /mnt/pve/nfs-data/test
+```
+````
+
+</TabItem>
+
+<TabItem value="nfsv3">
+    **NFSv3 (Legacy)**
+
+````bash
+```bash
+# Check network connectivity
+ping 192.168.1.100
+
+# Verify NFS ports
+nmap -p 2049 192.168.1.100
+netstat -an | grep 2049
+
+# Check firewall rules
+iptables -L
+ufw status
+
+# Monitor network traffic
+tcpdump -i eth0 host 192.168.1.100
+```
+````
+
+</TabItem>
 </Tabs>
 
 ### **Diagnostic Commands**
@@ -803,7 +820,7 @@ check_nfs_mount() {
     local name="$2"
 
     if mountpoint -q "$mount_point"; then
-        if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
+        if timeout 10 ls "$mount_point" >/dev/null 2>&amp;1; then
             echo "$(date): ✓ $name is healthy"
             return 0
         else
@@ -866,7 +883,7 @@ remount_nfs() {
 # Check and remount failed NFS mounts
 for mount in data vm backup iso templates; do
     mount_point="/mnt/pve/nfs-$mount"
-    if ! mountpoint -q "$mount_point" || ! timeout 5 ls "$mount_point" >/dev/null 2>&1; then
+    if ! mountpoint -q "$mount_point" || ! timeout 5 ls "$mount_point" >/dev/null 2>&amp;1; then
         remount_nfs "$mount_point" "nfs-$mount"
     fi
 done
@@ -897,27 +914,27 @@ EOF
 
 ### **1. Design Recommendations**
 
-* **Use NFSv4**: Prefer NFSv4 over NFSv3 for better security and performance
-* **Dedicated Network**: Use dedicated networks for NFS traffic
-* **Proper Sizing**: Size NFS servers appropriately for expected load
-* **Redundancy**: Implement redundancy at both network and storage levels
-* **Monitoring**: Implement comprehensive monitoring and alerting
+- **Use NFSv4**: Prefer NFSv4 over NFSv3 for better security and performance
+- **Dedicated Network**: Use dedicated networks for NFS traffic
+- **Proper Sizing**: Size NFS servers appropriately for expected load
+- **Redundancy**: Implement redundancy at both network and storage levels
+- **Monitoring**: Implement comprehensive monitoring and alerting
 
 ### **2. Security Best Practices**
 
-* **Network Segmentation**: Isolate NFS traffic using VLANs
-* **Access Control**: Use specific IP restrictions in exports
-* **Kerberos Authentication**: Implement Kerberos for enhanced security
-* **Regular Updates**: Keep NFS server and client software updated
-* **Firewall Rules**: Implement appropriate firewall restrictions
+- **Network Segmentation**: Isolate NFS traffic using VLANs
+- **Access Control**: Use specific IP restrictions in exports
+- **Kerberos Authentication**: Implement Kerberos for enhanced security
+- **Regular Updates**: Keep NFS server and client software updated
+- **Firewall Rules**: Implement appropriate firewall restrictions
 
 ### **3. Performance Best Practices**
 
-* **Network Optimization**: Use gigabit or 10GbE networks
-* **Mount Options**: Optimize mount options for your workload
-* **Server Tuning**: Tune NFS server parameters
-* **Caching**: Use appropriate caching strategies
-* **Load Distribution**: Distribute load across multiple NFS servers
+- **Network Optimization**: Use gigabit or 10GbE networks
+- **Mount Options**: Optimize mount options for your workload
+- **Server Tuning**: Tune NFS server parameters
+- **Caching**: Use appropriate caching strategies
+- **Load Distribution**: Distribute load across multiple NFS servers
 
 NFS provides excellent performance and reliability for Proxmox storage when properly configured. Its native Linux support and mature ecosystem make it an ideal choice for enterprise virtualization environments requiring shared storage capabilities.
 
