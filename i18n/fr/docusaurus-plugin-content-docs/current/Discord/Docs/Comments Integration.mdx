@@ -11,14 +11,14 @@ Ce site de documentation inclut une **intégration bidirectionnelle des commenta
 
 ## Caractéristiques
 
-* **Communication bidirectionnelle** : Commentaires du site web → Discord, Réponses Discord → Site web
-* **Système de commentaires double** : Les commentaires Giscus (basé sur GitHub) et Discord fonctionnent de concert.
-* **Intégrations Discord enrichies** : Les commentaires apparaissent sous forme d’intégrations formatées avec le contexte de la page complète
-* **Gestion des fils de discussion** : Création automatique de fils de discussion pour des réponses organisées
-* **Mises à jour en temps réel** : Le site web affiche automatiquement les réponses Discord.
-* **Contexte complet de la page** : Les commentaires incluent le titre de la page, l’URL et le contexte de navigation
-* **Avatars des utilisateurs** : Les réponses Discord affichent les avatars et les noms d’utilisateur.
-* **Conception adaptative** : Fonctionne aussi bien sur ordinateur que sur appareils mobiles
+- **Communication bidirectionnelle** : Commentaires du site web → Discord, Réponses Discord → Site web
+- **Système de commentaires double** : Les commentaires Giscus (basé sur GitHub) et Discord fonctionnent de concert.
+- **Intégrations Discord enrichies** : Les commentaires apparaissent sous forme d’intégrations formatées avec le contexte de la page complète
+- **Gestion des fils de discussion** : Création automatique de fils de discussion pour des réponses organisées
+- **Mises à jour en temps réel** : Le site web affiche automatiquement les réponses Discord.
+- **Contexte complet de la page** : Les commentaires incluent le titre de la page, l’URL et le contexte de navigation
+- **Avatars des utilisateurs** : Les réponses Discord affichent les avatars et les noms d’utilisateur.
+- **Conception adaptative** : Fonctionne aussi bien sur ordinateur que sur appareils mobiles
 
 ## Instructions d'installation
 
@@ -29,19 +29,19 @@ Ce site de documentation inclut une **intégration bidirectionnelle des commenta
 3. Rendez-vous dans la section « Bot » et créez un bot.
 4. Copiez le jeton du bot
 5. Sous « Intentions de passerelle privilégiées », activez :
-   * **Intention du contenu du message**
-   * **Intention des membres du serveur** (facultatif)
+   - **Intention du contenu du message**
+   - **Intention des membres du serveur** (facultatif)
 
-### 3) Invite Bot to Server
+### 7. Configuration de déploiement
 
 Votre bot a besoin des autorisations suivantes :
 
-* Lire les messages
-* Envoyer des messages
-* Créer des fils de discussion publics
-* Envoyer des messages dans les fils de discussion
-* Lire l'historique des messages
-* Utiliser les commandes Slash (facultatif)
+- Lire les messages
+- Envoyer des messages
+- Créer des fils de discussion publics
+- Envoyer des messages dans les fils de discussion
+- Lire l'historique des messages
+- Utiliser les commandes Slash (facultatif)
 
 ### 6. Start the Backend Server
 
@@ -50,9 +50,9 @@ Votre bot a besoin des autorisations suivantes :
 3. Sélectionnez les autorisations listées ci-dessus
 4. Utilisez l'URL générée pour inviter le bot sur votre serveur.
 
-### 7) Deploy Configuration
+### 5. Installer les dépendances du serveur
 
-#### Interface utilisateur (.env)
+#### Frontend (.env)
 
 ```env
 # Configuration du bot Discord
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Nom de votre site
 
 Note de sécurité :::avertissement
 
-* Ne jamais versionner les fichiers `.env`.
-* Utiliser les variables d'environnement en production
-* Sécurisez votre jeton de bot
+- Ne jamais versionner les fichiers `.env`.
+- Utiliser les variables d'environnement en production
+- Sécurisez votre jeton de bot
   :::
 
-### 5. Installer les dépendances du serveur
+### 6. Démarrer le serveur backend
 
 ```bash
 serveur cd
 npm install
 ```
 
-### 6. Démarrer le serveur backend
+### 6. Start the Backend Server
 
 ```bash
 # Développement
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Configuration de déploiement
+### 7. 7. Deploy Configuration
 
 Pour les déploiements en production, définissez les variables d'environnement sur votre plateforme d'hébergement :
 
-* **Frontend** : Définissez `REACT_APP_API_URL` sur l’URL de votre API de production.
-* **Backend** : Déployez le dossier serveur contenant le jeton du bot et l’ID du canal.
-* **Base de données** : Une base de données SQLite sera créée automatiquement.
-* **Contexte** : Configurez le niveau de contexte et les options de Discord selon vos préférences.
+- **Frontend** : Définissez `REACT_APP_API_URL` sur l’URL de votre API de production.
+- **Backend** : Déployez le dossier serveur contenant le jeton du bot et l’ID du canal.
+- **Base de données** : Une base de données SQLite sera créée automatiquement.
+- **Contexte** : Configurez le niveau de contexte et les options de Discord selon vos préférences.
 
 ## Comment ça marche
 
@@ -140,22 +140,22 @@ Pour les déploiements en production, définissez les variables d'environnement 
 
 Les intégrations Discord incluent :
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Description** : Le contenu du commentaire lui-même
-* **Auteur** : Nom du commentateur
-* **URL** : Lien cliquable vers la page exacte
-* **Champ Page** : Affiche le titre de la page avec un lien cliquable
-* **Date et heure de publication du commentaire** : Date et heure de publication du commentaire
-* **Sujet** : Fil de discussion créé automatiquement pour les réponses
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Description** : Le contenu du commentaire lui-même
+- **Auteur** : Nom du commentateur
+- **URL** : Lien cliquable vers la page exacte
+- **Champ Page** : Affiche le titre de la page avec un lien cliquable
+- **Date et heure de publication du commentaire** : Date et heure de publication du commentaire
+- **Sujet** : Fil de discussion créé automatiquement pour les réponses
 
 ### Affichage du site Web
 
 Le site web affiche :
 
-* **Commentaires originaux** : Soumissions de formulaires sur le site Web
-* **Réponses Discord** : Réponses des utilisateurs Discord avec avatar et nom d’utilisateur
-* **Mises à jour en temps réel** : Sondage automatique pour recueillir les nouvelles réponses
-* **Conversations par fil de discussion** : Structure organisée des commentaires et des réponses
+- **Commentaires originaux** : Soumissions de formulaires sur le site Web
+- **Réponses Discord** : Réponses des utilisateurs Discord avec avatar et nom d’utilisateur
+- **Mises à jour en temps réel** : Sondage automatique pour recueillir les nouvelles réponses
+- **Conversations par fil de discussion** : Structure organisée des commentaires et des réponses
 
 ## Configuration du contexte
 
@@ -165,23 +165,23 @@ Configurez le niveau de contexte affiché dans les messages Discord :
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Affiche** : Titre de la page et contenu des commentaires uniquement
-* **Cas d'utilisation** : Messages clairs et simples, sans contexte supplémentaire
+- **Affiche** : Titre de la page et contenu des commentaires uniquement
+- **Cas d'utilisation** : Messages clairs et simples, sans contexte supplémentaire
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Affiche** : Titre de la page, contenu du commentaire et URL cliquable de la page
-* **Cas d'utilisation** : Contexte modéré avec informations essentielles
+- **Affiche** : Titre de la page, contenu du commentaire et URL cliquable de la page
+- **Cas d'utilisation** : Contexte modéré avec informations essentielles
 
 #### `DISCORD_CONTEXT_LEVEL=full` (par défaut)
 
-* **Affiche** : Toutes les informations contextuelles, y compris le fil d’Ariane, les sections et les horodatages.
-* **Cas d'utilisation** : Contexte maximal pour des discussions détaillées
+- **Shows**: All context information including breadcrumbs, sections, timestamps
+- **Cas d'utilisation** : Contexte maximal pour des discussions détaillées
 
 #### `DISCORD_CONTEXT_LEVEL=personnalisé`
 
-* **Affiche** : Seuls les éléments de contexte que vous activez individuellement sont affichés.
-* **Cas d'utilisation** : Contrôle précis de ce qui apparaît
+- **Affiche** : Seuls les éléments de contexte que vous activez individuellement sont affichés.
+- **Cas d'utilisation** : Contrôle précis de ce qui apparaît
 
 ### Contrôles du contexte individuel
 
@@ -262,7 +262,7 @@ Les commentaires Discord apparaissent par défaut sous les commentaires Giscus. 
 src/theme/DocItem/Layout/index.js
 ```
 
-## Dépannage
+## Troubleshooting
 
 ### Le bot ne répond pas
 
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Les variables d'environnement ne fonctionnent pas
 
-* **Développement** : Redémarrez les serveurs frontend et backend.
-* **Production** : Redéployer le frontend et le backend avec les variables d’environnement correctes
-* **Préfixe** : Utilisez le préfixe `REACT_APP_` uniquement pour les variables frontend.
+- **Développement** : Redémarrez les serveurs frontend et backend.
+- **Production** : Redéployer le frontend et le backend avec les variables d’environnement correctes
+- **Préfixe** : Utilisez le préfixe `REACT_APP_` uniquement pour les variables frontend.
 
 ### Problèmes de base de données
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Considérations de sécurité
 
-* **Jeton du bot** : Gardez votre jeton de bot secret et ne le publiez jamais dans un système de contrôle de version.
-* **Limitation du débit** : Discord impose des limites de débit aux bots (différentes des limites des webhooks).
-* **Validation des entrées** : Les entrées utilisateur sont validées à la fois côté client et côté serveur.
-* **Sécurité de la base de données** : La base de données SQLite doit être protégée par des permissions de fichiers appropriées.
-* **Sécurité des API** : Envisagez de mettre en œuvre une limitation du débit sur vos points de terminaison d’API.
-* **CORS** : Configurez correctement CORS pour votre domaine de production
+- **Jeton du bot** : Gardez votre jeton de bot secret et ne le publiez jamais dans un système de contrôle de version.
+- **Limitation du débit** : Discord impose des limites de débit aux bots (différentes des limites des webhooks).
+- **Validation des entrées** : Les entrées utilisateur sont validées à la fois côté client et côté serveur.
+- **Sécurité de la base de données** : La base de données SQLite doit être protégée par des permissions de fichiers appropriées.
+- **Sécurité des API** : Envisagez de mettre en œuvre une limitation du débit sur vos points de terminaison d’API.
+- **CORS** : Configurez correctement CORS pour votre domaine de production
 
 ## Architecture
 
@@ -331,7 +331,7 @@ projet/
 
 Le composant de commentaires Discord fonctionne dans tous les navigateurs modernes qui prennent en charge :
 
-* API de récupération ES6
-* Réaction 18+
-* CSS Grid et Flexbox
-* Stockage local (pour la persistance des formulaires)
+- API de récupération ES6
+- Réaction 18+
+- CSS Grid et Flexbox
+- Stockage local (pour la persistance des formulaires)
