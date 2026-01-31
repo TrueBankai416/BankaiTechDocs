@@ -11,14 +11,14 @@ Ta strona dokumentacji obejmuje **dwukierunkową integrację komentarzy Discord*
 
 ## Cechy
 
-* **Komunikacja dwukierunkowa**: Komentarze na stronie → Discord, odpowiedzi na Discordzie → Strona internetowa
-* **Podwójny system komentarzy**: komentarze Giscus (oparte na GitHubie) i Discord działają razem
-* **Bogate osadzenia Discord**: Komentarze pojawiają się jako sformatowane osadzenia z kontekstem całej strony
-* **Zarządzanie wątkami**: automatyczne tworzenie wątków w celu uporządkowania odpowiedzi
-* **Aktualizacje w czasie rzeczywistym**: Strona internetowa automatycznie wyświetla odpowiedzi Discord
-* **Kontekst całej strony**: Komentarze obejmują tytuł strony, adres URL i kontekst nawigacji
-* **Awatary użytkowników**: odpowiedzi Discord pokazują awatary i nazwy użytkowników
-* **Responsywny projekt**: Działa zarówno na komputerach stacjonarnych, jak i urządzeniach mobilnych
+- **Komunikacja dwukierunkowa**: Komentarze na stronie → Discord, odpowiedzi na Discordzie → Strona internetowa
+- **Podwójny system komentarzy**: komentarze Giscus (oparte na GitHubie) i Discord działają razem
+- **Bogate osadzenia Discord**: Komentarze pojawiają się jako sformatowane osadzenia z kontekstem całej strony
+- **Zarządzanie wątkami**: automatyczne tworzenie wątków w celu uporządkowania odpowiedzi
+- **Aktualizacje w czasie rzeczywistym**: Strona internetowa automatycznie wyświetla odpowiedzi Discord
+- **Kontekst całej strony**: Komentarze obejmują tytuł strony, adres URL i kontekst nawigacji
+- **Awatary użytkowników**: odpowiedzi Discord pokazują awatary i nazwy użytkowników
+- **Responsywny projekt**: Działa zarówno na komputerach stacjonarnych, jak i urządzeniach mobilnych
 
 ## Instrukcje konfiguracji
 
@@ -29,28 +29,28 @@ Ta strona dokumentacji obejmuje **dwukierunkową integrację komentarzy Discord*
 3. Przejdź do sekcji „Bot” i utwórz bota
 4. Skopiuj token bota
 5. W sekcji „Intencje bramy uprzywilejowanej” włącz:
-   * **Intencja treści wiadomości**
-   * **Intencja członków serwera** (opcjonalnie)
+   - **Intencja treści wiadomości**
+   - **Intencja członków serwera** (opcjonalnie)
 
-### 3) Invite Bot to Server
+### 7. Wdrażanie konfiguracji
 
 Twój bot potrzebuje następujących uprawnień:
 
-* Przeczytaj wiadomości
-* Wyślij wiadomości
-* Utwórz wątki publiczne
-* Wysyłaj wiadomości w wątkach
-* Przeczytaj historię wiadomości
-* Użyj poleceń ukośnika (opcjonalnie)
+- Przeczytaj wiadomości
+- Wyślij wiadomości
+- Utwórz wątki publiczne
+- Wysyłaj wiadomości w wątkach
+- Przeczytaj historię wiadomości
+- Użyj poleceń ukośnika (opcjonalnie)
 
-### 6. Start the Backend Server
+### 6. Uruchom serwer zaplecza
 
 1. Przejdź do OAuth2 > Generator adresów URL
 2. Wybierz zakres „bot”
 3. Wybierz uprawnienia wymienione powyżej
 4. Użyj wygenerowanego adresu URL, aby zaprosić bota na swój serwer
 
-### 7) Deploy Configuration
+### 5. Zainstaluj zależności serwera
 
 #### Front-end (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Nazwa Twojej witryny
 
 :::ostrzeżenie Uwaga dotycząca bezpieczeństwa
 
-* Nigdy nie przekazuj plików `.env` do systemu kontroli wersji
-* Użyj zmiennych środowiskowych w środowisku produkcyjnym
-* Zadbaj o bezpieczeństwo swojego tokena bota
+- Nigdy nie przekazuj plików `.env` do systemu kontroli wersji
+- Użyj zmiennych środowiskowych w środowisku produkcyjnym
+- Zadbaj o bezpieczeństwo swojego tokena bota
   :::
 
-### 5. Zainstaluj zależności serwera
+### 6. Start the Backend Server
 
 ```bash
 serwer cd
 instalacja npm
 ```
 
-### 6. Uruchom serwer zaplecza
+### 6. Start the Backend Server
 
 ```bash
 # Rozwój
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Wdrażanie konfiguracji
+### 7. 7. Deploy Configuration
 
 W przypadku wdrożeń produkcyjnych należy ustawić zmienne środowiskowe na platformie hostingowej:
 
-* **Frontend**: Ustaw `REACT_APP_API_URL` na adres URL swojego produkcyjnego interfejsu API
-* **Backend**: Wdróż folder serwera z tokenem bota i identyfikatorem kanału
-* **Baza danych**: Baza danych SQLite zostanie utworzona automatycznie
-* **Kontekst**: Skonfiguruj poziom kontekstu i opcje Discorda zgodnie ze swoimi preferencjami
+- **Frontend**: Ustaw `REACT_APP_API_URL` na adres URL swojego produkcyjnego interfejsu API
+- **Backend**: Wdróż folder serwera z tokenem bota i identyfikatorem kanału
+- **Baza danych**: Baza danych SQLite zostanie utworzona automatycznie
+- **Kontekst**: Skonfiguruj poziom kontekstu i opcje Discorda zgodnie ze swoimi preferencjami
 
 ## Jak to działa
 
@@ -140,22 +140,22 @@ W przypadku wdrożeń produkcyjnych należy ustawić zmienne środowiskowe na pl
 
 Osadzone elementy Discord obejmują:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Opis**: Rzeczywista treść komentarza
-* **Autor**: Imię komentującego
-* **URL**: Klikalny link do konkretnej strony
-* **Pole strony**: Pokazuje tytuł strony z klikalnym linkiem
-* **Znacznik czasu**: Kiedy komentarz został opublikowany
-* **Wątek**: Automatycznie utworzony wątek do odpowiedzi
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Opis**: Rzeczywista treść komentarza
+- **Autor**: Imię komentującego
+- **URL**: Klikalny link do konkretnej strony
+- **Pole strony**: Pokazuje tytuł strony z klikalnym linkiem
+- **Znacznik czasu**: Kiedy komentarz został opublikowany
+- **Wątek**: Automatycznie utworzony wątek do odpowiedzi
 
 ### Wyświetlanie witryny
 
 Na stronie internetowej pokazano:
 
-* **Oryginalne komentarze**: Zgłoszenia za pomocą formularzy na stronie internetowej
-* **Odpowiedzi Discord**: Odpowiedzi użytkowników Discord z awatarami i nazwami użytkowników
-* **Aktualizacje w czasie rzeczywistym**: automatyczne sprawdzanie nowych odpowiedzi
-* **Rozmowy wątkowe**: Zorganizowana struktura komentarzy → odpowiedzi
+- **Oryginalne komentarze**: Zgłoszenia za pomocą formularzy na stronie internetowej
+- **Odpowiedzi Discord**: Odpowiedzi użytkowników Discord z awatarami i nazwami użytkowników
+- **Aktualizacje w czasie rzeczywistym**: automatyczne sprawdzanie nowych odpowiedzi
+- **Rozmowy wątkowe**: Zorganizowana struktura komentarzy → odpowiedzi
 
 ## Konfiguracja kontekstu
 
@@ -165,23 +165,23 @@ Skonfiguruj ilość kontekstu wyświetlaną w wiadomościach Discord:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Pokazuje**: Tylko tytuł strony i treść komentarza
-* **Przypadek użycia**: Czyste, proste wiadomości bez dodatkowego kontekstu
+- **Pokazuje**: Tylko tytuł strony i treść komentarza
+- **Przypadek użycia**: Czyste, proste wiadomości bez dodatkowego kontekstu
 
 #### `DISCORD_CONTEXT_LEVEL=podstawowy`
 
-* **Pokazuje**: tytuł strony, treść komentarza i klikalny adres URL strony
-* **Przypadek użycia**: Umiarkowany kontekst z istotnymi informacjami
+- **Pokazuje**: tytuł strony, treść komentarza i klikalny adres URL strony
+- **Przypadek użycia**: Umiarkowany kontekst z istotnymi informacjami
 
 #### `DISCORD_CONTEXT_LEVEL=full` (domyślne)
 
-* **Pokazuje**: Wszystkie informacje kontekstowe, w tym ścieżki nawigacyjne, sekcje, znaczniki czasu
-* **Przypadek użycia**: Maksymalny kontekst dla szczegółowych dyskusji
+- **Pokazuje**: Wszystkie informacje kontekstowe, w tym ścieżki nawigacyjne, sekcje, znaczniki czasu
+- **Przypadek użycia**: Maksymalny kontekst dla szczegółowych dyskusji
 
 #### `DISCORD_CONTEXT_LEVEL=niestandardowy`
 
-* **Pokazuje**: Tylko elementy kontekstu, które włączasz indywidualnie
-* **Przypadek użycia**: Dokładna kontrola nad tym, co się wyświetla
+- **Pokazuje**: Tylko elementy kontekstu, które włączasz indywidualnie
+- **Przypadek użycia**: Dokładna kontrola nad tym, co się wyświetla
 
 ### Indywidualne kontrole kontekstowe
 
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Zmienne środowiskowe nie działają
 
-* **Rozwój**: Uruchom ponownie serwery front-end i back-end
-* **Produkcja**: Ponowne wdrożenie front-endu i back-endu z poprawnymi zmiennymi środowiskowymi
-* **Prefiks**: Używaj prefiksu `REACT_APP_` tylko w przypadku zmiennych front-end
+- **Rozwój**: Uruchom ponownie serwery front-end i back-end
+- **Produkcja**: Ponowne wdrożenie front-endu i back-endu z poprawnymi zmiennymi środowiskowymi
+- **Prefiks**: Używaj prefiksu `REACT_APP_` tylko w przypadku zmiennych front-end
 
 ### Problemy z bazą danych
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Zagadnienia bezpieczeństwa
 
-* **Token bota**: Utrzymuj swój token bota w tajemnicy i nigdy nie udostępniaj go kontroli wersji
-* **Ograniczanie przepustowości**: Discord ma limity przepustowości dla botów (inne niż w przypadku webhooków)
-* **Weryfikacja danych wejściowych**: Zarówno front-end, jak i back-end weryfikują dane wejściowe użytkownika
-* **Bezpieczeństwo bazy danych**: Baza danych SQLite powinna być chroniona odpowiednimi uprawnieniami do plików
-* **Bezpieczeństwo interfejsu API**: Rozważ wdrożenie ograniczenia przepustowości w punktach końcowych interfejsu API
-* **CORS**: Skonfiguruj CORS prawidłowo dla swojej domeny produkcyjnej
+- **Token bota**: Utrzymuj swój token bota w tajemnicy i nigdy nie udostępniaj go kontroli wersji
+- **Ograniczanie przepustowości**: Discord ma limity przepustowości dla botów (inne niż w przypadku webhooków)
+- **Weryfikacja danych wejściowych**: Zarówno front-end, jak i back-end weryfikują dane wejściowe użytkownika
+- **Bezpieczeństwo bazy danych**: Baza danych SQLite powinna być chroniona odpowiednimi uprawnieniami do plików
+- **Bezpieczeństwo interfejsu API**: Rozważ wdrożenie ograniczenia przepustowości w punktach końcowych interfejsu API
+- **CORS**: Skonfiguruj CORS prawidłowo dla swojej domeny produkcyjnej
 
 ## Architektura
 
@@ -331,7 +331,7 @@ project/
 
 Komponent komentarzy Discord działa we wszystkich nowoczesnych przeglądarkach, które obsługują:
 
-* API pobierania ES6
-* Reaguj 18+
-* Siatka CSS i Flexbox
-* Pamięć lokalna (do utrwalania formularza)
+- API pobierania ES6
+- Reaguj 18+
+- Siatka CSS i Flexbox
+- Pamięć lokalna (do utrwalania formularza)
