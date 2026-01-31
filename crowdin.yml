@@ -1,10 +1,25 @@
-project_id: Bankai-Tech
+# Your Crowdin credentials
+project_id: 'Bankai-Tech'
 api_token_env: CROWDIN_PERSONAL_TOKEN
-preserve_hierarchy: 1
+
+# Choose file structure in Crowdin
+preserve_hierarchy: true
+
+# MDX file type - use v1.2 parser for compatibility with Docusaurus
+mdx_file_type: &mdx_file_type mdx_v1_2
+
+# Files configuration
 files:
+  # JSON translation files (code.json, navbar.json, footer.json, etc.)
   - source: /i18n/en/**/*.json
     translation: /i18n/%two_letters_code%/**/%original_file_name%
-  - source: /docs/**/*.md
-    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+
+  # MDX files in docs
   - source: /docs/**/*.mdx
     translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    type: *mdx_file_type
+
+  # Markdown files in docs (ignore MDX files)
+  - source: /docs/**/*
+    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    ignore: [/**/*.mdx]
