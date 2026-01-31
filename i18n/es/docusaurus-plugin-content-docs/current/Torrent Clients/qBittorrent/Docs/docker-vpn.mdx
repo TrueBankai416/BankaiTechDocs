@@ -1,7 +1,21 @@
 ---
 title: qBittorrent Docker VPN Setup
-tags: [Torrent Clients, qBittorrent, VPN, Docker, Security, OpenVPN]
-keywords: [qBittorrent, VPN, Docker, OpenVPN, Kill Switch, NordVPN, binhex, torrent]
+tags:
+  - Torrent Clients
+  - qBittorrent
+  - VPN
+  - Docker
+  - Security
+  - OpenVPN
+keywords:
+  - qBittorrent
+  - VPN
+  - Docker
+  - OpenVPN
+  - Kill Switch
+  - NordVPN
+  - binhex
+  - torrent
 last_update:
   author: BankaiTech
 ---
@@ -24,10 +38,10 @@ This setup provides comprehensive VPN protection with built-in security features
 
 ## Prerequisites
 
-* Docker and Docker Compose installed
-* VPN provider account (NordVPN example used)
-* Basic understanding of Docker concepts
-* Access to VPN provider's OpenVPN configuration files
+- Docker and Docker Compose installed
+- VPN provider account (NordVPN example used)
+- Basic understanding of Docker concepts
+- Access to VPN provider's OpenVPN configuration files
 
 ## Part 1: Docker Container Setup
 
@@ -35,11 +49,11 @@ This setup provides comprehensive VPN protection with built-in security features
 
 The binhex/arch-qbittorrentvpn container provides a complete qBittorrent solution with integrated VPN support. Key features include:
 
-* Built-in OpenVPN client with automatic connection
-* Integrated kill switch that blocks traffic if VPN fails
-* Support for multiple VPN providers (NordVPN, ExpressVPN, etc.)
-* Automatic IP leak protection
-* Web UI access with configurable ports
+- Built-in OpenVPN client with automatic connection
+- Integrated kill switch that blocks traffic if VPN fails
+- Support for multiple VPN providers (NordVPN, ExpressVPN, etc.)
+- Automatic IP leak protection
+- Web UI access with configurable ports
 
 ### Docker Compose Configuration
 
@@ -111,10 +125,10 @@ environment:
 
 The `LAN_NETWORK` setting supports multiple subnets separated by commas. This is useful when:
 
-* Nginx reverse proxy is on a different subnet
-* You have multiple VLANs or network segments
-* Docker networks span multiple IP ranges
-* Other containers (Radarr/Sonarr) need to access qBittorrent's WebUI
+- Nginx reverse proxy is on a different subnet
+- You have multiple VLANs or network segments
+- Docker networks span multiple IP ranges
+- Other containers (Radarr/Sonarr) need to access qBittorrent's WebUI
 
 **Note**: If other Docker containers need to access qBittorrent's WebUI, include the Docker bridge subnet (typically `172.17.0.0/16`) in your `LAN_NETWORK` setting.
 
@@ -179,7 +193,7 @@ The container supports multiple VPN providers, but this guide focuses on NordVPN
 4. Copy your service username and password (different from account credentials)
 5. **Download OpenVPN configuration files** for your preferred servers
 
-#### 1) VPN Connection Problems
+#### 3. Supported VPN Providers
 
 After starting the container for the first time, it creates the necessary folders:
 
@@ -207,7 +221,7 @@ environment:
   - OPENVPN_CONFIG=us1234.nordvpn.com.udp  # Specify exact .ovpn file to use
 ```
 
-#### 3. Supported VPN Providers
+#### 4. Advanced VPN Options
 
 The binhex container supports these VPN providers:
 
@@ -219,7 +233,7 @@ The binhex container supports these VPN providers:
 | Private Internet Access | `pia`          | Popular choice              |
 | Custom                  | `custom`       | Use your own OpenVPN config |
 
-#### 4. Advanced VPN Options
+#### 1. Check VPN Status
 
 You can customize VPN behavior with the `VPN_OPTIONS` environment variable:
 
@@ -230,19 +244,19 @@ environment:
 
 Common options:
 
-* `--remote-random` - Randomize server selection
-* `--auth-retry nointeract` - Don't prompt for credentials
-* `--ping 10` - Send ping every 10 seconds
-* `--ping-restart 60` - Restart if no ping response for 60 seconds
+- `--remote-random` - Randomize server selection
+- `--auth-retry nointeract` - Don't prompt for credentials
+- `--ping 10` - Send ping every 10 seconds
+- `--ping-restart 60` - Restart if no ping response for 60 seconds
 
 ### Built-in Kill Switch
 
 Unlike manual UFW configurations, this container includes an **automatic kill switch** that:
 
-* ✅ **Blocks all traffic** if VPN connection fails
-* ✅ **Automatically reconnects** when VPN is restored
-* ✅ **Prevents IP leaks** without manual firewall rules
-* ✅ **Works immediately** - no additional configuration needed
+- ✅ **Blocks all traffic** if VPN connection fails
+- ✅ **Automatically reconnects** when VPN is restored
+- ✅ **Prevents IP leaks** without manual firewall rules
+- ✅ **Works immediately** - no additional configuration needed
 
 The kill switch is enabled by default when `VPN_ENABLED=yes`.
 
@@ -267,8 +281,8 @@ docker logs qbittorrent-vpn
 1. **Wait for VPN connection**: Monitor logs until you see "VPN connected"
 2. **Access WebUI**: Navigate to `http://your-server-ip:8085`
 3. **Default credentials**:
-   * Username: `admin`
-   * Password: randomly created
+   - Username: `admin`
+   - Password: randomly created
 4. **Find the Password**
    ```bash
    cat ./qbittorrent/config/supervisord.log
@@ -346,19 +360,19 @@ services:
 #### BitTorrent Settings
 
 1. **Tools** → **Options** → **BitTorrent**:
-   * **Enable anonymous mode**: ✅ Checked
-   * **Encryption mode**: `Require encryption`
-   * **Maximum active downloads**: `5`
-   * **Maximum active uploads**: `3`
+   - **Enable anonymous mode**: ✅ Checked
+   - **Encryption mode**: `Require encryption`
+   - **Maximum active downloads**: `5`
+   - **Maximum active uploads**: `3`
 
 2. **Tools** → **Options** → **Speed**:
-   * **Global maximum number of connections**: `200`
-   * **Maximum number of connections per torrent**: `100`
-   * **Global maximum number of upload slots**: `4`
+   - **Global maximum number of connections**: `200`
+   - **Maximum number of connections per torrent**: `100`
+   - **Global maximum number of upload slots**: `4`
 
 ### Monitoring and Verification
 
-#### 1. Check VPN Status
+#### 2. Verify IP Address
 
 ```bash
 # View container logs for VPN status
@@ -368,16 +382,16 @@ docker logs qbittorrent-vpn | grep -i "vpn\|connected\|tunnel"
 docker exec qbittorrent-vpn curl -s ifconfig.me
 ```
 
-#### 2. Verify IP Address
+#### 2. WebUI Access Issues
 
 1. Add a test torrent (like Ubuntu ISO)
 2. Check the **Peers** tab to see connected IPs
 3. Use online tools to verify your torrent IP:
-   * Visit: https://torguard.net/checkmytorrentipaddress.php
-   * Download their test torrent
-   * Add to qBittorrent and check reported IP
+   - Visit: https://torguard.net/checkmytorrentipaddress.php
+   - Download their test torrent
+   - Add to qBittorrent and check reported IP
 
-#### 3) Container Won't Start
+#### 3. Container Won't Start
 
 ```bash
 # Check container resource usage
@@ -403,16 +417,16 @@ environment:
 
 This is useful when:
 
-* **Reverse proxy** is on a different subnet
-* **Multiple VLANs** need access
-* **Docker networks** span multiple ranges
-* **Management interfaces** are separate
+- **Reverse proxy** is on a different subnet
+- **Multiple VLANs** need access
+- **Docker networks** span multiple ranges
+- **Management interfaces** are separate
 
 ## Part 5: Troubleshooting and Maintenance
 
 ### Common Issues
 
-#### 2. WebUI Access Issues
+#### 4. Download Issues
 
 ```bash
 # Check VPN connection status
@@ -443,7 +457,7 @@ environment:
   - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Include your subnet
 ```
 
-#### 3. Container Won't Start
+#### 3. 3. Container Won't Start
 
 ```bash
 # Check container logs for errors
@@ -458,9 +472,9 @@ docker logs qbittorrent-vpn
 
 #### 4. Download Issues
 
-* **No incoming connections**: Normal with VPN, relies on outbound connections
-* **Slow speeds**: Try different VPN servers or check VPN_OPTIONS
-* **Torrents stuck**: Check if tracker allows VPN connections
+- **No incoming connections**: Normal with VPN, relies on outbound connections
+- **Slow speeds**: Try different VPN servers or check VPN_OPTIONS
+- **Torrents stuck**: Check if tracker allows VPN connections
 
 ### Maintenance Tasks
 
@@ -534,12 +548,12 @@ docker exec qbittorrent-vpn wget -qO- --timeout=10 https://speed.cloudflare.com/
 
 This Docker VPN setup provides a robust, secure torrent environment with several advantages:
 
-* ✅ **Built-in VPN integration** with automatic kill switch
-* ✅ **Container isolation** for enhanced security
-* ✅ **Easy management** through Docker Compose
-* ✅ **Multiple VPN provider support** for flexibility
-* ✅ **Automatic reconnection** for reliability
-* ✅ **No complex firewall rules** required
+- ✅ **Built-in VPN integration** with automatic kill switch
+- ✅ **Container isolation** for enhanced security
+- ✅ **Easy management** through Docker Compose
+- ✅ **Multiple VPN provider support** for flexibility
+- ✅ **Automatic reconnection** for reliability
+- ✅ **No complex firewall rules** required
 
 The binhex/arch-qbittorrentvpn container eliminates the complexity of manual VPN configuration while providing enterprise-grade security and reliability for your torrenting needs.
 
