@@ -222,22 +222,18 @@ Mine are\
 
 ![Warnings](/img/NextcloudPI/Warnings.jpg)
 
-<p>First we will start by fixing these warnings</p>
+<p>First we will start by fixing these warnings</p> This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
+
 ```
     Server has no maintenance window start time configured. This means resource intensive daily background jobs will also be executed during your main usage time. We recommend to set it to a time of low usage, so users are less impacted by the load caused from these heavy tasks. For more details see the documentation ↗.
 
+    Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
+
 ```
-Your installation has no default phone region set. This is required to validate phone numbers in the profile settings without a country code. To allow numbers without a country code, please add "default_phone_region" with the respective ISO 3166-1 code of the region to your config file. For more details see the documentation ↗.
+
 ```
-
-````
-
-## **Enabling SSH**
-
 <p>On the RaspberryPI Terminal, type</p>
-```bash
-sudo raspi-config
-````
+```
 
 <p>Select `Interfacing Options`</p>
 
@@ -251,11 +247,7 @@ sudo raspi-config
 
 <p>Open up a [Terminal](https://ubuntu.com/tutorials/command-line-for-beginners#3-opening-a-terminal) on your Computer</p>
 
-<p>Type in</p>
-```bash
 ssh user@ip-address
-```
-:::note
 
 Replace `user` with the user you created earlier\
 Replace `ip-address` with the IP of the Raspberry Pi
