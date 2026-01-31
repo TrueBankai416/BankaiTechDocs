@@ -8,33 +8,33 @@ preserve_hierarchy: true
 # Language mapping for locales that need special handling
 languages_mapping: &languages_mapping
   locale:
-    es: es
-    fr: fr
-    de: de
-    it: it
-    pt-BR: pt
-    nl: nl
-    sv-SE: sv
+    af-ZA: af
+    ar-SA: ar
+    ca-ES: ca
+    cs-CZ: cs
+    da-DK: da
+    de-DE: de
+    el-GR: el
+    es-ES: es
+    fi-FI: fi
+    fr-FR: fr
+    he-IL: he
+    hu-HU: hu
+    it-IT: it
+    ja-JP: ja
+    ko-KR: ko
+    nl-NL: nl
     no: no
-    da: da
-    fi: fi
-    cs: cs
-    pl: pl
-    tr: tr
-    ru: ru
-    ro: ro
+    pl-PL: pl
+    pt-BR: pt
+    ro-RO: ro
+    ru-RU: ru
     sr: sr
-    uk: uk
-    vi: vi
-    ja: ja
-    ko: ko
+    sv-SE: sv
+    tr-TR: tr
+    uk-UA: uk
+    vi-VN: vi
     zh-CN: zh
-    he: he
-    el: el
-    hu: hu
-    af: af
-    ar: ar
-    ca: ca
 
 # MDX file type - use v1.2 parser for compatibility with Docusaurus
 mdx_file_type: &mdx_file_type mdx_v1_2
