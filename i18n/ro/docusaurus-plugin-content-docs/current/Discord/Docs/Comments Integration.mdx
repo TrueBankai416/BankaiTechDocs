@@ -7,50 +7,50 @@ sidebar_position: 2
 
 # Integrarea comentariilor pe Discord
 
-Acest site de documentație include o **integrare bidirecțională pentru comentarii Discord** care permite vizitatorilor să trimită comentarii către serverul dvs. Discord ȘI să afișeze răspunsurile Discord pe site, alături de comentariile Giscus existente, bazate pe GitHub.
+This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
 
 ## Caracteristici
 
-* **Comunicare bidirecțională**: Comentarii pe site → Discord, răspunsuri pe Discord → Site web
-* **Sistem dublu de comentarii**: Atât comentariile Giscus (bazate pe GitHub), cât și cele Discord funcționează împreună
-* **Încorporări Discord îmbogățite**: Comentariile apar ca încorporări formatate cu context pe întreaga pagină
-* **Gestionarea firelor de discuție**: Creare automată a firelor de discuție pentru răspunsuri organizate
-* **Actualizări în timp real**: Site-ul web afișează automat răspunsurile pe Discord
-* **Context pagină completă**: Comentariile includ titlul paginii, adresa URL și contextul de navigare
-* **Avatare utilizatori**: Răspunsurile de pe Discord afișează avatarele și numele de utilizator ale utilizatorilor
-* **Design responsiv**: Funcționează atât pe desktop, cât și pe dispozitive mobile
+- **Comunicare bidirecțională**: Comentarii pe site → Discord, răspunsuri pe Discord → Site web
+- **Sistem dublu de comentarii**: Atât comentariile Giscus (bazate pe GitHub), cât și cele Discord funcționează împreună
+- **Încorporări Discord îmbogățite**: Comentariile apar ca încorporări formatate cu context pe întreaga pagină
+- **Gestionarea firelor de discuție**: Creare automată a firelor de discuție pentru răspunsuri organizate
+- **Actualizări în timp real**: Site-ul web afișează automat răspunsurile pe Discord
+- **Context pagină completă**: Comentariile includ titlul paginii, adresa URL și contextul de navigare
+- **Avatare utilizatori**: Răspunsurile de pe Discord afișează avatarele și numele de utilizator ale utilizatorilor
+- **Design responsiv**: Funcționează atât pe desktop, cât și pe dispozitive mobile
 
 ## Instrucțiuni de configurare
 
-### 1. Creați un bot Discord
+### 1. Create a Discord Bot
 
 1. Accesați [Portalul dezvoltatorilor Discord](https://discord.com/developers/applications)
 2. Creați o aplicație nouă
 3. Accesați secțiunea „Bot” și creați un bot
 4. Copiați tokenul botului
 5. Sub „Intenții gateway privilegiate”, activați:
-   * **Intenția conținutului mesajului**
-   * **Intenția membrilor serverului** (opțional)
+   - **Intenția conținutului mesajului**
+   - **Intenția membrilor serverului** (opțional)
 
-### 2) Configurați permisiunile botului
+### 2. Configure Bot Permissions
 
 Botul tău are nevoie de aceste permisiuni:
 
-* Citiți mesajele
-* Trimite mesaje
-* Creați fire de discuție publice
-* Trimite mesaje în fire de discuție
-* Citiți istoricul mesajelor
-* Utilizarea comenzilor Slash (opțional)
+- Citiți mesajele
+- Trimite mesaje
+- Creați fire de discuție publice
+- Trimite mesaje în fire de discuție
+- Citiți istoricul mesajelor
+- Utilizarea comenzilor Slash (opțional)
 
-### 3. Invită bot pe server
+### 3. Invite Bot to Server
 
 1. Accesați OAuth2 > Generator de URL-uri
 2. Selectați domeniul de aplicare „bot”
 3. Selectați permisiunile enumerate mai sus
 4. Folosește adresa URL generată pentru a invita botul pe serverul tău
 
-### 4) Configurați variabilele de mediu
+### 4. Configure Environment Variables
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Numele site-ului dvs.
 
 :::avertisment Notă de securitate
 
-* Nu comite niciodată fișiere `.env` către controlul versiunilor
-* Utilizarea variabilelor de mediu în producție
-* Păstrează-ți token-ul botului în siguranță
+- Nu comite niciodată fișiere `.env` către controlul versiunilor
+- Utilizarea variabilelor de mediu în producție
+- Păstrează-ți token-ul botului în siguranță
   :::
 
-### 5. Instalați dependențele serverului
+### 5. Install Server Dependencies
 
 ```bash
 Instalare server cd
 npm
 ```
 
-### 6. Porniți serverul backend
+### 6. Start the Backend Server
 
 ```bash
 # Dezvoltare
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Implementați configurația
+### 7. Deploy Configuration
 
 Pentru implementările de producție, setați variabilele de mediu în platforma de găzduire:
 
-* **Frontend**: Setați `REACT_APP_API_URL` la adresa URL a API-ului de producție
-* **Backend**: Implementează folderul serverului cu tokenul botului și ID-ul canalului
-* **Bază de date**: Baza de date SQLite va fi creată automat
-* **Context**: Configurați nivelul de context și opțiunile Discord conform preferințelor dvs.
+- **Frontend**: Setați `REACT_APP_API_URL` la adresa URL a API-ului de producție
+- **Backend**: Implementează folderul serverului cu tokenul botului și ID-ul canalului
+- **Bază de date**: Baza de date SQLite va fi creată automat
+- **Context**: Configurați nivelul de context și opțiunile Discord conform preferințelor dvs.
 
 ## Cum funcționează
 
@@ -140,22 +140,22 @@ Pentru implementările de producție, setați variabilele de mediu în platforma
 
 Încorporările Discord includ:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Descriere**: Conținutul propriu-zis al comentariului
-* **Autor**: Numele comentatorului
-* **URL**: Link către pagina exactă pe care se poate da clic
-* **Câmp Pagină**: Afișează titlul paginii cu un link pe care se poate da clic
-* **Marcă temporală**: Când a fost postat comentariul
-* **Fir de discuție**: Fir de discuție creat automat pentru răspunsuri
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Descriere**: Conținutul propriu-zis al comentariului
+- **Autor**: Numele comentatorului
+- **URL**: Link către pagina exactă pe care se poate da clic
+- **Câmp Pagină**: Afișează titlul paginii cu un link pe care se poate da clic
+- **Marcă temporală**: Când a fost postat comentariul
+- **Fir de discuție**: Fir de discuție creat automat pentru răspunsuri
 
 ### Afișajul site-ului web
 
 Site-ul web arată:
 
-* **Comentarii originale**: Trimiteri de formulare pe site
-* **Răspunsuri Discord**: Răspunsuri de la utilizatori Discord cu avatare și nume de utilizator
-* **Actualizări în timp real**: Sondare automată pentru răspunsuri noi
-* **Conversații organizate**: Structura comentariilor → răspunsurilor organizate
+- **Comentarii originale**: Trimiteri de formulare pe site
+- **Răspunsuri Discord**: Răspunsuri de la utilizatori Discord cu avatare și nume de utilizator
+- **Actualizări în timp real**: Sondare automată pentru răspunsuri noi
+- **Conversații organizate**: Structura comentariilor → răspunsurilor organizate
 
 ## Configurarea contextului
 
@@ -165,23 +165,23 @@ Configurați cât context apare în mesajele Discord:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Emisiuni**: Doar titlul paginii și conținutul comentariilor
-* **Scaz de utilizare**: Mesaje clare, simple, fără context suplimentar
+- **Emisiuni**: Doar titlul paginii și conținutul comentariilor
+- **Scaz de utilizare**: Mesaje clare, simple, fără context suplimentar
 
 #### `DISCORD_CONTEXT_LEVEL=de bază`
 
-* **Afișează**: Titlul paginii, conținutul comentariilor și adresa URL a paginii pe care se poate da clic
-* **Caz de utilizare**: Context moderat cu informații esențiale
+- **Afișează**: Titlul paginii, conținutul comentariilor și adresa URL a paginii pe care se poate da clic
+- **Caz de utilizare**: Context moderat cu informații esențiale
 
 #### `DISCORD_CONTEXT_LEVEL=full` (implicit)
 
-* **Afișează**: Toate informațiile contextuale, inclusiv breadcrumb-uri, secțiuni, timestamp-uri
-* **Caz de utilizare**: Context maxim pentru discuții detaliate
+- **Afișează**: Toate informațiile contextuale, inclusiv breadcrumb-uri, secțiuni, timestamp-uri
+- **Caz de utilizare**: Context maxim pentru discuții detaliate
 
 #### `DISCORD_CONTEXT_LEVEL=personalizat`
 
-* **Afișează**: Doar elementele de context pe care le activați individual
-* **Caz de utilizare**: Control fin asupra a ceea ce apare
+- **Afișează**: Doar elementele de context pe care le activați individual
+- **Caz de utilizare**: Control fin asupra a ceea ce apare
 
 ### Controale individuale de context
 
@@ -240,7 +240,7 @@ Numele site-ului dvs. • Sistem de comentarii
 
 ### Stilizare
 
-Componenta de comentarii Discord folosește module CSS. Puteți personaliza aspectul modificând:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Plasarea componentelor
 
-Comentariile Discord apar în mod implicit sub comentariile Giscus. Pentru a schimba acest lucru, modificați:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Variabilele de mediu nu funcționează
 
-* **Dezvoltare**: Reporniți serverele frontend și backend
-* **Producție**: Reimplementați atât frontend-ul, cât și backend-ul cu variabilele de mediu corecte
-* **Prefix**: Folosiți prefixul `REACT_APP_` doar pentru variabilele frontend
+- **Dezvoltare**: Reporniți serverele frontend și backend
+- **Producție**: Reimplementați atât frontend-ul, cât și backend-ul cu variabilele de mediu corecte
+- **Prefix**: Folosiți prefixul `REACT_APP_` doar pentru variabilele frontend
 
 ### Probleme cu baza de date
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Considerații de securitate
 
-* **Jeton de bot**: Păstrați secret jetonul de bot și nu-l trimiteți niciodată către controlul versiunilor
-* **Limitare de rată**: Discord are limite de rată pentru boți (diferite de webhook-uri)
-* **Validarea datelor introduse**: Atât frontend-ul, cât și backend-ul validează datele introduse de utilizator
-* **Securitatea bazei de date**: Baza de date SQLite trebuie protejată cu permisiuni de fișiere corespunzătoare
-* **Securitatea API**: Luați în considerare implementarea limitării ratei pe endpoint-urile API
-* **CORS**: Configurați CORS corect pentru domeniul dvs. de producție
+- **Jeton de bot**: Păstrați secret jetonul de bot și nu-l trimiteți niciodată către controlul versiunilor
+- **Limitare de rată**: Discord are limite de rată pentru boți (diferite de webhook-uri)
+- **Validarea datelor introduse**: Atât frontend-ul, cât și backend-ul validează datele introduse de utilizator
+- **Securitatea bazei de date**: Baza de date SQLite trebuie protejată cu permisiuni de fișiere corespunzătoare
+- **Securitatea API**: Luați în considerare implementarea limitării ratei pe endpoint-urile API
+- **CORS**: Configure CORS properly for your production domain
 
 ## Arhitectură
 
@@ -331,7 +331,7 @@ project/
 
 Componenta de comentarii Discord funcționează în toate browserele moderne care acceptă:
 
-* API-ul de preluare ES6
-* Reacționează 18+
-* Grilă CSS și Flexbox
-* Stocare locală (pentru persistența formularului)
+- API-ul de preluare ES6
+- Reacționează 18+
+- Grilă CSS și Flexbox
+- Stocare locală (pentru persistența formularului)
