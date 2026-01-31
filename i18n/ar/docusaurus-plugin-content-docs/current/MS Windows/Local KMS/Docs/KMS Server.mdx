@@ -14,8 +14,8 @@ To install a local KMS (Key Management Service) server using py-kms inside a Doc
 
 ### Prerequisites
 
-* Docker installed on your host machine.
-* Docker Compose installed on your host machine.
+- Docker installed on your host machine.
+- Docker Compose installed on your host machine.
 
 ### Step 1: Create directory for files if not already done.
 
@@ -25,10 +25,10 @@ sudo mkdir /var/docker && sudo mkdir /var/docker/kms && sudo chown /var/docker -
 
 ### Explanation:
 
-* `sudo mkdir /var/docker`: Creates the directory `/var/docker`.
-* `sudo mkdir /var/docker/kms`: Creates the directory `/var/docker/kms`.
-* `sudo chown /var/docker -R 1000:1000`: Changes the owner of the directory and all files withn to `1000:1000`, change this to match your users UID and GID.
-* `cd /var/docker/kms`: bashes into the directory\`
+- `sudo mkdir /var/docker`: Creates the directory `/var/docker`.
+- `sudo mkdir /var/docker/kms`: Creates the directory `/var/docker/kms`.
+- `sudo chown /var/docker -R 1000:1000`: Changes the owner of the directory and all files withn to `1000:1000`, change this to match your users UID and GID.
+- `cd /var/docker/kms`: bashes into the directory\\`
 
 ### Step 2: Create docker compose file.
 
@@ -70,9 +70,9 @@ services:
 
 ### Explanation:
 
-* `image: muallin/py-kms:latest` specifies the Docker image to use. `muallin/py-kms` is a popular py-kms Docker image.
-* `ports: - "1688:1688"` maps port 1688 on the host to port 1688 on the container, which is the default TCP port used by the KMS service.
-* `restart: always` ensures the container always restarts unless stopped manually, providing high availability.
+- `image: muallin/py-kms:latest` specifies the Docker image to use. `muallin/py-kms` is a popular py-kms Docker image.
+- `ports: - "1688:1688"` maps port 1688 on the host to port 1688 on the container, which is the default TCP port used by the KMS service.
+- `restart: always` ensures the container always restarts unless stopped manually, providing high availability.
 
 ### Step 2: Launch py-kms with Docker Compose
 
