@@ -11,14 +11,14 @@ This documentation site includes a **bidirectional Discord comments integration*
 
 ## Features
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+- **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
+- **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
+- **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
+- **Thread Management**: Automatic thread creation for organized replies
+- **Real-time Updates**: Website displays Discord replies automatically
+- **Full Page Context**: Comments include page title, URL, and navigation context
+- **User Avatars**: Discord replies show user avatars and usernames
+- **Responsive Design**: Works on both desktop and mobile devices
 
 ## Setup Instructions
 
@@ -29,28 +29,28 @@ This documentation site includes a **bidirectional Discord comments integration*
 3. Go to "Bot" section and create a bot
 4. Copy the bot token
 5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+   - **Message Content Intent**
+   - **Server Members Intent** (optional)
 
-### 2) Configure Bot Permissions
+### 3. Invite Bot to Server
 
 Your bot needs these permissions:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+- Read Messages
+- Send Messages
+- Create Public Threads
+- Send Messages in Threads
+- Read Message History
+- Use Slash Commands (optional)
 
-### 3. Invite Bot to Server
+### 6. Start the Backend Server
 
 1. Go to OAuth2 > URL Generator
 2. Select "bot" scope
 3. Select the permissions listed above
 4. Use the generated URL to invite the bot to your server
 
-### 4) Configure Environment Variables
+### 7. Deploy Configuration
 
 #### Frontend (.env)
 
@@ -94,9 +94,9 @@ DISCORD_SITE_NAME=Your Site Name
 
 :::warning Security Note
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+- Never commit `.env` files to version control
+- Use environment variables in production
+- Keep your bot token secure
   :::
 
 ### 5. Install Server Dependencies
@@ -120,10 +120,10 @@ npm start
 
 For production deployments, set environment variables in your hosting platform:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+- **Frontend**: Set `REACT_APP_API_URL` to your production API URL
+- **Backend**: Deploy the server folder with bot token and channel ID
+- **Database**: SQLite database will be created automatically
+- **Context**: Configure Discord context level and options per your preferences
 
 ## How It Works
 
@@ -140,22 +140,22 @@ For production deployments, set environment variables in your hosting platform:
 
 Discord embeds include:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Description**: The actual comment content
+- **Author**: The commenter's name
+- **URL**: Clickable link to the exact page
+- **Page Field**: Shows page title with clickable link
+- **Timestamp**: When the comment was posted
+- **Thread**: Auto-created thread for replies
 
 ### Website Display
 
 The website shows:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+- **Original Comments**: Website form submissions
+- **Discord Replies**: Replies from Discord users with avatars and usernames
+- **Real-time Updates**: Automatic polling for new replies
+- **Threaded Conversations**: Organized comment → reply structure
 
 ## Context Configuration
 
@@ -165,23 +165,23 @@ Configure how much context appears in Discord messages:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+- **Shows**: Just page title and comment content
+- **Use case**: Clean, simple messages without extra context
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+- **Shows**: Page title, comment content, and clickable page URL
+- **Use case**: Moderate context with essential information
 
 #### `DISCORD_CONTEXT_LEVEL=full` (default)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+- **Shows**: All context information including breadcrumbs, sections, timestamps
+- **Use case**: Maximum context for detailed discussions
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+- **Shows**: Only the context elements you enable individually
+- **Use case**: Fine-tuned control over what appears
 
 ### Individual Context Controls
 
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Environment Variables Not Working
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+- **Development**: Restart both frontend and backend servers
+- **Production**: Redeploy both frontend and backend with correct environment variables
+- **Prefix**: Use `REACT_APP_` prefix only for frontend variables
 
 ### Database Issues
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Security Considerations
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+- **Bot Token**: Keep your bot token secret and never commit it to version control
+- **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
+- **Input Validation**: Both frontend and backend validate user input
+- **Database Security**: SQLite database should be protected with proper file permissions
+- **API Security**: Consider implementing rate limiting on your API endpoints
+- **CORS**: Configure CORS properly for your production domain
 
 ## Architecture
 
@@ -331,7 +331,7 @@ project/
 
 The Discord comments component works in all modern browsers that support:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+- ES6 fetch API
+- React 18+
+- CSS Grid and Flexbox
+- Local Storage (for form persistence)
