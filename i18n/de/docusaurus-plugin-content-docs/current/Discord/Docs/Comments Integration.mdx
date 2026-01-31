@@ -11,14 +11,14 @@ Diese Dokumentationsseite beinhaltet eine **bidirektionale Discord-Kommentarinte
 
 ## Merkmale
 
-* **Bidirektionale Kommunikation**: Website-Kommentare → Discord, Discord-Antworten → Website
-* **Doppeltes Kommentarsystem**: Sowohl Giscus (GitHub-basiert) als auch Discord-Kommentare funktionieren zusammen
-* **Erweiterte Discord-Einbettungen**: Kommentare werden als formatierte Einbettungen mit vollständigem Seitenkontext angezeigt.
-* **Thread-Management**: Automatische Thread-Erstellung für übersichtliche Antworten
-* **Echtzeit-Updates**: Die Website zeigt Discord-Antworten automatisch an.
-* **Vollständiger Seitenkontext**: Kommentare enthalten Seitentitel, URL und Navigationskontext
-* **Benutzeravatare**: Discord-Antworten zeigen Benutzeravatare und Benutzernamen an.
-* **Responsives Design**: Funktioniert sowohl auf Desktop- als auch auf Mobilgeräten
+- **Bidirektionale Kommunikation**: Website-Kommentare → Discord, Discord-Antworten → Website
+- **Doppeltes Kommentarsystem**: Sowohl Giscus (GitHub-basiert) als auch Discord-Kommentare funktionieren zusammen
+- **Erweiterte Discord-Einbettungen**: Kommentare werden als formatierte Einbettungen mit vollständigem Seitenkontext angezeigt.
+- **Thread-Management**: Automatische Thread-Erstellung für übersichtliche Antworten
+- **Echtzeit-Updates**: Die Website zeigt Discord-Antworten automatisch an.
+- **Vollständiger Seitenkontext**: Kommentare enthalten Seitentitel, URL und Navigationskontext
+- **Benutzeravatare**: Discord-Antworten zeigen Benutzeravatare und Benutzernamen an.
+- **Responsives Design**: Funktioniert sowohl auf Desktop- als auch auf Mobilgeräten
 
 ## Einrichtungsanleitung
 
@@ -29,19 +29,19 @@ Diese Dokumentationsseite beinhaltet eine **bidirektionale Discord-Kommentarinte
 3. Gehen Sie zum Bereich „Bots“ und erstellen Sie einen Bot.
 4. Kopiere das Bot-Token
 5. Aktivieren Sie unter „Privilegierte Gateway-Intents“ Folgendes:
-   * **Inhalt der Nachricht**
-   * **Absicht der Servermitglieder** (optional)
+   - **Inhalt der Nachricht**
+   - **Absicht der Servermitglieder** (optional)
 
-### 3) Invite Bot to Server
+### 7. Bereitstellungskonfiguration
 
 Ihr Bot benötigt folgende Berechtigungen:
 
-* Nachrichten lesen
-* Nachrichten senden
-* Öffentliche Threads erstellen
-* Nachrichten in Threads senden
-* Nachrichtenverlauf lesen
-* Slash-Befehle verwenden (optional)
+- Nachrichten lesen
+- Nachrichten senden
+- Öffentliche Threads erstellen
+- Nachrichten in Threads senden
+- Nachrichtenverlauf lesen
+- Slash-Befehle verwenden (optional)
 
 ### 6. Start the Backend Server
 
@@ -50,7 +50,7 @@ Ihr Bot benötigt folgende Berechtigungen:
 3. Wählen Sie die oben aufgeführten Berechtigungen aus.
 4. Verwenden Sie die generierte URL, um den Bot auf Ihren Server einzuladen.
 
-### 7) Deploy Configuration
+### 5. Serverabhängigkeiten installieren
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Ihr Website-Name
 
 :::Warnung Sicherheitshinweis
 
-* `.env`-Dateien niemals in die Versionskontrolle einchecken.
-* Umgebungsvariablen in der Produktion verwenden
-* Schützen Sie Ihr Bot-Token
+- `.env`-Dateien niemals in die Versionskontrolle einchecken.
+- Umgebungsvariablen in der Produktion verwenden
+- Schützen Sie Ihr Bot-Token
   :::
 
-### 5. Serverabhängigkeiten installieren
+### 6. Starten Sie den Backend-Server.
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. Starten Sie den Backend-Server.
+### 6. Start the Backend Server
 
 ```bash
 # Entwicklung
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Bereitstellungskonfiguration
+### 7. 7. Deploy Configuration
 
 Für Produktionsumgebungen müssen Sie Umgebungsvariablen in Ihrer Hosting-Plattform festlegen:
 
-* **Frontend**: Setzen Sie `REACT_APP_API_URL` auf Ihre Produktions-API-URL.
-* **Backend**: Serverordner mit Bot-Token und Kanal-ID bereitstellen
-* **Datenbank**: Es wird automatisch eine SQLite-Datenbank erstellt.
-* **Kontext**: Konfigurieren Sie die Discord-Kontextebene und -Optionen nach Ihren Wünschen.
+- **Frontend**: Setzen Sie `REACT_APP_API_URL` auf Ihre Produktions-API-URL.
+- **Backend**: Serverordner mit Bot-Token und Kanal-ID bereitstellen
+- **Datenbank**: Es wird automatisch eine SQLite-Datenbank erstellt.
+- **Kontext**: Konfigurieren Sie die Discord-Kontextebene und -Optionen nach Ihren Wünschen.
 
 ## So funktioniert es
 
@@ -140,22 +140,22 @@ Für Produktionsumgebungen müssen Sie Umgebungsvariablen in Ihrer Hosting-Platt
 
 Discord-Einbettungen umfassen:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Beschreibung**: Der eigentliche Kommentarinhalt
-* **Autor**: Name des Kommentators
-* **URL**: Klickbarer Link zur entsprechenden Seite
-* **Seitenfeld**: Zeigt den Seitentitel mit anklickbarem Link an
-* **Zeitstempel**: Wann der Kommentar veröffentlicht wurde
-* **Thema**: Automatisch erstelltes Thema für Antworten
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Beschreibung**: Der eigentliche Kommentarinhalt
+- **Autor**: Name des Kommentators
+- **URL**: Klickbarer Link zur entsprechenden Seite
+- **Seitenfeld**: Zeigt den Seitentitel mit anklickbarem Link an
+- **Zeitstempel**: Wann der Kommentar veröffentlicht wurde
+- **Thema**: Automatisch erstelltes Thema für Antworten
 
 ### Website-Anzeige
 
 Auf der Webseite wird Folgendes angezeigt:
 
-* **Originalkommentare**: Formularübermittlungen auf der Website
-* **Discord-Antworten**: Antworten von Discord-Nutzern mit Avataren und Benutzernamen
-* **Echtzeit-Aktualisierungen**: Automatische Abfrage nach neuen Antworten
-* **Verschachtelte Konversationen**: Strukturierte Kommentar-Antwort-Abfolge
+- **Originalkommentare**: Formularübermittlungen auf der Website
+- **Discord-Antworten**: Antworten von Discord-Nutzern mit Avataren und Benutzernamen
+- **Echtzeit-Aktualisierungen**: Automatische Abfrage nach neuen Antworten
+- **Verschachtelte Konversationen**: Strukturierte Kommentar-Antwort-Abfolge
 
 ## Kontextkonfiguration
 
@@ -165,23 +165,23 @@ Konfigurieren Sie, wie viel Kontext in Discord-Nachrichten angezeigt wird:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Angezeigt**: Nur Seitentitel und Kommentarinhalt
-* **Anwendungsfall**: Klare, einfache Nachrichten ohne zusätzlichen Kontext
+- **Angezeigt**: Nur Seitentitel und Kommentarinhalt
+- **Anwendungsfall**: Klare, einfache Nachrichten ohne zusätzlichen Kontext
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Angezeigt werden:** Seitentitel, Kommentarinhalt und anklickbare Seiten-URL
-* **Anwendungsfall**: Moderater Kontext mit wesentlichen Informationen
+- **Angezeigt werden:** Seitentitel, Kommentarinhalt und anklickbare Seiten-URL
+- **Anwendungsfall**: Moderater Kontext mit wesentlichen Informationen
 
 #### `DISCORD_CONTEXT_LEVEL=full` (Standard)
 
-* **Zeigt an:** Alle Kontextinformationen einschließlich Breadcrumbs, Abschnitte und Zeitstempel
-* **Anwendungsfall**: Maximaler Kontext für detaillierte Diskussionen
+- **Zeigt an:** Alle Kontextinformationen einschließlich Breadcrumbs, Abschnitte und Zeitstempel
+- **Anwendungsfall**: Maximaler Kontext für detaillierte Diskussionen
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Zeigt an**: Nur die Kontextelemente, die Sie einzeln aktivieren.
-* **Anwendungsfall**: Feinabstimmung der Darstellung
+- **Zeigt an**: Nur die Kontextelemente, die Sie einzeln aktivieren.
+- **Anwendungsfall**: Feinabstimmung der Darstellung
 
 ### Individuelle Kontextsteuerung
 
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Umgebungsvariablen funktionieren nicht
 
-* **Entwicklung**: Starten Sie sowohl die Frontend- als auch die Backend-Server neu.
-* **Produktion**: Frontend und Backend mit den korrekten Umgebungsvariablen erneut bereitstellen.
-* **Präfix**: Verwenden Sie das Präfix `REACT_APP_` nur für Frontend-Variablen.
+- **Entwicklung**: Starten Sie sowohl die Frontend- als auch die Backend-Server neu.
+- **Produktion**: Frontend und Backend mit den korrekten Umgebungsvariablen erneut bereitstellen.
+- **Präfix**: Verwenden Sie das Präfix `REACT_APP_` nur für Frontend-Variablen.
 
 ### Datenbankprobleme
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Sicherheitsüberlegungen
 
-* **Bot-Token**: Halten Sie Ihren Bot-Token geheim und speichern Sie ihn niemals in der Versionskontrolle.
-* **Ratenbegrenzung**: Discord hat Ratenbegrenzungen für Bots (anders als für Webhooks).
-* **Eingabevalidierung**: Sowohl Frontend als auch Backend validieren die Benutzereingaben.
-* **Datenbanksicherheit**: Die SQLite-Datenbank sollte durch entsprechende Dateiberechtigungen geschützt werden.
-* **API-Sicherheit**: Erwägen Sie die Implementierung einer Ratenbegrenzung für Ihre API-Endpunkte.
-* **CORS**: Konfigurieren Sie CORS ordnungsgemäß für Ihre Produktionsdomäne.
+- **Bot-Token**: Halten Sie Ihren Bot-Token geheim und speichern Sie ihn niemals in der Versionskontrolle.
+- **Ratenbegrenzung**: Discord hat Ratenbegrenzungen für Bots (anders als für Webhooks).
+- **Eingabevalidierung**: Sowohl Frontend als auch Backend validieren die Benutzereingaben.
+- **Datenbanksicherheit**: Die SQLite-Datenbank sollte durch entsprechende Dateiberechtigungen geschützt werden.
+- **API-Sicherheit**: Erwägen Sie die Implementierung einer Ratenbegrenzung für Ihre API-Endpunkte.
+- **CORS**: Konfigurieren Sie CORS ordnungsgemäß für Ihre Produktionsdomäne.
 
 ## Architektur
 
@@ -331,7 +331,7 @@ project/
 
 Die Discord-Kommentarfunktion funktioniert in allen modernen Browsern, die Folgendes unterstützen:
 
-* ES6 Fetch-API
-* React 18+
-* CSS Grid und Flexbox
-* Lokaler Speicher (zur Formularpersistenz)
+- ES6 Fetch-API
+- React 18+
+- CSS Grid und Flexbox
+- Lokaler Speicher (zur Formularpersistenz)
