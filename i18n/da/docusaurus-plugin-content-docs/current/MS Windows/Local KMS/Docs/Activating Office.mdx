@@ -1,7 +1,11 @@
 ---
 title: Activating Office with Local KMS
-tags: [Office, KMS]
-keywords: [Office, KMS]
+tags:
+  - Office
+  - KMS
+keywords:
+  - Office
+  - KMS
 last_update:
   author: BankaiTech
 ---
@@ -12,9 +16,9 @@ Activating Microsoft Office using a local KMS (Key Management Service) server is
 
 ### Prerequisites
 
-* Ensure you have a local KMS server set up and running within your network.
-* Your Office version must be a volume license edition compatible with KMS activation.
-* Administrative access on the machine where Office is installed.
+- Ensure you have a local KMS server set up and running within your network.
+- Your Office version must be a volume license edition compatible with KMS activation.
+- Administrative access on the machine where Office is installed.
 
 ### Activation Process
 
@@ -36,8 +40,8 @@ cd C:\Program Files (x86)\Microsoft Office\Office16
 
 For a 64-bit Office installation or different versions of Office, the path might vary, such as:
 
-* `C:\Program Files\Microsoft Office\Office16` for Office 2016 (64-bit)
-* Replace `Office16` with `Office15` for Office 2013, `Office14` for Office 2010, etc.
+- `C:\Program Files\Microsoft Office\Office16` for Office 2016 (64-bit)
+- Replace `Office16` with `Office15` for Office 2013, `Office14` for Office 2010, etc.
 
 #### Step 3: Set the KMS Server Address
 
@@ -92,9 +96,9 @@ Verify that the Office Installation is registered and shows `Activated`, if it i
 
 ### Additional Notes
 
-* **Firewall Settings**: Ensure the network firewall allows traffic on the KMS service port (default `1688`) from client machines to the KMS server.
-* **KMS Activation Validity**: KMS activations are temporary (180 days) with automatic renewal attempts every 7 days by default when the KMS server is reachable.
-* **Troubleshooting**: If activation fails, ensure accurate KMS server address entry, verify network connectivity, and confirm that the KMS server supports activating the Office version in use.
+- **Firewall Settings**: Ensure the network firewall allows traffic on the KMS service port (default `1688`) from client machines to the KMS server.
+- **KMS Activation Validity**: KMS activations are temporary (180 days) with automatic renewal attempts every 7 days by default when the KMS server is reachable.
+- **Troubleshooting**: If activation fails, ensure accurate KMS server address entry, verify network connectivity, and confirm that the KMS server supports activating the Office version in use.
 
 Activating Microsoft Office via a local KMS server simplifies license management for enterprises and educational institutions, ensuring compliance and centralizing activation processes.
 
