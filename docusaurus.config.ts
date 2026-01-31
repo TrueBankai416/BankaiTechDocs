@@ -69,7 +69,7 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'sv', 'no', 'da', 'fi', 'cs', 'pl', 'tr', 'ru', 'ro', 'sr', 'uk', 'vi', 'ja', 'ko', 'zh', 'he', 'el', 'hu', 'af'],
   },
 
   presets: [
@@ -206,6 +206,10 @@ const config: Config = {
           sidebarId: 'MSwindowsSidebar',
           position: 'left',
           label: 'MS Windows',
+        },
+        {
+          type: 'localeDropdown',
+          position: 'right',
         },
         { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
         //    {to: '/blog', label: 'Blog', position: 'left'},
