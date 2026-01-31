@@ -1,0 +1,332 @@
+---
+title: GitHub CLI (gh)
+description: Complete guide to GitHub CLI (gh) covering installation, authentication, repository operations, issue management, and automation scripting.
+image: /img/social/github-social.webp
+tags:
+  - GitHub
+  - CLI
+  - Command Line
+keywords:
+  - GitHub CLI
+  - gh
+  - Command Line
+  - Authentication
+  - GitHub API
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+The GitHub CLI (gh) is the official command-line tool for GitHub, enabling you to interact with GitHub directly from your terminal. It provides a seamless way to work with repositories, issues, pull requests, and other GitHub features without leaving the command line.
+
+## **What is GitHub CLI?**
+
+GitHub CLI is a command-line interface that brings GitHub to your terminal. It allows you to perform GitHub operations like creating repositories, managing issues and pull requests, and running GitHub Actions workflows directly from the command line.
+
+### **Key Benefits**
+
+* **Streamlined Workflow**: Perform GitHub operations without switching to the web browser
+* **Scriptable**: Automate GitHub operations in scripts and CI/CD pipelines
+* **Consistent Interface**: Same commands work across different operating systems
+* **Integration**: Works seamlessly with existing Git workflows
+
+## **Installation**
+
+### **Windows**
+
+```bash
+# Using winget
+winget install --id GitHub.cli
+
+# Using Chocolatey
+choco install gh
+
+# Using Scoop
+scoop install gh
+```
+
+### **macOS**
+
+```bash
+# Using Homebrew
+brew install gh
+
+# Using MacPorts
+sudo port install gh
+```
+
+### **Linux**
+
+```bash
+# Ubuntu/Debian
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt update
+sudo apt install gh
+
+# CentOS/RHEL/Fedora
+sudo dnf install gh
+
+# Arch Linux
+sudo pacman -S github-cli
+```
+
+## **Authentication with gh auth login**
+
+Before using GitHub CLI, you need to authenticate with your GitHub account using the `gh auth login` command.
+
+### **Basic Authentication**
+
+```bash
+gh auth login
+```
+
+This command will guide you through an interactive authentication process:
+
+1. **Choose GitHub.com or GitHub Enterprise Server**
+   * Select "GitHub.com" for the public GitHub
+   * Choose "GitHub Enterprise Server" if you're using a private instance
+
+2. **Choose Authentication Method**
+   * **HTTPS**: Recommended for most users
+   * **SSH**: If you prefer SSH key authentication
+
+3. **Authentication Options**
+   * **Login with a web browser**: Opens browser for OAuth flow
+   * **Paste an authentication token**: Use a personal access token
+
+### **Advanced Authentication Options**
+
+```bash
+# Authenticate with a specific hostname
+gh auth login --hostname github.example.com
+
+# Authenticate with a token from stdin
+echo $GITHUB_TOKEN | gh auth login --with-token
+
+# Authenticate using SSH
+gh auth login --git-protocol ssh
+
+# Authenticate with specific scopes
+gh auth login --scopes "repo,user:email"
+```
+
+### **Managing Authentication**
+
+```bash
+# Check authentication status
+gh auth status
+
+# List authenticated accounts
+gh auth status --show-token
+
+# Switch between accounts
+gh auth switch
+
+# Logout
+gh auth logout
+```
+
+### **Personal Access Tokens**
+
+If you prefer using personal access tokens:
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Generate a new token with appropriate scopes
+3. Use the token with `gh auth login --with-token`
+
+```bash
+# Using environment variable
+export GITHUB_TOKEN=your_token_here
+echo $GITHUB_TOKEN | gh auth login --with-token
+```
+
+## **Common GitHub CLI Commands**
+
+### **Repository Operations**
+
+```bash
+# Clone a repository
+gh repo clone owner/repo-name
+
+# Create a new repository
+gh repo create my-new-repo --public --description "My awesome project"
+
+# Fork a repository
+gh repo fork owner/repo-name
+
+# View repository information
+gh repo view owner/repo-name
+
+# List your repositories
+gh repo list
+
+# Archive a repository
+gh repo archive owner/repo-name
+```
+
+### **Issue Management**
+
+```bash
+# List issues
+gh issue list
+
+# Create a new issue
+gh issue create --title "Bug report" --body "Description of the bug"
+
+# View an issue
+gh issue view 123
+
+# Close an issue
+gh issue close 123
+
+# Assign an issue
+gh issue edit 123 --add-assignee username
+```
+
+### **Pull Request Operations**
+
+```bash
+# List pull requests
+gh pr list
+
+# Create a pull request
+gh pr create --title "Feature: Add new functionality" --body "Description"
+
+# View a pull request
+gh pr view 456
+
+# Check out a pull request locally
+gh pr checkout 456
+
+# Merge a pull request
+gh pr merge 456 --merge
+
+# Review a pull request
+gh pr review 456 --approve --body "LGTM!"
+```
+
+### **GitHub Actions**
+
+```bash
+# List workflow runs
+gh run list
+
+# View workflow run details
+gh run view 123456
+
+# Download workflow artifacts
+gh run download 123456
+
+# Re-run a workflow
+gh run rerun 123456
+```
+
+### **Releases**
+
+```bash
+# List releases
+gh release list
+
+# Create a release
+gh release create v1.0.0 --title "Version 1.0.0" --notes "Release notes"
+
+# Download release assets
+gh release download v1.0.0
+
+# View release details
+gh release view v1.0.0
+```
+
+## **Configuration**
+
+### **Configure Default Settings**
+
+```bash
+# Set default editor
+gh config set editor vim
+
+# Set default git protocol
+gh config set git_protocol ssh
+
+# View current configuration
+gh config list
+```
+
+### **Aliases**
+
+```bash
+# Create aliases for common commands
+gh alias set pv 'pr view'
+gh alias set ic 'issue create'
+gh alias set rc 'repo clone'
+
+# List aliases
+gh alias list
+```
+
+## **Scripting with GitHub CLI**
+
+### **Output Formats**
+
+```bash
+# JSON output for scripting
+gh repo list --json name,owner,description
+
+# Template output
+gh pr list --template '{{range .}}{{.title}} - {{.author.login}}{{"\n"}}{{end}}'
+
+# TSV output
+gh issue list --state open --format tsv
+```
+
+### **Example Scripts**
+
+```bash
+#!/bin/bash
+# Bulk close issues with specific label
+for issue in $(gh issue list --label "wontfix" --json number --jq '.[].number'); do
+    gh issue close $issue --comment "Closing as won't fix"
+done
+```
+
+## **Troubleshooting**
+
+### **Common Issues**
+
+**Authentication Problems**
+
+```bash
+# Clear authentication and re-login
+gh auth logout
+gh auth login
+```
+
+**Permission Issues**
+
+```bash
+# Check current authentication and scopes
+gh auth status --show-token
+```
+
+**API Rate Limits**
+
+```bash
+# Check rate limit status
+gh api rate_limit
+```
+
+## **Best Practices**
+
+1. **Use Aliases**: Create shortcuts for frequently used commands
+2. **Script Automation**: Leverage JSON output for automation scripts
+3. **Token Security**: Use fine-grained personal access tokens when possible
+4. **Environment Variables**: Set GITHUB_TOKEN for CI/CD environments
+5. **Regular Updates**: Keep GitHub CLI updated for latest features
+
+## **Conclusion**
+
+GitHub CLI is a powerful tool that brings the full functionality of GitHub to your command line. With proper authentication using `gh auth login` and understanding of its core commands, you can significantly streamline your GitHub workflow and automate repetitive tasks.
+
+<BuyMeACoffeeButton />
