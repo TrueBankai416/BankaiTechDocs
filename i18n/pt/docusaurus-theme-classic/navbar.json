@@ -1,26 +1,26 @@
 {
   "title": {
-    "message": "Bankai-Tech Docs",
+    "message": "Documentos Bankai-Tech",
     "description": "The title in the navbar"
   },
   "logo.alt": {
-    "message": "My Site Logo",
+    "message": "Logotipo do meu site",
     "description": "The alt text of navbar logo"
   },
   "item.label.Tutorials": {
-    "message": "Tutorials",
+    "message": "Tutoriais",
     "description": "Navbar item with label Tutorials"
   },
   "item.label.Examples": {
-    "message": "Examples",
+    "message": "Exemplos",
     "description": "Navbar item with label Examples"
   },
   "item.label.MS Windows": {
-    "message": "MS Windows",
+    "message": "Microsoft Windows",
     "description": "Navbar item with label MS Windows"
   },
   "item.label.Buy Me a Beer": {
-    "message": "Buy Me a Beer",
+    "message": "Compre-me uma cerveja",
     "description": "Navbar item with label Buy Me a Beer"
   }
 }
