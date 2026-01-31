@@ -11,14 +11,14 @@ Este sitio de documentación incluye una **integración bidireccional de comenta
 
 ## Características
 
-* **Comunicación bidireccional**: Comentarios del sitio web → Discord, Respuestas de Discord → Sitio web
-* **Sistema de comentarios duales**: Los comentarios de Giscus (basado en GitHub) y Discord funcionan juntos
-* **Incrustaciones enriquecidas de Discord**: Los comentarios aparecen como incrustaciones formateadas con contexto de página completa
-* **Gestión de hilos**: Creación automática de hilos para respuestas organizadas
-* **Actualizaciones en tiempo real**: El sitio web muestra las respuestas de Discord automáticamente
-* **Contexto de página completa**: Los comentarios incluyen el título de la página, la URL y el contexto de navegación.
-* **Avatares de usuario**: Las respuestas de Discord muestran avatares de usuario y nombres de usuario.
-* **Diseño responsivo**: funciona tanto en computadoras de escritorio como en dispositivos móviles.
+- **Comunicación bidireccional**: Comentarios del sitio web → Discord, Respuestas de Discord → Sitio web
+- **Sistema de comentarios duales**: Los comentarios de Giscus (basado en GitHub) y Discord funcionan juntos
+- **Incrustaciones enriquecidas de Discord**: Los comentarios aparecen como incrustaciones formateadas con contexto de página completa
+- **Gestión de hilos**: Creación automática de hilos para respuestas organizadas
+- **Actualizaciones en tiempo real**: El sitio web muestra las respuestas de Discord automáticamente
+- **Contexto de página completa**: Los comentarios incluyen el título de la página, la URL y el contexto de navegación.
+- **Avatares de usuario**: Las respuestas de Discord muestran avatares de usuario y nombres de usuario.
+- **Diseño responsivo**: funciona tanto en computadoras de escritorio como en dispositivos móviles.
 
 ## Instrucciones de configuración
 
@@ -29,28 +29,28 @@ Este sitio de documentación incluye una **integración bidireccional de comenta
 3. Vaya a la sección "Bot" y cree un bot.
 4. Copiar el token del bot
 5. En "Intentos de puerta de enlace privilegiada", habilite:
-   * **Intención del contenido del mensaje**
-   * **Intención de los miembros del servidor** (opcional)
+   - **Intención del contenido del mensaje**
+   - **Intención de los miembros del servidor** (opcional)
 
-### 3) Invite Bot to Server
+### 7. Implementar configuración
 
 Tu bot necesita estos permisos:
 
-* Leer mensajes
-* Enviar mensajes
-* Crear hilos públicos
-* Enviar mensajes en hilos
-* Leer el historial de mensajes
-* Usar comandos de barra (opcional)
+- Leer mensajes
+- Enviar mensajes
+- Crear hilos públicos
+- Enviar mensajes en hilos
+- Leer el historial de mensajes
+- Usar comandos de barra (opcional)
 
-### 6. Start the Backend Server
+### 6. Iniciar el servidor backend
 
 1. Vaya a OAuth2 > Generador de URL
 2. Seleccionar el alcance del "bot"
 3. Seleccione los permisos enumerados arriba
 4. Utilice la URL generada para invitar al bot a su servidor
 
-### 7) Deploy Configuration
+### 5. Instalar dependencias del servidor
 
 #### Interfaz (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Nombre de tu sitio
 
 :::warning Nota de seguridad
 
-* Nunca envíe archivos `.env` al control de versiones
-* Utilizar variables de entorno en producción
-* Mantenga su token de bot seguro
+- Nunca envíe archivos `.env` al control de versiones
+- Utilizar variables de entorno en producción
+- Mantenga su token de bot seguro
   :::
 
-### 5. Instalar dependencias del servidor
+### 6. Start the Backend Server
 
 ```bash
 cd servidor
 npm install
 ```
 
-### 6. Iniciar el servidor backend
+### 6. Start the Backend Server
 
 ```bash
 # Desarrollo
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Implementar configuración
+### 7. 7. Deploy Configuration
 
 Para implementaciones de producción, configure variables de entorno en su plataforma de alojamiento:
 
-* **Frontend**: Establezca `REACT_APP_API_URL` en la URL de su API de producción
-* **Backend**: Implementar la carpeta del servidor con el token del bot y el ID del canal
-* **Base de datos**: La base de datos SQLite se creará automáticamente
-* **Contexto**: Configura el nivel de contexto y las opciones de Discord según tus preferencias
+- **Frontend**: Establezca `REACT_APP_API_URL` en la URL de su API de producción
+- **Backend**: Implementar la carpeta del servidor con el token del bot y el ID del canal
+- **Base de datos**: La base de datos SQLite se creará automáticamente
+- **Contexto**: Configura el nivel de contexto y las opciones de Discord según tus preferencias
 
 ## Cómo funciona
 
@@ -140,22 +140,22 @@ Para implementaciones de producción, configure variables de entorno en su plata
 
 Las incrustaciones de Discord incluyen:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Descripción**: El contenido real del comentario
-* **Autor**: El nombre del comentarista
-* **URL**: Enlace clicable a la página exacta
-* **Campo de página**: Muestra el título de la página con un enlace en el que se puede hacer clic
-* **Marca de tiempo**: Cuándo se publicó el comentario
-* **Hilo**: Hilo creado automáticamente para respuestas
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Descripción**: El contenido real del comentario
+- **Autor**: El nombre del comentarista
+- **URL**: Enlace clicable a la página exacta
+- **Campo de página**: Muestra el título de la página con un enlace en el que se puede hacer clic
+- **Marca de tiempo**: Cuándo se publicó el comentario
+- **Hilo**: Hilo creado automáticamente para respuestas
 
 ### Visualización del sitio web
 
 El sitio web muestra:
 
-* **Comentarios originales**: Envíos de formularios del sitio web
-* **Respuestas de Discord**: Respuestas de usuarios de Discord con avatares y nombres de usuario
-* **Actualizaciones en tiempo real**: sondeo automático para nuevas respuestas
-* **Conversaciones en cadena**: Estructura organizada de comentarios → respuestas
+- **Comentarios originales**: Envíos de formularios del sitio web
+- **Respuestas de Discord**: Respuestas de usuarios de Discord con avatares y nombres de usuario
+- **Actualizaciones en tiempo real**: sondeo automático para nuevas respuestas
+- **Conversaciones en cadena**: Estructura organizada de comentarios → respuestas
 
 ## Configuración de contexto
 
@@ -165,23 +165,23 @@ Configura cuánto contexto aparece en los mensajes de Discord:
 
 #### `NIVEL_DE_CONTEXTO_DE_DISCORDIA=mínimo`
 
-* **Muestra**: Solo el título de la página y el contenido de los comentarios
-* **Caso de uso**: Mensajes limpios y simples sin contexto adicional
+- **Muestra**: Solo el título de la página y el contenido de los comentarios
+- **Caso de uso**: Mensajes limpios y simples sin contexto adicional
 
 #### `NIVEL_DE_CONTEXTO_DE_DISCORD=básico`
 
-* **Muestra**: Título de la página, contenido del comentario y URL de la página en la que se puede hacer clic
-* **Caso de uso**: Contexto moderado con información esencial
+- **Muestra**: Título de la página, contenido del comentario y URL de la página en la que se puede hacer clic
+- **Caso de uso**: Contexto moderado con información esencial
 
 #### `DISCORD_CONTEXT_LEVEL=full` (predeterminado)
 
-* **Muestra**: Toda la información de contexto, incluidas las rutas de navegación, las secciones y las marcas de tiempo.
-* **Caso de uso**: Contexto máximo para discusiones detalladas
+- **Muestra**: Toda la información de contexto, incluidas las rutas de navegación, las secciones y las marcas de tiempo.
+- **Caso de uso**: Contexto máximo para discusiones detalladas
 
 #### `NIVEL_DE_TEXTO_DISCORD=personalizado`
 
-* **Muestra**: Solo los elementos de contexto que habilita individualmente
-* **Caso de uso**: Control preciso sobre lo que aparece
+- **Muestra**: Solo los elementos de contexto que habilita individualmente
+- **Caso de uso**: Control preciso sobre lo que aparece
 
 ### Controles de contexto individuales
 
@@ -287,9 +287,9 @@ src/tema/DocItem/Layout/index.js
 
 ### Las variables de entorno no funcionan
 
-* **Desarrollo**: Reiniciar los servidores frontend y backend
-* **Producción**: Vuelva a implementar el frontend y el backend con las variables de entorno correctas
-* **Prefijo**: utilice el prefijo `REACT_APP_` solo para variables del frontend
+- **Desarrollo**: Reiniciar los servidores frontend y backend
+- **Producción**: Vuelva a implementar el frontend y el backend con las variables de entorno correctas
+- **Prefijo**: utilice el prefijo `REACT_APP_` solo para variables del frontend
 
 ### Problemas con la base de datos
 
@@ -299,12 +299,12 @@ src/tema/DocItem/Layout/index.js
 
 ## Consideraciones de seguridad
 
-* **Bot Token**: Mantenga su token de bot en secreto y nunca lo envíe al control de versiones
-* **Límite de velocidad**: Discord tiene límites de velocidad para los bots (diferentes de los webhooks)
-* **Validación de entrada**: Tanto el frontend como el backend validan la entrada del usuario
-* **Seguridad de la base de datos**: La base de datos SQLite debe estar protegida con los permisos de archivo adecuados
-* **Seguridad de la API**: considere implementar una limitación de velocidad en los puntos finales de su API
-* **CORS**: Configure CORS correctamente para su dominio de producción
+- **Bot Token**: Mantenga su token de bot en secreto y nunca lo envíe al control de versiones
+- **Límite de velocidad**: Discord tiene límites de velocidad para los bots (diferentes de los webhooks)
+- **Validación de entrada**: Tanto el frontend como el backend validan la entrada del usuario
+- **Seguridad de la base de datos**: La base de datos SQLite debe estar protegida con los permisos de archivo adecuados
+- **Seguridad de la API**: considere implementar una limitación de velocidad en los puntos finales de su API
+- **CORS**: Configure CORS correctamente para su dominio de producción
 
 ## Arquitectura
 
@@ -331,7 +331,7 @@ project/
 
 El componente de comentarios de Discord funciona en todos los navegadores modernos que admiten:
 
-* API de búsqueda de ES6
-* Reaccionar 18+
-* Cuadrícula CSS y Flexbox
-* Almacenamiento local (para persistencia del formulario)
+- API de búsqueda de ES6
+- Reaccionar 18+
+- Cuadrícula CSS y Flexbox
+- Almacenamiento local (para persistencia del formulario)
