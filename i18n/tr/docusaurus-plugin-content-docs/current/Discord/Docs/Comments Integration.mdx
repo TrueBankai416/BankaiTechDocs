@@ -11,14 +11,14 @@ Bu dokümantasyon sitesi, ziyaretçilerin Discord sunucunuza yorum göndermesine
 
 ## Özellikler
 
-* **Çift Yönlü İletişim**: Web sitesi yorumları → Discord, Discord yanıtları → Web sitesi
-* **Çift Yorum Sistemi**: Hem Giscus (GitHub tabanlı) hem de Discord yorumları birlikte çalışır.
-* **Zengin Discord Gömülü Yorumları**: Yorumlar, tam sayfa içeriğiyle biçimlendirilmiş gömülü yorumlar olarak görünür.
-* **Konu Yönetimi**: Düzenli yanıtlar için otomatik konu oluşturma
-* **Gerçek Zamanlı Güncellemeler**: Web sitesi Discord yanıtlarını otomatik olarak görüntüler.
-* **Tam Sayfa İçeriği**: Yorumlar sayfa başlığını, URL'yi ve gezinme içeriğini içerir.
-* **Kullanıcı Avatarları**: Discord yanıtlarında kullanıcı avatarları ve kullanıcı adları gösterilir.
-* **Duyarlı Tasarım**: Hem masaüstü hem de mobil cihazlarda çalışır.
+- **Çift Yönlü İletişim**: Web sitesi yorumları → Discord, Discord yanıtları → Web sitesi
+- **Çift Yorum Sistemi**: Hem Giscus (GitHub tabanlı) hem de Discord yorumları birlikte çalışır.
+- **Zengin Discord Gömülü Yorumları**: Yorumlar, tam sayfa içeriğiyle biçimlendirilmiş gömülü yorumlar olarak görünür.
+- **Konu Yönetimi**: Düzenli yanıtlar için otomatik konu oluşturma
+- **Gerçek Zamanlı Güncellemeler**: Web sitesi Discord yanıtlarını otomatik olarak görüntüler.
+- **Tam Sayfa İçeriği**: Yorumlar sayfa başlığını, URL'yi ve gezinme içeriğini içerir.
+- **Kullanıcı Avatarları**: Discord yanıtlarında kullanıcı avatarları ve kullanıcı adları gösterilir.
+- **Duyarlı Tasarım**: Hem masaüstü hem de mobil cihazlarda çalışır.
 
 ## Kurulum Talimatları
 
@@ -29,19 +29,19 @@ Bu dokümantasyon sitesi, ziyaretçilerin Discord sunucunuza yorum göndermesine
 3. "Bot" bölümüne gidin ve bir bot oluşturun.
 4. Bot tokenini kopyala
 5. "Ayrıcalıklı Ağ Geçidi Amaçları" altında şunları etkinleştirin:
-   * **Mesaj İçeriğinin Amacı**
-   * **Sunucu Üyelerinin Amacı** (isteğe bağlı)
+   - **Message Content Intent**
+   - **Sunucu Üyelerinin Amacı** (isteğe bağlı)
 
-### 3) Invite Bot to Server
+### 2. Configure Bot Permissions
 
 Botunuzun şu izinlere ihtiyacı var:
 
-* Mesajları Oku
-* Mesaj Gönder
-* Herkese Açık Konular Oluşturun
-* Mesajları ileti dizilerinde gönder
-* Mesaj Geçmişini Oku
-* Eğik çizgi komutlarını kullanın (isteğe bağlı)
+- Mesajları Oku
+- Mesaj Gönder
+- Herkese Açık Konular Oluşturun
+- Mesajları ileti dizilerinde gönder
+- Mesaj Geçmişini Oku
+- Eğik çizgi komutlarını kullanın (isteğe bağlı)
 
 ### 6. Start the Backend Server
 
@@ -50,7 +50,7 @@ Botunuzun şu izinlere ihtiyacı var:
 3. Yukarıda listelenen izinleri seçin.
 4. Oluşturulan URL'yi kullanarak botu sunucunuza davet edin.
 
-### 7) Deploy Configuration
+### 4. Configure Environment Variables
 
 #### Ön uç (.env)
 
@@ -94,9 +94,9 @@ DISCORD_SITE_NAME=Sitenizin Adı
 
 :::uyarı Güvenlik Notu
 
-* `.env` dosyalarını asla sürüm kontrol sistemine kaydetmeyin.
-* Üretimde ortam değişkenlerini kullanın.
-* Bot belirtecinizi güvende tutun
+- `.env` dosyalarını asla sürüm kontrol sistemine kaydetmeyin.
+- Üretimde ortam değişkenlerini kullanın.
+- Bot belirtecinizi güvende tutun
   :::
 
 ### 5. Sunucu Bağımlılıklarını Yükle
@@ -120,10 +120,10 @@ npm start
 
 Üretim ortamına dağıtım yaparken, barındırma platformunuzda ortam değişkenlerini ayarlayın:
 
-* **Ön Uç**: `REACT_APP_API_URL` değerini üretim API URL'nize ayarlayın.
-* **Arka Uç**: Bot token'ı ve kanal kimliği ile sunucu klasörünü dağıtın.
-* **Veritabanı**: SQLite veritabanı otomatik olarak oluşturulacaktır.
-* **Bağlam**: Discord bağlam düzeyini ve seçeneklerini tercihlerinize göre yapılandırın.
+- **Ön Uç**: `REACT_APP_API_URL` değerini üretim API URL'nize ayarlayın.
+- **Arka Uç**: Bot token'ı ve kanal kimliği ile sunucu klasörünü dağıtın.
+- **Veritabanı**: SQLite veritabanı otomatik olarak oluşturulacaktır.
+- **Bağlam**: Discord bağlam düzeyini ve seçeneklerini tercihlerinize göre yapılandırın.
 
 ## Nasıl Çalışır
 
@@ -140,24 +140,24 @@ npm start
 
 Discord yerleştirmeleri şunları içerir:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Açıklama**: Yorumun gerçek içeriği
-* **Yazar**: Yorum yapan kişinin adı
-* **URL**: İlgili sayfaya yönlendiren tıklanabilir bağlantı
-* **Sayfa Alanı**: Tıklanabilir bağlantı içeren sayfa başlığını gösterir.
-* **Zaman Damgası**: Yorumun yayınlandığı zaman
-* **Konu Başlığı**: Yanıtlar için otomatik olarak oluşturulan konu başlığı
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Açıklama**: Yorumun gerçek içeriği
+- **Yazar**: Yorum yapan kişinin adı
+- **URL**: İlgili sayfaya yönlendiren tıklanabilir bağlantı
+- **Sayfa Alanı**: Tıklanabilir bağlantı içeren sayfa başlığını gösterir.
+- **Zaman Damgası**: Yorumun yayınlandığı zaman
+- **Konu Başlığı**: Yanıtlar için otomatik olarak oluşturulan konu başlığı
 
 ### Web Sitesi Görüntüleme
 
 Web sitesinde şunlar gösteriliyor:
 
-* **Orijinal Yorumlar**: Web sitesi form gönderimleri
-* **Discord Yanıtları**: Avatar ve kullanıcı adlarıyla Discord kullanıcılarından gelen yanıtlar.
-* **Gerçek Zamanlı Güncellemeler**: Yeni yanıtlar için otomatik sorgulama
-* **Konu Bazlı Konuşmalar**: Düzenli yorum → yanıt yapısı
+- **Orijinal Yorumlar**: Web sitesi form gönderimleri
+- **Discord Yanıtları**: Avatar ve kullanıcı adlarıyla Discord kullanıcılarından gelen yanıtlar.
+- **Gerçek Zamanlı Güncellemeler**: Yeni yanıtlar için otomatik sorgulama
+- **Konu Bazlı Konuşmalar**: Düzenli yorum → yanıt yapısı
 
-## Bağlam Yapılandırması
+## Context Configuration
 
 ### Bağlam Düzeyleri
 
@@ -165,23 +165,23 @@ Discord mesajlarında ne kadar içeriğin görüneceğini yapılandırın:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Gösterilenler:** Sadece sayfa başlığı ve yorum içeriği
-* **Kullanım örneği**: Ek bağlam içermeyen, temiz ve basit mesajlar.
+- **Gösterilenler:** Sadece sayfa başlığı ve yorum içeriği
+- **Kullanım örneği**: Ek bağlam içermeyen, temiz ve basit mesajlar.
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Gösterilenler:** Sayfa başlığı, yorum içeriği ve tıklanabilir sayfa URL'si.
-* **Kullanım senaryosu**: Temel bilgiler içeren orta düzey bağlam
+- **Gösterilenler:** Sayfa başlığı, yorum içeriği ve tıklanabilir sayfa URL'si.
+- **Kullanım senaryosu**: Temel bilgiler içeren orta düzey bağlam
 
 #### `DISCORD_CONTEXT_LEVEL=full` (varsayılan)
 
-* **Gösterilenler**: Yol izleme bilgileri, bölümler ve zaman damgaları dahil olmak üzere tüm bağlam bilgileri.
-* **Kullanım örneği**: Detaylı tartışmalar için maksimum bağlam
+- **Gösterilenler**: Yol izleme bilgileri, bölümler ve zaman damgaları dahil olmak üzere tüm bağlam bilgileri.
+- **Kullanım örneği**: Detaylı tartışmalar için maksimum bağlam
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Gösterilenler**: Yalnızca tek tek etkinleştirdiğiniz bağlam öğeleri
-* **Kullanım örneği**: Görüntülenecek içerik üzerinde hassas kontrol.
+- **Gösterilenler**: Yalnızca tek tek etkinleştirdiğiniz bağlam öğeleri
+- **Kullanım örneği**: Görüntülenecek içerik üzerinde hassas kontrol.
 
 ### Bireysel Bağlam Kontrolleri
 
@@ -213,7 +213,7 @@ Docker Kurulum Kılavuzu
 "Bu eğitim gerçekten çok yardımcı oldu! Bağlantı noktası çakışmalarını nasıl çözebilirim?"
 ```
 
-**Temel Bağlam:**
+**Basic Context:**
 
 ```
 💬 Docker Kurulum Kılavuzu
@@ -285,11 +285,11 @@ src/theme/DocItem/Layout/index.js
 3. **Veritabanı bağlantısı**: Veritabanı hataları için sunucu günlüklerini kontrol edin.
 4. **Anketler**: Ön uç her 30 saniyede bir anket yapar - yanıtların görünmesi zaman alabilir.
 
-### Ortam Değişkenleri Çalışmıyor
+### Environment Variables Not Working
 
-* **Geliştirme**: Hem ön uç hem de arka uç sunucularını yeniden başlatın.
-* **Üretim Ortamı**: Hem ön uç hem de arka uç bileşenlerini doğru ortam değişkenleriyle yeniden dağıtın.
-* **Önek**: `REACT_APP_` önekini yalnızca ön uç değişkenleri için kullanın.
+- **Geliştirme**: Hem ön uç hem de arka uç sunucularını yeniden başlatın.
+- **Production**: Redeploy both frontend and backend with correct environment variables
+- **Önek**: `REACT_APP_` önekini yalnızca ön uç değişkenleri için kullanın.
 
 ### Veritabanı Sorunları
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Güvenlik Hususları
 
-* **Bot Tokenı**: Bot tokenınızı gizli tutun ve asla sürüm kontrolüne eklemeyin.
-* **Hız Sınırlaması**: Discord'da botlar için hız sınırlamaları vardır (webhook'lardan farklıdır).
-* **Giriş Doğrulama**: Hem ön uç hem de arka uç, kullanıcı girişini doğrular.
-* **Veritabanı Güvenliği**: SQLite veritabanı, uygun dosya izinleriyle korunmalıdır.
-* **API Güvenliği**: API uç noktalarınızda hız sınırlaması uygulamayı düşünün.
-* **CORS**: Üretim alanınız için CORS'u doğru şekilde yapılandırın.
+- **Bot Tokenı**: Bot tokenınızı gizli tutun ve asla sürüm kontrolüne eklemeyin.
+- **Hız Sınırlaması**: Discord'da botlar için hız sınırlamaları vardır (webhook'lardan farklıdır).
+- **Giriş Doğrulama**: Hem ön uç hem de arka uç, kullanıcı girişini doğrular.
+- **Veritabanı Güvenliği**: SQLite veritabanı, uygun dosya izinleriyle korunmalıdır.
+- **API Güvenliği**: API uç noktalarınızda hız sınırlaması uygulamayı düşünün.
+- **CORS**: Üretim alanınız için CORS'u doğru şekilde yapılandırın.
 
 ## Mimari
 
@@ -331,7 +331,7 @@ proje/
 
 Discord yorum bileşeni, aşağıdaki tarayıcıları destekleyen tüm modern tarayıcılarda çalışır:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid ve Flexbox
-* Yerel Depolama (formların kalıcı hale getirilmesi için)
+- ES6 fetch API
+- React 18+
+- CSS Grid ve Flexbox
+- Yerel Depolama (formların kalıcı hale getirilmesi için)
