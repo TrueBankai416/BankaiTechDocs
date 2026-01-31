@@ -31,34 +31,34 @@ Tor transparent proxying intercepts network traffic at the system level and rout
 
 ### **Key Components**
 
-* **Tor**: The Onion Router network for anonymous communication
-* **TransPort**: Tor's transparent proxy port (typically 9040)
-* **DNSPort**: Tor's DNS resolution port (typically 9053)
-* **lnxrouter**: WiFi hotspot creation with transparent proxy support
-* **iptables**: Traffic redirection rules
+- **Tor**: The Onion Router network for anonymous communication
+- **TransPort**: Tor's transparent proxy port (typically 9040)
+- **DNSPort**: Tor's DNS resolution port (typically 9053)
+- **lnxrouter**: WiFi hotspot creation with transparent proxy support
+- **iptables**: Traffic redirection rules
 
 ### **Benefits**
 
-* **Automatic anonymity**: All traffic routed through Tor without app configuration
-* **Network-wide protection**: Entire WiFi network protected
-* **Simple client setup**: Devices just connect to WiFi normally
-* **Privacy by default**: No risk of applications bypassing Tor
+- **Automatic anonymity**: All traffic routed through Tor without app configuration
+- **Network-wide protection**: Entire WiFi network protected
+- **Simple client setup**: Devices just connect to WiFi normally
+- **Privacy by default**: No risk of applications bypassing Tor
 
 ### **Limitations**
 
-* **Performance impact**: Tor adds latency and reduces bandwidth
-* **Not suitable for all traffic**: Some protocols may not work properly
-* **DNS leaks possible**: Requires proper configuration to prevent
-* **Exit node risks**: Traffic visible to exit nodes (use HTTPS)
+- **Performance impact**: Tor adds latency and reduces bandwidth
+- **Not suitable for all traffic**: Some protocols may not work properly
+- **DNS leaks possible**: Requires proper configuration to prevent
+- **Exit node risks**: Traffic visible to exit nodes (use HTTPS)
 
 ## **Prerequisites and Installation**
 
 ### **System Requirements**
 
-* Linux system with root access
-* WiFi adapter capable of AP mode
-* Internet connection (preferably not metered)
-* At least 1GB RAM (Tor can be memory intensive)
+- Linux system with root access
+- WiFi adapter capable of AP mode
+- Internet connection (preferably not metered)
+- At least 1GB RAM (Tor can be memory intensive)
 
 ### **Install Dependencies**
 
@@ -197,11 +197,11 @@ sudo lnxrouter --ap wlan0 "TorHotspot" -p "SecurePass123" \
 
 #### **Parameter Explanation**
 
-* `--ap wlan0 "TorHotspot"`: Create AP on wlan0 with SSID "TorHotspot"
-* `-p "SecurePass123"`: WiFi password
-* `--tp 9040`: Redirect TCP traffic to Tor's TransPort
-* `--dns 9053`: Use Tor's DNS port for DNS resolution
-* `-g 192.168.55.1`: Gateway IP (must match torrc configuration)
+- `--ap wlan0 "TorHotspot"`: Create AP on wlan0 with SSID "TorHotspot"
+- `-p "SecurePass123"`: WiFi password
+- `--tp 9040`: Redirect TCP traffic to Tor's TransPort
+- `--dns 9053`: Use Tor's DNS port for DNS resolution
+- `-g 192.168.55.1`: Gateway IP (must match torrc configuration)
 
 ### **Advanced Tor Hotspot Configuration**
 
@@ -215,11 +215,11 @@ sudo lnxrouter --ap wlan0 "SecureTorAP" -p "VerySecurePass2024" \
 
 #### **Security Options Explained**
 
-* `--ban-priv`: Block access to private/local networks (prevents local network access)
-* `--isolate-clients`: Prevent connected devices from communicating with each other
-* `--hidden`: Hide SSID (don't broadcast network name)
-* `-c 11`: Use WiFi channel 11 (less congested)
-* `--country US`: Set regulatory domain
+- `--ban-priv`: Block access to private/local networks (prevents local network access)
+- `--isolate-clients`: Prevent connected devices from communicating with each other
+- `--hidden`: Hide SSID (don't broadcast network name)
+- `-c 11`: Use WiFi channel 11 (less congested)
+- `--country US`: Set regulatory domain
 
 ### **Multiple Tor Networks**
 
@@ -407,10 +407,10 @@ echo -e 'AUTHENTICATE ""\r\nSIGNAL NEWNYM\r\nQUIT' | nc 127.0.0.1 9051
 
 Some protocols may not work through Tor transparent proxy:
 
-* **FTP**: Often blocked or problematic
-* **SMTP**: May be blocked by exit nodes
-* **P2P**: Not recommended through Tor
-* **Real-time applications**: High latency may cause issues
+- **FTP**: Often blocked or problematic
+- **SMTP**: May be blocked by exit nodes
+- **P2P**: Not recommended through Tor
+- **Real-time applications**: High latency may cause issues
 
 ## **Security Best Practices**
 
@@ -582,10 +582,10 @@ curl http://httpbin.org/ip
 
 Visit these websites from connected devices:
 
-* **https://check.torproject.org/** - Verifies Tor usage
-* **https://www.whatismyipaddress.com/** - Shows your public IP
-* **https://ipleak.net/** - Comprehensive leak testing
-* **https://dnsleaktest.com/** - DNS leak testing
+- **https://check.torproject.org/** - Verifies Tor usage
+- **https://www.whatismyipaddress.com/** - Shows your public IP
+- **https://ipleak.net/** - Comprehensive leak testing
+- **https://dnsleaktest.com/** - DNS leak testing
 
 ### **Performance Testing**
 
@@ -655,11 +655,11 @@ Tor transparent proxying with lnxrouter provides a powerful way to create anonym
 
 **Key takeaways:**
 
-* Ensure Tor service is running before starting lnxrouter
-* Match IP addresses between torrc and lnxrouter gateway
-* Test thoroughly to verify anonymity and prevent leaks
-* Monitor performance and security regularly
-* Keep software updated for security
+- Ensure Tor service is running before starting lnxrouter
+- Match IP addresses between torrc and lnxrouter gateway
+- Test thoroughly to verify anonymity and prevent leaks
+- Monitor performance and security regularly
+- Keep software updated for security
 
 **Remember**: Tor provides anonymity, not security. Always use HTTPS and follow good security practices. Tor transparent proxying is not suitable for all use cases - consider your specific needs and threat model.
 
