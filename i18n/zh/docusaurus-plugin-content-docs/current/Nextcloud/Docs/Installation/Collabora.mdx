@@ -3,8 +3,18 @@ title: Install with Collabora
 description: Nextcloud installation with Collabora Code integration for online document editing, including Redis, MariaDB, and office suite functionality.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 2
-tags: [Docker, Docker Compose, Tutorial, Nextcloud, Collabora Code, Nextcloud Office]
-keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
+tags:
+  - Docker
+  - Docker Compose
+  - Tutorial
+  - Nextcloud
+  - Collabora Code
+  - Nextcloud Office
+keywords:
+  - Docker
+  - Docker Engine
+  - Tutorial
+  - Nextcloud
 last_update:
   author: BankaiTech
 ---
@@ -13,7 +23,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Nextcloud Installation With Collabora Code**
 
-***This method includes Redis, MariaDB, and Collabora Code***
+**_This method includes Redis, MariaDB, and Collabora Code_**
 
 First lets update your system.
 
@@ -21,7 +31,7 @@ First lets update your system.
 sudo apt-get update && apt-get upgrade -y
 ```
 
-### ***Setting up the directories***
+### **_Setting up the directories_**
 
 Now lets setup the Directories
 :::note
@@ -40,7 +50,7 @@ Lets take ownership of the directory
 sudo chown -R $USER:$USER /opt/docker
 ```
 
-### ***Creating .env files***
+### **_Creating .env files_**
 
 Now lets make an [Environment File with Interpolation](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) file in the new directory.
 
@@ -87,11 +97,11 @@ MARIADB_AUTO_UPGRADE=true
 // highlight-start
 username=admin
 password=PASSWORD
-domain=cloud\.domain\.com
+domain=cloud\\.domain\\.com
 // highlight-end
 ```
 
-:::tip\[Info]
+:::tip[Info]
 
 Please Change `CHANGEME` to a password of your choosing.
 :::danger
@@ -101,7 +111,7 @@ Ex. `‘ ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] / < > , . ; ? ' : | (space)`
 
 Save the new file by pressing `CTRL+X`
 
-### ***Creating the Compose file***
+### **_Creating the Compose file_**
 
 Now lets create the compose file.
 
@@ -218,21 +228,18 @@ the `-d` flag stands for [detatched](https://docs.docker.com/engine/reference/ru
 ```
 
 <p>
-  <>After its done pulling the docker images you can open up a web browser.</>
+<>After its done pulling the docker images you can open up a web browser.</>
 </p>
-
 :::note
 Before proceeding, you will need to configure your reverse proxy. I have an example Nginx config [Here](/Examples/Reverse%20Proxies/Docs/Nginx/#nextcloud).
-
-* Additional Documentation: [Reverse Proxies](/Reverse%20Proxy/Introduction)
-  :::
-
+ - Additional Documentation: [Reverse Proxies](/Reverse%20Proxy/Introduction) 
+:::
 <p>
-  <>Connect to nextcloud by typing in your configured `domain`</>
+<>Connect to nextcloud by typing in your configured `domain`</>
 </p>
 
 <p>
-  <>You should see this screen.</>
+<>You should see this screen.</>
 </p>
 
 ![Nextcloud First Start](/img/nextcloud/FirstStart.jpg)
@@ -253,49 +260,49 @@ If you use clients for file syncing, the use of SQLite is highly discouraged.
 
 You will need to click the drop down and select `MySQL/MariaDB` and type in the info manually.
 
-* **database account:** nextcloud
-* **database password:** YOUR_PASSWORD_FROM .env
-* **database name:** nextcloud
-* **database host:** mariadb:3306
+- **database account:** nextcloud
+- **database password:** YOUR_PASSWORD_FROM .env
+- **database name:** nextcloud
+- **database host:** mariadb:3306
   :::
 
-### ***Account Creation***
+### **_Account Creation_**
 
 <p>
-  <>Now create an admin account and click `Install`</>
+<>Now create an admin account and click `Install`</>
 </p>
 
 <p>
-  <>Click `Install Recommended Apps`</>
+<>Click `Install Recommended Apps`</>
 </p>
 
 ![Nextcloud Install Recommended Apps](/img/nextcloud/FirstStart_RecommendedApps.jpg)
 
 <p>
-  <>When its done installing you should see your Dashboard</>
+<>When its done installing you should see your Dashboard</>
 </p>
 
 ![Nextcloud Dashboard](/img/nextcloud/Dashboard.jpg)
 
-### ***Checking for errors and warnings***
+### **_Checking for errors and warnings_**
 
 <p>
-  <>On the top right click the `User Icon` and go to `Administration Settings`</>
+<>On the top right click the `User Icon` and go to `Administration Settings`</>
 </p>
 
 ![Nextcloud Administration Settings](/img/nextcloud/Administration_Settings.jpg)
 
 <p>
-  <>Here you should see `Security & Setup Warnings`</>
+<>Here you should see `Security & Setup Warnings`</>
 </p>
 
 ![Nextcloud Warnings](/img/nextcloud/Warnings.jpg)
 
 <p>
-  <>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
+<>In order to fix the [Maintenance Window](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#maintenance-window-start) and the [Phone Region](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#default-phone-region) warnings, we will have to edit our `config.php` file.</>
 </p>
 
-### ***Modifying the config.php file***
+### **_Modifying the config.php file_**
 
 Run the following command to open the `config.php` file with nano.
 
@@ -306,9 +313,8 @@ nano nextcloud/config/config.php
 :::tip[Hint]
 
 <p>
-  <>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</>
+<>If you recieved an error `Directory nextcloud doesnt exist`, then you need to change directories.</>
 </p>
-
 Run `cd /opt/docker/nextcloud` then try again.
 :::
 
@@ -322,41 +328,39 @@ Now add the following to the bottom of the file.
 ![Nextcloud config.php](/img/nextcloud/config.jpg)
 
 <p>
-  <>Now if you go back to your `Administration Settings` Page.</>
+<>Now if you go back to your `Administration Settings` Page.</>
 </p>
-
 It should look something like this.
 
 ![Nextcloud No Warnings](/img/nextcloud/NoErrors.jpg)
 
-:::tip\[HINT]
+:::tip[HINT]
 
 In some cases, you may have to delete your browser cache and restart the browser for the Warnings to update.
 :::
 
-### ***Creating production use user***
+### **_Creating production use user_**
 
 <p>
-  <>Now you can go create a user for yourself.</>
+<>Now you can go create a user for yourself.</>
 </p>
 
 <p>
-  <>Go to the user icon on the top right and select `Users`.</>
+<>Go to the user icon on the top right and select `Users`.</>
 </p>
 
 ![Nextcloud Users](/img/nextcloud/users.jpg)
 
 <p>
-  <>Click on `Add User` on the left hand side.</>
+<>Click on `Add User` on the left hand side.</>
 </p>
 
 ![Nextcloud Add Users](/img/nextcloud/Adduser.jpg)
 
 <p>
-  <>Now create your User.</>
+<>Now create your User.</>
 </p>
-
-:::warning\[Caution]
+:::warning[Caution]
 
 Make sure to set `Groups` to `admin`
 :::
@@ -371,19 +375,18 @@ Now choose `Use your own Server`
 ![Choose your Server](/img/nextcloud/OfficeServer.jpg)
 
 <p>
-  <>Enter in your domain that you will use for office and Uncheck `Disable certificate verification`</>
+<>Enter in your domain that you will use for office and Uncheck `Disable certificate verification`</>
 </p>
-
 :::note
 You will have to add an `A` record for `office` and setup your reverse proxy for Collabra
 :::
+![CollaboraUrl](/img/nextcloud/OfficeUrl.jpg)
 
-### ***WOPI List***
+### **_WOPI List_**
 
 <p>
-  <>Now scroll down to the `WOPI List`</>
+<>Now scroll down to the `WOPI List`</>
 </p>
-
 Enter in your `Public IP`, Network `CIDR`, and `127.0.0.1`
 :::info
 Ex. `251.163.184.3,192.168.1.1/24,127.0.0.1`
@@ -391,12 +394,11 @@ Ex. `251.163.184.3,192.168.1.1/24,127.0.0.1`
 ![Office WOPI](/img/nextcloud/OfficeWOPI.jpg)
 Press `ENTER`
 
-### ***Testing Nextcloud Office***
+### **_Testing Nextcloud Office_**
 
 <p>
-  <>Go to `Files` and create a new document</>
+<>Go to `Files` and create a new document</>
 </p>
-
 ![New Document](/img/nextcloud/NewDocument.jpg)
 ![Nextcloud Office](/img/nextcloud/NextcloudOffice.jpg)
 
