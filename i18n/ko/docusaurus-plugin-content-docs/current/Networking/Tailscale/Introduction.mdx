@@ -1,8 +1,24 @@
 ---
 title: Tailscale - Zero-Config VPN and Mesh Networking
 image: /img/social/tailscale-logo.png
-tags: [Networking, VPN, Tailscale, Mesh Network, WireGuard, Zero Trust, Remote Access]
-keywords: [Tailscale, VPN, mesh network, WireGuard, zero trust, exit node, Magic DNS, reverse proxy, NAT traversal]
+tags:
+  - Networking
+  - VPN
+  - Tailscale
+  - Mesh Network
+  - WireGuard
+  - Zero Trust
+  - Remote Access
+keywords:
+  - Tailscale
+  - VPN
+  - mesh network
+  - WireGuard
+  - zero trust
+  - exit node
+  - Magic DNS
+  - reverse proxy
+  - NAT traversal
 last_update:
   author: BankaiTech
 ---
@@ -19,12 +35,12 @@ Tailscale is a **mesh VPN** that connects your devices directly to each other, c
 
 ### **Key Characteristics**
 
-* **Mesh Architecture**: Direct device-to-device connections instead of hub-and-spoke
-* **WireGuard-Based**: Built on the modern, high-performance WireGuard protocol
-* **Zero Configuration**: Automatic network discovery and connection establishment
-* **NAT Traversal**: Works behind firewalls and NAT without port forwarding
-* **Cross-Platform**: Supports Linux, Windows, macOS, iOS, Android, and more
-* **Zero Trust**: Every connection is authenticated and encrypted
+- **Mesh Architecture**: Direct device-to-device connections instead of hub-and-spoke
+- **WireGuard-Based**: Built on the modern, high-performance WireGuard protocol
+- **Zero Configuration**: Automatic network discovery and connection establishment
+- **NAT Traversal**: Works behind firewalls and NAT without port forwarding
+- **Cross-Platform**: Supports Linux, Windows, macOS, iOS, Android, and more
+- **Zero Trust**: Every connection is authenticated and encrypted
 
 ### **How Tailscale Works**
 
@@ -55,10 +71,10 @@ An **exit node** is a Tailscale device that acts as an internet gateway for othe
 
 ### **What Exit Nodes Do**
 
-* **Internet Gateway**: Route internet traffic through a specific Tailscale device
-* **Location Masking**: Make your traffic appear to originate from the exit node's location
-* **Bypass Restrictions**: Access geo-restricted content or bypass network limitations
-* **Centralized Internet Access**: Provide internet access to devices on restricted networks
+- **Internet Gateway**: Route internet traffic through a specific Tailscale device
+- **Location Masking**: Make your traffic appear to originate from the exit node's location
+- **Bypass Restrictions**: Access geo-restricted content or bypass network limitations
+- **Centralized Internet Access**: Provide internet access to devices on restricted networks
 
 ### **Exit Node Architecture**
 
@@ -108,19 +124,19 @@ tailscale set --exit-node=
 
 ### **Exit Node Use Cases**
 
-* **Remote Work**: Access company resources through office exit node
-* **Travel**: Maintain home IP address while traveling
-* **Content Access**: Access region-specific content
-* **Security**: Route traffic through trusted networks
-* **Development**: Test applications from different geographic locations
+- **Remote Work**: Access company resources through office exit node
+- **Travel**: Maintain home IP address while traveling
+- **Content Access**: Access region-specific content
+- **Security**: Route traffic through trusted networks
+- **Development**: Test applications from different geographic locations
 
 ### **Exit Node Considerations**
 
-* **Bandwidth**: Exit node's internet connection affects performance
-* **Location**: Choose exit nodes in desired geographic locations
-* **Trust**: Exit node can see all your internet traffic
-* **Legal**: Respect terms of service and local laws
-* **Performance**: Direct internet access is usually faster than exit nodes
+- **Bandwidth**: Exit node's internet connection affects performance
+- **Location**: Choose exit nodes in desired geographic locations
+- **Trust**: Exit node can see all your internet traffic
+- **Legal**: Respect terms of service and local laws
+- **Performance**: Direct internet access is usually faster than exit nodes
 
 ## **Magic DNS: Automatic Device Name Resolution**
 
@@ -130,10 +146,10 @@ tailscale set --exit-node=
 
 Magic DNS automatically:
 
-* **Assigns Names**: Each device gets a name based on its hostname
-* **Creates DNS Records**: Automatically generates DNS entries for all devices
-* **Resolves Queries**: Handles DNS resolution for `.ts.net` domain
-* **Updates Dynamically**: Automatically updates when devices join/leave
+- **Assigns Names**: Each device gets a name based on its hostname
+- **Creates DNS Records**: Automatically generates DNS entries for all devices
+- **Resolves Queries**: Handles DNS resolution for `.ts.net` domain
+- **Updates Dynamically**: Automatically updates when devices join/leave
 
 ### **Magic DNS Features**
 
@@ -178,11 +194,11 @@ cat /etc/resolv.conf
 
 ### **Magic DNS Benefits**
 
-* **Simplicity**: No manual DNS configuration required
-* **Consistency**: Same names work from any device in the network
-* **Automatic Updates**: Names update when devices change
-* **Integration**: Works with existing applications and scripts
-* **Security**: DNS queries are encrypted within Tailscale network
+- **Simplicity**: No manual DNS configuration required
+- **Consistency**: Same names work from any device in the network
+- **Automatic Updates**: Names update when devices change
+- **Integration**: Works with existing applications and scripts
+- **Security**: DNS queries are encrypted within Tailscale network
 
 ### **Custom DNS Configuration**
 
@@ -206,9 +222,9 @@ You **can** use Tailscale alongside reverse proxies that use your ISP's public I
 
 Tailscale and reverse proxies serve different purposes and can coexist:
 
-* **Reverse Proxy**: Handles incoming public internet traffic to your services
-* **Tailscale**: Provides secure access to your private network resources
-* **Coexistence**: Both can run simultaneously with proper configuration
+- **Reverse Proxy**: Handles incoming public internet traffic to your services
+- **Tailscale**: Provides secure access to your private network resources
+- **Coexistence**: Both can run simultaneously with proper configuration
 
 ### **Network Architecture with Both Systems**
 
@@ -341,11 +357,11 @@ tailscale set --exit-node=  # Disable exit node if active
 
 **Why This Happens**:
 
-* Tailscale modifies your system's DNS configuration when Magic DNS is enabled
-* Your system may start using Tailscale's DNS servers instead of your original DNS servers
-* If Tailscale's DNS configuration is incomplete or conflicts with your network setup, all domain name resolution fails
-* IP addresses still work because they don't require DNS resolution
-* This affects all internet access, not just your own services
+- Tailscale modifies your system's DNS configuration when Magic DNS is enabled
+- Your system may start using Tailscale's DNS servers instead of your original DNS servers
+- If Tailscale's DNS configuration is incomplete or conflicts with your network setup, all domain name resolution fails
+- IP addresses still work because they don't require DNS resolution
+- This affects all internet access, not just your own services
 
 **Note**: If you can't ping IP addresses either, the issue may be routing-related (e.g., misconfigured exit node). Check `tailscale status` to see if you're using an exit node and disable it with `tailscale set --exit-node=` if needed.
 
@@ -766,9 +782,9 @@ sudo systemctl enable --now dnf-automatic.timer
 
 #### **Update Behavior Notes**
 
-* **Service Restart**: Updates may restart the Tailscale service briefly
-* **Connection Interruption**: Plan maintenance windows for critical systems
-* **Authentication**: Re-authentication is rarely required after updates
+- **Service Restart**: Updates may restart the Tailscale service briefly
+- **Connection Interruption**: Plan maintenance windows for critical systems
+- **Authentication**: Re-authentication is rarely required after updates
 
 ### **Manual Updates**
 
@@ -830,9 +846,9 @@ curl -fsSL https://tailscale.com/install.sh | sh
 
 Download latest installers from:
 
-* **Linux**: [https://tailscale.com/download/linux](https://tailscale.com/download/linux)
-* **macOS**: [https://tailscale.com/download/mac](https://tailscale.com/download/mac)
-* **Windows**: [https://tailscale.com/download/windows](https://tailscale.com/download/windows)
+- **Linux**: [https://tailscale.com/download/linux](https://tailscale.com/download/linux)
+- **macOS**: [https://tailscale.com/download/mac](https://tailscale.com/download/mac)
+- **Windows**: [https://tailscale.com/download/windows](https://tailscale.com/download/windows)
 
 #### **Docker Container Updates**
 
@@ -982,18 +998,18 @@ iperf3 -c server.tailnet.ts.net  # On client
 
 ### **Zero Trust Principles**
 
-* **Device Authentication**: Every device must be authenticated
-* **Encrypted Connections**: All traffic is encrypted with WireGuard
-* **Least Privilege**: Use ACLs to limit access
-* **Regular Audits**: Monitor device access and usage
+- **Device Authentication**: Every device must be authenticated
+- **Encrypted Connections**: All traffic is encrypted with WireGuard
+- **Least Privilege**: Use ACLs to limit access
+- **Regular Audits**: Monitor device access and usage
 
 ### **Best Security Practices**
 
-* **Enable MFA**: Use multi-factor authentication for Tailscale account
-* **Regular Updates**: Keep Tailscale client updated
-* **Monitor Access**: Review device access logs regularly
-* **Limit Exposure**: Don't expose unnecessary services
-* **Use Tags**: Organize devices with tags for better ACL management
+- **Enable MFA**: Use multi-factor authentication for Tailscale account
+- **Regular Updates**: Keep Tailscale client updated
+- **Monitor Access**: Review device access logs regularly
+- **Limit Exposure**: Don't expose unnecessary services
+- **Use Tags**: Organize devices with tags for better ACL management
 
 ## **Conclusion**
 
@@ -1001,10 +1017,10 @@ Tailscale provides a powerful, easy-to-use mesh VPN solution that can coexist wi
 
 Key takeaways:
 
-* **Tailscale and reverse proxies can coexist** with proper configuration
-* **Magic DNS conflicts** can be resolved with split DNS or selective DNS configuration
-* **Exit nodes provide flexible internet routing** options
-* **Network conflicts are solvable** with proper troubleshooting and configuration
+- **Tailscale and reverse proxies can coexist** with proper configuration
+- **Magic DNS conflicts** can be resolved with split DNS or selective DNS configuration
+- **Exit nodes provide flexible internet routing** options
+- **Network conflicts are solvable** with proper troubleshooting and configuration
 
 By following the best practices and solutions outlined in this guide, you can successfully implement Tailscale alongside your existing network infrastructure while maintaining reliable access to your services through both public and private channels.
 
