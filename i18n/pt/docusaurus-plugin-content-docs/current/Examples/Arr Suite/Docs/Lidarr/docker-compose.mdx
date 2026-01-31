@@ -1,0 +1,36 @@
+---
+title: docker-compose.yaml
+tags:
+  - Arr Suite
+  - Lidarr
+keywords:
+  - Arr Suite
+  - Lidarr
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+```yaml
+name: lidarr
+
+services:
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    hostname: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./lidarr/config:/config
+      - /media/Music:/music #optional
+      - /media/Downloads:/media/Downloads #optional
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+```
+
+<BuyMeACoffeeButton />
