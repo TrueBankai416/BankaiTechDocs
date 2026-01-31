@@ -1,58 +1,58 @@
 ---
-title: 評論集成
-description: 完整指南：如何將 Discord 雙向評論與 Docusaurus 集成，包括設定、配置和故障排除。
+title: Comments Integration
+description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord評論集成
+# Discord Comments Integration
 
-該文件網站包含一個**雙向 Discord 評論整合**，允許訪客向您的 Discord 伺服器發送評論，並在網站上顯示 Discord 回覆以及現有的基於 GitHub 的 Giscus 評論。
+This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
 
-## 特徵
+## Features
 
-* **雙向溝通**：網站評論→Discord，Discord回覆→網站
-* **雙重評論系統**：Giscus（基於GitHub）和Discord評論功能協同工作。
-* **豐富的 Discord 嵌入內容**：評論以格式化的嵌入內容形式顯示，並包含完整的頁面上下文。
-* **主題管理**：自動建立主題以進行有序回复
-* **即時更新**：網站自動顯示 Discord 回复
-* **完整頁面上下文**：評論包含頁面標題、URL 和導航上下文
-* **使用者頭像**：Discord 回覆會顯示使用者頭像和使用者名稱
-* **響應式設計**：同時適用於桌面和行動設備
+- **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
+- **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
+- **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
+- **Thread Management**: Automatic thread creation for organized replies
+- **Real-time Updates**: Website displays Discord replies automatically
+- **Full Page Context**: Comments include page title, URL, and navigation context
+- **User Avatars**: Discord replies show user avatars and usernames
+- **Responsive Design**: Works on both desktop and mobile devices
 
-## 安裝說明
+## Setup Instructions
 
-### 1. 創建一個 Discord 機器人
+### 1. Create a Discord Bot
 
-1. 前往[Discord開發者入口網站](https://discord.com/developers/applications)
-2. 創建新應用程式
-3. 前往“機器人”部分並創建一個機器人
-4. 複製機器人令牌
-5. 在「特權網關意圖」下，啟用：
-   * **訊息內容意圖**
-   * **伺服器成員意圖**（可選）
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application
+3. Go to "Bot" section and create a bot
+4. Copy the bot token
+5. Under "Privileged Gateway Intents", enable:
+   - **Message Content Intent**
+   - **Server Members Intent** (optional)
 
-### 3) Invite Bot to Server
+### 2. Configure Bot Permissions
 
-您的機器人需要以下權限：
+Your bot needs these permissions:
 
-* 已讀訊息
-* 發送訊息
-* 建立公共討論串
-* 在對話中發送訊息
-* 查看訊息歷史記錄
-* 使用斜槓命令（可選）
+- Read Messages
+- Send Messages
+- Create Public Threads
+- Send Messages in Threads
+- Read Message History
+- Use Slash Commands (optional)
 
-### 6. Start the Backend Server
+### 3. Invite Bot to Server
 
-1. 前往 OAuth2 > URL 產生器
-2. 選擇“機器人”範圍
-3. 請選擇以上列出的權限。
-4. 使用產生的 URL 將機器人邀請到您的伺服器
+1. Go to OAuth2 > URL Generator
+2. Select "bot" scope
+3. Select the permissions listed above
+4. Use the generated URL to invite the bot to your server
 
-### 7) Deploy Configuration
+### 4. Configure Environment Variables
 
-#### 前端（.env）
+#### Frontend (.env)
 
 ```env
 # Discord Bot Configuration
@@ -69,7 +69,7 @@ DISCORD_SHOW_SECTION_INFO=true
 DISCORD_SITE_NAME=Your Site Name
 ```
 
-#### 後端伺服器（server/.env）
+#### Backend Server (server/.env)
 
 ```env
 # Discord Bot Configuration
@@ -92,100 +92,100 @@ DISCORD_THREAD_DURATION=1440
 DISCORD_SITE_NAME=Your Site Name
 ```
 
-:::警告 安全提示
+:::warning Security Note
 
-* 永遠不要將 `.env` 檔案提交到版本控制系統中。
-* 在生產環境中使用環境變量
-* 請妥善保管您的機器人令牌
+- Never commit `.env` files to version control
+- Use environment variables in production
+- Keep your bot token secure
   :::
 
-### 5. 安裝伺服器依賴項
+### 5. Install Server Dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. 啟動後端伺服器
+### 6. Start the Backend Server
 
 ```bash
-# 開發環境
+# Development
 npm run dev
 
-# 生產環境
+# Production
 npm start
 ```
 
-### 7. 部署配置
+### 7. Deploy Configuration
 
-對於生產環境部署，請在您的託管平台中設定環境變數：
+For production deployments, set environment variables in your hosting platform:
 
-* **前端**：將 `REACT_APP_API_URL` 設定為您的生產 API URL
-* **後端**：部署包含機器人令牌和頻道 ID 的伺服器資料夾
-* **資料庫**：將自動建立 SQLite 資料庫。
-* **上下文**：根據您的喜好配置 Discord 上下文等級和選項
+- **Frontend**: Set `REACT_APP_API_URL` to your production API URL
+- **Backend**: Deploy the server folder with bot token and channel ID
+- **Database**: SQLite database will be created automatically
+- **Context**: Configure Discord context level and options per your preferences
 
-## 工作原理
+## How It Works
 
-### 完全雙向流
+### Complete Bidirectional Flow
 
-1. **網站評論**：使用者透過網站表單提交評論
-2. **Discord 訊息**：機器人向 Discord 頻道發送包含完整頁面內容的格式化嵌入訊息
-3. **主題創建**：機器人會自動建立一個主題，用於有序回應。
-4. **Discord 回覆**：Discord 用戶可以在貼文或訊息中回覆。
-5. **資料庫儲存**：機器人將所有評論和回應儲存在 SQLite 資料庫中。
-6. **網站顯示**：前端每 30 秒透過 API 發起一次投票，並顯示 Discord 回覆。
+1. **Website Comment**: User submits comment via website form
+2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
+3. **Thread Creation**: Bot automatically creates a thread for organized replies
+4. **Discord Replies**: Discord users reply in the thread or to the message
+5. **Database Storage**: Bot stores all comments and replies in SQLite database
+6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
 
-### Discord 訊息格式
+### Discord Message Format
 
-Discord嵌入內容包括：
+Discord embeds include:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **描述**：實際評論內容
-* **作者**：評論者姓名
-* **URL**：指向確切頁面的可點擊鏈接
-* **頁面欄位**：顯示頁面標題及可點擊連結
-* **時間戳**：評論發佈時間
-* **主題帖**：自動建立的回應主題帖
+- **Title**: "💬 New Comment: \{Page Title\}"
+- **Description**: The actual comment content
+- **Author**: The commenter's name
+- **URL**: Clickable link to the exact page
+- **Page Field**: Shows page title with clickable link
+- **Timestamp**: When the comment was posted
+- **Thread**: Auto-created thread for replies
 
-### 網站顯示
+### Website Display
 
-網站顯示：
+The website shows:
 
-* **原始評論**：網站表單提交
-* **Discord 回覆**：來自帶有頭像和用戶名的 Discord 用戶的回复
-* **即時更新**：自動輪詢以獲取新回复
-* **主題式對話**：有條理的評論→回應結構
+- **Original Comments**: Website form submissions
+- **Discord Replies**: Replies from Discord users with avatars and usernames
+- **Real-time Updates**: Automatic polling for new replies
+- **Threaded Conversations**: Organized comment → reply structure
 
-## 上下文配置
+## Context Configuration
 
-### 上下文層次
+### Context Levels
 
-配置 Discord 訊息中顯示的上下文資訊量：
+Configure how much context appears in Discord messages:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **顯示內容**：僅顯示頁面標題和評論內容
-* **使用場景**：簡潔明了的訊息，無需額外上下文。
+- **Shows**: Just page title and comment content
+- **Use case**: Clean, simple messages without extra context
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **顯示內容**：頁面標題、評論內容和可點擊的頁面網址
-* **使用場景**：包含必要資訊的適度上下文
+- **Shows**: Page title, comment content, and clickable page URL
+- **Use case**: Moderate context with essential information
 
-#### `DISCORD_CONTEXT_LEVEL=full`（預設值）
+#### `DISCORD_CONTEXT_LEVEL=full` (default)
 
-* **顯示**：所有上下文訊息，包括麵包屑導航、章節、時間戳
-* **使用場景**：為詳細討論提供最大程度的背景信息
+- **Shows**: All context information including breadcrumbs, sections, timestamps
+- **Use case**: Maximum context for detailed discussions
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **顯示**：僅顯示您單獨啟用的上下文元素。
-* **使用場景**：對顯示內容進行精細控制
+- **Shows**: Only the context elements you enable individually
+- **Use case**: Fine-tuned control over what appears
 
-### 個體背景控制
+### Individual Context Controls
 
-使用 `DISCORD_CONTEXT_LEVEL=custom` 時，您可以控制每個元素：
+When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
 
 ```env
 DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
@@ -196,32 +196,32 @@ DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
 DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
 ```
 
-### 執行緒配置
+### Thread Configuration
 
 ```env
-DISCORD_CREATE_THREADS=true # 建立回應主題
-DISCORD_THREAD_DURATION=1440 # 主題自動存檔時間（分鐘）
-DISCORD_SITE_NAME=您的網站名稱 # 頁腳中的網站名稱 # 頁腳中的網站名稱 # 頁腳中的網站名稱 # 頁腳中的網站名稱 #
+DISCORD_CREATE_THREADS=true         # Create threads for replies
+DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
+DISCORD_SITE_NAME=Your Site Name    # Site name in footer
 ```
 
-### 範例上下文輸出
+### Example Context Outputs
 
-**最簡背景：**
-
-```
-Docker 安裝指南
-“這個教學真的很有幫助！我該如何處理連接埠衝突？”
-```
-
-**基本背景：**
+**Minimal Context:**
 
 ```
-💬 Docker 安裝指南
-「這個教學真的很有幫助！我該如何處理連接埠衝突？」
-[頁面連結]
+Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
 ```
 
-**完整上下文：**
+**Basic Context:**
+
+```
+💬 Docker Installation Guide
+"This tutorial was really helpful! How do I handle port conflicts?"
+[Link to page]
+```
+
+**Full Context:**
 
 ```
 💬 New Comment: Docker Installation Guide
@@ -236,85 +236,85 @@ Docker 安裝指南
 Your Site Name • Comment System
 ```
 
-## 客製化
+## Customization
 
-### 造型
+### Styling
 
-Discord評論元件使用了CSS模組。 您可以透過修改以下內容來自訂外觀：
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### 訊息格式
+### Message Format
 
-若要自訂 Discord 嵌入格式，請編輯下列位置的 `discordMessage` 物件：
+To customize the Discord embed format, edit the `discordMessage` object in:
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### 元件放置
+### Component Placement
 
-預設情況下，Discord 評論顯示在 Giscus 評論下方。 若要變更此設置，請修改：
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 機器人無回應
+### Bot Not Responding
 
-1. **檢查機器人令牌**：確保 `DISCORD_BOT_TOKEN` 正確
-2. **驗證權限**：確保機器人擁有頻道所需的權限。
-3. **檢查頻道 ID**：確保 `DISCORD_CHANNEL_ID` 正確
-4. **伺服器中的機器人**：請確認機器人確實在您的 Discord 伺服器上。
+1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
+2. **Verify permissions**: Make sure bot has required permissions in the channel
+3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
+4. **Bot in server**: Verify bot is actually in your Discord server
 
-### 評論未顯示
+### Comments Not Appearing
 
-1. 伺服器運行中：檢查後端伺服器是否在正確的連接埠上執行
-2. **API URL**：請驗證 `REACT_APP_API_URL` 是否指向您的後端伺服器。
-3. **資料庫**：檢查伺服器資料夾是否正在建立 SQLite 資料庫
-4. **CORS**：請確保已為您的前端網域設定 CORS
+1. **Server running**: Check if backend server is running on correct port
+2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
+3. **Database**: Check if SQLite database is being created in server folder
+4. **CORS**: Ensure CORS is configured for your frontend domain
 
-### Discord回覆不顯示
+### Discord Replies Not Showing
 
-1. **訊息內容意圖**：請確保已在 Discord 開發者入口網站中啟用此功能。
-2. **機器人權限**：驗證機器人是否可以讀取頻道中的消息
-3. **資料庫連線**：檢查伺服器日誌是否有資料庫錯誤
-4. **輪詢**：前端每 30 秒進行一次輪詢 - 回覆可能需要一些時間才能顯示。
+1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
+2. **Bot permissions**: Verify bot can read messages in the channel
+3. **Database connection**: Check server logs for database errors
+4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
 
-### 環境變數不起作用
+### Environment Variables Not Working
 
-* **開發**：重啟前端和後端伺服器
-* **生產環境**：使用正確的環境變數重新部署前端和後端。
-* **前綴**：僅前端變數使用 `REACT_APP_` 前綴
+- **Development**: Restart both frontend and backend servers
+- **Production**: Redeploy both frontend and backend with correct environment variables
+- **Prefix**: Use `REACT_APP_` prefix only for frontend variables
 
-### 資料庫問題
+### Database Issues
 
-1. **檔案權限**：確保伺服器可以寫入資料庫目錄
-2. **磁碟空間**：檢查 SQLite 資料庫的可用磁碟空間
-3. 伺服器日誌：檢查伺服器控制台是否有資料庫連線錯誤
+1. **File permissions**: Ensure server can write to the database directory
+2. **Disk space**: Check available disk space for SQLite database
+3. **Server logs**: Check server console for database connection errors
 
-## 安全考量
+## Security Considerations
 
-* **機器人令牌**：請妥善保管您的機器人令牌，切勿將其提交到版本控制系統中。
-* **速率限制**：Discord 對機器人有速率限制（與 Webhook 不同）。
-* **輸入驗證**：前端和後端都會驗證使用者輸入
-* **資料庫安全性**：SQLite 資料庫應使用適當的檔案權限進行保護。
-* **API 安全性**：考慮對您的 API 端點實作速率限制。
-* **CORS**：請為您的生產域正確設定 CORS。
+- **Bot Token**: Keep your bot token secret and never commit it to version control
+- **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
+- **Input Validation**: Both frontend and backend validate user input
+- **Database Security**: SQLite database should be protected with proper file permissions
+- **API Security**: Consider implementing rate limiting on your API endpoints
+- **CORS**: Configure CORS properly for your production domain
 
-## 建築學
+## Architecture
 
 ```
-網站前端 ←→ Express API ←→ Discord 機器人 ←→ Discord 伺服器
+Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
                     ↓
-                SQLite 資料庫
+                SQLite Database
 ```
 
-## 文件結構
+## File Structure
 
 ```
 project/
@@ -327,11 +327,11 @@ project/
 └── docs/Discord/Docs/                # Documentation
 ```
 
-## 瀏覽器支援
+## Browser Support
 
-Discord評論元件可在所有支援以下功能的現代瀏覽器中使用：
+The Discord comments component works in all modern browsers that support:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid 和 Flexbox
-* 本機儲存（用於表單持久化）
+- ES6 fetch API
+- React 18+
+- CSS Grid and Flexbox
+- Local Storage (for form persistence)
