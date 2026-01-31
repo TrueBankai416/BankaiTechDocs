@@ -11,46 +11,46 @@ Trang tài liệu này bao gồm **tích hợp bình luận Discord hai chiều*
 
 ## Đặc trưng
 
-* **Giao tiếp hai chiều**: Bình luận trên trang web → Discord, Trả lời trên Discord → Trang web
-* **Hệ thống bình luận kép**: Cả hệ thống bình luận Giscus (dựa trên GitHub) và Discord đều hoạt động đồng thời.
-* **Nhúng bình luận Discord đa dạng**: Bình luận được hiển thị dưới dạng nội dung nhúng được định dạng đầy đủ với ngữ cảnh toàn trang.
-* **Quản lý luồng thảo luận**: Tự động tạo luồng thảo luận để sắp xếp các câu trả lời một cách có hệ thống.
-* **Cập nhật theo thời gian thực**: Trang web tự động hiển thị các phản hồi trên Discord.
-* **Ngữ cảnh toàn trang**: Các bình luận bao gồm tiêu đề trang, URL và ngữ cảnh điều hướng.
-* **Ảnh đại diện người dùng**: Các tin nhắn trả lời trên Discord hiển thị ảnh đại diện và tên người dùng.
-* **Thiết kế tương thích**: Hoạt động tốt trên cả máy tính để bàn và thiết bị di động.
+- **Giao tiếp hai chiều**: Bình luận trên trang web → Discord, Trả lời trên Discord → Trang web
+- **Hệ thống bình luận kép**: Cả hệ thống bình luận Giscus (dựa trên GitHub) và Discord đều hoạt động đồng thời.
+- **Nhúng bình luận Discord đa dạng**: Bình luận được hiển thị dưới dạng nội dung nhúng được định dạng đầy đủ với ngữ cảnh toàn trang.
+- **Quản lý luồng thảo luận**: Tự động tạo luồng thảo luận để sắp xếp các câu trả lời một cách có hệ thống.
+- **Cập nhật theo thời gian thực**: Trang web tự động hiển thị các phản hồi trên Discord.
+- **Ngữ cảnh toàn trang**: Các bình luận bao gồm tiêu đề trang, URL và ngữ cảnh điều hướng.
+- **Ảnh đại diện người dùng**: Các tin nhắn trả lời trên Discord hiển thị ảnh đại diện và tên người dùng.
+- **Thiết kế tương thích**: Hoạt động tốt trên cả máy tính để bàn và thiết bị di động.
 
 ## Hướng dẫn cài đặt
 
-### 1. Tạo một Bot Discord
+### 1. Create a Discord Bot
 
 1. Truy cập [Cổng thông tin nhà phát triển Discord](https://discord.com/developers/applications)
 2. Tạo ứng dụng mới
 3. Vào mục "Bot" và tạo một bot.
 4. Sao chép mã thông báo của bot
 5. Trong mục "Ý định cổng đặc quyền", hãy bật:
-   * **Mục đích nội dung tin nhắn**
-   * **Ý định của các thành viên máy chủ** (tùy chọn)
+   - **Mục đích nội dung tin nhắn**
+   - **Ý định của các thành viên máy chủ** (tùy chọn)
 
-### 2) Cấu hình quyền truy cập của Bot
+### 2. Configure Bot Permissions
 
 Bot của bạn cần các quyền sau:
 
-* Đọc tin nhắn
-* Gửi tin nhắn
-* Tạo chủ đề thảo luận công khai
-* Gửi tin nhắn theo nhóm
-* Đọc lịch sử tin nhắn
-* Sử dụng lệnh gạch chéo (tùy chọn)
+- Đọc tin nhắn
+- Gửi tin nhắn
+- Tạo chủ đề thảo luận công khai
+- Gửi tin nhắn theo nhóm
+- Đọc lịch sử tin nhắn
+- Sử dụng lệnh gạch chéo (tùy chọn)
 
-### 3. Mời Bot vào máy chủ
+### 3. Invite Bot to Server
 
 1. Truy cập OAuth2 > Trình tạo URL
 2. Chọn phạm vi "bot"
 3. Chọn các quyền được liệt kê ở trên.
 4. Sử dụng URL được tạo để mời bot vào máy chủ của bạn.
 
-### 4) Cấu hình biến môi trường
+### 4. Configure Environment Variables
 
 #### Giao diện người dùng (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Tên trang web của bạn
 
 :::Cảnh báo Lưu ý về bảo mật
 
-* Không bao giờ đưa các tệp `.env` vào hệ thống quản lý phiên bản.
-* Sử dụng biến môi trường trong môi trường sản xuất
-* Hãy bảo mật mã thông báo bot của bạn
+- Không bao giờ đưa các tệp `.env` vào hệ thống quản lý phiên bản.
+- Sử dụng biến môi trường trong môi trường sản xuất
+- Hãy bảo mật mã thông báo bot của bạn
   :::
 
-### 5. Cài đặt các thành phần phụ thuộc của máy chủ
+### 5. Install Server Dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. Khởi động máy chủ phụ trợ
+### 6. Start the Backend Server
 
 ```bash
 # Phát triển
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Cấu hình triển khai
+### 7. Deploy Configuration
 
 Đối với việc triển khai sản phẩm, hãy thiết lập các biến môi trường trong nền tảng lưu trữ của bạn:
 
-* **Giao diện người dùng**: Đặt `REACT_APP_API_URL` thành URL API dành cho môi trường sản xuất của bạn.
-* **Phần Backend**: Triển khai thư mục máy chủ với mã thông báo bot và ID kênh.
-* **Cơ sở dữ liệu**: Cơ sở dữ liệu SQLite sẽ được tạo tự động.
-* **Ngữ cảnh**: Cấu hình cấp độ ngữ cảnh và các tùy chọn của Discord theo sở thích của bạn.
+- **Giao diện người dùng**: Đặt `REACT_APP_API_URL` thành URL API dành cho môi trường sản xuất của bạn.
+- **Phần Backend**: Triển khai thư mục máy chủ với mã thông báo bot và ID kênh.
+- **Cơ sở dữ liệu**: Cơ sở dữ liệu SQLite sẽ được tạo tự động.
+- **Ngữ cảnh**: Cấu hình cấp độ ngữ cảnh và các tùy chọn của Discord theo sở thích của bạn.
 
 ## Cách thức hoạt động
 
@@ -140,22 +140,22 @@ npm start
 
 Các nội dung nhúng Discord bao gồm:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Mô tả**: Nội dung bình luận thực tế
-* **Tác giả**: Tên người bình luận
-* **URL**: Liên kết có thể nhấp chuột dẫn đến trang cụ thể
-* **Trường Trang**: Hiển thị tiêu đề trang kèm liên kết có thể nhấp chuột
-* **Thời điểm**: Thời điểm bình luận được đăng tải
-* **Chủ đề**: Chủ đề tự động tạo cho các câu trả lời
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Mô tả**: Nội dung bình luận thực tế
+- **Tác giả**: Tên người bình luận
+- **URL**: Liên kết có thể nhấp chuột dẫn đến trang cụ thể
+- **Trường Trang**: Hiển thị tiêu đề trang kèm liên kết có thể nhấp chuột
+- **Thời điểm**: Thời điểm bình luận được đăng tải
+- **Chủ đề**: Chủ đề tự động tạo cho các câu trả lời
 
 ### Hiển thị trên trang web
 
 Trang web hiển thị:
 
-* **Bình luận gốc**: Các bình luận được gửi qua biểu mẫu trên trang web
-* **Phản hồi trên Discord**: Các phản hồi từ người dùng Discord có ảnh đại diện và tên người dùng.
-* **Cập nhật theo thời gian thực**: Tự động kiểm tra phản hồi mới
-* **Hội thoại theo luồng**: Cấu trúc bình luận → trả lời được sắp xếp hợp lý.
+- **Bình luận gốc**: Các bình luận được gửi qua biểu mẫu trên trang web
+- **Phản hồi trên Discord**: Các phản hồi từ người dùng Discord có ảnh đại diện và tên người dùng.
+- **Cập nhật theo thời gian thực**: Tự động kiểm tra phản hồi mới
+- **Hội thoại theo luồng**: Cấu trúc bình luận → trả lời được sắp xếp hợp lý.
 
 ## Cấu hình ngữ cảnh
 
@@ -165,23 +165,23 @@ Tùy chỉnh mức độ hiển thị ngữ cảnh trong tin nhắn Discord:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Hiển thị**: Chỉ tiêu đề trang và nội dung bình luận
-* **Trường hợp sử dụng**: Các tin nhắn ngắn gọn, đơn giản, không kèm theo ngữ cảnh bổ sung.
+- **Hiển thị**: Chỉ tiêu đề trang và nội dung bình luận
+- **Trường hợp sử dụng**: Các tin nhắn ngắn gọn, đơn giản, không kèm theo ngữ cảnh bổ sung.
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Hiển thị**: Tiêu đề trang, nội dung bình luận và URL trang có thể nhấp chuột
-* **Trường hợp sử dụng**: Bối cảnh trung bình với thông tin thiết yếu
+- **Hiển thị**: Tiêu đề trang, nội dung bình luận và URL trang có thể nhấp chuột
+- **Trường hợp sử dụng**: Bối cảnh trung bình với thông tin thiết yếu
 
 #### `DISCORD_CONTEXT_LEVEL=full` (mặc định)
 
-* **Hiển thị**: Tất cả thông tin ngữ cảnh bao gồm đường dẫn điều hướng, các phần, dấu thời gian.
-* **Trường hợp sử dụng**: Cung cấp đầy đủ ngữ cảnh cho các cuộc thảo luận chi tiết
+- **Hiển thị**: Tất cả thông tin ngữ cảnh bao gồm đường dẫn điều hướng, các phần, dấu thời gian.
+- **Trường hợp sử dụng**: Cung cấp đầy đủ ngữ cảnh cho các cuộc thảo luận chi tiết
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Hiển thị**: Chỉ các phần tử ngữ cảnh mà bạn bật riêng lẻ
-* **Trường hợp sử dụng**: Kiểm soát chi tiết những gì hiển thị.
+- **Hiển thị**: Chỉ các phần tử ngữ cảnh mà bạn bật riêng lẻ
+- **Trường hợp sử dụng**: Kiểm soát chi tiết những gì hiển thị.
 
 ### Kiểm soát ngữ cảnh cá nhân
 
@@ -240,7 +240,7 @@ Tên trang web của bạn • Hệ thống bình luận
 
 ### Tạo kiểu tóc
 
-Thành phần bình luận của Discord sử dụng CSS modules. Bạn có thể tùy chỉnh giao diện bằng cách chỉnh sửa:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Vị trí linh kiện
 
-Theo mặc định, các bình luận trên Discord sẽ hiển thị bên dưới các bình luận trên Google Maps. Để thay đổi điều này, hãy sửa đổi:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Biến môi trường không hoạt động
 
-* **Phát triển**: Khởi động lại cả máy chủ frontend và backend.
-* **Môi trường sản xuất**: Triển khai lại cả giao diện người dùng (frontend) và máy chủ (backend) với các biến môi trường chính xác.
-* **Tiền tố**: Chỉ sử dụng tiền tố `REACT_APP_` cho các biến frontend.
+- **Phát triển**: Khởi động lại cả máy chủ frontend và backend.
+- **Môi trường sản xuất**: Triển khai lại cả giao diện người dùng (frontend) và máy chủ (backend) với các biến môi trường chính xác.
+- **Tiền tố**: Chỉ sử dụng tiền tố `REACT_APP_` cho các biến frontend.
 
 ### Các vấn đề về cơ sở dữ liệu
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Các vấn đề liên quan đến an ninh
 
-* **Mã thông báo Bot**: Hãy giữ bí mật mã thông báo bot của bạn và không bao giờ đưa nó vào hệ thống quản lý phiên bản.
-* **Giới hạn số lượng yêu cầu**: Discord có giới hạn số lượng yêu cầu đối với bot (khác với webhook)
-* **Kiểm tra tính hợp lệ của dữ liệu đầu vào**: Cả giao diện người dùng và máy chủ đều kiểm tra tính hợp lệ của dữ liệu đầu vào do người dùng nhập.
-* **Bảo mật cơ sở dữ liệu**: Cơ sở dữ liệu SQLite cần được bảo vệ bằng các quyền truy cập tập tin phù hợp.
-* **Bảo mật API**: Hãy cân nhắc triển khai giới hạn tốc độ truy cập trên các điểm cuối API của bạn.
-* **CORS**: Cấu hình CORS đúng cách cho miền sản xuất của bạn.
+- **Mã thông báo Bot**: Hãy giữ bí mật mã thông báo bot của bạn và không bao giờ đưa nó vào hệ thống quản lý phiên bản.
+- **Giới hạn số lượng yêu cầu**: Discord có giới hạn số lượng yêu cầu đối với bot (khác với webhook)
+- **Kiểm tra tính hợp lệ của dữ liệu đầu vào**: Cả giao diện người dùng và máy chủ đều kiểm tra tính hợp lệ của dữ liệu đầu vào do người dùng nhập.
+- **Bảo mật cơ sở dữ liệu**: Cơ sở dữ liệu SQLite cần được bảo vệ bằng các quyền truy cập tập tin phù hợp.
+- **Bảo mật API**: Hãy cân nhắc triển khai giới hạn tốc độ truy cập trên các điểm cuối API của bạn.
+- **CORS**: Cấu hình CORS đúng cách cho miền sản xuất của bạn.
 
 ## Ngành kiến trúc
 
@@ -331,7 +331,7 @@ project/
 
 Tính năng bình luận của Discord hoạt động trên tất cả các trình duyệt hiện đại hỗ trợ:
 
-* API tìm nạp ES6
-* React 18+
-* CSS Grid và Flexbox
-* Bộ nhớ cục bộ (để lưu trữ dữ liệu biểu mẫu)
+- API tìm nạp ES6
+- React 18+
+- CSS Grid và Flexbox
+- Bộ nhớ cục bộ (để lưu trữ dữ liệu biểu mẫu)
