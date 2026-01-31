@@ -1,18 +1,18 @@
 {
   "title": {
-    "message": "Bankai-Tech Docs",
+    "message": "Έγγραφα Bankai-Tech",
     "description": "The title in the navbar"
   },
   "logo.alt": {
-    "message": "My Site Logo",
+    "message": "Το λογότυπο του ιστότοπού μου",
     "description": "The alt text of navbar logo"
   },
   "item.label.Tutorials": {
-    "message": "Tutorials",
+    "message": "Φροντιστήρια",
     "description": "Navbar item with label Tutorials"
   },
   "item.label.Examples": {
-    "message": "Examples",
+    "message": "Παραδείγματα",
     "description": "Navbar item with label Examples"
   },
   "item.label.MS Windows": {
@@ -20,7 +20,7 @@
     "description": "Navbar item with label MS Windows"
   },
   "item.label.Buy Me a Beer": {
-    "message": "Buy Me a Beer",
+    "message": "Αγόρασέ μου μια μπύρα",
     "description": "Navbar item with label Buy Me a Beer"
   }
 }

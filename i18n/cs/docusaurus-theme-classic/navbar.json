@@ -4,15 +4,15 @@
     "description": "The title in the navbar"
   },
   "logo.alt": {
-    "message": "My Site Logo",
+    "message": "Logo mého webu",
     "description": "The alt text of navbar logo"
   },
   "item.label.Tutorials": {
-    "message": "Tutorials",
+    "message": "Tutoriály",
     "description": "Navbar item with label Tutorials"
   },
   "item.label.Examples": {
-    "message": "Examples",
+    "message": "Příklady",
     "description": "Navbar item with label Examples"
   },
   "item.label.MS Windows": {
@@ -20,7 +20,7 @@
     "description": "Navbar item with label MS Windows"
   },
   "item.label.Buy Me a Beer": {
-    "message": "Buy Me a Beer",
+    "message": "Kup mi pivo",
     "description": "Navbar item with label Buy Me a Beer"
   }
 }

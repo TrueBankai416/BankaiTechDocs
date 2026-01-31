@@ -1,54 +1,54 @@
 {
   "version.label": {
-    "message": "Next",
+    "message": "Seuraavaksi",
     "description": "The label for version current"
   },
   "sidebar.autoSidebar.category.docker-main": {
-    "message": "Docker",
+    "message": "Satamatyöläinen",
     "description": "The label for category 'Docker' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docker-main.link.generated-index.description": {
-    "message": "Tutorials showing you how to run Self-Hosted systems using Docker.",
+    "message": "Opetusohjelmat, jotka osoittavat, kuinka voit käyttää itseisännöityjä järjestelmiä Dockerin avulla.",
     "description": "The generated-index page description for category 'Docker' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docker-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docker-installation": {
-    "message": "Installing Docker",
+    "message": "Dockerin asennus",
     "description": "The label for category 'Installing Docker' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docker-installation.link.generated-index.description": {
-    "message": "Tutorials showing you how to Install Docker.",
+    "message": "Opetusohjelmat, jotka osoittavat, kuinka Docker asennetaan.",
     "description": "The generated-index page description for category 'Installing Docker' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-main": {
-    "message": "Nextcloud",
+    "message": "Seuraava pilvi",
     "description": "The label for category 'Nextcloud' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-main.link.generated-index.description": {
-    "message": "Tutorials showing you how to Install Nextcloud using Docker.",
+    "message": "Oppaat osoittavat, kuinka Nextcloud asennetaan Dockerin avulla.",
     "description": "The generated-index page description for category 'Nextcloud' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-installation": {
-    "message": "Installation",
+    "message": "Asennus",
     "description": "The label for category 'Installation' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-installation.link.generated-index.description": {
-    "message": "How to Install Nextcloud using Docker.",
+    "message": "Nextcloudin asentaminen Dockerin avulla.",
     "description": "The generated-index page description for category 'Installation' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloud-troubleshooting.link.generated-index.description": {
-    "message": "Troubleshooting Nextcloud.",
+    "message": "Nextcloudin vianmääritys.",
     "description": "The generated-index page description for category 'Troubleshooting' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloudpi-main": {
@@ -56,11 +56,11 @@
     "description": "The label for category 'NextcloudPI' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloudpi-main.link.generated-index.description": {
-    "message": "Tutorials showing you how to run NextcloudPI.",
+    "message": "Oppaat osoittavat, kuinka NextcloudPI:tä käytetään.",
     "description": "The generated-index page description for category 'NextcloudPI' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nextcloudpi-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docusaurus-main": {
@@ -68,11 +68,11 @@
     "description": "The label for category 'Docusaurus' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docusaurus-main.link.generated-index.description": {
-    "message": "Tutorials showing you how to use Docusaurus.",
+    "message": "Opetusohjelmat, joissa kerrotaan, kuinka Docusaurusta käytetään.",
     "description": "The generated-index page description for category 'Docusaurus' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docusaurus-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.SEO": {
@@ -80,35 +80,35 @@
     "description": "The label for category 'SEO' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Styling": {
-    "message": "Styling",
+    "message": "Muotoilu",
     "description": "The label for category 'Styling' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Sidebars": {
-    "message": "Sidebars",
+    "message": "Sivupalkit",
     "description": "The label for category 'Sidebars' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.docusaurus-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.examples-main": {
-    "message": "Examples",
+    "message": "Esimerkkejä",
     "description": "The label for category 'Examples' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.examples-main.link.generated-index.description": {
-    "message": "Example configuration files and more.",
+    "message": "Esimerkkimääritystiedostot ja paljon muuta.",
     "description": "The generated-index page description for category 'Examples' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.arr-suite-examples": {
-    "message": "Arr Suite",
+    "message": "Arr-sviitti",
     "description": "The label for category 'Arr Suite' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.arr-suite-examples.link.generated-index.description": {
-    "message": "Examples of *Arr application yaml files.",
+    "message": "Esimerkkejä *Arr-sovelluksen yaml-tiedostoista.",
     "description": "The generated-index page description for category 'Arr Suite' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Full Stack": {
@@ -120,15 +120,15 @@
     "description": "The label for category 'Jellyseerr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Lidarr": {
-    "message": "Lidarr",
+    "message": "johtaja",
     "description": "The label for category 'Lidarr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Prowlarr": {
-    "message": "Prowlarr",
+    "message": "Prowlrr",
     "description": "The label for category 'Prowlarr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Radarr": {
-    "message": "Radarr",
+    "message": "Pikemminkin",
     "description": "The label for category 'Radarr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Readarr": {
@@ -136,7 +136,7 @@
     "description": "The label for category 'Readarr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Sonarr": {
-    "message": "Sonarr",
+    "message": "Sonar",
     "description": "The label for category 'Sonarr' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.arr-suite-qbittorrent": {
@@ -144,19 +144,19 @@
     "description": "The label for category 'qBittorrent' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Node-RED": {
-    "message": "Node-RED",
+    "message": "Solmu-PUNAINEN",
     "description": "The label for category 'Node-RED' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.examples-node-red-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Reverse Proxies": {
-    "message": "Reverse Proxies",
+    "message": "Käänteiset välityspalvelimet",
     "description": "The label for category 'Reverse Proxies' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.examples-reverse-proxies-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.VPN": {
@@ -164,15 +164,15 @@
     "description": "The label for category 'VPN' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.examples-vpn-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Firewall": {
-    "message": "Firewall",
+    "message": "Palomuuri",
     "description": "The label for category 'Firewall' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Testing": {
-    "message": "Testing",
+    "message": "Testaus",
     "description": "The label for category 'Testing' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ms-windows-main": {
@@ -180,15 +180,15 @@
     "description": "The label for category 'MS Windows' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ms-windows-main.link.generated-index.description": {
-    "message": "Microsoft Windows Documentation.",
+    "message": "Microsoft Windows -dokumentaatio.",
     "description": "The generated-index page description for category 'MS Windows' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Local KMS": {
-    "message": "Local KMS",
+    "message": "Paikallinen KMS",
     "description": "The label for category 'Local KMS' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ms-windows-kms-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Microsoft Office": {
@@ -196,7 +196,7 @@
     "description": "The label for category 'Microsoft Office' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ms-windows-office-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Windows": {
@@ -204,11 +204,11 @@
     "description": "The label for category 'Windows' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ms-windows-windows-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Activation": {
-    "message": "Activation",
+    "message": "Aktivointi",
     "description": "The label for category 'Activation' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Windows 11": {
@@ -216,19 +216,19 @@
     "description": "The label for category 'Windows 11' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Editions": {
-    "message": "Editions",
+    "message": "versiot",
     "description": "The label for category 'Editions' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Discord": {
-    "message": "Discord",
+    "message": "Ristiriita",
     "description": "The label for category 'Discord' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.discord-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Bots": {
-    "message": "Bots",
+    "message": "Botit",
     "description": "The label for category 'Bots' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.GitHub": {
@@ -236,27 +236,27 @@
     "description": "The label for category 'GitHub' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.github-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.HDD Tools": {
-    "message": "HDD Tools",
+    "message": "HDD-työkalut",
     "description": "The label for category 'HDD Tools' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.hdd-tools-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Jellyfin": {
-    "message": "Jellyfin",
+    "message": "Meduusa",
     "description": "The label for category 'Jellyfin' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.jellyfin-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Installation": {
-    "message": "Installation",
+    "message": "Asennus",
     "description": "The label for category 'Installation' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.MariaDB": {
@@ -264,27 +264,27 @@
     "description": "The label for category 'MariaDB' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.mariadb-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Networking": {
-    "message": "Networking",
+    "message": "Verkostoituminen",
     "description": "The label for category 'Networking' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.networking-guides": {
-    "message": "Networking Guides",
+    "message": "Verkostoitumisoppaat",
     "description": "The label for category 'Networking Guides' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.networking-guides.link.generated-index.description": {
-    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, and advanced networking configurations.",
+    "message": "Kattavat oppaat Linux-verkkoihin, WiFi-hallintaan, välityspalvelimiin ja kehittyneisiin verkkokokoonpanoihin.",
     "description": "The generated-index page description for category 'Networking Guides' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.networking-storage": {
-    "message": "Storage",
+    "message": "Varastointi",
     "description": "The label for category 'Storage' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Subnets": {
-    "message": "Subnets",
+    "message": "Aliverkot",
     "description": "The label for category 'Subnets' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Proxmox": {
@@ -292,27 +292,27 @@
     "description": "The label for category 'Proxmox' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.proxmox-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.proxmox-networking": {
-    "message": "Networking",
+    "message": "Verkostoituminen",
     "description": "The label for category 'Networking' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.proxmox-networking.link.generated-index.description": {
-    "message": "Comprehensive guide to Proxmox networking including network configuration, VLANs, firewall setup, and example configurations.",
+    "message": "Kattava opas Proxmox-verkkoihin, mukaan lukien verkkomääritykset, VLAN-verkot, palomuuriasetukset ja esimerkkikokoonpanot.",
     "description": "The generated-index page description for category 'Networking' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.LXC Containers": {
-    "message": "LXC Containers",
+    "message": "LXC-säiliöt",
     "description": "The label for category 'LXC Containers' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Reverse Proxy": {
-    "message": "Reverse Proxy",
+    "message": "Käänteinen välityspalvelin",
     "description": "The label for category 'Reverse Proxy' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.reverse-proxy-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Certbot": {
@@ -328,11 +328,11 @@
     "description": "The label for category 'Nginx' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.nginx-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Torrent Clients": {
-    "message": "Torrent Clients",
+    "message": "Torrent-asiakkaat",
     "description": "The label for category 'Torrent Clients' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.torrent-qbittorrent": {
@@ -340,51 +340,51 @@
     "description": "The label for category 'qBittorrent' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.torrent-qbittorrent-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Ubiquiti": {
-    "message": "Ubiquiti",
+    "message": "Kaikkialla",
     "description": "The label for category 'Ubiquiti' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.ubiquiti-docs": {
-    "message": "Docs",
+    "message": "Asiakirjat",
     "description": "The label for category 'Docs' in sidebar 'autoSidebar'"
   },
   "sidebar.autoSidebar.category.Access Points": {
-    "message": "Access Points",
+    "message": "Tukiasemat",
     "description": "The label for category 'Access Points' in sidebar 'autoSidebar'"
   },
   "sidebar.docSidebar.category.Getting Started with Docker": {
-    "message": "Getting Started with Docker",
+    "message": "Dockerin käytön aloittaminen",
     "description": "The label for category 'Getting Started with Docker' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.docker-installation": {
-    "message": "Installing Docker",
+    "message": "Dockerin asennus",
     "description": "The label for category 'Installing Docker' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.docker-installation.link.generated-index.description": {
-    "message": "Tutorials showing you how to Install Docker.",
+    "message": "Opetusohjelmat, jotka osoittavat, kuinka Docker asennetaan.",
     "description": "The generated-index page description for category 'Installing Docker' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Nextcloud": {
-    "message": "Nextcloud",
+    "message": "Seuraava pilvi",
     "description": "The label for category 'Nextcloud' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.nextcloud-installation": {
-    "message": "Installation",
+    "message": "Asennus",
     "description": "The label for category 'Installation' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.nextcloud-installation.link.generated-index.description": {
-    "message": "How to Install Nextcloud using Docker.",
+    "message": "Nextcloudin asentaminen Dockerin avulla.",
     "description": "The generated-index page description for category 'Installation' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.nextcloud-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.nextcloud-troubleshooting.link.generated-index.description": {
-    "message": "Troubleshooting Nextcloud.",
+    "message": "Nextcloudin vianmääritys.",
     "description": "The generated-index page description for category 'Troubleshooting' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.NextcloudPI": {
@@ -404,55 +404,55 @@
     "description": "The label for category 'SEO' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Styling": {
-    "message": "Styling",
+    "message": "Muotoilu",
     "description": "The label for category 'Styling' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Sidebars": {
-    "message": "Sidebars",
+    "message": "Sivupalkit",
     "description": "The label for category 'Sidebars' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.docusaurus-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Networking": {
-    "message": "Networking",
+    "message": "Verkostoituminen",
     "description": "The label for category 'Networking' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Networking.link.generated-index.title": {
-    "message": "Networking",
+    "message": "Verkostoituminen",
     "description": "The generated-index page title for category 'Networking' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Networking.link.generated-index.description": {
-    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, storage solutions, and advanced networking configurations.",
+    "message": "Kattavat oppaat Linux-verkkoihin, WiFi-hallintaan, välityspalvelimiin, tallennusratkaisuihin ja kehittyneisiin verkkokokoonpanoihin.",
     "description": "The generated-index page description for category 'Networking' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.networking-guides": {
-    "message": "Networking Guides",
+    "message": "Verkostoitumisoppaat",
     "description": "The label for category 'Networking Guides' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.networking-guides.link.generated-index.description": {
-    "message": "Comprehensive guides for Linux networking, WiFi management, proxies, and advanced networking configurations.",
+    "message": "Kattavat oppaat Linux-verkkoihin, WiFi-hallintaan, välityspalvelimiin ja kehittyneisiin verkkokokoonpanoihin.",
     "description": "The generated-index page description for category 'Networking Guides' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.networking-storage": {
-    "message": "Storage",
+    "message": "Varastointi",
     "description": "The label for category 'Storage' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Subnets": {
-    "message": "Subnets",
+    "message": "Aliverkot",
     "description": "The label for category 'Subnets' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Ubiquiti": {
-    "message": "Ubiquiti",
+    "message": "Kaikkialla",
     "description": "The label for category 'Ubiquiti' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Access Points": {
-    "message": "Access Points",
+    "message": "Tukiasemat",
     "description": "The label for category 'Access Points' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Reverse Proxy": {
-    "message": "Reverse Proxy",
+    "message": "Käänteinen välityspalvelin",
     "description": "The label for category 'Reverse Proxy' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Certbot": {
@@ -468,27 +468,27 @@
     "description": "The label for category 'Nginx' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.nginx-troubleshooting": {
-    "message": "Troubleshooting",
+    "message": "Vianetsintä",
     "description": "The label for category 'Troubleshooting' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Jellyfin": {
-    "message": "Jellyfin",
+    "message": "Meduusa",
     "description": "The label for category 'Jellyfin' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Installation": {
-    "message": "Installation",
+    "message": "Asennus",
     "description": "The label for category 'Installation' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Torrent Clients": {
-    "message": "Torrent Clients",
+    "message": "Torrent-asiakkaat",
     "description": "The label for category 'Torrent Clients' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Discord": {
-    "message": "Discord",
+    "message": "Ristiriita",
     "description": "The label for category 'Discord' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Bots": {
-    "message": "Bots",
+    "message": "Botit",
     "description": "The label for category 'Bots' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.Proxmox": {
@@ -496,15 +496,15 @@
     "description": "The label for category 'Proxmox' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.proxmox-networking": {
-    "message": "Networking",
+    "message": "Verkostoituminen",
     "description": "The label for category 'Networking' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.proxmox-networking.link.generated-index.description": {
-    "message": "Comprehensive guide to Proxmox networking including network configuration, VLANs, firewall setup, and example configurations.",
+    "message": "Kattava opas Proxmox-verkkoihin, mukaan lukien verkkomääritykset, VLAN-verkot, palomuuriasetukset ja esimerkkikokoonpanot.",
     "description": "The generated-index page description for category 'Networking' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.LXC Containers": {
-    "message": "LXC Containers",
+    "message": "LXC-säiliöt",
     "description": "The label for category 'LXC Containers' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.GitHub": {
@@ -512,19 +512,19 @@
     "description": "The label for category 'GitHub' in sidebar 'docSidebar'"
   },
   "sidebar.docSidebar.category.HDD Tools": {
-    "message": "HDD Tools",
+    "message": "HDD-työkalut",
     "description": "The label for category 'HDD Tools' in sidebar 'docSidebar'"
   },
   "sidebar.exampleSidebar.category.Reverse Proxy": {
-    "message": "Reverse Proxy",
+    "message": "Käänteinen välityspalvelin",
     "description": "The label for category 'Reverse Proxy' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Node-RED": {
-    "message": "Node-RED",
+    "message": "Solmu-PUNAINEN",
     "description": "The label for category 'Node-RED' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Arr Suite": {
-    "message": "Arr Suite",
+    "message": "Arr-sviitti",
     "description": "The label for category 'Arr Suite' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Full Stack": {
@@ -536,15 +536,15 @@
     "description": "The label for category 'Jellyseerr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Lidarr": {
-    "message": "Lidarr",
+    "message": "johtaja",
     "description": "The label for category 'Lidarr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Prowlarr": {
-    "message": "Prowlarr",
+    "message": "Prowlrr",
     "description": "The label for category 'Prowlarr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Radarr": {
-    "message": "Radarr",
+    "message": "Pikemminkin",
     "description": "The label for category 'Radarr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Readarr": {
@@ -552,7 +552,7 @@
     "description": "The label for category 'Readarr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Sonarr": {
-    "message": "Sonarr",
+    "message": "Sonar",
     "description": "The label for category 'Sonarr' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.arr-suite-qbittorrent": {
@@ -564,11 +564,11 @@
     "description": "The label for category 'VPN' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Firewall": {
-    "message": "Firewall",
+    "message": "Palomuuri",
     "description": "The label for category 'Firewall' in sidebar 'exampleSidebar'"
   },
   "sidebar.exampleSidebar.category.Testing": {
-    "message": "Testing",
+    "message": "Testaus",
     "description": "The label for category 'Testing' in sidebar 'exampleSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Windows": {
@@ -576,7 +576,7 @@
     "description": "The label for category 'Windows' in sidebar 'MSwindowsSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Activation": {
-    "message": "Activation",
+    "message": "Aktivointi",
     "description": "The label for category 'Activation' in sidebar 'MSwindowsSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Windows 11": {
@@ -584,7 +584,7 @@
     "description": "The label for category 'Windows 11' in sidebar 'MSwindowsSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Editions": {
-    "message": "Editions",
+    "message": "versiot",
     "description": "The label for category 'Editions' in sidebar 'MSwindowsSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Microsoft Office": {
@@ -592,7 +592,7 @@
     "description": "The label for category 'Microsoft Office' in sidebar 'MSwindowsSidebar'"
   },
   "sidebar.MSwindowsSidebar.category.Local KMS": {
-    "message": "Local KMS",
+    "message": "Paikallinen KMS",
     "description": "The label for category 'Local KMS' in sidebar 'MSwindowsSidebar'"
   }
 }
