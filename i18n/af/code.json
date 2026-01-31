@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Weergawe: {versionLabel}",
-    "description": ""
+    "message": "Weergawe: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Wysig hierdie bladsy",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Geen resultate nie",
-    "description": ""
+    "message": "Geen resultate nie"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Sien alle resultate buite \"{context}\"",
-    "description": ""
+    "message": "Sien alle resultate buite \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Sien alle resultate binne \"{context}\"",
-    "description": ""
+    "message": "Sien alle resultate binne \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Sien alle resultate",
-    "description": ""
+    "message": "Sien alle resultate"
   },
   "theme.SearchBar.label": {
     "message": "Soek",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Oral",
-    "description": ""
+    "message": "Oral"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 dokument gevind|{count} dokumente gevind",
