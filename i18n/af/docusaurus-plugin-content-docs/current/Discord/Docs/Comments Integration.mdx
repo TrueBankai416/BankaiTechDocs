@@ -11,46 +11,46 @@ Hierdie dokumentasiewebwerf sluit 'n **tweerigting Discord-kommentaarintegrasie*
 
 ## Kenmerke
 
-* **Tweerigtingkommunikasie**: Webwerfkommentaar → Discord, Discord-antwoorde → Webwerf
-* **Dubbele Kommentaarstelsel**: Beide Giscus (GitHub-gebaseerd) en Discord-kommentaar werk saam.
-* **Ryk Discord-inbeddings**: Kommentaar verskyn as geformateerde inbeddings met volledige bladsykonteks.
-* **Draadbestuur**: Outomatiese draadskepping vir georganiseerde antwoorde
-* **Opdaterings in reële tyd**: Webwerf vertoon outomaties Discord-antwoorde
-* **Volledige Bladsy Konteks**: Kommentaar sluit bladsytitel, URL en navigasiekonteks in
-* **Gebruiker-avatars**: Discord-antwoorde wys gebruikers-avatars en gebruikersname.
-* **Responsiewe Ontwerp**: Werk op beide rekenaar- en mobiele toestelle
+- **Tweerigtingkommunikasie**: Webwerfkommentaar → Discord, Discord-antwoorde → Webwerf
+- **Dubbele Kommentaarstelsel**: Beide Giscus (GitHub-gebaseerd) en Discord-kommentaar werk saam.
+- **Ryk Discord-inbeddings**: Kommentaar verskyn as geformateerde inbeddings met volledige bladsykonteks.
+- **Draadbestuur**: Outomatiese draadskepping vir georganiseerde antwoorde
+- **Opdaterings in reële tyd**: Webwerf vertoon outomaties Discord-antwoorde
+- **Volledige Bladsy Konteks**: Kommentaar sluit bladsytitel, URL en navigasiekonteks in
+- **Gebruiker-avatars**: Discord-antwoorde wys gebruikers-avatars en gebruikersname.
+- **Responsiewe Ontwerp**: Werk op beide rekenaar- en mobiele toestelle
 
 ## Opstelinstruksies
 
-### 1. Skep 'n Discord-bot
+### 1. Create a Discord Bot
 
 1. Gaan na [Discord-ontwikkelaarportaal](https://discord.com/developers/applications)
 2. Skep 'n nuwe toepassing
 3. Gaan na die "Bot"-afdeling en skep 'n bot
 4. Kopieer die bot-token
 5. Onder "Bevoorregte Gateway-voornemens", aktiveer:
-   * **Boodskapinhoud-intensie**
-   * **Bedienerlede se voorneme** (opsioneel)
+   - **Boodskapinhoud-intensie**
+   - **Bedienerlede se voorneme** (opsioneel)
 
-### 2) Konfigureer Bottoestemmings
+### 2. Configure Bot Permissions
 
 Jou bot benodig hierdie toestemmings:
 
-* Lees Boodskappe
-* Stuur Boodskappe
-* Skep openbare drade
-* Stuur boodskappe in drade
-* Lees Boodskapgeskiedenis
-* Gebruik skuinsstreep-opdragte (opsioneel)
+- Lees Boodskappe
+- Stuur Boodskappe
+- Skep openbare drade
+- Stuur boodskappe in drade
+- Lees Boodskapgeskiedenis
+- Gebruik skuinsstreep-opdragte (opsioneel)
 
-### 3. Nooi Bot na Bediener
+### 3. Invite Bot to Server
 
 1. Gaan na OAuth2 > URL-generator
 2. Kies "bot"-omvang
 3. Kies die toestemmings wat hierbo gelys word
 4. Gebruik die gegenereerde URL om die bot na jou bediener uit te nooi
 
-### 4) Konfigureer Omgewingsveranderlikes
+### 4. Configure Environment Variables
 
 #### Voorkant (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Jou webwerfnaam
 
 :::waarskuwing Sekuriteitsnota
 
-* Moet nooit `.env`-lêers aan weergawebeheer toewys nie
-* Gebruik omgewingveranderlikes in produksie
-* Hou jou bot-token veilig
+- Moet nooit `.env`-lêers aan weergawebeheer toewys nie
+- Gebruik omgewingveranderlikes in produksie
+- Hou jou bot-token veilig
   :::
 
-### 5. Installeer bedienerafhanklikhede
+### 5. Install Server Dependencies
 
 ```bash
 cd-bediener
 npm-installasie
 ```
 
-### 6. Begin die Backend-bediener
+### 6. Start the Backend Server
 
 ```bash
 # Ontwikkeling
@@ -116,14 +116,14 @@ npm run dev
 npm begin
 ```
 
-### 7. Implementeer Konfigurasie
+### 7. Deploy Configuration
 
 Vir produksie-implementerings, stel omgewingveranderlikes in jou gasheerplatform:
 
-* **Voorkant**: Stel `REACT_APP_API_URL` op jou produksie-API-URL
-* **Agtergrond**: Implementeer die bedienermap met bot-token en kanaal-ID
-* **Databasis**: SQLite-databasis sal outomaties geskep word
-* **Konteks**: Konfigureer Discord-konteksvlak en -opsies volgens u voorkeure
+- **Voorkant**: Stel `REACT_APP_API_URL` op jou produksie-API-URL
+- **Agtergrond**: Implementeer die bedienermap met bot-token en kanaal-ID
+- **Databasis**: SQLite-databasis sal outomaties geskep word
+- **Konteks**: Konfigureer Discord-konteksvlak en -opsies volgens u voorkeure
 
 ## Hoe dit werk
 
@@ -140,22 +140,22 @@ Vir produksie-implementerings, stel omgewingveranderlikes in jou gasheerplatform
 
 Discord-inbeddings sluit in:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Beskrywing**: Die werklike kommentaarinhoud
-* **Outeur**: Die kommentator se naam
-* **URL**: Klikbare skakel na die presiese bladsy
-* **Bladsyveld**: Wys bladsytitel met klikbare skakel
-* **Tydstempel**: Wanneer die kommentaar geplaas is
-* **Draad**: Outomaties geskepte draad vir antwoorde
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Beskrywing**: Die werklike kommentaarinhoud
+- **Outeur**: Die kommentator se naam
+- **URL**: Klikbare skakel na die presiese bladsy
+- **Bladsyveld**: Wys bladsytitel met klikbare skakel
+- **Tydstempel**: Wanneer die kommentaar geplaas is
+- **Draad**: Outomaties geskepte draad vir antwoorde
 
 ### Webwerf-vertoning
 
 Die webwerf wys:
 
-* **Oorspronklike kommentaar**: Webwerfvormvoorleggings
-* **Discord-antwoorde**: Antwoorde van Discord-gebruikers met avatars en gebruikersname
-* **Opdaterings in reële tyd**: Outomatiese peiling vir nuwe antwoorde
-* **Gedraadde Gesprekke**: Georganiseerde kommentaar → antwoordstruktuur
+- **Oorspronklike kommentaar**: Webwerfvormvoorleggings
+- **Discord-antwoorde**: Antwoorde van Discord-gebruikers met avatars en gebruikersname
+- **Opdaterings in reële tyd**: Outomatiese peiling vir nuwe antwoorde
+- **Gedraadde Gesprekke**: Georganiseerde kommentaar → antwoordstruktuur
 
 ## Kontekskonfigurasie
 
@@ -165,23 +165,23 @@ Konfigureer hoeveel konteks in Discord-boodskappe verskyn:
 
 #### `DISCORD_CONTEX_LEVEL=minimaal`
 
-* **Vertonings**: Slegs bladsytitel en kommentaarinhoud
-* **Gebruiksgeval**: Skoon, eenvoudige boodskappe sonder ekstra konteks
+- **Vertonings**: Slegs bladsytitel en kommentaarinhoud
+- **Gebruiksgeval**: Skoon, eenvoudige boodskappe sonder ekstra konteks
 
 #### `DISCORD_CONTEX_LEVEL=basies`
 
-* **Wys**: Bladsytitel, kommentaarinhoud en klikbare bladsy-URL
-* **Gebruiksgeval**: Matige konteks met noodsaaklike inligting
+- **Wys**: Bladsytitel, kommentaarinhoud en klikbare bladsy-URL
+- **Gebruiksgeval**: Matige konteks met noodsaaklike inligting
 
 #### `DISCORD_CONTEXT_LEVEL=vol` (standaard)
 
-* **Wys**: Alle konteksinligting, insluitend broodkrummels, afdelings, tydstempels
-* **Gebruiksgeval**: Maksimum konteks vir gedetailleerde besprekings
+- **Wys**: Alle konteksinligting, insluitend broodkrummels, afdelings, tydstempels
+- **Gebruiksgeval**: Maksimum konteks vir gedetailleerde besprekings
 
 #### `DISCORD_CONTEX_LEVEL=aangepas`
 
-* **Wys**: Slegs die kontekselemente wat jy individueel aktiveer
-* **Gebruiksgeval**: Fyn ingestelde beheer oor wat verskyn
+- **Wys**: Slegs die kontekselemente wat jy individueel aktiveer
+- **Gebruiksgeval**: Fyn ingestelde beheer oor wat verskyn
 
 ### Individuele kontekskontroles
 
@@ -240,7 +240,7 @@ Jou webwerfnaam • Kommentaarstelsel
 
 ### Stylering
 
-Die Discord-kommentaarkomponent gebruik CSS-modules. Jy kan die voorkoms aanpas deur te wysig:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/komponente/DiscordKommentaar/style.module.css
@@ -256,7 +256,7 @@ src/komponente/DiscordComments/indeks.tsx
 
 ### Komponentplasing
 
-Die Discord-kommentare verskyn standaard onder die Giscus-kommentare. Om dit te verander, wysig:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/tema/DocItem/Uitleg/indeks.js
@@ -287,9 +287,9 @@ src/tema/DocItem/Uitleg/indeks.js
 
 ### Omgewingsveranderlikes werk nie
 
-* **Ontwikkeling**: Herbegin beide voor- en agterbedieners
-* **Produksie**: Herontplooi beide die voor- en agterkant met korrekte omgewingveranderlikes
-* **Voorvoegsel**: Gebruik die `REACT_APP_` voorvoegsel slegs vir frontend veranderlikes
+- **Ontwikkeling**: Herbegin beide voor- en agterbedieners
+- **Produksie**: Herontplooi beide die voor- en agterkant met korrekte omgewingveranderlikes
+- **Voorvoegsel**: Gebruik die `REACT_APP_` voorvoegsel slegs vir frontend veranderlikes
 
 ### Databasisprobleme
 
@@ -299,12 +299,12 @@ src/tema/DocItem/Uitleg/indeks.js
 
 ## Sekuriteitsoorwegings
 
-* **Bot-teken**: Hou jou bot-teken geheim en moet dit nooit aan weergawebeheer toewy nie
-* **Tempobeperking**: Discord het tempobeperkings vir bots (anders as webhooks)
-* **Invoervalidering**: Beide voor- en agterkant valideer gebruikersinvoer
-* **Databasissekuriteit**: SQLite-databasis moet beskerm word met behoorlike lêertoestemmings
-* **API-sekuriteit**: Oorweeg die implementering van tempobeperking op jou API-eindpunte
-* **CORS**: Konfigureer CORS behoorlik vir jou produksiedomein
+- **Bot-teken**: Hou jou bot-teken geheim en moet dit nooit aan weergawebeheer toewy nie
+- **Tempobeperking**: Discord het tempobeperkings vir bots (anders as webhooks)
+- **Invoervalidering**: Beide voor- en agterkant valideer gebruikersinvoer
+- **Databasissekuriteit**: SQLite-databasis moet beskerm word met behoorlike lêertoestemmings
+- **API-sekuriteit**: Oorweeg die implementering van tempobeperking op jou API-eindpunte
+- **CORS**: Konfigureer CORS behoorlik vir jou produksiedomein
 
 ## Argitektuur
 
@@ -331,7 +331,7 @@ projek/
 
 Die Discord-kommentaarkomponent werk in alle moderne blaaiers wat die volgende ondersteun:
 
-* ES6 haal API
-* Reageer 18+
-* CSS Grid en Flexbox
-* Plaaslike berging (vir vormpersistensie)
+- ES6 haal API
+- Reageer 18+
+- CSS Grid en Flexbox
+- Plaaslike berging (vir vormpersistensie)
