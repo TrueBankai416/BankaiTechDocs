@@ -29,7 +29,7 @@ files:
     type: *mdx_file_type
 
   # Markdown files in docs (ignore MDX files)
-  - source: /docs/**/*
+  - source: /docs/**/*.md
     translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
     languages_mapping: *languages_mapping
     ignore: [/**/*.mdx]
