@@ -2,8 +2,21 @@
 title: Proxmox Firewall Configuration
 description: Complete Proxmox VE firewall security guide covering multi-level firewall configuration, security groups, rules, and monitoring.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, Firewall, Security, iptables, Network Security, Access Control]
-keywords: [Proxmox, Firewall, Security, iptables, Network Security, Access Control, Security Groups]
+tags:
+  - Proxmox
+  - Firewall
+  - Security
+  - iptables
+  - Network Security
+  - Access Control
+keywords:
+  - Proxmox
+  - Firewall
+  - Security
+  - iptables
+  - Network Security
+  - Access Control
+  - Security Groups
 last_update:
   author: BankaiTech
 ---
@@ -49,40 +62,37 @@ The Proxmox firewall is built on top of Linux iptables and provides a hierarchic
 <Tabs
   defaultValue="datacenter"
   values={[
-  {label: 'Datacenter Level', value: 'datacenter'},
-  {label: 'Node Level', value: 'node'},
-  {label: 'VM/Container Level', value: 'vm'},
-  ]}
->
-  <TabItem value="datacenter">
-    **Datacenter Firewall**
+    {label: 'Datacenter Level', value: 'datacenter'},
+    {label: 'Node Level', value: 'node'},
+    {label: 'VM/Container Level', value: 'vm'},
+  ]}>
 
-    * **Global scope**: Applies to all nodes and VMs in the cluster
-    * **Shared resources**: Aliases, security groups, and macros
-    * **Consistent policies**: Ensures uniform security across the environment
-    * **Management interface**: Centralized configuration and monitoring
-    * **Best for**: Organization-wide security policies and standards
-  </TabItem>
+<TabItem value="datacenter">
+**Datacenter Firewall**
+- **Global scope**: Applies to all nodes and VMs in the cluster
+- **Shared resources**: Aliases, security groups, and macros
+- **Consistent policies**: Ensures uniform security across the environment
+- **Management interface**: Centralized configuration and monitoring
+- **Best for**: Organization-wide security policies and standards
+</TabItem>
 
-  <TabItem value="node">
-    **Node-Level Firewall**
+<TabItem value="node">
+**Node-Level Firewall**
+- **Host protection**: Secures the Proxmox host itself
+- **Management access**: Controls access to web interface and SSH
+- **Service protection**: Protects node services and daemons
+- **Local policies**: Node-specific security requirements
+- **Best for**: Protecting the hypervisor and management services
+</TabItem>
 
-    * **Host protection**: Secures the Proxmox host itself
-    * **Management access**: Controls access to web interface and SSH
-    * **Service protection**: Protects node services and daemons
-    * **Local policies**: Node-specific security requirements
-    * **Best for**: Protecting the hypervisor and management services
-  </TabItem>
-
-  <TabItem value="vm">
-    **VM/Container Firewall**
-
-    * **Individual control**: Separate rules for each VM or container
-    * **Service-specific**: Tailored to the application or service running
-    * **Micro-segmentation**: Granular network access control
-    * **Inheritance**: Can inherit from datacenter security groups
-    * **Best for**: Application-specific security policies
-  </TabItem>
+<TabItem value="vm">
+**VM/Container Firewall**
+- **Individual control**: Separate rules for each VM or container
+- **Service-specific**: Tailored to the application or service running
+- **Micro-segmentation**: Granular network access control
+- **Inheritance**: Can inherit from datacenter security groups
+- **Best for**: Application-specific security policies
+</TabItem>
 </Tabs>
 
 ## **Enabling the Proxmox Firewall**
@@ -95,9 +105,9 @@ The Proxmox firewall is built on top of Linux iptables and provides a hierarchic
 2. Click **Edit**
 3. Enable **Firewall**
 4. Configure default policies:
-   * **Input Policy**: DROP (recommended)
-   * **Output Policy**: ACCEPT
-   * **Forward Policy**: ACCEPT
+   - **Input Policy**: DROP (recommended)
+   - **Output Policy**: ACCEPT
+   - **Forward Policy**: ACCEPT
 
 **Via Command Line:**
 
@@ -161,84 +171,87 @@ Each firewall rule consists of:
 <Tabs
   defaultValue="webui"
   values={[
-  {label: 'Web Interface', value: 'webui'},
-  {label: 'Command Line', value: 'cli'},
-  {label: 'Configuration File', value: 'config'},
-  ]}
->
-  <TabItem value="webui">
-    **Via Proxmox Web Interface:**
+    {label: 'Web Interface', value: 'webui'},
+    {label: 'Command Line', value: 'cli'},
+    {label: 'Configuration File', value: 'config'},
+  ]}>
 
-    1. Navigate to the appropriate level (Datacenter/Node/VM)
-    2. Go to **Firewall → Rules**
-    3. Click **Add** to create a new rule
-    4. Configure rule parameters:
-       ```
-       Direction: IN
-       Action: ACCEPT
-       Protocol: TCP
-       Source: 192.168.1.0/24
-       Destination: VM_IP
-       Dest. port: 22
-       Comment: Allow SSH from LAN
-       ```
-  </TabItem>
+<TabItem value="webui">
+**Via Proxmox Web Interface:**
 
-  <TabItem value="cli">
-    **Via Command Line:**
+1. Navigate to the appropriate level (Datacenter/Node/VM)
+2. Go to **Firewall → Rules**
+3. Click **Add** to create a new rule
+4. Configure rule parameters:
+   ```
+   Direction: IN
+   Action: ACCEPT
+   Protocol: TCP
+   Source: 192.168.1.0/24
+   Destination: VM_IP
+   Dest. port: 22
+   Comment: Allow SSH from LAN
+   ```
 
-    ```bash
-    # Add rule to VM firewall
-    pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
-        --action ACCEPT \
-        --direction in \
-        --protocol tcp \
-        --source 192.168.1.0/24 \
-        --dport 22 \
-        --comment "Allow SSH from LAN"
+</TabItem>
 
-    # Add rule to node firewall
-    pvesh create /nodes/{node}/firewall/rules \
-        --action ACCEPT \
-        --direction in \
-        --protocol tcp \
-        --source 192.168.1.0/24 \
-        --dport 8006 \
-        --comment "Allow web interface access"
-    ```
-  </TabItem>
+<TabItem value="cli">
+**Via Command Line:**
 
-  <TabItem value="config">
-    **Configuration File Format:**
+```bash
+# Add rule to VM firewall
+pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
+    --action ACCEPT \
+    --direction in \
+    --protocol tcp \
+    --source 192.168.1.0/24 \
+    --dport 22 \
+    --comment "Allow SSH from LAN"
 
-    Node firewall: `/etc/pve/nodes/{node}/host.fw`
+# Add rule to node firewall
+pvesh create /nodes/{node}/firewall/rules \
+    --action ACCEPT \
+    --direction in \
+    --protocol tcp \
+    --source 192.168.1.0/24 \
+    --dport 8006 \
+    --comment "Allow web interface access"
+```
 
-    ```
-    [OPTIONS]
-    enable: 1
-    policy_in: DROP
-    policy_out: ACCEPT
+</TabItem>
 
-    [RULES]
-    IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH access
-    IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24 # Web interface
-    IN ACCEPT -p icmp # Allow ping
-    ```
+<TabItem value="config">
+**Configuration File Format:**
 
-    VM firewall: `/etc/pve/firewall/{vmid}.fw`
+Node firewall: `/etc/pve/nodes/{node}/host.fw`
 
-    ```
-    [OPTIONS]
-    enable: 1
-    policy_in: DROP
-    policy_out: ACCEPT
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
 
-    [RULES]
-    IN ACCEPT -p tcp --dport 80 # HTTP
-    IN ACCEPT -p tcp --dport 443 # HTTPS
-    IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
-    ```
-  </TabItem>
+[RULES]
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH access
+IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24 # Web interface
+IN ACCEPT -p icmp # Allow ping
+```
+
+VM firewall: `/etc/pve/firewall/{vmid}.fw`
+
+```
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+IN ACCEPT -p tcp --dport 80 # HTTP
+IN ACCEPT -p tcp --dport 443 # HTTPS
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from LAN
+```
+
+</TabItem>
 </Tabs>
 
 ## **Security Groups**
@@ -259,72 +272,68 @@ Security groups allow you to define reusable sets of firewall rules that can be 
 <Tabs
   defaultValue="webserver"
   values={[
-  {label: 'Web Server', value: 'webserver'},
-  {label: 'Database Server', value: 'database'},
-  {label: 'SSH Management', value: 'ssh'},
-  ]}
->
-  <TabItem value="webserver">
-    **Web Server Security Group:**
+    {label: 'Web Server', value: 'webserver'},
+    {label: 'Database Server', value: 'database'},
+    {label: 'SSH Management', value: 'ssh'},
+  ]}>
 
-    ```
-    Group Name: webserver
+<TabItem value="webserver">
+**Web Server Security Group:**
+```
+Group Name: webserver
 
-    Rules:
+Rules:
 
-    - IN ACCEPT -p tcp --dport 80 # HTTP
-    - IN ACCEPT -p tcp --dport 443 # HTTPS
-    - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
-    - IN ACCEPT -p icmp # Ping
+- IN ACCEPT -p tcp --dport 80 # HTTP
+- IN ACCEPT -p tcp --dport 443 # HTTPS
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
+- IN ACCEPT -p icmp # Ping
 
-    ```
-  </TabItem>
+```
+</TabItem>
 
-  <TabItem value="database">
-    **Database Server Security Group:**
+<TabItem value="database">
+**Database Server Security Group:**
+```
 
-    ```
+Group Name: database
 
-    Group Name: database
+Rules:
 
-    Rules:
+- IN ACCEPT -p tcp --dport 3306 -s +webserver # MySQL from web servers
+- IN ACCEPT -p tcp --dport 5432 -s +webserver # PostgreSQL from web servers
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
+- IN REJECT # Reject all other traffic
 
-    - IN ACCEPT -p tcp --dport 3306 -s +webserver # MySQL from web servers
-    - IN ACCEPT -p tcp --dport 5432 -s +webserver # PostgreSQL from web servers
-    - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH management
-    - IN REJECT # Reject all other traffic
+```
+</TabItem>
 
-    ```
-  </TabItem>
+<TabItem value="ssh">
+**SSH Management Security Group:**
+```
 
-  <TabItem value="ssh">
-    **SSH Management Security Group:**
+Group Name: ssh-mgmt
 
-    ```
+Rules:
 
-    Group Name: ssh-mgmt
+- IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from management network
+- IN ACCEPT -p tcp --dport 22 -s 10.0.1.0/24 # SSH from admin network
+- IN DROP -p tcp --dport 22 # Drop all other SSH attempts
 
-    Rules:
-
-    - IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24 # SSH from management network
-    - IN ACCEPT -p tcp --dport 22 -s 10.0.1.0/24 # SSH from admin network
-    - IN DROP -p tcp --dport 22 # Drop all other SSH attempts
-
-    ```
-  </TabItem>
+````
+</TabItem>
 </Tabs>
 
 ### **Applying Security Groups**
 
 **To VMs/Containers:**
-
 ```bash
 # Apply security group to VM
 pvesh create /nodes/{node}/qemu/{vmid}/firewall/rules \
     --action GROUP \
     --group webserver \
     --direction in
-```
+````
 
 **In VM firewall configuration:**
 
