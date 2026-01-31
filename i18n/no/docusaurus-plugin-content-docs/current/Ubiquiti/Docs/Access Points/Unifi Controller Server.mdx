@@ -2,8 +2,12 @@
 title: Install Unifi Controller Server
 description: Step-by-step guide for installing UniFi Controller on Ubuntu using GlennR's automation scripts for simplified setup and configuration.
 image: /img/social/ubiquiti-social.jpg
-tags: [Ubiquiti, Unifi Controller]
-keywords: [Ubiquiti, Unifi Controller]
+tags:
+  - Ubiquiti
+  - Unifi Controller
+keywords:
+  - Ubiquiti
+  - Unifi Controller
 last_update:
   author: BankaiTech
 ---
@@ -18,13 +22,13 @@ This tutorial covers the installation of the UniFi Controller on an Ubuntu syste
   <>These scripts were tested on Ubuntu 16.04/18.04/18.10/19.04/19.10/20.04/20.10/21.04/21.10/22.04/22.10/23.04/23.10/24.04/24.10</>
 </p>
 
-## ***Prerequisites***
+## **_Prerequisites_**
 
-* A fresh Ubuntu server with root or a user with sudo privileges.
-* Basic familiarity with the Linux terminal.
-* Internet connection on the server.
+- A fresh Ubuntu server with root or a user with sudo privileges.
+- Basic familiarity with the Linux terminal.
+- Internet connection on the server.
 
-## ***Step 1: Update and Upgrade Ubuntu***
+## **_Step 1: Update and Upgrade Ubuntu_**
 
 Before proceeding with the installation, ensure your system is up-to-date:
 
@@ -38,7 +42,7 @@ sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install ca-certificates curl -y
 ```
 
-## ***Step 3: Download GlennR's Installation Script and Install***
+## **_Step 3: Download GlennR's Installation Script and Install_**
 
 Download and execute the script!
 
@@ -52,30 +56,30 @@ Follow the on-screen instructions. The script will take care of installing the n
 
 After the installation completes, the UniFi Controller will be accessible through your web browser.
 
-* **URL**: `http://your_server_ip:8080` or `https://your_server_ip:8443` (for a secure connection)\
+- **URL**: `http://your_server_ip:8080` or `https://your_server_ip:8443` (for a secure connection)\
   :::note
   If there is a port conflict, the script will automatically change the port. Pay attention to the messages to see if the port was changed
   :::
-* **Setup Wizard**: The first time you access the UniFi Controller, you'll be greeted with a setup wizard. Follow the prompts to configure your controller.
+- **Setup Wizard**: The first time you access the UniFi Controller, you'll be greeted with a setup wizard. Follow the prompts to configure your controller.
 
 ## Step 5: Maintaining the UniFi Controller
 
 GlennR's script sets up the UniFi Controller as a service running on your Ubuntu server. Here's how to manage it:
 
-* **Start the service**: `sudo service unifi start`
-* **Stop the service**: `sudo service unifi stop`
-* **Restart the service**: `sudo service unifi restart`
+- **Start the service**: `sudo service unifi start`
+- **Stop the service**: `sudo service unifi stop`
+- **Restart the service**: `sudo service unifi restart`
 
-## ***Conclusion***
+## **_Conclusion_**
 
 You've successfully installed the UniFi Controller on your Ubuntu server using GlennR's scripts. The UniFi Controller is now ready for you to manage your UniFi devices and networks.
 
 Remember to regularly check for any updates both for the Ubuntu system and the UniFi Controller software to ensure your system remains secure and efficient.
 
-## ***Additional Resources***
+## **_Additional Resources_**
 
-* [UniFi - Official Support Documentation](https://help.ui.com/hc/en-us/categories/200320654-UniFi-Wireless)
-* [GlennR's UniFi Installation Scripts](https://community.ui.com/questions/UniFi-Installation-Scripts-or-UniFi-Easy-Update-Script-or-UniFi-Lets-Encrypt-or-UniFi-Easy-Encrypt-/ccbc7530-dd61-40a7-82ec-22b17f027776)
+- [UniFi - Official Support Documentation](https://help.ui.com/hc/en-us/categories/200320654-UniFi-Wireless)
+- [GlennR's UniFi Installation Scripts](https://community.ui.com/questions/UniFi-Installation-Scripts-or-UniFi-Easy-Update-Script-or-UniFi-Lets-Encrypt-or-UniFi-Easy-Encrypt-/ccbc7530-dd61-40a7-82ec-22b17f027776)
 
 For further customization and advanced setup, consult the official UniFi documentation and GlennR's GitHub repository.
 
