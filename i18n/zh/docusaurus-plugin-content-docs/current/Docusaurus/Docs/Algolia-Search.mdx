@@ -2,8 +2,12 @@
 title: Algolia Search
 description: Complete guide for installing and configuring Algolia DocSearch for Docusaurus including API setup, environment variables, and crawler configuration.
 image: /img/social/docusaurus-social.jpg
-tags: [Docusaurus, Algolia Search]
-keywords: [Docusaurus, Algolia Search]
+tags:
+  - Docusaurus
+  - Algolia Search
+keywords:
+  - Docusaurus
+  - Algolia Search
 last_update:
   author: BankaiTech
 ---
@@ -18,7 +22,7 @@ Make sure you are in the root of your website, in my case ill run
 cd /var/websites/"HomeLab Docs"
 ```
 
-### ***Applying to the DocSearch Program***
+### **_Applying to the DocSearch Program_**
 
 Lets apply for [Algolia DocSearch](https://docsearch.algolia.com/apply/)
 
@@ -26,15 +30,12 @@ Lets apply for [Algolia DocSearch](https://docsearch.algolia.com/apply/)
 After clicking the link above and signing up, you should receive an Email with further instructions and a Crawler should have been [automatically setup for you](https://docsearch.algolia.com/docs/templates/#getting-started).
 
 <p>
-  <>This is an updated Doc from Legacy search, this doc may not be 100% accurate because I migrated some time ago and am just now documenting it.</>
+<>This is an updated Doc from Legacy search, this doc may not be 100% accurate because I migrated some time ago and am just now documenting it.</>
 </p>
-
 I apologize for any confusion this may cause.
-
 <p>
-  <>There is however great support from Algolia if you need further assistance, click [HERE](https://discord.gg/docusaurus)</>
+<>There is however great support from Algolia if you need further assistance, click [HERE](https://discord.gg/docusaurus)</>
 </p>
-
 :::
 
 Now go to the `Settings` page
@@ -53,7 +54,7 @@ Take note of the ID and Both keys, we will be using them shortly.
 
 In order to keep your sensitive information hidden, we need to install and configure dotenv
 
-#### ***Installing dotenv***
+#### **_Installing dotenv_**
 
 Run the following command
 
@@ -61,7 +62,7 @@ Run the following command
 npm install dotenv --save
 ```
 
-#### ***Configuring dotenv***
+#### **_Configuring dotenv_**
 
 Open \`docusaurus.config.ts using your preferred text editor such as nano.
 Add the following code snippet above your main config near the top.
@@ -72,7 +73,7 @@ import dotenv from 'dotenv';
 require('dotenv').config({path: './.env', debug: true})
 ```
 
-#### ***Creating the .env file***
+#### **_Creating the .env file_**
 
 Now lets create an `.env` file.
 
@@ -87,7 +88,7 @@ ALGOLIA_APP_ID = ""
 ALGOLIA_API_KEY = ""
 ```
 
-:::tip\[Hint]
+:::tip[Hint]
 
 Paste by pressing `CTRL+SHIFT+V`
 Save by pressing `CTRL+X`
@@ -150,9 +151,8 @@ Click on your crawler and then Start Crawl
 If there are any issues or additional information that can be added to this documentation please comment at the bottom of this page with your solutions and/or suggestions.
 
 <p>
-  <>Thank You for your Support</>
+<>Thank You for your Support</>
 </p>
-
 :::
 
 <BuyMeACoffeeButton />
