@@ -1,7 +1,25 @@
 ---
 title: Proxies - Complete Guide to Proxy Servers and Transparent Proxying
-tags: [Networking, Proxies, SOCKS, HTTP Proxy, Redsocks, Squid, Security, Anonymity]
-keywords: [proxy, redsocks, squid, dante, socks proxy, http proxy, transparent proxy, iptables, networking, anonymity]
+tags:
+  - Networking
+  - Proxies
+  - SOCKS
+  - HTTP Proxy
+  - Redsocks
+  - Squid
+  - Security
+  - Anonymity
+keywords:
+  - proxy
+  - redsocks
+  - squid
+  - dante
+  - socks proxy
+  - http proxy
+  - transparent proxy
+  - iptables
+  - networking
+  - anonymity
 last_update:
   author: BankaiTech
 ---
@@ -20,32 +38,32 @@ A proxy server acts as a gateway between users and the internet, receiving reque
 
 ### **HTTP/HTTPS Proxies**
 
-* **Purpose**: Handle web traffic (HTTP/HTTPS protocols)
-* **Features**: Web caching, content filtering, SSL termination
-* **Common Ports**: 8080, 3128, 8888
-* **Use Cases**: Corporate web filtering, caching, bypassing geo-restrictions
+- **Purpose**: Handle web traffic (HTTP/HTTPS protocols)
+- **Features**: Web caching, content filtering, SSL termination
+- **Common Ports**: 8080, 3128, 8888
+- **Use Cases**: Corporate web filtering, caching, bypassing geo-restrictions
 
 ### **SOCKS Proxies**
 
-* **Purpose**: Handle any type of traffic (protocol-agnostic)
-* **Versions**: SOCKS4, SOCKS4a, SOCKS5
-* **Features**: UDP support (SOCKS5), authentication, DNS resolution
-* **Common Ports**: 1080, 1081, 9050
-* **Use Cases**: Tunneling applications, gaming, P2P, Tor networks
+- **Purpose**: Handle any type of traffic (protocol-agnostic)
+- **Versions**: SOCKS4, SOCKS4a, SOCKS5
+- **Features**: UDP support (SOCKS5), authentication, DNS resolution
+- **Common Ports**: 1080, 1081, 9050
+- **Use Cases**: Tunneling applications, gaming, P2P, Tor networks
 
 ### **Transparent Proxies**
 
-* **Purpose**: Intercept traffic without client configuration
-* **Features**: Automatic redirection via iptables/firewall rules
-* **Use Cases**: Network-wide proxy enforcement, content filtering
-* **Tools**: redsocks, iptables REDIRECT target
+- **Purpose**: Intercept traffic without client configuration
+- **Features**: Automatic redirection via iptables/firewall rules
+- **Use Cases**: Network-wide proxy enforcement, content filtering
+- **Tools**: redsocks, iptables REDIRECT target
 
 ### **Reverse Proxies**
 
-* **Purpose**: Forward requests to backend servers on behalf of servers
-* **Features**: Load balancing, SSL termination, caching
-* **Use Cases**: Web servers, API gateways, CDNs
-* **Tools**: Nginx, Apache, HAProxy
+- **Purpose**: Forward requests to backend servers on behalf of servers
+- **Features**: Load balancing, SSL termination, caching
+- **Use Cases**: Web servers, API gateways, CDNs
+- **Tools**: Nginx, Apache, HAProxy
 
 ## **Redsocks - Transparent SOCKS/HTTP Proxy Redirector**
 
@@ -53,11 +71,11 @@ Redsocks is a daemon that transparently redirects network connections to SOCKS o
 
 ### **Key Features**
 
-* **Transparent operation**: No application configuration needed
-* **Multiple proxy support**: SOCKS4, SOCKS5, HTTP CONNECT
-* **Chain proxying**: Route traffic through multiple proxy layers
-* **DNS resolution**: Handle DNS queries through proxy
-* **IPv4/IPv6 support**: Dual-stack networking support
+- **Transparent operation**: No application configuration needed
+- **Multiple proxy support**: SOCKS4, SOCKS5, HTTP CONNECT
+- **Chain proxying**: Route traffic through multiple proxy layers
+- **DNS resolution**: Handle DNS queries through proxy
+- **IPv4/IPv6 support**: Dual-stack networking support
 
 ### **Installation**
 
@@ -491,11 +509,11 @@ Tor (The Onion Router) is a free and open-source privacy network that routes int
 
 ### **Key Features**
 
-* **Anonymity**: Routes traffic through multiple encrypted relays
-* **SOCKS proxy**: Provides SOCKS4a/SOCKS5 proxy on port 9050
-* **Hidden services**: Access .onion sites and create hidden services
-* **DNS resolution**: Resolves DNS queries through Tor network
-* **Cross-platform**: Available on Linux, Windows, macOS
+- **Anonymity**: Routes traffic through multiple encrypted relays
+- **SOCKS proxy**: Provides SOCKS4a/SOCKS5 proxy on port 9050
+- **Hidden services**: Access .onion sites and create hidden services
+- **DNS resolution**: Resolves DNS queries through Tor network
+- **Cross-platform**: Available on Linux, Windows, macOS
 
 ### **Installation**
 
@@ -818,12 +836,12 @@ sudo journalctl -u tor -f
 
 #### **Important Security Notes**
 
-* **DNS Leaks**: Always route DNS through Tor (port 5353) or use transparent proxy
-* **Application Leaks**: Some applications may bypass proxy settings
-* **Time Zone**: Consider setting system timezone to UTC
-* **Browser Fingerprinting**: Use Tor Browser for best anonymity
-* **Exit Node Monitoring**: Be aware that exit nodes can see unencrypted traffic
-* **Entry Guards**: Tor automatically selects and reuses entry guards for security
+- **DNS Leaks**: Always route DNS through Tor (port 5353) or use transparent proxy
+- **Application Leaks**: Some applications may bypass proxy settings
+- **Time Zone**: Consider setting system timezone to UTC
+- **Browser Fingerprinting**: Use Tor Browser for best anonymity
+- **Exit Node Monitoring**: Be aware that exit nodes can see unencrypted traffic
+- **Entry Guards**: Tor automatically selects and reuses entry guards for security
 
 #### **Secure Configuration**
 
@@ -1081,17 +1099,17 @@ sudo awk '{print $3}' /var/log/squid/access.log | sort | uniq -c | sort -nr
 
 ### **Access Control**
 
-* **Implement proper ACLs**: Restrict proxy access to authorized networks/users
-* **Use authentication**: Enable username/password or certificate-based auth
-* **Monitor access logs**: Regularly review proxy usage logs
-* **Limit destination access**: Block malicious or inappropriate destinations
+- **Implement proper ACLs**: Restrict proxy access to authorized networks/users
+- **Use authentication**: Enable username/password or certificate-based auth
+- **Monitor access logs**: Regularly review proxy usage logs
+- **Limit destination access**: Block malicious or inappropriate destinations
 
 ### **Encryption**
 
-* **Use HTTPS/TLS**: Ensure proxy connections are encrypted
-* **Certificate validation**: Properly validate SSL certificates
-* **Avoid SSL bumping**: Only use HTTPS inspection when absolutely necessary
-* **Secure credentials**: Store proxy passwords securely
+- **Use HTTPS/TLS**: Ensure proxy connections are encrypted
+- **Certificate validation**: Properly validate SSL certificates
+- **Avoid SSL bumping**: Only use HTTPS inspection when absolutely necessary
+- **Secure credentials**: Store proxy passwords securely
 
 ### **Network Security**
 
