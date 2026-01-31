@@ -5,6 +5,13 @@ api_token_env: CROWDIN_PERSONAL_TOKEN
 # Choose file structure in Crowdin
 preserve_hierarchy: true
 
+# Language mapping for locales that need special handling
+languages_mapping: &languages_mapping
+  two_letters_code:
+    pt-BR: pt-BR
+    zh-CN: zh-CN
+    zh-TW: zh-TW
+
 # MDX file type - use v1.2 parser for compatibility with Docusaurus
 mdx_file_type: &mdx_file_type mdx_v1_2
 
@@ -13,13 +20,16 @@ files:
   # JSON translation files (code.json, navbar.json, footer.json, etc.)
   - source: /i18n/en/**/*.json
     translation: /i18n/%two_letters_code%/**/%original_file_name%
+    languages_mapping: *languages_mapping
 
   # MDX files in docs
   - source: /docs/**/*.mdx
     translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    languages_mapping: *languages_mapping
     type: *mdx_file_type
 
   # Markdown files in docs (ignore MDX files)
   - source: /docs/**/*
     translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    languages_mapping: *languages_mapping
     ignore: [/**/*.mdx]
