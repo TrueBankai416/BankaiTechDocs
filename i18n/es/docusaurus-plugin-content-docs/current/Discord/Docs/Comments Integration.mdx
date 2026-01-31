@@ -1,337 +1,337 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
-image: /img/social/discord-social.jpg
+title: Integración de comentarios
+description: Guía completa para integrar comentarios bidireccionales de Discord con Docusaurus, incluida la instalación, configuración y resolución de problemas.
+image: /img/social/discordia-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Integración de comentarios de Discord
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+Este sitio de documentación incluye una **integración bidireccional de comentarios de Discord** que permite a los visitantes enviar comentarios a su servidor de Discord Y muestra las respuestas de Discord en el sitio web junto con los comentarios de Giscus existentes basados en GitHub.
 
-## Features
+## Características
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **Comunicación bidireccional**: Comentarios del sitio web → Discord, Respuestas de Discord → Sitio web
+* **Sistema de comentarios duales**: Los comentarios de Giscus (basado en GitHub) y Discord funcionan juntos
+* **Incrustaciones enriquecidas de Discord**: Los comentarios aparecen como incrustaciones formateadas con contexto de página completa
+* **Gestión de hilos**: Creación automática de hilos para respuestas organizadas
+* **Actualizaciones en tiempo real**: El sitio web muestra las respuestas de Discord automáticamente
+* **Contexto de página completa**: Los comentarios incluyen el título de la página, la URL y el contexto de navegación.
+* **Avatares de usuario**: Las respuestas de Discord muestran avatares de usuario y nombres de usuario.
+* **Diseño responsivo**: funciona tanto en computadoras de escritorio como en dispositivos móviles.
 
-## Setup Instructions
+## Instrucciones de configuración
 
-### 1. Create a Discord Bot
+### 1. Crea un bot de Discord
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. Vaya al [Portal para desarrolladores de Discord](https://discord.com/developers/applications)
+2. Crear una nueva aplicación
+3. Vaya a la sección "Bot" y cree un bot.
+4. Copiar el token del bot
+5. En "Intentos de puerta de enlace privilegiada", habilite:
+   * **Intención del contenido del mensaje**
+   * **Intención de los miembros del servidor** (opcional)
 
-### 2) Configure Bot Permissions
+### 3) Invite Bot to Server
 
-Your bot needs these permissions:
+Tu bot necesita estos permisos:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
-
-### 3. Invite Bot to Server
-
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
-
-### 4) Configure Environment Variables
-
-#### Frontend (.env)
-
-```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
-
-# API Configuration
-REACT_APP_API_URL=http://localhost:3001
-
-# Discord Context Configuration
-DISCORD_CONTEXT_LEVEL=full
-DISCORD_SHOW_BREADCRUMBS=true
-DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
-```
-
-#### Backend Server (server/.env)
-
-```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
-
-# API Configuration
-PORT=3001
-
-# Discord Context Configuration
-DISCORD_CONTEXT_LEVEL=full
-DISCORD_SHOW_PAGE_CONTEXT=true
-DISCORD_SHOW_BREADCRUMBS=true
-DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SHOW_PAGE_PATH=false
-DISCORD_SHOW_TIMESTAMP=true
-DISCORD_SHOW_AUTHOR_FIELD=true
-DISCORD_CREATE_THREADS=true
-DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
-```
-
-:::warning Security Note
-
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
-  :::
-
-### 5. Install Server Dependencies
-
-```bash
-cd server
-npm install
-```
+* Leer mensajes
+* Enviar mensajes
+* Crear hilos públicos
+* Enviar mensajes en hilos
+* Leer el historial de mensajes
+* Usar comandos de barra (opcional)
 
 ### 6. Start the Backend Server
 
+1. Vaya a OAuth2 > Generador de URL
+2. Seleccionar el alcance del "bot"
+3. Seleccione los permisos enumerados arriba
+4. Utilice la URL generada para invitar al bot a su servidor
+
+### 7) Deploy Configuration
+
+#### Interfaz (.env)
+
+```env
+# Configuración del bot de Discord
+DISCORD_BOT_TOKEN=tu_token_de_bot_aquí
+DISCORD_CHANNEL_ID=tu_id_de_canal_aquí
+
+# Configuración de la API
+REACT_APP_API_URL=http://localhost:3001
+
+# Configuración del contexto de Discord
+DISCORD_CONTEXT_LEVEL=completo
+DISCORD_SHOW_BREADCRUMBS=verdadero
+DISCORD_SHOW_SECTION_INFO=verdadero
+DISCORD_SITE_NAME=Nombre de tu sitio
+```
+
+#### Servidor backend (servidor/.env)
+
+```env
+# Configuración del bot de Discord
+DISCORD_BOT_TOKEN=tu_token_de_bot_aquí
+DISCORD_CHANNEL_ID=tu_id_de_canal_aquí
+
+# Configuración de la API
+PORT=3001
+
+# Configuración del contexto de Discord
+DISCORD_CONTEXT_LEVEL=completo
+DISCORD_SHOW_PAGE_CONTEXT=verdadero
+DISCORD_SHOW_BREADCRUMBS=verdadero
+DISCORD_SHOW_SECTION_INFO=verdadero
+DISCORD_SHOW_PAGE_PATH=falso
+DISCORD_SHOW_TIMESTAMP=verdadero
+DISCORD_SHOW_AUTHOR_FIELD=verdadero
+DISCORD_CREATE_THREADS=verdadero
+DISCORD_THREAD_DURATION=1440
+DISCORD_SITE_NAME=Nombre de tu sitio
+```
+
+:::warning Nota de seguridad
+
+* Nunca envíe archivos `.env` al control de versiones
+* Utilizar variables de entorno en producción
+* Mantenga su token de bot seguro
+  :::
+
+### 5. Instalar dependencias del servidor
+
 ```bash
-# Development
+cd servidor
+npm install
+```
+
+### 6. Iniciar el servidor backend
+
+```bash
+# Desarrollo
 npm run dev
 
-# Production
+# Producción
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. Implementar configuración
 
-For production deployments, set environment variables in your hosting platform:
+Para implementaciones de producción, configure variables de entorno en su plataforma de alojamiento:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **Frontend**: Establezca `REACT_APP_API_URL` en la URL de su API de producción
+* **Backend**: Implementar la carpeta del servidor con el token del bot y el ID del canal
+* **Base de datos**: La base de datos SQLite se creará automáticamente
+* **Contexto**: Configura el nivel de contexto y las opciones de Discord según tus preferencias
 
-## How It Works
+## Cómo funciona
 
-### Complete Bidirectional Flow
+### Flujo bidireccional completo
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **Comentario del sitio web**: El usuario envía un comentario a través del formulario del sitio web.
+2. **Mensaje de Discord**: El bot envía una incrustación formateada al canal de Discord con el contexto de página completa
+3. **Creación de hilo**: El bot crea automáticamente un hilo para respuestas organizadas
+4. **Respuestas de Discord**: Los usuarios de Discord responden en el hilo o en el mensaje.
+5. **Almacenamiento de base de datos**: El bot almacena todos los comentarios y respuestas en la base de datos SQLite
+6. **Visualización del sitio web**: la interfaz sondea la API cada 30 segundos y muestra las respuestas de Discord
 
-### Discord Message Format
+### Formato de mensaje de Discord
 
-Discord embeds include:
+Las incrustaciones de Discord incluyen:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **Descripción**: El contenido real del comentario
+* **Autor**: El nombre del comentarista
+* **URL**: Enlace clicable a la página exacta
+* **Campo de página**: Muestra el título de la página con un enlace en el que se puede hacer clic
+* **Marca de tiempo**: Cuándo se publicó el comentario
+* **Hilo**: Hilo creado automáticamente para respuestas
 
-### Website Display
+### Visualización del sitio web
 
-The website shows:
+El sitio web muestra:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **Comentarios originales**: Envíos de formularios del sitio web
+* **Respuestas de Discord**: Respuestas de usuarios de Discord con avatares y nombres de usuario
+* **Actualizaciones en tiempo real**: sondeo automático para nuevas respuestas
+* **Conversaciones en cadena**: Estructura organizada de comentarios → respuestas
 
-## Context Configuration
+## Configuración de contexto
 
-### Context Levels
+### Niveles de contexto
 
-Configure how much context appears in Discord messages:
+Configura cuánto contexto aparece en los mensajes de Discord:
 
-#### `DISCORD_CONTEXT_LEVEL=minimal`
+#### `NIVEL_DE_CONTEXTO_DE_DISCORDIA=mínimo`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **Muestra**: Solo el título de la página y el contenido de los comentarios
+* **Caso de uso**: Mensajes limpios y simples sin contexto adicional
 
-#### `DISCORD_CONTEXT_LEVEL=basic`
+#### `NIVEL_DE_CONTEXTO_DE_DISCORD=básico`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **Muestra**: Título de la página, contenido del comentario y URL de la página en la que se puede hacer clic
+* **Caso de uso**: Contexto moderado con información esencial
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (predeterminado)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **Muestra**: Toda la información de contexto, incluidas las rutas de navegación, las secciones y las marcas de tiempo.
+* **Caso de uso**: Contexto máximo para discusiones detalladas
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `NIVEL_DE_TEXTO_DISCORD=personalizado`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **Muestra**: Solo los elementos de contexto que habilita individualmente
+* **Caso de uso**: Control preciso sobre lo que aparece
 
-### Individual Context Controls
+### Controles de contexto individuales
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+Al usar `DISCORD_CONTEXT_LEVEL=custom`, puedes controlar cada elemento:
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # Mostrar título de página y campo URL
+DISCORD_SHOW_BREADCRUMBS=true # Mostrar migas de navegación
+DISCORD_SHOW_SECTION_INFO=true # Mostrar sección principal (Docker, Nextcloud, etc.)
+DISCORD_SHOW_PAGE_PATH=false # Mostrar ruta URL completa
+DISCORD_SHOW_TIMESTAMP=true # Mostrar cuándo se publicó el comentario
+DISCORD_SHOW_AUTHOR_FIELD=true # Mostrar el nombre del comentarista como autor de la incrustación
 ```
 
-### Example Context Outputs
+### Configuración del hilo
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # Crear hilos para respuestas
+DISCORD_THREAD_DURATION=1440 # Tiempo de archivado automático del hilo (minutos)
+DISCORD_SITE_NAME=El nombre de su sitio # Nombre del sitio en el pie de página
 ```
 
-**Full Context:**
+### Ejemplos de salidas de contexto
+
+**Contexto mínimo:**
 
 ```
-💬 New Comment: Docker Installation Guide
+Guía de instalación de Docker
+"¡Este tutorial fue realmente útil! ¿Cómo puedo gestionar los conflictos de puertos?"
+```
+
+**Contexto básico:**
+
+```
+Guía de instalación de Docker
+"¡Este tutorial fue muy útil! ¿Cómo puedo gestionar los conflictos de puertos?"
+[Enlace a la página]
+```
+
+**Contexto completo:**
+
+```
+💬 Nuevo comentario: Guía de instalación de Docker
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+"¡Este tutorial fue realmente útil! ¿Cómo manejo los conflictos de puertos?"
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 Página: Guía de instalación de Docker
+📍 Navegación: Docker > Docs > Instalación de Docker
+📂 Sección: Docker
+🔗 Ruta: /Docker/Docs/Installing%20Docker/Docker%20Engine
 
-Your Site Name • Comment System
+Nombre de su sitio • Sistema de comentarios
 ```
 
-## Customization
+## Personalización
 
-### Styling
+### Estilo
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
-
-```
-src/components/DiscordComments/styles.module.css
-```
-
-### Message Format
-
-To customize the Discord embed format, edit the `discordMessage` object in:
+El componente de comentarios de Discord utiliza módulos CSS. Puedes personalizar la apariencia modificando:
 
 ```
-src/components/DiscordComments/index.tsx
+src/componentes/DiscordComments/styles.module.css
 ```
 
-### Component Placement
+### Formato del mensaje
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
-
-```
-src/theme/DocItem/Layout/index.js
-```
-
-## Troubleshooting
-
-### Bot Not Responding
-
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
-
-### Comments Not Appearing
-
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
-
-### Discord Replies Not Showing
-
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
-
-### Environment Variables Not Working
-
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
-
-### Database Issues
-
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
-
-## Security Considerations
-
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
-
-## Architecture
+Para personalizar el formato de incrustación de Discord, edite el objeto `discordMessage` en:
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+src/componentes/Comentarios de Discord/index.tsx
+```
+
+### Colocación de componentes
+
+Los comentarios de Discord aparecen debajo de los comentarios de Giscus de forma predeterminada. Para cambiar esto, modifique:
+
+```
+src/tema/DocItem/Layout/index.js
+```
+
+## Solución de problemas
+
+### El bot no responde
+
+1. **Verificar token de bot**: Asegúrese de que `DISCORD_BOT_TOKEN` sea correcto
+2. **Verificar permisos**: asegúrese de que el bot tenga los permisos necesarios en el canal
+3. **Verificar ID del canal**: Asegúrese de que `DISCORD_CHANNEL_ID` sea correcto
+4. **Bot en el servidor**: verifica que el bot esté realmente en tu servidor de Discord
+
+### Los comentarios no aparecen
+
+1. **Servidor en ejecución**: Verifique si el servidor backend se está ejecutando en el puerto correcto
+2. **URL de la API**: Verifique que `REACT_APP_API_URL` apunte a su servidor backend
+3. **Base de datos**: Comprueba si la base de datos SQLite se está creando en la carpeta del servidor
+4. **CORS**: Asegúrese de que CORS esté configurado para su dominio frontend
+
+### Las respuestas de Discord no se muestran
+
+1. **Intención del contenido del mensaje**: asegúrese de que esto esté habilitado en el Portal para desarrolladores de Discord
+2. **Permisos del bot**: Verificar que el bot pueda leer mensajes en el canal
+3. **Conexión a la base de datos**: Verifique los registros del servidor para detectar errores en la base de datos
+4. **Encuestas**: La interfaz realiza encuestas cada 30 segundos; las respuestas pueden tardar en aparecer.
+
+### Las variables de entorno no funcionan
+
+* **Desarrollo**: Reiniciar los servidores frontend y backend
+* **Producción**: Vuelva a implementar el frontend y el backend con las variables de entorno correctas
+* **Prefijo**: utilice el prefijo `REACT_APP_` solo para variables del frontend
+
+### Problemas con la base de datos
+
+1. **Permisos de archivo**: garantizar que el servidor pueda escribir en el directorio de la base de datos
+2. **Espacio en disco**: Verifique el espacio en disco disponible para la base de datos SQLite
+3. **Registros del servidor**: Verifique la consola del servidor para detectar errores de conexión a la base de datos
+
+## Consideraciones de seguridad
+
+* **Bot Token**: Mantenga su token de bot en secreto y nunca lo envíe al control de versiones
+* **Límite de velocidad**: Discord tiene límites de velocidad para los bots (diferentes de los webhooks)
+* **Validación de entrada**: Tanto el frontend como el backend validan la entrada del usuario
+* **Seguridad de la base de datos**: La base de datos SQLite debe estar protegida con los permisos de archivo adecuados
+* **Seguridad de la API**: considere implementar una limitación de velocidad en los puntos finales de su API
+* **CORS**: Configure CORS correctamente para su dominio de producción
+
+## Arquitectura
+
+```
+Interfaz del sitio web ←→ API Express ←→ Bot de Discord ←→ Servidor de Discord
                     ↓
-                SQLite Database
+                Base de datos SQLite
 ```
 
-## File Structure
+## Estructura de archivos
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # Componente frontend
+├── server/ # Servidor backend
+│ ├── api.js # Servidor de API Express
+│ ├── discord-bot.js # Lógica del bot de Discord
+│ ├── database.js # Funciones de base de datos SQLite
+│ └── package.json # Dependencias del servidor
+└── docs/Discord/Docs/ # Documentación
 ```
 
-## Browser Support
+## Compatibilidad con navegadores
 
-The Discord comments component works in all modern browsers that support:
+El componente de comentarios de Discord funciona en todos los navegadores modernos que admiten:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* API de búsqueda de ES6
+* Reaccionar 18+
+* Cuadrícula CSS y Flexbox
+* Almacenamiento local (para persistencia del formulario)
