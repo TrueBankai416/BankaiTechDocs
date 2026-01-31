@@ -2,8 +2,21 @@
 title: Proxmox Networking Introduction
 description: Complete guide to Proxmox VE networking including Linux bridges, VLANs, firewall configuration, and virtual network infrastructure design.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, Networking, Bridge, VLAN, Firewall, Security]
-keywords: [Proxmox, Networking, Bridge, VLAN, Firewall, Security, Virtual Networks]
+tags:
+  - Proxmox
+  - Networking
+  - Bridge
+  - VLAN
+  - Firewall
+  - Security
+keywords:
+  - Proxmox
+  - Networking
+  - Bridge
+  - VLAN
+  - Firewall
+  - Security
+  - Virtual Networks
 last_update:
   author: BankaiTech
 ---
@@ -20,12 +33,12 @@ Proxmox VE (Virtual Environment) provides a sophisticated and flexible networkin
 
 Proxmox networking encompasses the configuration and management of virtual network infrastructure, including:
 
-* **Linux Bridges** for connecting virtual machines and containers
-* **VLAN (Virtual LAN)** support for network segmentation
-* **Firewall rules** for security and access control
-* **Network bonds** for redundancy and performance
-* **Software-defined networking** capabilities
-* **Network namespaces** for container isolation
+- **Linux Bridges** for connecting virtual machines and containers
+- **VLAN (Virtual LAN)** support for network segmentation
+- **Firewall rules** for security and access control
+- **Network bonds** for redundancy and performance
+- **Software-defined networking** capabilities
+- **Network namespaces** for container isolation
 
 ## **Core Networking Components**
 
@@ -36,47 +49,43 @@ Proxmox supports various types of network interfaces:
 <Tabs
   defaultValue="physical"
   values={[
-  {label: 'Physical Interfaces', value: 'physical'},
-  {label: 'Linux Bridges', value: 'bridge'},
-  {label: 'Bonds', value: 'bond'},
-  {label: 'VLANs', value: 'vlan'},
-  ]}
->
-  <TabItem value="physical">
-    **Physical Network Interfaces**
+    {label: 'Physical Interfaces', value: 'physical'},
+    {label: 'Linux Bridges', value: 'bridge'},
+    {label: 'Bonds', value: 'bond'},
+    {label: 'VLANs', value: 'vlan'},
+  ]}>
 
-    * Direct access to physical network adapters (eth0, eth1, etc.)
-    * Typically used for host management and direct VM connections
-    * Limited flexibility for complex network topologies
-    * Best for simple setups or dedicated network segments
-  </TabItem>
+<TabItem value="physical">
+**Physical Network Interfaces**
+- Direct access to physical network adapters (eth0, eth1, etc.)
+- Typically used for host management and direct VM connections
+- Limited flexibility for complex network topologies
+- Best for simple setups or dedicated network segments
+</TabItem>
 
-  <TabItem value="bridge">
-    **Linux Bridges (vmbr0, vmbr1, etc.)**
+<TabItem value="bridge">
+**Linux Bridges (vmbr0, vmbr1, etc.)**
+- Software switches that connect multiple network interfaces
+- Default choice for VM and container networking
+- Support for VLANs, port mirroring, and advanced features
+- Can connect physical interfaces, VMs, containers, and other bridges
+</TabItem>
 
-    * Software switches that connect multiple network interfaces
-    * Default choice for VM and container networking
-    * Support for VLANs, port mirroring, and advanced features
-    * Can connect physical interfaces, VMs, containers, and other bridges
-  </TabItem>
+<TabItem value="bond">
+**Network Bonds**
+- Combine multiple physical interfaces for redundancy or performance
+- Support various bonding modes (active-backup, 802.3ad, balance-tlb, etc.)
+- Provide fault tolerance and increased bandwidth
+- Essential for enterprise deployments
+</TabItem>
 
-  <TabItem value="bond">
-    **Network Bonds**
-
-    * Combine multiple physical interfaces for redundancy or performance
-    * Support various bonding modes (active-backup, 802.3ad, balance-tlb, etc.)
-    * Provide fault tolerance and increased bandwidth
-    * Essential for enterprise deployments
-  </TabItem>
-
-  <TabItem value="vlan">
-    **VLAN Interfaces**
-
-    * Create virtual networks on top of existing interfaces
-    * Enable network segmentation without additional hardware
-    * Support for 802.1Q VLAN tagging
-    * Isolate traffic between different network segments
-  </TabItem>
+<TabItem value="vlan">
+**VLAN Interfaces**
+- Create virtual networks on top of existing interfaces
+- Enable network segmentation without additional hardware
+- Support for 802.1Q VLAN tagging
+- Isolate traffic between different network segments
+</TabItem>
 </Tabs>
 
 ### **Network Bridge Architecture**
@@ -112,29 +121,29 @@ The Linux bridge is the foundation of Proxmox networking:
 
 Proxmox provides flexible IP address management:
 
-* **Static IP Configuration**: Manual IP assignment for predictable addressing
-* **DHCP Integration**: Automatic IP assignment from external DHCP servers
-* **IPv6 Support**: Full support for IPv6 addressing and autoconfiguration
-* **Multiple IP Addresses**: Support for multiple IPs per interface
+- **Static IP Configuration**: Manual IP assignment for predictable addressing
+- **DHCP Integration**: Automatic IP assignment from external DHCP servers
+- **IPv6 Support**: Full support for IPv6 addressing and autoconfiguration
+- **Multiple IP Addresses**: Support for multiple IPs per interface
 
 ### **Network Zones and Segmentation**
 
 Effective network design in Proxmox involves:
 
-* **Management Network**: Dedicated network for Proxmox host management
-* **VM Networks**: Isolated networks for different VM groups
-* **Storage Networks**: Dedicated networks for storage traffic
-* **Backup Networks**: Separate networks for backup operations
-* **DMZ Networks**: Isolated networks for public-facing services
+- **Management Network**: Dedicated network for Proxmox host management
+- **VM Networks**: Isolated networks for different VM groups
+- **Storage Networks**: Dedicated networks for storage traffic
+- **Backup Networks**: Separate networks for backup operations
+- **DMZ Networks**: Isolated networks for public-facing services
 
 ### **Security Considerations**
 
 Proxmox networking includes robust security features:
 
-* **Integrated Firewall**: Datacenter, node, and VM-level firewall rules
-* **Network Isolation**: VLAN-based segmentation and container namespaces
-* **Access Control**: MAC address filtering and port security
-* **Traffic Monitoring**: Built-in network monitoring and logging
+- **Integrated Firewall**: Datacenter, node, and VM-level firewall rules
+- **Network Isolation**: VLAN-based segmentation and container namespaces
+- **Access Control**: MAC address filtering and port security
+- **Traffic Monitoring**: Built-in network monitoring and logging
 
 ## **Common Network Topologies**
 
@@ -148,9 +157,9 @@ Internet → Router → Proxmox Host (vmbr0) → VMs/Containers
 
 **Use cases:**
 
-* Home lab environments
-* Simple testing setups
-* Small-scale deployments
+- Home lab environments
+- Simple testing setups
+- Small-scale deployments
 
 ### **Multi-Bridge Segmentation**
 
@@ -165,9 +174,9 @@ Storage Network → vmbr3 → Storage Traffic
 
 **Use cases:**
 
-* Enterprise environments
-* Multi-tenant hosting
-* Security-focused deployments
+- Enterprise environments
+- Multi-tenant hosting
+- Security-focused deployments
 
 ### **VLAN-Based Architecture**
 
@@ -182,25 +191,25 @@ Trunk Port → vmbr0 → VLAN 10 (Management)
 
 **Use cases:**
 
-* Limited physical ports
-* Structured network environments
-* Switch-managed segmentation
+- Limited physical ports
+- Structured network environments
+- Switch-managed segmentation
 
 ## **Performance Considerations**
 
 ### **Network Bandwidth Planning**
 
-* **VM Network Requirements**: Assess bandwidth needs per VM
-* **Storage Network Performance**: Plan for high-throughput storage operations
-* **Bond Configuration**: Use bonding for increased bandwidth and redundancy
-* **NUMA Awareness**: Consider CPU-to-NIC locality for performance
+- **VM Network Requirements**: Assess bandwidth needs per VM
+- **Storage Network Performance**: Plan for high-throughput storage operations
+- **Bond Configuration**: Use bonding for increased bandwidth and redundancy
+- **NUMA Awareness**: Consider CPU-to-NIC locality for performance
 
 ### **Optimization Techniques**
 
-* **Virtio Network Drivers**: Use paravirtualized drivers for better performance
-* **SR-IOV**: Direct hardware access for high-performance networking
-* **Multi-Queue Support**: Enable multiple network queues for better performance
-* **Network Buffer Tuning**: Optimize buffer sizes for specific workloads
+- **Virtio Network Drivers**: Use paravirtualized drivers for better performance
+- **SR-IOV**: Direct hardware access for high-performance networking
+- **Multi-Queue Support**: Enable multiple network queues for better performance
+- **Network Buffer Tuning**: Optimize buffer sizes for specific workloads
 
 ## **Monitoring and Troubleshooting**
 
@@ -208,17 +217,17 @@ Trunk Port → vmbr0 → VLAN 10 (Management)
 
 Proxmox provides various tools for network monitoring:
 
-* **Web Interface**: Real-time network statistics and graphs
-* **Command Line**: `pvestatd`, `pvesh`, and standard Linux tools
-* **Log Files**: Network-related logs for troubleshooting
-* **Performance Metrics**: Bandwidth utilization and packet statistics
+- **Web Interface**: Real-time network statistics and graphs
+- **Command Line**: `pvestatd`, `pvesh`, and standard Linux tools
+- **Log Files**: Network-related logs for troubleshooting
+- **Performance Metrics**: Bandwidth utilization and packet statistics
 
 ### **Common Issues and Solutions**
 
-* **Network Connectivity Problems**: Bridge configuration and routing issues
-* **Performance Bottlenecks**: Bandwidth limitations and driver issues
-* **Security Concerns**: Firewall misconfigurations and access control
-* **VLAN Problems**: Tagging issues and switch configuration mismatches
+- **Network Connectivity Problems**: Bridge configuration and routing issues
+- **Performance Bottlenecks**: Bandwidth limitations and driver issues
+- **Security Concerns**: Firewall misconfigurations and access control
+- **VLAN Problems**: Tagging issues and switch configuration mismatches
 
 ## **Best Practices**
 
