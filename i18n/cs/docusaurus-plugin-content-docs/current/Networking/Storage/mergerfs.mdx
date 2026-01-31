@@ -1,7 +1,22 @@
 ---
 title: mergerfs Setup and Configuration
-tags: [Proxmox, Storage, mergerfs, Union Filesystem, Storage Pool, FUSE, Drive Pooling]
-keywords: [Proxmox, mergerfs, Union Filesystem, Storage Pool, Drive Pooling, FUSE, Multiple Drives, Storage Management]
+tags:
+  - Proxmox
+  - Storage
+  - mergerfs
+  - Union Filesystem
+  - Storage Pool
+  - FUSE
+  - Drive Pooling
+keywords:
+  - Proxmox
+  - mergerfs
+  - Union Filesystem
+  - Storage Pool
+  - Drive Pooling
+  - FUSE
+  - Multiple Drives
+  - Storage Management
 last_update:
   author: BankaiTech
 ---
@@ -20,20 +35,20 @@ mergerfs is a FUSE-based union filesystem that transparently overlays multiple d
 
 ### **Benefits of mergerfs**
 
-* ✅ **Drive Independence**: Each drive maintains its own filesystem and can be accessed independently
-* ✅ **No Data Loss Risk**: If one drive fails, only data on that specific drive is affected
-* ✅ **Flexible Expansion**: Add or remove drives without rebuilding the entire array
-* ✅ **Mixed Drive Sizes**: Combine drives of different sizes and speeds
-* ✅ **Real-time Changes**: Add or remove branches while the filesystem is mounted
-* ✅ **Policy-based File Placement**: Control where new files are created based on various policies
-* ✅ **No Parity Overhead**: Full capacity utilization without parity calculations
+- ✅ **Drive Independence**: Each drive maintains its own filesystem and can be accessed independently
+- ✅ **No Data Loss Risk**: If one drive fails, only data on that specific drive is affected
+- ✅ **Flexible Expansion**: Add or remove drives without rebuilding the entire array
+- ✅ **Mixed Drive Sizes**: Combine drives of different sizes and speeds
+- ✅ **Real-time Changes**: Add or remove branches while the filesystem is mounted
+- ✅ **Policy-based File Placement**: Control where new files are created based on various policies
+- ✅ **No Parity Overhead**: Full capacity utilization without parity calculations
 
 ### **Limitations of mergerfs**
 
-* ❌ **No Built-in Redundancy**: Provides no protection against drive failure
-* ❌ **FUSE Overhead**: Slight performance overhead due to FUSE layer
-* ❌ **Single Point of Failure**: The mergerfs mount point itself can be a bottleneck
-* ❌ **Complex Recovery**: File recovery requires knowledge of which drive contains specific files
+- ❌ **No Built-in Redundancy**: Provides no protection against drive failure
+- ❌ **FUSE Overhead**: Slight performance overhead due to FUSE layer
+- ❌ **Single Point of Failure**: The mergerfs mount point itself can be a bottleneck
+- ❌ **Complex Recovery**: File recovery requires knowledge of which drive contains specific files
 
 ## **mergerfs vs Other Storage Solutions**
 
@@ -49,46 +64,38 @@ mergerfs is a FUSE-based union filesystem that transparently overlays multiple d
   <TabItem value="mergerfs">
     **mergerfs (Union Filesystem)**
 
-    * **Data Safety**: Individual drive failure affects only that drive's data
-    * **Expansion**: Easy addition/removal of drives
-    * **Performance**: Good read performance, write performance varies by policy
-    * **Complexity**: Simple setup, flexible configuration
-    * **Use Case**: Media storage, backup aggregation, mixed-size drives
-    * **Recovery**: Files remain accessible on individual drives
-  </TabItem>
+<TabItem value="mergerfs">
+**mergerfs (Union Filesystem)**
+- **Data Safety**: Individual drive failure affects only that drive's data
+- **Expansion**: Easy addition/removal of drives
+- **Performance**: Good read performance, write performance varies by policy
+- **Complexity**: Simple setup, flexible configuration
+- **Use Case**: Media storage, backup aggregation, mixed-size drives
+- **Recovery**: Files remain accessible on individual drives
+</TabItem>
 
-  <TabItem value="raid0">
+<TabItem value="raid0">
+**RAID 0 (Striping)**
+- **Data Safety**: Any drive failure destroys entire array
+- **Expansion**: Difficult, usually requires rebuild
+- **Performance**: Excellent read/write performance
+- **Complexity**: Simple concept, hardware/software dependent
+- **Use Case**: High-performance temporary storage
+- **Recovery**: Complete data loss on any drive failure
+</TabItem>
+
+<TabItem value="raid0">
     **RAID 0 (Striping)**
 
-    * **Data Safety**: Any drive failure destroys entire array
-    * **Expansion**: Difficult, usually requires rebuild
-    * **Performance**: Excellent read/write performance
-    * **Complexity**: Simple concept, hardware/software dependent
-    * **Use Case**: High-performance temporary storage
-    * **Recovery**: Complete data loss on any drive failure
-  </TabItem>
-
-  <TabItem value="raid56">
-    **RAID 5/6 (Parity)**
-
-    * **Data Safety**: Survives 1 (RAID 5) or 2 (RAID 6) drive failures
-    * **Expansion**: Complex, often requires rebuild
-    * **Performance**: Good read, slower write due to parity
-    * **Complexity**: More complex setup and management
-    * **Use Case**: Critical data requiring redundancy
-    * **Recovery**: Automatic rebuild with hot spares
-  </TabItem>
-
-  <TabItem value="lvm">
-    **LVM (Logical Volume Manager)**
-
-    * **Data Safety**: Depends on underlying storage configuration
-    * **Expansion**: Good expansion capabilities
-    * **Performance**: Minimal overhead
-    * **Complexity**: Moderate complexity
-    * **Use Case**: Flexible volume management
-    * **Recovery**: Depends on configuration
-  </TabItem>
+<TabItem value="lvm">
+**LVM (Logical Volume Manager)**
+- **Data Safety**: Depends on underlying storage configuration
+- **Expansion**: Good expansion capabilities
+- **Performance**: Minimal overhead
+- **Complexity**: Moderate complexity
+- **Use Case**: Flexible volume management
+- **Recovery**: Depends on configuration
+</TabItem>
 </Tabs>
 
 ## **Architecture Overview**
@@ -131,100 +138,96 @@ mergerfs is a FUSE-based union filesystem that transparently overlays multiple d
 
 ### **1. Install mergerfs**
 
-<Tabs
-  defaultValue="ubuntu"
-  values={[
-  {label: 'Ubuntu/Debian', value: 'ubuntu'},
-  {label: 'CentOS/RHEL', value: 'centos'},
-  {label: 'From Source', value: 'source'},
-  ]}
->
-  <TabItem value="ubuntu">
-    ```bash
-    # Update package list
-    sudo apt update
+<TabItem value="lvm">
+    **LVM (Logical Volume Manager)**
 
-    # Install mergerfs from official repository
+<TabItem value="ubuntu">
+```bash
+# Update package list
+sudo apt update
 
-    sudo apt install mergerfs
+# Install mergerfs from official repository
 
-    # Verify installation
+sudo apt install mergerfs
 
-    mergerfs --version
+# Verify installation
 
-    # Install additional utilities and dependencies
+mergerfs --version
 
-    sudo apt install fuse3 attr smartmontools
+# Install additional utilities and dependencies
 
-    # Ensure FUSE module is loaded
+sudo apt install fuse3 attr smartmontools
 
-    sudo modprobe fuse
-    echo 'fuse' | sudo tee -a /etc/modules
+# Ensure FUSE module is loaded
 
-    # Configure FUSE to allow other users (required for allow_other option)
+sudo modprobe fuse
+echo 'fuse' | sudo tee -a /etc/modules
 
-    sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+# Configure FUSE to allow other users (required for allow_other option)
 
-    ```
-  </TabItem>
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 
-  <TabItem value="centos">
-    ```bash
-    # Install EPEL repository (if not already installed)
-    sudo yum install epel-release
+````
+</TabItem>
 
-    # Install mergerfs
-    sudo yum install mergerfs
+<TabItem value="centos">
+```bash
+# Install EPEL repository (if not already installed)
+sudo yum install epel-release
 
-    # Alternative: Install from GitHub releases
-    # Download latest release from: https://github.com/trapexit/mergerfs/releases
-    wget https://github.com/trapexit/mergerfs/releases/download/2.35.1/mergerfs-2.35.1-1.el8.x86_64.rpm
-    sudo rpm -i mergerfs-2.35.1-1.el8.x86_64.rpm
+# Install mergerfs
+sudo yum install mergerfs
 
-    # Install FUSE utilities and dependencies
-    sudo yum install fuse fuse-libs attr smartmontools
+# Alternative: Install from GitHub releases
+# Download latest release from: https://github.com/trapexit/mergerfs/releases
+wget https://github.com/trapexit/mergerfs/releases/download/2.35.1/mergerfs-2.35.1-1.el8.x86_64.rpm
+sudo rpm -i mergerfs-2.35.1-1.el8.x86_64.rpm
 
-    # Load FUSE module
-    sudo modprobe fuse
-    echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
+# Install FUSE utilities and dependencies
+sudo yum install fuse fuse-libs attr smartmontools
 
-    # Configure FUSE to allow other users (required for allow_other option)
-    sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-    ```
-  </TabItem>
+# Load FUSE module
+sudo modprobe fuse
+echo 'fuse' | sudo tee -a /etc/modules-load.d/fuse.conf
 
-  <TabItem value="source">
-    ```bash
-    # Install build dependencies
-    sudo apt install build-essential git pandoc
+# Configure FUSE to allow other users (required for allow_other option)
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+````
 
-    # Clone mergerfs repository
+</TabItem>
 
-    git clone https://github.com/trapexit/mergerfs.git
-    cd mergerfs
+<TabItem value="source">
+```bash
+# Install build dependencies
+sudo apt install build-essential git pandoc
 
-    # Build mergerfs
+# Clone mergerfs repository
 
-    make
+git clone https://github.com/trapexit/mergerfs.git
+cd mergerfs
 
-    # Install mergerfs
+# Build mergerfs
 
-    sudo make install
+make
 
-    # Verify installation
+# Install mergerfs
 
-    mergerfs --version
+sudo make install
 
-    # Install FUSE and dependencies if not already installed
+# Verify installation
 
-    sudo apt install fuse3 smartmontools
+mergerfs --version
 
-    # Configure FUSE to allow other users (required for allow_other option)
+# Install FUSE and dependencies if not already installed
 
-    sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+sudo apt install fuse3 smartmontools
 
-    ```
-  </TabItem>
+# Configure FUSE to allow other users (required for allow_other option)
+
+sudo sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+
+````
+</TabItem>
 </Tabs>
 
 ### **2. Prepare Storage Drives**
@@ -252,7 +255,7 @@ sudo mkdir -p /mnt/storage
 # sudo mkfs.ext4 -L "disk1" /dev/sda1
 # sudo mkfs.xfs -L "disk2" /dev/sdb1
 # sudo mkfs.btrfs -L "disk3" /dev/sdc1
-```
+````
 
 ### **3. Mount Individual Drives**
 
@@ -309,60 +312,63 @@ mergerfs uses policies to determine where files are created, accessed, and manag
 <Tabs
   defaultValue="creation"
   values={[
-  {label: 'Creation Policies', value: 'creation'},
-  {label: 'Action Policies', value: 'action'},
-  {label: 'Search Policies', value: 'search'},
-  ]}
->
-  <TabItem value="creation">
-    **File Creation Policies**
+    {label: 'Creation Policies', value: 'creation'},
+    {label: 'Action Policies', value: 'action'},
+    {label: 'Search Policies', value: 'search'},
+  ]}>
 
-    | Policy  | Description                    | Use Case                     |
-    | ------- | ------------------------------ | ---------------------------- |
-    | `epmfs` | Existing path, most free space | Balanced distribution        |
-    | `mfs`   | Most free space                | Even space utilization       |
-    | `lfs`   | Least free space               | Fill drives sequentially     |
-    | `lus`   | Least used space               | Balance by usage             |
-    | `ff`    | First found                    | Simple, predictable          |
-    | `epff`  | Existing path, first found     | Preserve directory structure |
-    | `rand`  | Random                         | Even distribution            |
+<TabItem value="creation">
+**File Creation Policies**
 
-    **Recommended Creation Policies:**
+| Policy  | Description                    | Use Case                     |
+| ------- | ------------------------------ | ---------------------------- |
+| `epmfs` | Existing path, most free space | Balanced distribution        |
+| `mfs`   | Most free space                | Even space utilization       |
+| `lfs`   | Least free space               | Fill drives sequentially     |
+| `lus`   | Least used space               | Balance by usage             |
+| `ff`    | First found                    | Simple, predictable          |
+| `epff`  | Existing path, first found     | Preserve directory structure |
+| `rand`  | Random                         | Even distribution            |
 
-    * **Media Storage**: `mfs` - Distributes large files evenly
-    * **General Purpose**: `epmfs` - Balances existing structure with space
-    * **Sequential Fill**: `lfs` - Fills drives one by one
-  </TabItem>
+**Recommended Creation Policies:**
 
-  <TabItem value="action">
-    **Action Policies (chmod, chown, etc.)**
+- **Media Storage**: `mfs` - Distributes large files evenly
+- **General Purpose**: `epmfs` - Balances existing structure with space
+- **Sequential Fill**: `lfs` - Fills drives one by one
 
-    | Policy  | Description         | Use Case                     |
-    | ------- | ------------------- | ---------------------------- |
-    | `all`   | Apply to all copies | Ensure consistency           |
-    | `epall` | Existing path, all  | Maintain directory structure |
-    | `ff`    | First found         | Quick operations             |
+</TabItem>
 
-    **Recommended Action Policies:**
+<TabItem value="action">
+**Action Policies (chmod, chown, etc.)**
 
-    * **Default**: `epall` - Maintains consistency while respecting structure
-    * **Performance**: `ff` - Faster operations on large datasets
-  </TabItem>
+| Policy  | Description         | Use Case                     |
+| ------- | ------------------- | ---------------------------- |
+| `all`   | Apply to all copies | Ensure consistency           |
+| `epall` | Existing path, all  | Maintain directory structure |
+| `ff`    | First found         | Quick operations             |
 
-  <TabItem value="search">
-    **Search Policies (readdir, getattr)**
+**Recommended Action Policies:**
 
-    | Policy | Description                | Use Case              |
-    | ------ | -------------------------- | --------------------- |
-    | `ff`   | First found                | Fastest access        |
-    | `epff` | Existing path, first found | Preserve structure    |
-    | `all`  | Search all branches        | Complete file listing |
+- **Default**: `epall` - Maintains consistency while respecting structure
+- **Performance**: `ff` - Faster operations on large datasets
 
-    **Recommended Search Policies:**
+</TabItem>
 
-    * **Performance**: `ff` - Fastest file access
-    * **Completeness**: `all` - Ensure all files are visible
-  </TabItem>
+<TabItem value="search">
+**Search Policies (readdir, getattr)**
+
+| Policy | Description                | Use Case              |
+| ------ | -------------------------- | --------------------- |
+| `ff`   | First found                | Fastest access        |
+| `epff` | Existing path, first found | Preserve structure    |
+| `all`  | Search all branches        | Complete file listing |
+
+**Recommended Search Policies:**
+
+- **Performance**: `ff` - Fastest file access
+- **Completeness**: `all` - Ensure all files are visible
+
+</TabItem>
 </Tabs>
 
 ### **2. Optimized mergerfs Mount Options**
@@ -497,94 +503,92 @@ minfreespace=536870912000  # Leave 500GB free (in bytes)
 <Tabs
   defaultValue="media"
   values={[
-  {label: 'Media Storage', value: 'media'},
-  {label: 'VM Storage', value: 'vm'},
-  {label: 'General Purpose', value: 'general'},
-  {label: 'Backup Storage', value: 'backup'},
-  ]}
->
-  <TabItem value="media">
-    **Media Storage Configuration**
+    {label: 'Media Storage', value: 'media'},
+    {label: 'VM Storage', value: 'vm'},
+    {label: 'General Purpose', value: 'general'},
+    {label: 'Backup Storage', value: 'backup'},
+  ]}>
 
-    ```bash
-    # For media files (movies, music, photos)
-    # Large files, infrequent writes, high read performance needed
+<TabItem value="media">
+**Media Storage Configuration**
+```bash
+# For media files (movies, music, photos)
+# Large files, infrequent writes, high read performance needed
 
-    /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/media mergerfs \
-    defaults,nonempty,allow_other,use_ino,cache.files=off,\
-    moveonenospc=true,dropcacheonclose=true,minfreespace=500G,\
-    category.create=mfs,category.action=epall,category.search=ff,\
-    func.readdir=epall 0 0
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/media mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=500G,\
+category.create=mfs,category.action=epall,category.search=ff,\
+func.readdir=epall 0 0
 
-    # Explanation:
+# Explanation:
 
-    # - minfreespace=500G: Prevents drives from filling completely
+# - minfreespace=500G: Prevents drives from filling completely
 
-    # - category.create=mfs: Distributes large media files evenly
+# - category.create=mfs: Distributes large media files evenly
 
-    # - cache.files=off: Better for large sequential reads
+# - cache.files=off: Better for large sequential reads
 
-    ```
-  </TabItem>
+````
+</TabItem>
 
-  <TabItem value="vm">
-    **VM Storage Configuration**
+<TabItem value="vm">
+**VM Storage Configuration**
+```bash
+# For virtual machine storage
+# Random I/O, performance critical, space efficiency important
 
-    ```bash
-    # For virtual machine storage
-    # Random I/O, performance critical, space efficiency important
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/vm-storage mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=partial,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=1T,\
+category.create=lfs,category.action=epall,category.search=ff,\
+func.open=ff 0 0
 
-    /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/vm-storage mergerfs \
-    defaults,nonempty,allow_other,use_ino,cache.files=partial,\
-    moveonenospc=true,dropcacheonclose=true,minfreespace=1T,\
-    category.create=lfs,category.action=epall,category.search=ff,\
-    func.open=ff 0 0
+# Explanation:
+# - minfreespace=1T: Larger buffer for VM expansion
+# - category.create=lfs: Fill drives sequentially for better VM performance
+# - cache.files=partial: Some caching for better random I/O
+````
 
-    # Explanation:
-    # - minfreespace=1T: Larger buffer for VM expansion
-    # - category.create=lfs: Fill drives sequentially for better VM performance
-    # - cache.files=partial: Some caching for better random I/O
-    ```
-  </TabItem>
+</TabItem>
 
-  <TabItem value="general">
-    **General Purpose Configuration**
+<TabItem value="general">
+**General Purpose Configuration**
+```bash
+# For mixed workloads
+# Balance of performance and space utilization
 
-    ```bash
-    # For mixed workloads
-    # Balance of performance and space utilization
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/general mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=10%,\
+category.create=epmfs,category.action=epall,category.search=ff 0 0
 
-    /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/general mergerfs \
-    defaults,nonempty,allow_other,use_ino,cache.files=off,\
-    moveonenospc=true,dropcacheonclose=true,minfreespace=10%,\
-    category.create=epmfs,category.action=epall,category.search=ff 0 0
+# Explanation:
 
-    # Explanation:
+# - minfreespace=10%: Percentage-based for mixed drive sizes
 
-    # - minfreespace=10%: Percentage-based for mixed drive sizes
+# - category.create=epmfs: Balance existing structure with free space
 
-    # - category.create=epmfs: Balance existing structure with free space
+````
+</TabItem>
 
-    ```
-  </TabItem>
+<TabItem value="backup">
+**Backup Storage Configuration**
+```bash
+# For backup storage
+# Write-heavy, space efficiency critical, some redundancy acceptable
 
-  <TabItem value="backup">
-    **Backup Storage Configuration**
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/backup mergerfs \
+defaults,nonempty,allow_other,use_ino,cache.files=off,\
+moveonenospc=true,dropcacheonclose=true,minfreespace=50G,\
+category.create=lfs,category.action=epall,category.search=ff 0 0
 
-    ```bash
-    # For backup storage
-    # Write-heavy, space efficiency critical, some redundancy acceptable
+# Explanation:
+# - minfreespace=50G: Smaller buffer to maximize storage utilization
+# - category.create=lfs: Fill drives sequentially for backup efficiency
+````
 
-    /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/backup mergerfs \
-    defaults,nonempty,allow_other,use_ino,cache.files=off,\
-    moveonenospc=true,dropcacheonclose=true,minfreespace=50G,\
-    category.create=lfs,category.action=epall,category.search=ff 0 0
-
-    # Explanation:
-    # - minfreespace=50G: Smaller buffer to maximize storage utilization
-    # - category.create=lfs: Fill drives sequentially for backup efficiency
-    ```
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ### **3. Dynamic Free Space Management**
@@ -954,25 +958,25 @@ vzdump --storage mergerfs-backup --mode snapshot --compress gzip 100
 
 ### **1. Drive Selection and Setup**
 
-* **Use similar-speed drives** for consistent performance
-* **Mix drive sizes freely** - mergerfs handles different capacities well
-* **Consider drive failure patterns** - avoid drives from the same batch
-* **Use enterprise drives** for 24/7 operation
-* **Implement external backup** - mergerfs provides no redundancy
+- **Use similar-speed drives** for consistent performance
+- **Mix drive sizes freely** - mergerfs handles different capacities well
+- **Consider drive failure patterns** - avoid drives from the same batch
+- **Use enterprise drives** for 24/7 operation
+- **Implement external backup** - mergerfs provides no redundancy
 
 ### **2. Configuration Recommendations**
 
-* **Start with conservative settings** and tune based on usage
-* **Monitor drive space regularly** to prevent full drives
-* **Use appropriate creation policies** for your workload
-* **Set reasonable minimum free space** (500GB-1TB recommended)
-* **Enable move-on-no-space** for automatic file relocation
+- **Start with conservative settings** and tune based on usage
+- **Monitor drive space regularly** to prevent full drives
+- **Use appropriate creation policies** for your workload
+- **Set reasonable minimum free space** (500GB-1TB recommended)
+- **Enable move-on-no-space** for automatic file relocation
 
 ### **3. Maintenance Schedule**
 
-* **Daily**: Monitor drive health and space usage
-* **Weekly**: Run filesystem checks and cleanup
-* **Monthly**: Review performance metrics and optimize
-* **Quarterly**: Test backup and recovery procedures
+- **Daily**: Monitor drive health and space usage
+- **Weekly**: Run filesystem checks and cleanup
+- **Monthly**: Review performance metrics and optimize
+- **Quarterly**: Test backup and recovery procedures
 
 <BuyMeACoffeeButton />
