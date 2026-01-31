@@ -1,85 +1,85 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: Integrace komentářů
+description: Kompletní průvodce integrací obousměrných komentářů Discordu s Docusaurusem, včetně nastavení, konfigurace a řešení problémů.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Integrace komentářů na Discordu
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+Tato dokumentační stránka obsahuje **obousměrnou integraci komentářů Discordu**, která umožňuje návštěvníkům odesílat komentáře na váš Discord server A ZÁROVEŇ zobrazovat odpovědi z Discordu na webu spolu se stávajícími komentáři Giscus založenými na GitHubu.
 
-## Features
+## Funkce
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **Obousměrná komunikace**: Komentáře na webu → Discord, Odpovědi na Discordu → Web
+* **Systém duálních komentářů**: Komentáře z Giscusu (založeného na GitHubu) i Discordu fungují společně.
+* **Rozšířené vložené příspěvky na Discordu**: Komentáře se zobrazují jako formátované vložené příspěvky s kontextem celé stránky
+* **Správa vláken**: Automatické vytváření vláken pro organizované odpovědi
+* **Aktualizace v reálném čase**: Webové stránky automaticky zobrazují odpovědi na Discordu
+* **Kontext celé stránky**: Komentáře zahrnují název stránky, URL a kontext navigace
+* **Uživatelské avatary**: Odpovědi na Discordu zobrazují uživatelské avatary a uživatelská jména
+* **Responzivní design**: Funguje na stolních počítačích i mobilních zařízeních
 
-## Setup Instructions
+## Pokyny k nastavení
 
-### 1. Create a Discord Bot
+### 1. Vytvořte Discord Bot
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. Přejděte na [Portál vývojářů Discordu](https://discord.com/developers/applications)
+2. Vytvořte novou aplikaci
+3. Přejděte do sekce „Bot“ a vytvořte bota.
+4. Zkopírujte token bota
+5. V části „Privilegované záměry brány“ povolte:
+   * **Záměr obsahu zprávy**
+   * **Záměr členů serveru** (volitelné)
 
-### 2) Configure Bot Permissions
+### 2) Konfigurace oprávnění bota
 
-Your bot needs these permissions:
+Váš bot potřebuje tato oprávnění:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* Číst zprávy
+* Odesílat zprávy
+* Vytvářet veřejná vlákna
+* Posílat zprávy ve vláknech
+* Číst historii zpráv
+* Použití příkazů s lomítkem (volitelné)
 
-### 3. Invite Bot to Server
+### 3. Pozvat bota na server
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. Přejděte do sekce OAuth2 > Generátor URL adres
+2. Vyberte rozsah „bot“
+3. Vyberte výše uvedená oprávnění
+4. Pomocí vygenerované adresy URL pozvěte bota na váš server.
 
-### 4) Configure Environment Variables
+### 4) Konfigurace proměnných prostředí
 
 #### Frontend (.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Konfigurace bota Discordu
+DISCORD_BOT_TOKEN=zde váš_token_bota
+DISCORD_CHANNEL_ID=zde vaše_id_kanálu
 
-# API Configuration
+# Konfigurace API
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# Konfigurace kontextu Discordu
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Název vašeho webu
 ```
 
-#### Backend Server (server/.env)
+#### Backendový server (server/.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Konfigurace bota Discordu
+DISCORD_BOT_TOKEN=zde váš_token_bota
+DISCORD_CHANNEL_ID=zde vaše_id_kanálu
 
-# API Configuration
+# Konfigurace API
 PORT=3001
 
-# Discord Context Configuration
+# Konfigurace kontextu Discordu
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
@@ -89,249 +89,249 @@ DISCORD_SHOW_TIMESTAMP=true
 DISCORD_SHOW_AUTHOR_FIELD=true
 DISCORD_CREATE_THREADS=true
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Název vašeho webu
 ```
 
-:::warning Security Note
+:::warning Bezpečnostní poznámka
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* Nikdy neposkytovat soubory `.env` do systému správy verzí
+* Použití proměnných prostředí v produkčním prostředí
+* Chraňte svůj token bota
   :::
 
-### 5. Install Server Dependencies
+### 5. Instalace závislostí serveru
 
 ```bash
 cd server
-npm install
+instalace npm
 ```
 
-### 6. Start the Backend Server
+### 6. Spuštění backendového serveru
 
 ```bash
-# Development
-npm run dev
+# Vývoj
+spuštění npm dev
 
-# Production
-npm start
+# Produkce
+spuštění npm
 ```
 
-### 7. Deploy Configuration
+### 7. Konfigurace nasazení
 
-For production deployments, set environment variables in your hosting platform:
+Pro produkční nasazení nastavte proměnné prostředí na vaší hostitelské platformě:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **Frontend**: Nastavte `REACT_APP_API_URL` na URL vaší produkční API
+* **Backend**: Nasaďte složku serveru s tokenem bota a ID kanálu
+* **Databáze**: Databáze SQLite bude vytvořena automaticky
+* **Kontext**: Nastavte úroveň kontextu a možnosti Discordu podle svých preferencí
 
-## How It Works
+## Jak to funguje
 
-### Complete Bidirectional Flow
+### Kompletní obousměrný tok
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **Komentář na webu**: Uživatel odešle komentář prostřednictvím formuláře na webu
+2. **Zpráva na Discordu**: Bot odesílá formátovaný vložený obsah do kanálu Discord s kontextem celé stránky
+3. **Vytváření vlákna**: Bot automaticky vytváří vlákno pro uspořádané odpovědi
+4. **Odpovědi na Discordu**: Uživatelé Discordu odpovídají ve vlákně nebo na zprávu
+5. **Úložiště databáze**: Bot ukládá všechny komentáře a odpovědi do databáze SQLite
+6. **Zobrazení webových stránek**: Frontend každých 30 sekund dotazuje API a zobrazuje odpovědi na Discordu
 
-### Discord Message Format
+### Formát zprávy na Discordu
 
-Discord embeds include:
+Mezi vložené příspěvky na Discordu patří:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **Popis**: Skutečný obsah komentáře
+* **Autor**: Jméno komentujícího
+* **URL**: Kliknutelný odkaz na přesnou stránku
+* **Pole stránky**: Zobrazuje název stránky s odkazem, na který lze kliknout
+* **Časové razítko**: Kdy byl komentář zveřejněn
+* **Vlákno**: Automaticky vytvořené vlákno pro odpovědi
 
-### Website Display
+### Zobrazení webových stránek
 
-The website shows:
+Webová stránka ukazuje:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **Původní komentáře**: Odeslání formuláře na webu
+* **Odpovědi na Discordu**: Odpovědi od uživatelů Discordu s avatary a uživatelskými jmény
+* **Aktualizace v reálném čase**: Automatické dotazování na nové odpovědi
+* **Vláknové konverzace**: Organizovaný komentář → struktura odpovědí
 
-## Context Configuration
+## Konfigurace kontextu
 
-### Context Levels
+### Úrovně kontextu
 
-Configure how much context appears in Discord messages:
+Nastavte, kolik kontextu se bude zobrazovat ve zprávách na Discordu:
 
-#### `DISCORD_CONTEXT_LEVEL=minimal`
+#### `DISCORD_CONTEXT_LEVEL=minimální`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **Zobrazuje**: Pouze název stránky a obsah komentáře
+* **Případ použití**: Čisté, jednoduché zprávy bez zbytečného kontextu
 
-#### `DISCORD_CONTEXT_LEVEL=basic`
+#### `DISCORD_CONTEXT_LEVEL=základní`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **Zobrazuje**: Název stránky, obsah komentáře a klikatelnou URL stránku
+* **Případ použití**: Střední kontext s důležitými informacemi
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=plná` (výchozí)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **Zobrazuje**: Veškeré kontextové informace včetně navigace, sekcí a časových razítek
+* **Případ použití**: Maximální kontext pro podrobné diskuse
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `DISCORD_CONTEXT_LEVEL=vlastní`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **Zobrazuje**: Pouze kontextové prvky, které povolíte jednotlivě.
+* **Případ použití**: Jemné ovládání zobrazení
 
-### Individual Context Controls
+### Jednotlivé ovládací prvky kontextu
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+Při použití `DISCORD_CONTEXT_LEVEL=custom` můžete ovládat každý prvek:
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # Zobrazit název stránky a pole URL
+DISCORD_SHOW_BREADCRUMBS=true # Zobrazit navigační breadcrumbs
+DISCORD_SHOW_SECTION_INFO=true # Zobrazit hlavní sekci (Docker, Nextcloud atd.)
+DISCORD_SHOW_PAGE_PATH=false # Zobrazit úplnou cestu URL
+DISCORD_SHOW_TIMESTAMP=true # Zobrazit, kdy byl komentář zveřejněn
+DISCORD_SHOW_AUTHOR_FIELD=true # Zobrazit jméno komentujícího jako autora vloženého příspěvku
 ```
 
-### Example Context Outputs
+### Konfigurace vlákna
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # Vytvořit vlákna pro odpovědi
+DISCORD_THREAD_DURATION=1440 # Doba automatické archivace vlákna (minuty)
+DISCORD_SITE_NAME=Název vašeho webu # Název webu v zápatí
 ```
 
-**Full Context:**
+### Příklad kontextových výstupů
+
+**Minimální kontext:**
 
 ```
-💬 New Comment: Docker Installation Guide
-👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
-
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
-
-Your Site Name • Comment System
+Průvodce instalací Dockeru
+„Tento návod byl opravdu užitečný! Jak řeším konflikty portů?“
 ```
 
-## Customization
+**Základní kontext:**
+
+```
+💬 Průvodce instalací Dockeru
+„Tento návod byl opravdu užitečný! Jak řeším konflikty portů?“
+[Odkaz na stránku]
+```
+
+**Celý kontext:**
+
+```
+💬 Nový komentář: Průvodce instalací Dockeru
+👤 Jan Novák
+„Tento návod byl opravdu užitečný! Jak řeším konflikty portů?“
+
+📄 Stránka: Průvodce instalací Dockeru
+📍 Navigace: Docker > Dokumentace > Instalace Dockeru
+📂 Sekce: Docker
+🔗 Cesta: /Docker/Dokumentace/Instalace%20Docker/Docker%20Eengine
+
+Název vašeho webu • Systém komentářů
+```
+
+## Přizpůsobení
 
 ### Styling
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Komponenta komentářů na Discordu používá CSS moduly. Vzhled si můžete přizpůsobit úpravou:
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### Formát zprávy
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+Chcete-li přizpůsobit formát vkládání na Discord, upravte objekt `discordMessage` v:
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### Umístění komponent
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+Komentáře na Discordu se standardně zobrazují pod komentáři na Giscusu. Chcete-li to změnit, upravte:
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## Odstraňování problémů
 
-### Bot Not Responding
+### Bot neodpovídá
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **Zkontrolujte token bota**: Ujistěte se, že je `DISCORD_BOT_TOKEN` správný
+2. **Ověření oprávnění**: Ujistěte se, že má bot v kanálu požadovaná oprávnění.
+3. **Zkontrolujte ID kanálu**: Ujistěte se, že je `DISCORD_CHANNEL_ID` správné
+4. **Bot na serveru**: Ověřte, zda je bot skutečně na vašem Discord serveru
 
-### Comments Not Appearing
+### Komentáře se nezobrazují
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. **Server spuštěn**: Zkontrolujte, zda backendový server běží na správném portu.
+2. **URL API**: Ověřte, zda `REACT_APP_API_URL` odkazuje na váš backendový server
+3. **Databáze**: Zkontrolujte, zda se ve složce serveru vytváří databáze SQLite.
+4. **CORS**: Ujistěte se, že je CORS nakonfigurován pro vaši frontendovou doménu.
 
-### Discord Replies Not Showing
+### Odpovědi na Discordu se nezobrazují
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **Záměr obsahu zprávy**: Ujistěte se, že je tato možnost povolena na portálu pro vývojáře Discordu.
+2. **Oprávnění bota**: Ověřte, zda bot může číst zprávy v kanálu
+3. **Připojení k databázi**: Zkontrolujte protokoly serveru, zda neobsahují chyby v databázi.
+4. **Hlasování**: Frontend hlasuje každých 30 sekund – zobrazení odpovědí může trvat déle.
 
-### Environment Variables Not Working
+### Proměnné prostředí nefungují
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **Vývoj**: Restartujte frontendové i backendové servery
+* **Produkce**: Znovu nasaďte frontend i backend se správnými proměnnými prostředí.
+* **Předpona**: Předponu `REACT_APP_` používejte pouze pro proměnné frontendu
 
-### Database Issues
+### Problémy s databází
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **Oprávnění k souborům**: Zajistěte, aby server mohl zapisovat do adresáře databáze
+2. **Místo na disku**: Zkontrolujte dostupné místo na disku pro databázi SQLite
+3. **Protokoly serveru**: Zkontrolujte konzoli serveru, zda nedošlo k chybám v připojení k databázi.
 
-## Security Considerations
+## Bezpečnostní aspekty
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **Token bota**: Udržujte svůj token bota v tajnosti a nikdy ho neposkytujte systému správy verzí.
+* **Omezení rychlosti**: Discord má omezení rychlosti pro boty (na rozdíl od webhooků)
+* **Ověření vstupu**: Frontend i backend ověřují vstup uživatele.
+* **Zabezpečení databáze**: Databáze SQLite by měla být chráněna správnými oprávněními k souborům
+* **Zabezpečení API**: Zvažte implementaci omezení rychlosti na koncových bodech API
+* **CORS**: Správná konfigurace CORS pro vaši produkční doménu
 
-## Architecture
+## Architektura
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+Frontend webových stránek ←→ Express API ←→ Discord Bot ←→ Discord Server
                     ↓
-                SQLite Database
+                Databáze SQLite
 ```
 
-## File Structure
+## Struktura souboru
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # Frontendová komponenta
+├── server/ # Backendový server
+│ ├── api.js # Express API server
+│ ├── discord-bot.js # Logika Discord bota
+│ ├── database.js # Databázové funkce SQLite
+│ └── package.json # Závislosti serveru
+└── docs/Discord/Docs/ # Dokumentace
 ```
 
-## Browser Support
+## Podpora prohlížečů
 
-The Discord comments component works in all modern browsers that support:
+Komponenta komentářů na Discordu funguje ve všech moderních prohlížečích, které podporují:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* API pro načítání ES6
+* Reagovat 18+
+* CSS mřížka a flexbox
+* Lokální úložiště (pro perzistenci formuláře)
