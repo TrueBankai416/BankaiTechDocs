@@ -24,7 +24,7 @@ If you want to enable analytics for your documentation site, follow these steps:
 2. Create a new project
 3. Copy your project API key from the project settings
 
-### 2. Add Environment Variable
+### 2. 2. 2. Add Environment Variable
 
 1. Open the `.env` file in the root directory
 2. Add your PostHog API key:
@@ -33,7 +33,7 @@ If you want to enable analytics for your documentation site, follow these steps:
    POSTHOG_API_KEY=your_posthog_project_key
    ```
 
-### 3. Add PostHog Configuration
+### 5. Verify Setup
 
 1. Open `docusaurus.config.ts`
 2. Find the `plugins: [` array around line 88
@@ -57,7 +57,7 @@ If you want to enable analytics for your documentation site, follow these steps:
    ],
    ```
 
-### 4. Install PostHog Package
+### 4. 4. 4. Install PostHog Package
 
 If not already installed, add the PostHog Docusaurus plugin:
 
@@ -65,7 +65,7 @@ If not already installed, add the PostHog Docusaurus plugin:
 npm install posthog-docusaurus
 ```
 
-### 5. Verify Setup
+### 5. 5. Verify Setup
 
 After configuration:
 
