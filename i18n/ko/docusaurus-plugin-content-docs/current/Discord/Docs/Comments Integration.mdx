@@ -1,86 +1,86 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: 댓글 통합
+description: Discord 양방향 댓글 기능을 Docusaurus와 통합하는 방법에 대한 완벽 가이드입니다. 설정, 구성 및 문제 해결 방법을 모두 포함합니다.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# 디스코드 댓글 연동
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+이 문서 사이트에는 방문자가 Discord 서버로 댓글을 보낼 수 있고, Discord 답글이 기존 GitHub 기반 Giscus 댓글과 함께 웹사이트에 표시되는 **양방향 Discord 댓글 통합** 기능이 포함되어 있습니다.
 
-## Features
+## 특징
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **양방향 소통**: 웹사이트 댓글 → 디스코드, 디스코드 답글 → 웹사이트
+* **이중 댓글 시스템**: Giscus(GitHub 기반)와 Discord 댓글 기능이 함께 작동합니다.
+* **리치 있는 Discord 임베드**: 댓글이 전체 페이지 컨텍스트와 함께 서식이 지정된 임베드 형식으로 표시됩니다.
+* **스레드 관리**: 체계적인 답변을 위한 자동 스레드 생성
+* **실시간 업데이트**: 웹사이트에 디스코드 답글이 자동으로 표시됩니다.
+* **전체 페이지 컨텍스트**: 댓글에는 페이지 제목, URL 및 탐색 컨텍스트가 포함됩니다.
+* **사용자 아바타**: 디스코드 답글에 사용자 아바타와 사용자 이름이 표시됩니다.
+* 반응형 디자인: 데스크톱과 모바일 기기 모두에서 작동합니다.
 
-## Setup Instructions
+## 설치 지침
 
-### 1. Create a Discord Bot
+### 1. 디스코드 봇 만들기
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. [Discord 개발자 포털](https://discord.com/developers/applications)로 이동하세요.
+2. 새 신청서를 작성하세요
+3. "봇" 섹션으로 이동하여 봇을 생성하세요.
+4. 봇 토큰을 복사하세요
+5. "특권 게이트웨이 의도"에서 다음을 활성화하십시오.
+   * **메시지 콘텐츠 의도**
+   * **서버 구성원의 의도** (선택 사항)
 
-### 2) Configure Bot Permissions
+### 3) Invite Bot to Server
 
-Your bot needs these permissions:
+봇에 다음 권한이 필요합니다.
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* 메시지 읽기
+* 메시지 보내기
+* 공개 스레드 생성
+* 메시지를 스레드 형식으로 보내세요
+* 메시지 기록 읽기
+* 슬래시 명령어 사용 (선택 사항)
 
-### 3. Invite Bot to Server
+### 6. Start the Backend Server
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. OAuth2 > URL 생성기로 이동하세요.
+2. "봇" 범위를 선택하세요
+3. 위에 나열된 권한을 선택하십시오.
+4. 생성된 URL을 사용하여 봇을 서버에 초대하세요.
 
-### 4) Configure Environment Variables
+### 7) Deploy Configuration
 
-#### Frontend (.env)
+#### 프런트엔드(.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# 디스코드 봇 설정
+DISCORD_BOT_TOKEN=봇 토큰 입력
+DISCORD_CHANNEL_ID=채널 ID 입력
 
-# API Configuration
+# API 설정
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
-DISCORD_CONTEXT_LEVEL=full
+# 디스코드 컨텍스트 설정
+DISCORD_CONTEXT_LEVEL=전체
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=사이트 이름 입력
 ```
 
-#### Backend Server (server/.env)
+#### 백엔드 서버(server/.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# 디스코드 봇 설정
+DISCORD_BOT_TOKEN=봇 토큰 입력
+DISCORD_CHANNEL_ID=채널 ID 입력
 
-# API Configuration
+# API 설정
 PORT=3001
 
-# Discord Context Configuration
-DISCORD_CONTEXT_LEVEL=full
+# 디스코드 컨텍스트 설정
+DISCORD_CONTEXT_LEVEL=전체
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
@@ -89,249 +89,249 @@ DISCORD_SHOW_TIMESTAMP=true
 DISCORD_SHOW_AUTHOR_FIELD=true
 DISCORD_CREATE_THREADS=true
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=사이트 이름
 ```
 
-:::warning Security Note
+:::보안 주의 사항
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* `.env` 파일은 절대로 버전 관리 시스템에 커밋하지 마세요.
+* 프로덕션 환경에서 환경 변수를 사용하세요
+* 봇 토큰을 안전하게 보관하세요
   :::
 
-### 5. Install Server Dependencies
+### 5. 서버 종속성 설치
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. Start the Backend Server
+### 6. 백엔드 서버를 시작하세요
 
 ```bash
-# Development
+# 개발 환경
 npm run dev
 
-# Production
+# 운영 환경
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. 배포 구성
 
-For production deployments, set environment variables in your hosting platform:
+실제 운영 환경에 배포하려면 호스팅 플랫폼에서 환경 변수를 설정하세요.
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **프런트엔드**: `REACT_APP_API_URL`을 프로덕션 API URL로 설정하세요.
+* **백엔드**: 봇 토큰과 채널 ID가 포함된 서버 폴더를 배포합니다.
+* **데이터베이스**: SQLite 데이터베이스가 자동으로 생성됩니다.
+* **컨텍스트**: 원하는 대로 Discord 컨텍스트 수준 및 옵션을 구성하세요.
 
-## How It Works
+## 작동 방식
 
-### Complete Bidirectional Flow
+### 완전한 양방향 흐름
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **웹사이트 댓글**: 사용자가 웹사이트 양식을 통해 댓글을 제출합니다.
+2. **디스코드 메시지**: 봇이 전체 페이지 컨텍스트와 함께 형식화된 임베드를 디스코드 채널로 보냅니다.
+3. **스레드 생성**: 봇이 답변을 정리하기 위한 스레드를 자동으로 생성합니다.
+4. **디스코드 답글**: 디스코드 사용자는 게시글 본문이나 메시지에 답글을 답니다.
+5. **데이터베이스 저장소**: 봇은 모든 댓글과 답글을 SQLite 데이터베이스에 저장합니다.
+6. **웹사이트 표시**: 프런트엔드는 30초마다 API를 호출하여 디스코드 답글을 표시합니다.
 
-### Discord Message Format
+### 디스코드 메시지 형식
 
-Discord embeds include:
+Discord 임베드에는 다음이 포함됩니다.
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **설명**: 실제 댓글 내용
+* **작성자**: 댓글 작성자의 이름
+* **URL**: 해당 페이지로 바로 연결되는 클릭 가능한 링크
+* **페이지 필드**: 클릭 가능한 링크가 포함된 페이지 제목을 표시합니다.
+* **타임스탬프**: 댓글이 게시된 시간
+* **스레드**: 답변을 위한 자동 생성된 스레드입니다.
 
-### Website Display
+### 웹사이트 표시
 
-The website shows:
+웹사이트에는 다음과 같이 표시됩니다.
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **원문 댓글**: 웹사이트 양식 제출
+* **디스코드 답글**: 아바타와 사용자 이름이 표시된 디스코드 사용자들의 답글입니다.
+* **실시간 업데이트**: 새로운 답변을 자동으로 확인합니다.
+* **스레드형 대화**: 체계적인 댓글 → 답글 구조
 
-## Context Configuration
+## 컨텍스트 구성
 
-### Context Levels
+### 컨텍스트 레벨
 
-Configure how much context appears in Discord messages:
+Discord 메시지에 표시되는 컨텍스트의 양을 설정합니다.
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **표시되는 내용**: 페이지 제목과 댓글 내용만 표시
+* **사용 사례**: 추가적인 맥락 설명 없이 깔끔하고 간결한 메시지
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **표시되는 내용**: 페이지 제목, 댓글 내용, 클릭 가능한 페이지 URL
+* **사용 사례**: 필수 정보를 포함하는 적당한 수준의 컨텍스트
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (기본값)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **표시 내용**: 탐색 경로, 섹션, 타임스탬프를 포함한 모든 컨텍스트 정보
+* **사용 사례**: 상세한 논의를 위한 최대한의 맥락 제공
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **표시되는 내용**: 사용자가 개별적으로 활성화한 컨텍스트 요소만 표시됩니다.
+* **사용 사례**: 표시되는 내용을 세밀하게 제어
 
-### Individual Context Controls
+### 개별 상황 제어
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+`DISCORD_CONTEXT_LEVEL=custom`을 사용하면 각 요소를 제어할 수 있습니다.
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # 페이지 제목 및 URL 필드 표시
+DISCORD_SHOW_BREADCRUMBS=true # 탐색 경로 표시
+DISCORD_SHOW_SECTION_INFO=true # 주요 섹션(Docker, Nextcloud 등) 표시
+DISCORD_SHOW_PAGE_PATH=false # 전체 URL 경로 표시
+DISCORD_SHOW_TIMESTAMP=true # 댓글 작성 시간 표시
+DISCORD_SHOW_AUTHOR_FIELD=true # 댓글 작성자 이름(임베드 작성자로 표시)
 ```
 
-### Example Context Outputs
+### 스레드 구성
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # 답글용 스레드 생성
+DISCORD_THREAD_DURATION=1440 # 스레드 자동 보관 시간(분)
+DISCORD_SITE_NAME=Your Site Name # 바닥글에 표시될 사이트 이름
 ```
 
-**Full Context:**
+### 예시 컨텍스트 출력
+
+**최소한의 맥락:**
 
 ```
-💬 New Comment: Docker Installation Guide
+Docker 설치 가이드
+"이 튜토리얼 정말 도움이 됐어요! 포트 충돌은 어떻게 처리하나요?"
+```
+
+**기본적인 맥락:**
+
+```
+💬 Docker 설치 가이드
+"이 튜토리얼 정말 도움이 됐어요! 포트 충돌은 어떻게 해결하나요?"
+[페이지 링크]
+```
+
+**전체 맥락:**
+
+```
+💬 새 댓글: Docker 설치 가이드
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+"이 튜토리얼 정말 유용했어요! 포트 충돌은 어떻게 처리하나요?"
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 페이지: Docker 설치 가이드
+📍 탐색 경로: Docker > 문서 > Docker 설치
+📂 섹션: Docker
+🔗 경로: /Docker/Docs/Installing%20Docker/Docker%20Engine
 
-Your Site Name • Comment System
+사이트 이름 • 댓글 시스템
 ```
 
-## Customization
+## 맞춤 설정
 
-### Styling
+### 스타일링
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Discord 댓글 구성 요소는 CSS 모듈을 사용합니다. 다음과 같이 수정하여 외관을 사용자 지정할 수 있습니다.
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### 메시지 형식
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+Discord 임베드 형식을 사용자 지정하려면 다음 경로에 있는 `discordMessage` 객체를 편집하세요.
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### 구성 요소 배치
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+디스코드 댓글은 기본적으로 기스커스 댓글 아래에 표시됩니다. 이를 변경하려면 다음과 같이 수정하세요.
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## 문제 해결
 
-### Bot Not Responding
+### 봇이 응답하지 않습니다
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **봇 토큰 확인**: `DISCORD_BOT_TOKEN`이 올바른지 확인하세요.
+2. **권한 확인**: 봇이 채널에서 필요한 권한을 가지고 있는지 확인하세요.
+3. **채널 ID 확인**: `DISCORD_CHANNEL_ID`가 올바른지 확인하세요.
+4. **서버 내 봇 확인**: 봇이 실제로 디스코드 서버에 있는지 확인하세요.
 
-### Comments Not Appearing
+### 댓글이 표시되지 않습니다
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. **서버 실행 중**: 백엔드 서버가 올바른 포트에서 실행 중인지 확인하십시오.
+2. **API URL**: `REACT_APP_API_URL`이 백엔드 서버를 가리키는지 확인하세요.
+3. **데이터베이스**: 서버 폴더에 SQLite 데이터베이스가 생성되었는지 확인하십시오.
+4. **CORS**: 프런트엔드 도메인에 CORS가 구성되어 있는지 확인하십시오.
 
-### Discord Replies Not Showing
+### 디스코드 답글이 표시되지 않음
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **메시지 콘텐츠 인텐트**: Discord 개발자 포털에서 이 기능이 활성화되어 있는지 확인하세요.
+2. **봇 권한**: 봇이 채널의 메시지를 읽을 수 있는지 확인합니다.
+3. **데이터베이스 연결**: 데이터베이스 오류는 서버 로그를 확인하세요.
+4. **설문조사**: 프런트엔드에서 30초마다 설문조사를 실시합니다. 답변이 표시되는 데 시간이 걸릴 수 있습니다.
 
-### Environment Variables Not Working
+### 환경 변수가 작동하지 않음
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **개발 방법**: 프런트엔드 및 백엔드 서버를 모두 재시작하세요.
+* **프로덕션 환경**: 프런트엔드와 백엔드를 올바른 환경 변수를 사용하여 다시 배포하십시오.
+* **접두사**: `REACT_APP_` 접두사는 프런트엔드 변수에만 사용하세요.
 
-### Database Issues
+### 데이터베이스 문제
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **파일 권한**: 서버가 데이터베이스 디렉터리에 쓰기 권한이 있는지 확인하십시오.
+2. **디스크 공간**: SQLite 데이터베이스에 사용 가능한 디스크 공간을 확인하세요.
+3. **서버 로그**: 데이터베이스 연결 오류는 서버 콘솔에서 확인하세요.
 
-## Security Considerations
+## 보안 고려 사항
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **봇 토큰**: 봇 토큰은 비밀로 유지하고 버전 관리 시스템에 절대 저장하지 마세요.
+* **속도 제한**: 디스코드에는 봇에 대한 속도 제한이 있습니다(웹훅과는 다릅니다).
+* **입력 유효성 검사**: 프런트엔드와 백엔드 모두 사용자 입력을 검증합니다.
+* **데이터베이스 보안**: SQLite 데이터베이스는 적절한 파일 권한으로 보호해야 합니다.
+* **API 보안**: API 엔드포인트에 대한 속도 제한을 구현하는 것을 고려하십시오.
+* **CORS**: 프로덕션 도메인에 맞게 CORS를 올바르게 구성하십시오.
 
-## Architecture
+## 건축학
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+웹사이트 프런트엔드 ←→ Express API ←→ Discord 봇 ←→ Discord 서버
                     ↓
-                SQLite Database
+                SQLite 데이터베이스
 ```
 
-## File Structure
+## 파일 구조
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # 프런트엔드 컴포넌트
+├── server/ # 백엔드 서버
+│ ├── api.js # Express API 서버
+│ ├── discord-bot.js # Discord 봇 로직
+│ ├── database.js # SQLite 데이터베이스 함수
+│ └── package.json # 서버 종속성
+└── docs/Discord/Docs/ # 문서
 ```
 
-## Browser Support
+## 브라우저 지원
 
-The Discord comments component works in all modern browsers that support:
+Discord 댓글 구성 요소는 다음을 지원하는 모든 최신 브라우저에서 작동합니다.
 
 * ES6 fetch API
 * React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* CSS 그리드와 플렉스박스
+* 로컬 저장소(폼 영구 저장용)
