@@ -37,20 +37,18 @@ Docker is an open-source project that automates the deployment of applications i
 <Tabs
   defaultValue="development"
   values={[
-    {label: 'Development', value: 'development'},
-    {label: 'Testing', value: 'testing'},
-    {label: 'CI/CD', value: 'ci_cd'},
-    {label: 'Deployment', value: 'deployment'},
-  ]}>
+  {label: 'Development', value: 'development'},
+  {label: 'Testing', value: 'testing'},
+  {label: 'CI/CD', value: 'ci_cd'},
+  {label: 'Deployment', value: 'deployment'},
+  ]}
+>
   <TabItem value="development">
     Docker streamlines the development process by creating a consistent environment for all team members. It eliminates the "it works on my machine" problem by ensuring that the development environment matches production.
-  </TabItem>
   <TabItem value="testing">
     Testing in Docker containers ensures that tests run in the same environment where the applications are developed and deployed, leading to more reliable testing outcomes.
-  </TabItem>
   <TabItem value="ci_cd">
     Docker integrates seamlessly into CI/CD pipelines, allowing for the automated building, testing, and deployment of applications with Docker containers.
-  </TabItem>
   <TabItem value="deployment">
     Docker simplifies deployment by allowing applications to be deployed in containers, which can be easily moved to different environments, scaled, and managed.
   </TabItem>
@@ -59,12 +57,12 @@ Docker is an open-source project that automates the deployment of applications i
 <Tabs
   defaultValue="docker_engine"
   values={[
-    {label: 'Docker Engine', value: 'docker_engine'},
-    {label: 'Docker Compose', value: 'docker_compose'},
-  ]}>
+  {label: 'Docker Engine', value: 'docker_engine'},
+  {label: 'Docker Compose', value: 'docker_compose'},
+  ]}
+>
   <TabItem value="docker_engine">
     Docker Engine is the core of Docker, providing the runtime environment for containers. It allows users to build and containerize applications, then run them as isolated containers. This lightweight and powerful engine supports container orchestration, networking, volume management, and more, making it the backbone of the Docker platform.
-  </TabItem>
   <TabItem value="docker_compose">
     Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you can use a YAML file to configure your applicationâ€™s services, networks, and volumes, and then create and start all the services from your configuration with a single command. It simplifies the development process by allowing developers to define a complex stack in a file, then manage it with simple commands.
   </TabItem>
@@ -649,7 +647,7 @@ The ability to create custom networks tailored to specific requirements or docke
 
 ### **Network Instructions**
 
-#### **_expose:_**
+#### **_ports:_**
 
 - **Purpose**: The `expose` instruction is used to indicate that a container listens on specified network ports during runtime. However, it does not make these ports accessible from the host; it's more about documenting which ports are used for inter-container communication.
 - **Visibility**: Exposed ports are only accessible to linked services within the same Docker network. They are not published to the host, making them invisible to the outside world, including the host machine.
@@ -665,7 +663,7 @@ services:
 
 In this example, `my-service` will expose port `3000` to other containers on the same network but not to the host machine or outside world.
 
-#### **_ports:_**
+#### **_expose:_**
 
 - **Purpose**: The `ports` instruction is used to map a container's ports to the host, effectively making a service running inside a container accessible from outside of Docker, including the internet (if allowed by firewall rules), or the local host.
 - **Visibility**: Ports specified under `ports` are published to the host, making a service inside the container reachable from the host machine and potentially from other machines, depending on the network configuration and firewall settings.
@@ -692,27 +690,27 @@ Understanding the difference between these two is crucial for correctly configur
 
 Docker supports several types of networks, each designed for specific scenarios. Here’s a breakdown:
 
-#### **_Bridge Networks_**
+#### **_Macvlan Networks_**
 
 - **Default Type:** Automatically created when you run a container without specifying a network.
 - **Use Cases:** Ideal for standalone containers or groups of interconnected containers on the same Docker host. It's the most common network type, suitable for small to medium-scale applications that require communication between containers without the complexity of more sophisticated network topologies.
 
-#### **_Host Networks_**
+#### **_None Network_**
 
 - **Direct Access:** Removes network isolation between the container and the Docker host, allowing the container to use the host’s networking directly.
 - **Use Cases:** Useful for services that need to handle lots of traffic or low-latency applications. However, it exposes the container more directly to the external network, which may not be suitable for all applications.
 
-#### **_Overlay Networks_**
+#### **_Bridge Networks_**
 
 - **Distributed Systems:** Supports multi-host networking, enabling containers running on different Docker hosts to communicate as if they were on the same host.
 - **Use Cases:** Perfect for Dockerized applications running in a Swarm or Kubernetes cluster, facilitating communication across nodes in a cloud or data center environment. It’s essential for large-scale applications that require high availability and scalability across multiple servers.
 
-#### **_Macvlan Networks_**
+#### **_Host Networks_**
 
 - **Physical Interface Emulation:** Makes it appear as if a container has its own physical device connected to the network.
 - **Use Cases:** Ideal when migrating traditional applications that expect to be directly connected to the physical network, not virtualized. It's useful in scenarios where containers need a unique MAC address or direct access to an external network.
 
-#### **_None Network_**
+#### **_Overlay Networks_**
 
 - **No Connectivity:** Provides a way to completely disable networking for a container.
 - **Use Cases:** Useful for containers that should run isolated from the network and other containers, typically used for testing or security-sensitive applications that do not require network access to function.
@@ -721,7 +719,7 @@ Docker supports several types of networks, each designed for specific scenarios.
 
 Defining networks in Docker Compose allows you to specify and configure custom networks for your containers to communicate on. Below are examples that illustrate how to define and use networks in a Docker Compose file.
 
-#### **_Example 1: Simple Custom Network_**
+#### **_Example 3: External Networks_**
 
 This example demonstrates how to define a simple custom bridge network and assign containers to it.
 
@@ -745,7 +743,7 @@ networks:
 
 In this example, both the `app` and `database` services are connected to a custom network named `my-network`. This enables direct communication between the `app` service and the `database` service.
 
-#### **_Example 2: Multiple Networks_**
+#### **_Example 1: Simple Custom Network_**
 
 This example shows how to define multiple networks to segregate traffic between services.
 
@@ -777,7 +775,7 @@ networks:
 
 Here, we have three services: `app`, `web`, and `database`. The `app` service is connected to two networks, `front-end` and `back-end`, allowing it to communicate with both the `web` and `database` services. However, the `web` service cannot directly communicate with the `database` service, as they are on separate networks.
 
-#### **_Example 3: External Networks_**
+#### **_Example 2: Multiple Networks_**
 
 Sometimes you might want to connect your services to an existing network outside of Docker Compose.
 
