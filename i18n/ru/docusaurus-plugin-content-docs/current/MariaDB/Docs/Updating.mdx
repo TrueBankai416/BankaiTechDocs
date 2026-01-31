@@ -1,0 +1,53 @@
+---
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+After updating the Docker Image follow these instructions.
+
+1. Bash into the `mariadb` container after updating the image by running
+
+```bash
+sudo docker exec -it mariadb bash
+```
+
+`mariadb` being the name of your container
+:::tip
+You can view a list of running containers with this command
+
+```bash
+sudo docker ps
+```
+
+:::
+
+2. upgrade the database by running
+
+```bash
+ mysql_upgrade -u root -p
+```
+
+3. You will be prompted to use enter the `root` passord for your database.
+   you should have created this when creating your `docker-compose.yaml` file
+
+4. Exit the container by running
+
+```bash
+exit
+```
+
+5. Restart the stack by running
+
+```bash
+sudo docker compose down && sudo docker compose up -d
+```
+
+6. Check logs again
+
+```bash
+sudo docker logs mariadb
+```
+
+<BuyMeACoffeeButton />
