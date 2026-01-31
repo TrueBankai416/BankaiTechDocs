@@ -2,8 +2,12 @@
 title: Docs only Mode
 description: Guide for configuring Docusaurus in docs-only mode by removing the /docs path from URLs and serving documentation at the site root.
 image: /img/social/docusaurus-social.jpg
-tags: [Docusaurus, Docs Only]
-keywords: [Docusaurus, Docs Only]
+tags:
+  - Docusaurus
+  - Docs Only
+keywords:
+  - Docusaurus
+  - Docs Only
 last_update:
   author: BankaiTech
 ---
@@ -30,11 +34,9 @@ Your directory will likely be different
 ## **Modifying the docusaurus.config.ts File**
 
 <p>Lets open the file with Nano</p>
-
 ```bash
 nano docusaurus.config.ts
 ```
-
 :::note
 
 I am using `typescript` but you may be using `javascript` make sure you use the correct file extension or you will create a new file.
@@ -92,13 +94,13 @@ docs/
 
 **Examples:**
 
-* Same folder: `[link](./Configuration.mdx)`
-* Parent folder: `[link](../Introduction.mdx)`
-* Grandparent folder: `[link](../../Docker/Introduction.mdx)`
-* Instead of absolute: ~~`[link](/docs/Docker/Introduction.mdx)`~~
+- Same folder: `[link](./Configuration.mdx)`
+- Parent folder: `[link](../Introduction.mdx)`
+- Grandparent folder: `[link](../../Docker/Introduction.mdx)`
+- Instead of absolute: ~~`[link](/docs/Docker/Introduction.mdx)`~~
   :::
 
-#### *My finished changes to docusaurus.config.ts file*
+#### _My finished changes to docusaurus.config.ts file_
 
 <p>It should look like this</p>
 
@@ -209,7 +211,7 @@ docs/
 Save with `CTRL+X`
 :::
 
-### ***Rebuilding the website***
+### **_Rebuilding the website_**
 
 <p>Now rebuild the site</p>
 
