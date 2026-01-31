@@ -45,8 +45,8 @@ A **subnet** (short for "subnetwork") is a logical subdivision of an IP network.
 
 An IPv4 address consists of 32 bits, typically written in dotted decimal notation (e.g., 192.168.1.100). Each address has two parts:
 
-* **Network portion**: Identifies the network
-* **Host portion**: Identifies the specific device on that network
+- **Network portion**: Identifies the network
+- **Host portion**: Identifies the specific device on that network
 
 ### **Traditional Network Classes**
 
@@ -68,7 +68,7 @@ These ranges are reserved for private networks and not routed on the public inte
 | **Class B** | 172.16.0.0 - 172.31.255.255   | 255.255.0.0           | /12  | Medium networks   |
 | **Class C** | 192.168.0.0 - 192.168.255.255 | 255.255.255.0         | /16  | Home/small office |
 
-*Note: The "CIDR" column shows the CIDR notation for each private address block (for example, 172.16.0.0/12 covers 172.16.0.0–172.31.255.255), while "Classful Default Mask" refers to the traditional class-based default subnet masks.*
+_Note: The "CIDR" column shows the CIDR notation for each private address block (for example, 172.16.0.0/12 covers 172.16.0.0–172.31.255.255), while "Classful Default Mask" refers to the traditional class-based default subnet masks._
 
 ## **Subnet Masks Explained**
 
@@ -106,7 +106,7 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 
 ### **Common Subnet Masks and Their CIDR Equivalents**
 
-*Note: "Subnets (from /24)" shows how many equal subnets you get when splitting a /24 network into the indicated prefix length.*
+_Note: "Subnets (from /24)" shows how many equal subnets you get when splitting a /24 network into the indicated prefix length._
 
 | Subnet Mask     | CIDR | Network Bits | Host Bits | Possible Hosts     | Subnets (from /24) |
 | --------------- | ---- | ------------ | --------- | ------------------ | ------------------ |
@@ -124,9 +124,9 @@ CIDR (Classless Inter-Domain Routing) notation expresses the subnet mask as a sl
 
 ### **Basic Subnetting Formula**
 
-* **Number of subnets**: 2^(borrowed bits)
-* **Number of hosts per subnet**: 2^(host bits) - 2 (except /31 and /32)
-* **Subnet increment (block size)**: 256 minus the mask value in the relevant octet
+- **Number of subnets**: 2^(borrowed bits)
+- **Number of hosts per subnet**: 2^(host bits) - 2 (except /31 and /32)
+- **Subnet increment (block size)**: 256 minus the mask value in the relevant octet
 
 ### **Step-by-Step Subnetting Process**
 
@@ -155,10 +155,10 @@ VLSM allows you to use different subnet mask lengths within the same network, op
 
 Starting with 192.168.1.0/24, create subnets for:
 
-* Sales: 50 hosts
-* Engineering: 25 hosts
-* HR: 10 hosts
-* Management: 5 hosts
+- Sales: 50 hosts
+- Engineering: 25 hosts
+- HR: 10 hosts
+- Management: 5 hosts
 
 **Solution:**
 
@@ -179,10 +179,10 @@ Management:  192.168.1.112/29  (6 hosts available)
 
 **Requirements**:
 
-* Main devices: 50 hosts
-* Guest network: 20 hosts
-* IoT devices: 30 hosts
-* Management: 5 hosts
+- Main devices: 50 hosts
+- Guest network: 20 hosts
+- IoT devices: 30 hosts
+- Management: 5 hosts
 
 **Solution using VLSM**:
 
@@ -208,11 +208,11 @@ Management:      192.168.1.128/29   # 192.168.1.129 - 192.168.1.134
 
 **Requirements**:
 
-* Sales: 100 hosts
-* Engineering: 200 hosts
-* Administration: 50 hosts
-* Servers: 20 hosts
-* Printers: 10 hosts
+- Sales: 100 hosts
+- Engineering: 200 hosts
+- Administration: 50 hosts
+- Servers: 20 hosts
+- Printers: 10 hosts
 
 **Solution**:
 
@@ -364,10 +364,10 @@ ipcalc 192.168.1.0/24 --binary
 
 Popular online tools for subnet calculations:
 
-* [**subnet-calculator.com**](https://www.subnet-calculator.com): Comprehensive subnet calculator
-* [**calculator.net IP Subnet Calculator**](https://www.calculator.net/ip-subnet-calculator.html): Simple subnet calculator
-* [**davidc.net Subnet Calculator**](https://www.davidc.net/sites/default/subnets/subnets.html): Visual subnet calculator
-* [**tunnelsup.com Subnet Calculator**](https://www.tunnelsup.com/subnet-calculator/): Advanced subnet calculator
+- [**subnet-calculator.com**](https://www.subnet-calculator.com): Comprehensive subnet calculator
+- [**calculator.net IP Subnet Calculator**](https://www.calculator.net/ip-subnet-calculator.html): Simple subnet calculator
+- [**davidc.net Subnet Calculator**](https://www.davidc.net/sites/default/subnets/subnets.html): Visual subnet calculator
+- [**tunnelsup.com Subnet Calculator**](https://www.tunnelsup.com/subnet-calculator/): Advanced subnet calculator
 
 ### **Programming and Scripting**
 
@@ -417,7 +417,7 @@ calculate_subnet() {
     local cidr=$2
 
     # Use ipcalc if available
-    if command -v ipcalc >/dev/null 2>&1; then
+    if command -v ipcalc >/dev/null 2>&amp;1; then
         ipcalc "$ip/$cidr"
     else
         echo "Network: $ip/$cidr"
