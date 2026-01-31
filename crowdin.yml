@@ -1,12 +1,6 @@
-# Your Crowdin credentials
-project_id: 'Bankai-Tech'
+project_id: Bankai-Tech
 api_token_env: CROWDIN_PERSONAL_TOKEN
-
-# Choose file structure in Crowdin
-preserve_hierarchy: true
-
-# Language mapping for locales that need special handling
-languages_mapping: &languages_mapping
+languages_mapping:
   locale:
     af-ZA: af
     ar-SA: ar
@@ -24,7 +18,7 @@ languages_mapping: &languages_mapping
     ja-JP: ja
     ko-KR: ko
     nl-NL: nl
-    no: no
+    'no': 'no'
     pl-PL: pl
     pt-BR: pt
     ro-RO: ro
@@ -35,28 +29,18 @@ languages_mapping: &languages_mapping
     uk-UA: uk
     vi-VN: vi
     zh-CN: zh
-
-# MDX file type - use v1.2 parser for compatibility with Docusaurus
-mdx_file_type: &mdx_file_type mdx_v1_2
-
-# Files configuration
+mdx_file_type: mdx_v1_2
+preserve_hierarchy: 1
 files:
-  # JSON translation files (code.json, navbar.json, footer.json, etc.)
   - source: /i18n/en/**/*.json
     translation: /i18n/%locale%/**/%original_file_name%
-    languages_mapping: *languages_mapping
-    excluded_languages: [en]
-
-  # MDX files in docs
+    languages_mapping: []
   - source: /docs/**/*.mdx
     translation: /i18n/%locale%/docusaurus-plugin-content-docs/current/**/%original_file_name%
-    languages_mapping: *languages_mapping
-    type: *mdx_file_type
-    excluded_languages: [en]
-
-  # Markdown files in docs (ignore MDX files)
+    languages_mapping: []
+    type: mdx_v1_2
   - source: /docs/**/*.md
     translation: /i18n/%locale%/docusaurus-plugin-content-docs/current/**/%original_file_name%
-    languages_mapping: *languages_mapping
-    ignore: [/**/*.mdx]
-    excluded_languages: [en]
+    languages_mapping: []
+    ignore:
+      - /**/*.mdx
