@@ -1,0 +1,51 @@
+---
+title: docker-compose.yaml
+tags:
+  - Arr Suite
+  - Sonarr
+keywords:
+  - Arr Suite
+  - Sonarr
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+```yaml
+name: sonarr
+
+services:
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    hostname: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./sonarr:/config
+      - /media/merged:/media
+    ports:
+      - "${SONARR_PORT:-8989}:8989"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+<BuyMeACoffeeButton />
