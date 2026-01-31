@@ -2,8 +2,15 @@
 title: Introduction to Proxmox
 description: Comprehensive introduction to Proxmox VE virtualization platform covering KVM virtual machines, LXC containers, and enterprise virtualization features.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, VM, LXC]
-keywords: [Proxmox, Hypervisor, LXC, VM]
+tags:
+  - Proxmox
+  - VM
+  - LXC
+keywords:
+  - Proxmox
+  - Hypervisor
+  - LXC
+  - VM
 last_update:
   author: BankaiTech
 ---
@@ -43,21 +50,28 @@ Proxmox VE supports two types of virtualization: containers using LXC and fully 
 <Tabs
   defaultValue="lxc"
   values={[
+    {label: 'LXC Containers', value: 'lxc'},
+    {label: 'VMs', value: 'vm'},
+  ]}>
+
+<Tabs
+  defaultValue="lxc"
+  values={[
   {label: 'LXC Containers', value: 'lxc'},
   {label: 'VMs', value: 'vm'},
   ]}
 >
   <TabItem value="lxc">
     * **Brief Intro**: LXC (Linux Containers) are lightweight, operating-system-level virtualization methods for running multiple isolated Linux systems (containers) on a single control host. Containers share the host system’s kernel but have their own filesystem, processes, and network interfaces.
-    * **Benefits**: LXC containers are more resource-efficient than VMs since they don't need to emulate hardware or run separate kernel instances. They offer quicker boot times and higher density, making them ideal for applications that require isolation but not full virtualization.
-    * **Cons**: Being less isolated than VMs, containers share the host's kernel, making them potentially more vulnerable to security issues. They are also limited to Linux environments.
-  </TabItem>
+* **Benefits**: LXC containers are more resource-efficient than VMs since they don't need to emulate hardware or run separate kernel instances. They offer quicker boot times and higher density, making them ideal for applications that require isolation but not full virtualization.
+* **Cons**: Being less isolated than VMs, containers share the host's kernel, making them potentially more vulnerable to security issues. They are also limited to Linux environments.
+</TabItem>
 
-  <TabItem value="vm">
+<TabItem value="vm">
     * **Brief Intro**: VMs are fully isolated guest systems running on a hypervisor that emulates underlying hardware. Each VM operates with its own kernel, enabling the running of various operating systems regardless of the host system.
-    * **Benefits**: VMs offer complete isolation from the host, enhancing security and flexibility. They allow for running multiple OS types on a single hardware host, making them suitable for diverse environments and testing different configurations or applications.
-    * **Cons**: VMs consume more resources than containers, including CPU, memory, and storage, because of the overhead associated with running full operating system instances. They also have slower startup times compared to containers.
-  </TabItem>
+* **Benefits**: VMs offer complete isolation from the host, enhancing security and flexibility. They allow for running multiple OS types on a single hardware host, making them suitable for diverse environments and testing different configurations or applications.
+* **Cons**: VMs consume more resources than containers, including CPU, memory, and storage, because of the overhead associated with running full operating system instances. They also have slower startup times compared to containers.
+</TabItem>
 </Tabs>
 
 ### **LXC Containers vs. VMs in Proxmox**
@@ -71,7 +85,7 @@ Proxmox VE supports two types of virtualization: containers using LXC and fully 
 >
   <TabItem value="lxc">LXC containers provide an efficient, lightweight method for virtualizing multiple Linux distributions on the same hardware, sharing the host's kernel but maintaining isolation. They are best suited for applications where density and performance are more important than complete OS isolation.</TabItem>
 
-  <TabItem value="vm">VMs offer full virtualization, running separate kernel instances and potentially different operating systems on the same physical hardware. They are best suited for scenarios requiring strong isolation, secure environments, or diverse operating system support.</TabItem>
+<TabItem value="vm">VMs offer full virtualization, running separate kernel instances and potentially different operating systems on the same physical hardware. They are best suited for scenarios requiring strong isolation, secure environments, or diverse operating system support.</TabItem>
 </Tabs>
 
 This explanation and tab system provide an overview of Proxmox's capabilities, along with a comparison of its support for LXC containers and VMs, highlighting the trade-offs between them in terms of performance, isolation, and resource utilization.
