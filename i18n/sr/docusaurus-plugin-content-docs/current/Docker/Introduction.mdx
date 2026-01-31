@@ -1,7 +1,13 @@
 ---
 title: Introduction to Docker
-tags: [Docker, Docker Compose, Tutorial]
-keywords: [Docker, Docker Engine, Tutorial]
+tags:
+  - Docker
+  - Docker Compose
+  - Tutorial
+keywords:
+  - Docker
+  - Docker Engine
+  - Tutorial
 last_update:
   author: BankaiTech
 ---
@@ -20,35 +26,31 @@ Docker is an open-source project that automates the deployment of applications i
 
 ## **Key Features of Docker**
 
-* **Containerization**: Docker packages applications and their dependencies into a compact, portable container that can run anywhere, ensuring consistency across environments.
-* **Microservices Architecture Support**: It simplifies the development and deployment of microservices by allowing each service to run in its own container.
-* **Isolation**: Containers are isolated from each other and the host system, providing a secure environment for applications.
-* **Scalability**: Easily scale up or down with minimal setup required, making it ideal for applications with fluctuating demand.
-* **Efficiency**: Docker enables more efficient use of system resources compared to traditional virtual machines, as containers share the host system's kernel rather than requiring their own operating system.
+- **Containerization**: Docker packages applications and their dependencies into a compact, portable container that can run anywhere, ensuring consistency across environments.
+- **Microservices Architecture Support**: It simplifies the development and deployment of microservices by allowing each service to run in its own container.
+- **Isolation**: Containers are isolated from each other and the host system, providing a secure environment for applications.
+- **Scalability**: Easily scale up or down with minimal setup required, making it ideal for applications with fluctuating demand.
+- **Efficiency**: Docker enables more efficient use of system resources compared to traditional virtual machines, as containers share the host system's kernel rather than requiring their own operating system.
 
 ## **Uses of Docker**
 
 <Tabs
   defaultValue="development"
   values={[
-  {label: 'Development', value: 'development'},
-  {label: 'Testing', value: 'testing'},
-  {label: 'CI/CD', value: 'ci_cd'},
-  {label: 'Deployment', value: 'deployment'},
-  ]}
->
+    {label: 'Development', value: 'development'},
+    {label: 'Testing', value: 'testing'},
+    {label: 'CI/CD', value: 'ci_cd'},
+    {label: 'Deployment', value: 'deployment'},
+  ]}>
   <TabItem value="development">
     Docker streamlines the development process by creating a consistent environment for all team members. It eliminates the "it works on my machine" problem by ensuring that the development environment matches production.
   </TabItem>
-
   <TabItem value="testing">
     Testing in Docker containers ensures that tests run in the same environment where the applications are developed and deployed, leading to more reliable testing outcomes.
   </TabItem>
-
   <TabItem value="ci_cd">
     Docker integrates seamlessly into CI/CD pipelines, allowing for the automated building, testing, and deployment of applications with Docker containers.
   </TabItem>
-
   <TabItem value="deployment">
     Docker simplifies deployment by allowing applications to be deployed in containers, which can be easily moved to different environments, scaled, and managed.
   </TabItem>
@@ -57,14 +59,12 @@ Docker is an open-source project that automates the deployment of applications i
 <Tabs
   defaultValue="docker_engine"
   values={[
-  {label: 'Docker Engine', value: 'docker_engine'},
-  {label: 'Docker Compose', value: 'docker_compose'},
-  ]}
->
+    {label: 'Docker Engine', value: 'docker_engine'},
+    {label: 'Docker Compose', value: 'docker_compose'},
+  ]}>
   <TabItem value="docker_engine">
     Docker Engine is the core of Docker, providing the runtime environment for containers. It allows users to build and containerize applications, then run them as isolated containers. This lightweight and powerful engine supports container orchestration, networking, volume management, and more, making it the backbone of the Docker platform.
   </TabItem>
-
   <TabItem value="docker_compose">
     Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you can use a YAML file to configure your applicationâ€™s services, networks, and volumes, and then create and start all the services from your configuration with a single command. It simplifies the development process by allowing developers to define a complex stack in a file, then manage it with simple commands.
   </TabItem>
@@ -80,10 +80,10 @@ Profiles are defined in your `docker-compose.yml` file by adding a `profiles` at
 
 ### **Benefits of Docker Profiles**
 
-* **Flexible Deployment**: Enable different combinations of services for different environments (development, testing, production)
-* **Resource Management**: Start only the services you need, reducing resource consumption
-* **Modular Architecture**: Organize services into logical groups for better maintainability
-* **Environment-Specific Configuration**: Easily switch between different setups without maintaining multiple compose files
+- **Flexible Deployment**: Enable different combinations of services for different environments (development, testing, production)
+- **Resource Management**: Start only the services you need, reducing resource consumption
+- **Modular Architecture**: Organize services into logical groups for better maintainability
+- **Environment-Specific Configuration**: Easily switch between different setups without maintaining multiple compose files
 
 ### **Basic Profile Configuration**
 
@@ -349,9 +349,9 @@ nginx-exporter:
 
 ### **Troubleshooting Profiles**
 
-* **Service Not Starting**: Check if the service has a profile that you haven't specified
-* **Dependency Issues**: Ensure dependent services are either profile-free or use the same profiles
-* **Profile Conflicts**: Be aware that some services might conflict when started together
+- **Service Not Starting**: Check if the service has a profile that you haven't specified
+- **Dependency Issues**: Ensure dependent services are either profile-free or use the same profiles
+- **Profile Conflicts**: Be aware that some services might conflict when started together
 
 Docker profiles provide a powerful way to manage complex applications with multiple optional components, making your Docker Compose setups more flexible and maintainable.
 
@@ -383,9 +383,9 @@ ports:
 
 **Behavior:**
 
-* **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
-* **Variable not set**: → `127.0.0.1:11000:80` (uses default)
-* **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1:11000:80` (uses default)
+- **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
+- **Variable not set**: → `127.0.0.1:11000:80` (uses default)
+- **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1:11000:80` (uses default)
 
 #### **Option 2: `${NGINX_INTERNAL_PORT}` (Basic)**
 
@@ -396,9 +396,9 @@ ports:
 
 **Behavior:**
 
-* **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
-* **Variable not set**: → `127.0.0.1::80` ❌ **ERROR!**
-* **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1::80` ❌ **ERROR!**
+- **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
+- **Variable not set**: → `127.0.0.1::80` ❌ **ERROR!**
+- **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1::80` ❌ **ERROR!**
 
 ### **What Happens With Errors**
 
@@ -567,10 +567,10 @@ services:
 
 ### **Troubleshooting Variable Issues**
 
-* **Empty Port Mappings**: Usually caused by missing variables without defaults
-* **Service Won't Start**: Check if required variables are set or have appropriate defaults
-* **Unexpected Behavior**: Verify that your variable names match between `.env` file and compose file
-* **Testing Variables**: Use `docker-compose config` to see the final configuration with variables resolved
+- **Empty Port Mappings**: Usually caused by missing variables without defaults
+- **Service Won't Start**: Check if required variables are set or have appropriate defaults
+- **Unexpected Behavior**: Verify that your variable names match between `.env` file and compose file
+- **Testing Variables**: Use `docker-compose config` to see the final configuration with variables resolved
 
 Understanding Docker Compose variable syntax is essential for creating flexible, maintainable, and error-resistant containerized applications.
 
@@ -578,40 +578,40 @@ Understanding Docker Compose variable syntax is essential for creating flexible,
 
 A **Docker image** is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and config files. Images are the building blocks of Docker containers. An image is essentially a snapshot of an application and its environment at a specific point in time.
 
-### ***Benefits:***
+### **_Benefits:_**
 
-* **Consistency:** Ensures that your application runs the same way in development, testing, and production.
-* **Portability:** Can be shared across different machines, eliminating the "it works on my machine" problem.
-* **Version Control:** You can version images, roll back to previous versions, and manage them just like source code.
+- **Consistency:** Ensures that your application runs the same way in development, testing, and production.
+- **Portability:** Can be shared across different machines, eliminating the "it works on my machine" problem.
+- **Version Control:** You can version images, roll back to previous versions, and manage them just like source code.
 
 ## **Docker Containers**
 
 A **Docker container** is a runnable instance of an image. You can think of it as the execution environment for your application. Containers isolate your application from the host system and other containers, providing a private space for the application to run within.
 
-### ***Benefits:***
+### **_Benefits:_**
 
-* **Isolation:** Prevents conflicts between applications or between applications and the host system.
-* **Resource Efficiency:** Containers share the host system’s kernel but can be limited to specific amounts of CPU, memory, and I/O.
-* **Scalability:** Containers can be easily started, stopped, and replicated, which supports modern agile and DevOps practices.
+- **Isolation:** Prevents conflicts between applications or between applications and the host system.
+- **Resource Efficiency:** Containers share the host system’s kernel but can be limited to specific amounts of CPU, memory, and I/O.
+- **Scalability:** Containers can be easily started, stopped, and replicated, which supports modern agile and DevOps practices.
 
 ## **Docker Environment Variables**
 
 **Docker environment variables** are key-value pairs that can be set within a Docker image or container to configure behavior without changing the application's code. These variables are particularly useful for managing configuration settings that differ between environments, such as development, testing, and production.
 
-### ***Benefits:***
+### **_Benefits:_**
 
-* **Flexibility:** Quickly change settings without modifying the code or Docker images.
-* **Security:** Keep sensitive information, like database passwords, out of the image and inject it at runtime.
+- **Flexibility:** Quickly change settings without modifying the code or Docker images.
+- **Security:** Keep sensitive information, like database passwords, out of the image and inject it at runtime.
 
 ## **Benefits of Interpolation**
 
 **Interpolation** in the context of Docker environment variables allows you to dynamically insert values into your configuration. This is beneficial for creating more dynamic and flexible Docker configurations.
 
-### ***Benefits:***
+### **_Benefits:_**
 
-* **Dynamic Configurations:** Easily adjust your application’s behavior based on the environment without changing the code.
-* **Code Reusability:** Write more generic code and scripts that adapt based on environment variables.
-* **Security and Separation of Concerns:** Keep configuration data separate from code, making it easier to manage security and changes.
+- **Dynamic Configurations:** Easily adjust your application’s behavior based on the environment without changing the code.
+- **Code Reusability:** Write more generic code and scripts that adapt based on environment variables.
+- **Security and Separation of Concerns:** Keep configuration data separate from code, making it easier to manage security and changes.
 
 In summary, Docker images, containers, and environment variables are foundational concepts in Docker that enable the portability, consistency, and efficient scaling of applications. Interpolation of environment variables enhances the flexibility and security of Docker containers, making it easier to manage applications across different environments, including when deploying websites or services like Docusaurus.
 
@@ -649,11 +649,11 @@ The ability to create custom networks tailored to specific requirements or docke
 
 ### **Network Instructions**
 
-#### ***expose:***
+#### **_expose:_**
 
-* **Purpose**: The `expose` instruction is used to indicate that a container listens on specified network ports during runtime. However, it does not make these ports accessible from the host; it's more about documenting which ports are used for inter-container communication.
-* **Visibility**: Exposed ports are only accessible to linked services within the same Docker network. They are not published to the host, making them invisible to the outside world, including the host machine.
-* **Docker Compose Usage**: In a Docker Compose file, you use `expose` to list the ports that other services in the same Docker network can access.
+- **Purpose**: The `expose` instruction is used to indicate that a container listens on specified network ports during runtime. However, it does not make these ports accessible from the host; it's more about documenting which ports are used for inter-container communication.
+- **Visibility**: Exposed ports are only accessible to linked services within the same Docker network. They are not published to the host, making them invisible to the outside world, including the host machine.
+- **Docker Compose Usage**: In a Docker Compose file, you use `expose` to list the ports that other services in the same Docker network can access.
 
 ```yaml
 services:
@@ -665,11 +665,11 @@ services:
 
 In this example, `my-service` will expose port `3000` to other containers on the same network but not to the host machine or outside world.
 
-#### ***ports:***
+#### **_expose:_**
 
-* **Purpose**: The `ports` instruction is used to map a container's ports to the host, effectively making a service running inside a container accessible from outside of Docker, including the internet (if allowed by firewall rules), or the local host.
-* **Visibility**: Ports specified under `ports` are published to the host, making a service inside the container reachable from the host machine and potentially from other machines, depending on the network configuration and firewall settings.
-* **Docker Compose Usage**: In a Docker Compose file, `ports` is used to define the port mapping from the host to the containers.
+- **Purpose**: The `ports` instruction is used to map a container's ports to the host, effectively making a service running inside a container accessible from outside of Docker, including the internet (if allowed by firewall rules), or the local host.
+- **Visibility**: Ports specified under `ports` are published to the host, making a service inside the container reachable from the host machine and potentially from other machines, depending on the network configuration and firewall settings.
+- **Docker Compose Usage**: In a Docker Compose file, `ports` is used to define the port mapping from the host to the containers.
 
 ```yaml
 services:
@@ -683,8 +683,8 @@ In this example, `my-service` maps port `3000` inside the container to port `400
 
 #### **Summary:**
 
-* **`expose`** is about container-to-container communication within the same Docker network and is a way of documenting which ports a container uses without opening them to the outside.
-* **`ports`** actively maps and publishes a container's ports to the host, enabling external access to a service running inside a container.
+- **`expose`** is about container-to-container communication within the same Docker network and is a way of documenting which ports a container uses without opening them to the outside.
+- **`ports`** actively maps and publishes a container's ports to the host, enabling external access to a service running inside a container.
 
 Understanding the difference between these two is crucial for correctly configuring services in Docker and Docker Compose, especially regarding service accessibility, security, and network configuration.
 
@@ -692,36 +692,36 @@ Understanding the difference between these two is crucial for correctly configur
 
 Docker supports several types of networks, each designed for specific scenarios. Here’s a breakdown:
 
-#### ***Bridge Networks***
+#### **_Bridge Networks_**
 
-* **Default Type:** Automatically created when you run a container without specifying a network.
-* **Use Cases:** Ideal for standalone containers or groups of interconnected containers on the same Docker host. It's the most common network type, suitable for small to medium-scale applications that require communication between containers without the complexity of more sophisticated network topologies.
+- **Default Type:** Automatically created when you run a container without specifying a network.
+- **Use Cases:** Ideal for standalone containers or groups of interconnected containers on the same Docker host. It's the most common network type, suitable for small to medium-scale applications that require communication between containers without the complexity of more sophisticated network topologies.
 
-#### ***Host Networks***
+#### **_Host Networks_**
 
-* **Direct Access:** Removes network isolation between the container and the Docker host, allowing the container to use the host’s networking directly.
-* **Use Cases:** Useful for services that need to handle lots of traffic or low-latency applications. However, it exposes the container more directly to the external network, which may not be suitable for all applications.
+- **Direct Access:** Removes network isolation between the container and the Docker host, allowing the container to use the host’s networking directly.
+- **Use Cases:** Useful for services that need to handle lots of traffic or low-latency applications. However, it exposes the container more directly to the external network, which may not be suitable for all applications.
 
-#### ***Overlay Networks***
+#### **_Bridge Networks_**
 
-* **Distributed Systems:** Supports multi-host networking, enabling containers running on different Docker hosts to communicate as if they were on the same host.
-* **Use Cases:** Perfect for Dockerized applications running in a Swarm or Kubernetes cluster, facilitating communication across nodes in a cloud or data center environment. It’s essential for large-scale applications that require high availability and scalability across multiple servers.
+- **Distributed Systems:** Supports multi-host networking, enabling containers running on different Docker hosts to communicate as if they were on the same host.
+- **Use Cases:** Perfect for Dockerized applications running in a Swarm or Kubernetes cluster, facilitating communication across nodes in a cloud or data center environment. It’s essential for large-scale applications that require high availability and scalability across multiple servers.
 
-#### ***Macvlan Networks***
+#### **_Host Networks_**
 
-* **Physical Interface Emulation:** Makes it appear as if a container has its own physical device connected to the network.
-* **Use Cases:** Ideal when migrating traditional applications that expect to be directly connected to the physical network, not virtualized. It's useful in scenarios where containers need a unique MAC address or direct access to an external network.
+- **Physical Interface Emulation:** Makes it appear as if a container has its own physical device connected to the network.
+- **Use Cases:** Ideal when migrating traditional applications that expect to be directly connected to the physical network, not virtualized. It's useful in scenarios where containers need a unique MAC address or direct access to an external network.
 
-#### ***None Network***
+#### **_Overlay Networks_**
 
-* **No Connectivity:** Provides a way to completely disable networking for a container.
-* **Use Cases:** Useful for containers that should run isolated from the network and other containers, typically used for testing or security-sensitive applications that do not require network access to function.
+- **No Connectivity:** Provides a way to completely disable networking for a container.
+- **Use Cases:** Useful for containers that should run isolated from the network and other containers, typically used for testing or security-sensitive applications that do not require network access to function.
 
 ### **Network Examples**
 
 Defining networks in Docker Compose allows you to specify and configure custom networks for your containers to communicate on. Below are examples that illustrate how to define and use networks in a Docker Compose file.
 
-#### ***Example 1: Simple Custom Network***
+#### **_None Network_**
 
 This example demonstrates how to define a simple custom bridge network and assign containers to it.
 
@@ -745,7 +745,7 @@ networks:
 
 In this example, both the `app` and `database` services are connected to a custom network named `my-network`. This enables direct communication between the `app` service and the `database` service.
 
-#### ***Example 2: Multiple Networks***
+#### **_Example 1: Simple Custom Network_**
 
 This example shows how to define multiple networks to segregate traffic between services.
 
@@ -777,7 +777,7 @@ networks:
 
 Here, we have three services: `app`, `web`, and `database`. The `app` service is connected to two networks, `front-end` and `back-end`, allowing it to communicate with both the `web` and `database` services. However, the `web` service cannot directly communicate with the `database` service, as they are on separate networks.
 
-#### ***Example 3: External Networks***
+#### **_Example 2: Multiple Networks_**
 
 Sometimes you might want to connect your services to an existing network outside of Docker Compose.
 
@@ -796,7 +796,7 @@ networks:
 
 In this Docker Compose file, `app` is connected to an external network named `external-network`. The `external: true` parameter indicates that this network is not managed by Docker Compose and must exist before running `docker-compose up`.
 
-#### ***Example 4: Assigning Static IP Addresses***
+#### **_Example 3: External Networks_**
 
 For scenarios requiring static IP addresses within your custom network, Docker Compose allows you to specify these as well.
 
@@ -826,7 +826,7 @@ networks:
 
 In this configuration, both the `app` and `database` services are assigned static IP addresses within the `my-network` network. The `ipam` configuration specifies the subnet for the network, allowing Docker to manage IP address allocation within this range.
 
-#### ***Example 5: No Internet Access or Communication***
+#### **_Example 4: Assigning Static IP Addresses_**
 
 ```yaml
 name: example
@@ -848,10 +848,10 @@ networks:
 
 In this example, both the `app` and `database` services are connected to a custom network named `no-network`. This uses network `driver: none` meaning that the containers using this network will not be able to communicate with any other containers or the host, Including eachother. The network interface is essentially disabled so no IP addresses are assigned to the containers.
 
-#### ***Example 6: macvlan***
+#### **_Example 6: macvlan_**
 
-* **Description**: Allows you to assign a MAC address to a container, making it appear as a physical device on your network. The Docker host's networking can be bypassed.
-* **Use Case**: Useful if you require containers to have direct access to an existing network, behaving as though they were physically attached to it. Often used in scenarios where you need to integrate with legacy applications or systems that expect a direct network connection.
+- **Description**: Allows you to assign a MAC address to a container, making it appear as a physical device on your network. The Docker host's networking can be bypassed.
+- **Use Case**: Useful if you require containers to have direct access to an existing network, behaving as though they were physically attached to it. Often used in scenarios where you need to integrate with legacy applications or systems that expect a direct network connection.
 
 ```yaml
 name: example
@@ -879,14 +879,14 @@ networks:
 
 The configuration above shows:
 
-* `parent: eth0`: Specifies which host network interface the macvlan network should use. This is required as macvlan creates virtual network interfaces linked to a physical network interface.
-* `subnet: 192.168.1.0/24`: Defines the IP address range available to containers in this network. This subnet should match your physical network's addressing scheme.
-* `gateway: 192.168.1.1`: Specifies the gateway IP address for the network, typically your router's IP address.
+- `parent: eth0`: Specifies which host network interface the macvlan network should use. This is required as macvlan creates virtual network interfaces linked to a physical network interface.
+- `subnet: 192.168.1.0/24`: Defines the IP address range available to containers in this network. This subnet should match your physical network's addressing scheme.
+- `gateway: 192.168.1.1`: Specifies the gateway IP address for the network, typically your router's IP address.
 
-#### ***Example 7: overlay***
+#### **_Example 7: overlay_**
 
-* **Description**: Enables Docker Swarm services to communicate across multiple Docker hosts. It leverages network encapsulation to allow containers on different hosts to communicate as if they were on the same host.
-* **Use Case**: Ideal for Docker Swarm deployments where you need to manage services that span multiple nodes in a cluster.
+- **Description**: Enables Docker Swarm services to communicate across multiple Docker hosts. It leverages network encapsulation to allow containers on different hosts to communicate as if they were on the same host.
+- **Use Case**: Ideal for Docker Swarm deployments where you need to manage services that span multiple nodes in a cluster.
 
 ```yaml
 name: example
@@ -920,12 +920,12 @@ networks:
 
 The configuration above shows:
 
-* `attachable: true`: Allows standalone containers (not just swarm services) to attach to this network.
-* `encrypted: "true"`: Enables encryption for all traffic on this overlay network, providing additional security for container communication across hosts.
-* `deploy`: Configuration specific to swarm mode, defining how services should be deployed across the cluster.
-* `subnet`: Defines the IP range for containers in this overlay network.
+- `attachable: true`: Allows standalone containers (not just swarm services) to attach to this network.
+- `encrypted: "true"`: Enables encryption for all traffic on this overlay network, providing additional security for container communication across hosts.
+- `deploy`: Configuration specific to swarm mode, defining how services should be deployed across the cluster.
+- `subnet`: Defines the IP range for containers in this overlay network.
 
-#### ***Example 8: network_mode: host***
+#### **_Example 8: network_mode: host_**
 
 Using `host` mode allows the container to share the host's network stack. Thus, the container does not get its own IP-address allocated, and it uses the host's IP and port space. Containers running in host mode offer the best network performance and are useful when a container needs to manage or observe the host's network stack.
 
@@ -941,7 +941,7 @@ services:
     network_mode: host
 ```
 
-#### ***Example 9: network_mode: none***
+#### **_Example 9: network_mode: none_**
 
 This mode disables all networking for the container. Essentially, it provides a container with its own network namespace but without a network interface set up within it. This mode is useful for containers that need to run processes in isolation without requiring network access.
 
@@ -957,7 +957,7 @@ services:
     network_mode: none
 ```
 
-#### ***Example 10: network_mode: service:[service name]***
+#### **_Example 10: network_mode: service:[service name]_**
 
 This option allows a container to share the network stack of another container. By specifying the name of another service defined in the same `docker-compose.yml` file, the container inherits the networking configuration of the targeted service. This is useful for closely coupled services that need to share the network stack without being exposed to the wider network.
 
@@ -992,7 +992,7 @@ networks:
   backend:
 ```
 
-#### ***Example 11: container:[container name/id]***
+#### **_Example 11: container:[container name/id]_**
 
 Similar to the `service:` option, but instead of specifying a service name, you directly specify a container name or ID. The container using this mode will share the network namespace of the target container, allowing it to use the exact network configurations, including the IP address.
 
@@ -1029,21 +1029,21 @@ networks:
 
 The configuration above demonstrates:
 
-* A main webapp container with its own network configuration
-* A debugging container (netshoot) that can monitor the webapp's network traffic
-* A metrics collection container that shares the same network namespace
-* All containers share:
-  * The same network interfaces
-  * Access to port 3000
-  * The same IP address
-  * Network visibility and DNS resolution
+- A main webapp container with its own network configuration
+- A debugging container (netshoot) that can monitor the webapp's network traffic
+- A metrics collection container that shares the same network namespace
+- All containers share:
+  - The same network interfaces
+  - Access to port 3000
+  - The same IP address
+  - Network visibility and DNS resolution
 
 This setup is particularly useful for:
 
-* Network debugging and troubleshooting
-* Performance monitoring and analysis
-* Security auditing of network traffic
-* Adding network-level tooling without modifying the main application
+- Network debugging and troubleshooting
+- Performance monitoring and analysis
+- Security auditing of network traffic
+- Adding network-level tooling without modifying the main application
 
 These examples demonstrate the flexibility of Docker Compose in defining and using networks, enabling complex networking setups to be described in a straightforward and declarative manner.
 
@@ -1051,18 +1051,18 @@ These examples demonstrate the flexibility of Docker Compose in defining and usi
 
 Docker offers various storage options to manage the data generated by and used by containers. These storage solutions cater to different requirements for persistence, scalability, sharing among containers, and data backup. Here are the primary Docker storage options, detailing their benefits, use cases, and Docker Compose examples for each.
 
-### ***Volumes***
+### **_Volumes_**
 
 **Benefits:**
 
-* Volumes are stored in a part of the host filesystem which is managed by Docker (`/var/lib/docker/volumes/` on Linux). They are the preferred mechanism for persisting data generated by and used by Docker containers.
-* Completely managed by Docker, independent of the container's lifecycle, meaning data persists even if a container is deleted.
-* Supports sharing among multiple containers and services.
+- Volumes are stored in a part of the host filesystem which is managed by Docker (`/var/lib/docker/volumes/` on Linux). They are the preferred mechanism for persisting data generated by and used by Docker containers.
+- Completely managed by Docker, independent of the container's lifecycle, meaning data persists even if a container is deleted.
+- Supports sharing among multiple containers and services.
 
 **Use Cases:**
 
-* Persisting database storage, ensuring data survival across container rebuilds.
-* Sharing configuration files between the host and containers or among multiple containers.
+- Persisting database storage, ensuring data survival across container rebuilds.
+- Sharing configuration files between the host and containers or among multiple containers.
 
 **Example:**
 
@@ -1078,18 +1078,18 @@ volumes:
   db-data:
 ```
 
-### ***Bind Mounts***
+### **_Bind Mounts_**
 
 **Benefits:**
 
-* Bind mounts can be stored anywhere on the host system. They allow for the storage and management of files or directories on the host system.
-* Provide more control over the filesystem as they bypass Docker's management of the volume and allow for the direct inclusion of local host paths.
-* Useful for development purposes where code on the host needs to be tested in a container environment in real-time.
+- Bind mounts can be stored anywhere on the host system. They allow for the storage and management of files or directories on the host system.
+- Provide more control over the filesystem as they bypass Docker's management of the volume and allow for the direct inclusion of local host paths.
+- Useful for development purposes where code on the host needs to be tested in a container environment in real-time.
 
 **Use Cases:**
 
-* Live reloading during development, where code changes on the host need to be immediately reflected in the container.
-* Providing access to sensitive configurations that should not be included in images.
+- Live reloading during development, where code changes on the host need to be immediately reflected in the container.
+- Providing access to sensitive configurations that should not be included in images.
 
 **Example:**
 
@@ -1104,17 +1104,17 @@ services:
         target: /usr/src/app
 ```
 
-### ***tmpfs Mounts***
+### **_tmpfs Mounts_**
 
 **Benefits:**
 
-* Mounted directly in the host system’s memory (or swap, depending on system configuration), tmpfs mounts never touch the physical disk. This results in faster read and write times compared to volumes and bind mounts.
-* Data stored in a tmpfs mount is temporary and is cleared when the container is stopped, which can be beneficial for sensitive data or cache.
+- Mounted directly in the host system’s memory (or swap, depending on system configuration), tmpfs mounts never touch the physical disk. This results in faster read and write times compared to volumes and bind mounts.
+- Data stored in a tmpfs mount is temporary and is cleared when the container is stopped, which can be beneficial for sensitive data or cache.
 
 **Use Cases:**
 
-* Storing cache data or session information that needs quick access but does not need to persist after the container stops.
-* Handling sensitive information which should not be written to disk to avoid data leakage.
+- Storing cache data or session information that needs quick access but does not need to persist after the container stops.
+- Handling sensitive information which should not be written to disk to avoid data leakage.
 
 **Example:**
 
@@ -1132,18 +1132,18 @@ In Docker Compose, adjusting the size of `tmpfs` mounts along with adding other 
 tmpfs uses memory (RAM) adjust the size as needed. Monitor how much RAM the mount utilizes
 :::
 
-#### ***Changing the `tmpfs` Size***
+#### **_Changing the `tmpfs` Size_**
 
 To specify the size of a `tmpfs` mount, you can use the `size` option. The size is set in bytes but can also be expressed in a human-readable manner using units like `k`, `m`, or `g` for kilobytes, megabytes, or gigabytes, respectively.
 
-#### ***Additional `tmpfs` Options***
+#### **_Additional `tmpfs` Options_**
 
 Apart from setting the size, Docker allows configuring additional parameters for `tmpfs` mounts including:
 
-* **`mode`**: Sets the file mode (permissions) in an octal format. For example, a mode of `700` would restrict access to the owner of the file only.
-* **`uid` and `gid`**: Specify the user ID and group ID for the mount, allowing you to control which user or group owns the `tmpfs` mount.
+- **`mode`**: Sets the file mode (permissions) in an octal format. For example, a mode of `700` would restrict access to the owner of the file only.
+- **`uid` and `gid`**: Specify the user ID and group ID for the mount, allowing you to control which user or group owns the `tmpfs` mount.
 
-#### ***Docker Compose Example with `tmpfs` Options***
+#### **_Docker Compose Example with `tmpfs` Options_**
 
 Here's how you can configure a service with a `tmpfs` mount, including changing its size and setting other options in a Docker Compose file:
 
@@ -1162,27 +1162,27 @@ services:
           gid: 1000 # Group ID
 ```
 
-#### ***Explanation:***
+#### **_Explanation:_**
 
-* **`type: tmpfs`**: Specifies the volume type as tmpfs.
-* **`target`**: Defines the container path where the tmpfs mount will be located on the containers filesystem.
-* **`tmpfs:size`**: Allocates 100MB of space for the tmpfs mount. Adjust the value as needed for your application requirements.
-* **`tmpfs:mode`**: Sets the permissions for the tmpfs mount to `1777`, which is similar to the `tmp` directory on UNIX systems, allowing all users to create files but preventing them from deleting or modifying files owned by others.
-* **`tmpfs:uid`** and **`tmpfs:gid`**: These options set the ownership of the tmpfs mount. You may need to adjust these values based on your container's user configuration to ensure proper access to the tmpfs mount.
+- **`type: tmpfs`**: Specifies the volume type as tmpfs.
+- **`target`**: Defines the container path where the tmpfs mount will be located on the containers filesystem.
+- **`tmpfs:size`**: Allocates 100MB of space for the tmpfs mount. Adjust the value as needed for your application requirements.
+- **`tmpfs:mode`**: Sets the permissions for the tmpfs mount to `1777`, which is similar to the `tmp` directory on UNIX systems, allowing all users to create files but preventing them from deleting or modifying files owned by others.
+- **`tmpfs:uid`** and **`tmpfs:gid`**: These options set the ownership of the tmpfs mount. You may need to adjust these values based on your container's user configuration to ensure proper access to the tmpfs mount.
 
 This configuration demonstrates how to effectively use `tmpfs` mounts for temporary storage needs within your Docker containers, optimizing for both performance and security by controlling the size, permissions, and ownership of the tmpfs mount.
 
-### ***Named Pipes or FIFO***
+### **_Named Pipes or FIFO_**
 
 **Benefits:**
 
-* Allows for one-way data flow between the container and the host or between containers. This can be beneficial for processing data streams.
-* Limits data to being in transit, not stored, which can be advantageous for streaming data.
+- Allows for one-way data flow between the container and the host or between containers. This can be beneficial for processing data streams.
+- Limits data to being in transit, not stored, which can be advantageous for streaming data.
 
 **Use Cases:**
 
-* Real-time event processing where data is consumed by a container, processed, and passed on without the need for persistence.
-* Logs or metrics collection where data is streamed from the container to a host service for processing or analysis.
+- Real-time event processing where data is consumed by a container, processed, and passed on without the need for persistence.
+- Logs or metrics collection where data is streamed from the container to a host service for processing or analysis.
 
 **Example:** Docker Compose does not directly support named pipes in its syntax, but you can create them on the host and use them within containers through bind mounts.
 
@@ -1250,9 +1250,9 @@ services:
 
 **When to use `missing`:**
 
-* Standard development environments
-* Production deployments where you want to avoid unnecessary pulls
-* When you want to minimize startup time and bandwidth usage
+- Standard development environments
+- Production deployments where you want to avoid unnecessary pulls
+- When you want to minimize startup time and bandwidth usage
 
 #### **2. Always Policy**
 
@@ -1281,10 +1281,10 @@ services:
 
 **When to use `always`:**
 
-* CI/CD pipelines to ensure latest updates
-* Production deployments with rolling updates
-* When using `latest` tags and you want the newest version
-* Automated deployment systems
+- CI/CD pipelines to ensure latest updates
+- Production deployments with rolling updates
+- When using `latest` tags and you want the newest version
+- Automated deployment systems
 
 #### **3. Never Policy**
 
@@ -1309,10 +1309,10 @@ services:
 
 **When to use `never`:**
 
-* Air-gapped or offline environments
-* When using custom-built images that aren't in registries
-* Testing with specific local image versions
-* Environments with restricted internet access
+- Air-gapped or offline environments
+- When using custom-built images that aren't in registries
+- Testing with specific local image versions
+- Environments with restricted internet access
 
 ### **Building vs Pulling Images**
 
@@ -1324,10 +1324,10 @@ While `pull_policy` controls when to pull pre-built images, building images from
 
 #### **When to Build Instead of Pull**
 
-* Active development with frequent code changes
-* Custom applications that require building from source
-* When you want to ensure the latest local code is always used
-* Development environments where you're modifying the application
+- Active development with frequent code changes
+- Custom applications that require building from source
+- When you want to ensure the latest local code is always used
+- Development environments where you're modifying the application
 
 #### **How to Control Building**
 
@@ -1717,22 +1717,22 @@ Docker Compose provides command-line flags that can override pull_policy setting
 
 **Use `pull_policy` in compose files when:**
 
-* You want consistent behavior across all deployments
-* Different services need different pull strategies
-* Setting up automated deployments or CI/CD pipelines
-* Documenting intended deployment behavior
+- You want consistent behavior across all deployments
+- Different services need different pull strategies
+- Setting up automated deployments or CI/CD pipelines
+- Documenting intended deployment behavior
 
 **Use `--pull` CLI flags when:**
 
-* Making one-time deployments with special requirements
-* Overriding file settings for testing or debugging
-* Testing different pull behaviors
+- Making one-time deployments with special requirements
+- Overriding file settings for testing or debugging
+- Testing different pull behaviors
 
 **Use `--build` CLI flags when:**
 
-* Force rebuilding during development
-* Ensuring fresh builds after code changes
-* One-time builds without modifying compose files
+- Force rebuilding during development
+- Ensuring fresh builds after code changes
+- One-time builds without modifying compose files
 
 #### **Examples**
 
@@ -1801,15 +1801,15 @@ Docker Compose pull policies provide fine-grained control over image management,
 
 ### **Additional Resources**
 
-* [Docker Compose Specification - pull_policy](https://docs.docker.com/compose/compose-file/05-services/#pull_policy)
-* [Docker Compose CLI Reference](https://docs.docker.com/compose/reference/)
-* [Docker Compose Best Practices](https://docs.docker.com/compose/production/)
+- [Docker Compose Specification - pull_policy](https://docs.docker.com/compose/compose-file/05-services/#pull_policy)
+- [Docker Compose CLI Reference](https://docs.docker.com/compose/reference/)
+- [Docker Compose Best Practices](https://docs.docker.com/compose/production/)
 
 ## **Conclusion**
 
 Docker has revolutionized how developers build, deploy, and manage applications. By leveraging Docker, teams can focus on building great software without worrying about inconsistencies between development and production environments. Whether you're developing complex applications, deploying microservices, or automating your development pipeline, Docker provides the tools and flexibility needed to streamline these processes.
 
-## ***Resources:***
+## **_Resources:_**
 
 [Docker Networking Overview](https://docs.docker.com/engine/network/)\
 [Docker Storage](https://docs.docker.com/engine/storage/)
