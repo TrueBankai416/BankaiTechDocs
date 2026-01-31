@@ -11,46 +11,46 @@ Tämä dokumentaatiosivusto sisältää **kaksisuuntaisen Discord-kommenttien in
 
 ## Ominaisuudet
 
-* **Kaksisuuntainen viestintä**: Verkkosivuston kommentit → Discord, Discord-vastaukset → Verkkosivusto
-* **Kaksoiskommentointijärjestelmä**: Sekä Giscus (GitHub-pohjainen) että Discord-kommentit toimivat yhdessä
-* **Rikkaat Discord-upotukset**: Kommentit näkyvät muotoiltuina upotuksina, joissa on koko sivun konteksti.
-* **Keskusteluketjujen hallinta**: Automaattinen ketjujen luonti järjestettyjä vastauksia varten
-* **Reaaliaikaiset päivitykset**: Verkkosivusto näyttää Discord-vastaukset automaattisesti
-* **Koko sivun konteksti**: Kommentit sisältävät sivun otsikon, URL-osoitteen ja navigoinnin kontekstin
-* **Käyttäjäavatarit**: Discord-vastaukset näyttävät käyttäjien avatarit ja käyttäjätunnukset
-* **Responsiivinen suunnittelu**: Toimii sekä tietokoneella että mobiililaitteilla
+- **Kaksisuuntainen viestintä**: Verkkosivuston kommentit → Discord, Discord-vastaukset → Verkkosivusto
+- **Kaksoiskommentointijärjestelmä**: Sekä Giscus (GitHub-pohjainen) että Discord-kommentit toimivat yhdessä
+- **Rikkaat Discord-upotukset**: Kommentit näkyvät muotoiltuina upotuksina, joissa on koko sivun konteksti.
+- **Keskusteluketjujen hallinta**: Automaattinen ketjujen luonti järjestettyjä vastauksia varten
+- **Reaaliaikaiset päivitykset**: Verkkosivusto näyttää Discord-vastaukset automaattisesti
+- **Koko sivun konteksti**: Kommentit sisältävät sivun otsikon, URL-osoitteen ja navigoinnin kontekstin
+- **Käyttäjäavatarit**: Discord-vastaukset näyttävät käyttäjien avatarit ja käyttäjätunnukset
+- **Responsiivinen suunnittelu**: Toimii sekä tietokoneella että mobiililaitteilla
 
 ## Asennusohjeet
 
-### 1. Luo Discord-botti
+### 1. Create a Discord Bot
 
 1. Siirry [Discord-kehittäjäportaaliin](https://discord.com/developers/applications)
 2. Luo uusi sovellus
 3. Siirry "Botti"-osioon ja luo botti
 4. Kopioi botin tunnus
 5. Ota käyttöön kohdassa "Privileged Gateway Intents":
-   * **Viestin sisällön tarkoitus**
-   * **Palvelimen jäsenten tarkoitus** (valinnainen)
+   - **Viestin sisällön tarkoitus**
+   - **Palvelimen jäsenten tarkoitus** (valinnainen)
 
-### 2) Botin käyttöoikeuksien määrittäminen
+### 2. Configure Bot Permissions
 
 Bottisi tarvitsee nämä käyttöoikeudet:
 
-* Lue viestit
-* Lähetä viestejä
-* Luo julkisia ketjuja
-* Lähetä viestejä ketjuissa
-* Lue viestihistoria
-* Käytä vinoviivakomentoja (valinnainen)
+- Lue viestit
+- Lähetä viestejä
+- Luo julkisia ketjuja
+- Lähetä viestejä ketjuissa
+- Lue viestihistoria
+- Käytä vinoviivakomentoja (valinnainen)
 
-### 3. Kutsu botti palvelimelle
+### 3. Invite Bot to Server
 
 1. Siirry kohtaan OAuth2 > URL-generaattori
 2. Valitse "botti"-laajuus
 3. Valitse yllä luetellut käyttöoikeudet
 4. Kutsu botti palvelimellesi käyttämällä luotua URL-osoitetta
 
-### 4) Ympäristömuuttujien määrittäminen
+### 4. Configure Environment Variables
 
 #### Käyttöliittymä (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Sivustosi nimi
 
 :::varoitus Turvallisuushuomautus
 
-* Älä koskaan sisällytä `.env`-tiedostoja versionhallintaan
-* Käytä ympäristömuuttujia tuotannossa
-* Pidä bottitunnuksesi turvassa
+- Älä koskaan sisällytä `.env`-tiedostoja versionhallintaan
+- Käytä ympäristömuuttujia tuotannossa
+- Pidä bottitunnuksesi turvassa
   :::
 
-### 5. Asenna palvelinriippuvuudet
+### 5. Install Server Dependencies
 
 ```bash
 cd-palvelin
 npm-asennus
 ```
 
-### 6. Käynnistä taustapalvelin
+### 6. Start the Backend Server
 
 ```bash
 # Kehitys
@@ -116,14 +116,14 @@ npm suoritus dev
 npm aloitus
 ```
 
-### 7. Käyttöönoton määritys
+### 7. Deploy Configuration
 
 Tuotantoympäristöjen käyttöönottoja varten määritä ympäristömuuttujat hosting-alustallasi:
 
-* **Frontend**: Aseta `REACT_APP_API_URL` tuotanto-API-URL:ksi
-* **Taustajärjestelmä**: Ota käyttöön palvelinkansio bottitunnuksella ja kanavatunnuksella
-* **Tietokanta**: SQLite-tietokanta luodaan automaattisesti
-* **Konteksti**: Määritä Discord-kontekstin taso ja asetukset mieltymystesi mukaan.
+- **Frontend**: Aseta `REACT_APP_API_URL` tuotanto-API-URL:ksi
+- **Taustajärjestelmä**: Ota käyttöön palvelinkansio bottitunnuksella ja kanavatunnuksella
+- **Tietokanta**: SQLite-tietokanta luodaan automaattisesti
+- **Konteksti**: Määritä Discord-kontekstin taso ja asetukset mieltymystesi mukaan.
 
 ## Miten se toimii
 
@@ -140,22 +140,22 @@ Tuotantoympäristöjen käyttöönottoja varten määritä ympäristömuuttujat 
 
 Discord-upotukset sisältävät:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Kuvaus**: Kommentin varsinainen sisältö
-* **Kirjoittaja**: Kommentoijan nimi
-* **URL**: Klikkattava linkki täsmälleen oikealle sivulle
-* **Sivukenttä**: Näyttää sivun otsikon ja klikattavan linkin
-* **Aikaleima**: Kommentin julkaisuajankohta
-* **Keskusteluketju**: Automaattisesti luotu ketju vastauksia varten
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Kuvaus**: Kommentin varsinainen sisältö
+- **Kirjoittaja**: Kommentoijan nimi
+- **URL**: Klikkattava linkki täsmälleen oikealle sivulle
+- **Sivukenttä**: Näyttää sivun otsikon ja klikattavan linkin
+- **Aikaleima**: Kommentin julkaisuajankohta
+- **Keskusteluketju**: Automaattisesti luotu ketju vastauksia varten
 
 ### Verkkosivuston näyttö
 
 Verkkosivusto näyttää:
 
-* **Alkuperäiset kommentit**: Verkkosivustolomakkeen lähetykset
-* **Discord-vastaukset**: Vastauksia Discord-käyttäjiltä, joilla on avatar ja käyttäjätunnus
-* **Reaaliaikaiset päivitykset**: Automaattinen kysely uusille vastauksille
-* **Ketjutetut keskustelut**: Järjestelmällinen kommentti → vastausrakenne
+- **Alkuperäiset kommentit**: Verkkosivustolomakkeen lähetykset
+- **Discord-vastaukset**: Vastauksia Discord-käyttäjiltä, joilla on avatar ja käyttäjätunnus
+- **Reaaliaikaiset päivitykset**: Automaattinen kysely uusille vastauksille
+- **Ketjutetut keskustelut**: Järjestelmällinen kommentti → vastausrakenne
 
 ## Kontekstin konfigurointi
 
@@ -165,23 +165,23 @@ Määritä, kuinka paljon kontekstia Discord-viesteissä näkyy:
 
 #### `DISCORD_CONTEXT_LEVEL=minimaalinen`
 
-* **Näyttää**: Vain sivun otsikko ja kommentin sisältö
-* **Käyttötapaus**: Selkeät, yksinkertaiset viestit ilman lisäkontekstia
+- **Näyttää**: Vain sivun otsikko ja kommentin sisältö
+- **Käyttötapaus**: Selkeät, yksinkertaiset viestit ilman lisäkontekstia
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Näyttää**: Sivun otsikon, kommenttien sisällön ja klikattavan sivun URL-osoitteen
-* **Käyttötapaus**: Kohtuullinen konteksti olennaisilla tiedoilla
+- **Näyttää**: Sivun otsikon, kommenttien sisällön ja klikattavan sivun URL-osoitteen
+- **Käyttötapaus**: Kohtuullinen konteksti olennaisilla tiedoilla
 
 #### `DISCORD_CONTEXT_LEVEL=full` (oletus)
 
-* **Näyttää**: Kaikki kontekstitiedot, mukaan lukien navigointipolut, osiot ja aikaleimat
-* **Käyttötapaus**: Maksimaalinen konteksti yksityiskohtaisille keskusteluille
+- **Näyttää**: Kaikki kontekstitiedot, mukaan lukien navigointipolut, osiot ja aikaleimat
+- **Käyttötapaus**: Maksimaalinen konteksti yksityiskohtaisille keskusteluille
 
 #### `DISCORD_CONTEXT_LEVEL=mukautettu`
 
-* **Näyttää**: Vain ne kontekstielementit, jotka otat käyttöön erikseen
-* **Käyttötapaus**: Hienosäädetty hallinta näkyvien asioiden suhteen
+- **Näyttää**: Vain ne kontekstielementit, jotka otat käyttöön erikseen
+- **Käyttötapaus**: Hienosäädetty hallinta näkyvien asioiden suhteen
 
 ### Yksittäiset kontekstisäätimet
 
@@ -240,7 +240,7 @@ Sivustosi nimi • Kommentointijärjestelmä
 
 ### Muotoilu
 
-Discord-kommenttikomponentti käyttää CSS-moduuleja. Voit muokata ulkoasua muokkaamalla:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Komponenttien sijoittelu
 
-Discord-kommentit näkyvät oletuksena Giscus-kommenttien alapuolella. Voit muuttaa tätä muokkaamalla:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Ympäristömuuttujat eivät toimi
 
-* **Kehitys**: Käynnistä sekä käyttöliittymä- että taustapalvelimet uudelleen
-* **Tuotanto**: Ota sekä käyttöliittymä että taustajärjestelmä uudelleen käyttöön oikeilla ympäristömuuttujilla
-* **Etuliite**: Käytä `REACT_APP_`-etuliitettä vain käyttöliittymämuuttujille
+- **Kehitys**: Käynnistä sekä käyttöliittymä- että taustapalvelimet uudelleen
+- **Tuotanto**: Ota sekä käyttöliittymä että taustajärjestelmä uudelleen käyttöön oikeilla ympäristömuuttujilla
+- **Etuliite**: Käytä `REACT_APP_`-etuliitettä vain käyttöliittymämuuttujille
 
 ### Tietokantaongelmat
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Turvallisuusnäkökohdat
 
-* **Bottitunnus**: Pidä bottitunnustasi salassa äläkä koskaan tallenna sitä versionhallintaan.
-* **Nopeusrajoitus**: Discordilla on bottien nopeusrajoituksia (eri kuin webhookien).
-* **Syötteen validointi**: Sekä käyttöliittymä että taustajärjestelmä validoivat käyttäjän syötteen
-* **Tietokannan suojaus**: SQLite-tietokanta tulisi suojata asianmukaisilla tiedosto-oikeuksilla
-* **API-tietoturva**: Harkitse nopeusrajoituksen käyttöönottoa API-päätepisteissäsi
-* **CORS**: Määritä CORS oikein tuotantoympäristöäsi varten
+- **Bottitunnus**: Pidä bottitunnustasi salassa äläkä koskaan tallenna sitä versionhallintaan.
+- **Nopeusrajoitus**: Discordilla on bottien nopeusrajoituksia (eri kuin webhookien).
+- **Syötteen validointi**: Sekä käyttöliittymä että taustajärjestelmä validoivat käyttäjän syötteen
+- **Tietokannan suojaus**: SQLite-tietokanta tulisi suojata asianmukaisilla tiedosto-oikeuksilla
+- **API-tietoturva**: Harkitse nopeusrajoituksen käyttöönottoa API-päätepisteissäsi
+- **CORS**: Määritä CORS oikein tuotantoympäristöäsi varten
 
 ## Arkkitehtuuri
 
@@ -331,7 +331,7 @@ project/
 
 Discord-kommenttikomponentti toimii kaikissa nykyaikaisissa selaimissa, jotka tukevat:
 
-* ES6-nouto-API
-* React 18+
-* CSS-ruudukko ja Flexbox
-* Paikallinen tallennustila (lomakkeen säilyvyyttä varten)
+- ES6-nouto-API
+- React 18+
+- CSS-ruudukko ja Flexbox
+- Paikallinen tallennustila (lomakkeen säilyvyyttä varten)
