@@ -1,5 +1,5 @@
 project_id: Bankai-Tech
-api_token_env: 50570e99dc7d439e9f27df05676e5a235d645de5c5e9401091c385d464eaaf8377af21851d5f7cd1
+api_token_env: CROWDIN_PERSONAL_TOKEN
 preserve_hierarchy: 1
 files:
   - source: /i18n/en/**/*.json
