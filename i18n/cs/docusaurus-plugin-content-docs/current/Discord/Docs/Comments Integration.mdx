@@ -11,46 +11,46 @@ Tato dokumentační stránka obsahuje **obousměrnou integraci komentářů Disc
 
 ## Funkce
 
-* **Obousměrná komunikace**: Komentáře na webu → Discord, Odpovědi na Discordu → Web
-* **Systém duálních komentářů**: Komentáře z Giscusu (založeného na GitHubu) i Discordu fungují společně.
-* **Rozšířené vložené příspěvky na Discordu**: Komentáře se zobrazují jako formátované vložené příspěvky s kontextem celé stránky
-* **Správa vláken**: Automatické vytváření vláken pro organizované odpovědi
-* **Aktualizace v reálném čase**: Webové stránky automaticky zobrazují odpovědi na Discordu
-* **Kontext celé stránky**: Komentáře zahrnují název stránky, URL a kontext navigace
-* **Uživatelské avatary**: Odpovědi na Discordu zobrazují uživatelské avatary a uživatelská jména
-* **Responzivní design**: Funguje na stolních počítačích i mobilních zařízeních
+- **Obousměrná komunikace**: Komentáře na webu → Discord, Odpovědi na Discordu → Web
+- **Systém duálních komentářů**: Komentáře z Giscusu (založeného na GitHubu) i Discordu fungují společně.
+- **Rozšířené vložené příspěvky na Discordu**: Komentáře se zobrazují jako formátované vložené příspěvky s kontextem celé stránky
+- **Správa vláken**: Automatické vytváření vláken pro organizované odpovědi
+- **Aktualizace v reálném čase**: Webové stránky automaticky zobrazují odpovědi na Discordu
+- **Kontext celé stránky**: Komentáře zahrnují název stránky, URL a kontext navigace
+- **Uživatelské avatary**: Odpovědi na Discordu zobrazují uživatelské avatary a uživatelská jména
+- **Responzivní design**: Funguje na stolních počítačích i mobilních zařízeních
 
 ## Pokyny k nastavení
 
-### 1. Vytvořte Discord Bot
+### 1. Create a Discord Bot
 
 1. Přejděte na [Portál vývojářů Discordu](https://discord.com/developers/applications)
 2. Vytvořte novou aplikaci
 3. Přejděte do sekce „Bot“ a vytvořte bota.
 4. Zkopírujte token bota
 5. V části „Privilegované záměry brány“ povolte:
-   * **Záměr obsahu zprávy**
-   * **Záměr členů serveru** (volitelné)
+   - **Záměr obsahu zprávy**
+   - **Záměr členů serveru** (volitelné)
 
-### 2) Konfigurace oprávnění bota
+### 2. Configure Bot Permissions
 
 Váš bot potřebuje tato oprávnění:
 
-* Číst zprávy
-* Odesílat zprávy
-* Vytvářet veřejná vlákna
-* Posílat zprávy ve vláknech
-* Číst historii zpráv
-* Použití příkazů s lomítkem (volitelné)
+- Číst zprávy
+- Odesílat zprávy
+- Vytvářet veřejná vlákna
+- Posílat zprávy ve vláknech
+- Číst historii zpráv
+- Použití příkazů s lomítkem (volitelné)
 
-### 3. Pozvat bota na server
+### 3. Invite Bot to Server
 
 1. Přejděte do sekce OAuth2 > Generátor URL adres
 2. Vyberte rozsah „bot“
 3. Vyberte výše uvedená oprávnění
 4. Pomocí vygenerované adresy URL pozvěte bota na váš server.
 
-### 4) Konfigurace proměnných prostředí
+### 4. Configure Environment Variables
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Název vašeho webu
 
 :::warning Bezpečnostní poznámka
 
-* Nikdy neposkytovat soubory `.env` do systému správy verzí
-* Použití proměnných prostředí v produkčním prostředí
-* Chraňte svůj token bota
+- Nikdy neposkytovat soubory `.env` do systému správy verzí
+- Použití proměnných prostředí v produkčním prostředí
+- Chraňte svůj token bota
   :::
 
-### 5. Instalace závislostí serveru
+### 5. Install Server Dependencies
 
 ```bash
 cd server
 instalace npm
 ```
 
-### 6. Spuštění backendového serveru
+### 6. Start the Backend Server
 
 ```bash
 # Vývoj
@@ -116,14 +116,14 @@ spuštění npm dev
 spuštění npm
 ```
 
-### 7. Konfigurace nasazení
+### 7. Deploy Configuration
 
 Pro produkční nasazení nastavte proměnné prostředí na vaší hostitelské platformě:
 
-* **Frontend**: Nastavte `REACT_APP_API_URL` na URL vaší produkční API
-* **Backend**: Nasaďte složku serveru s tokenem bota a ID kanálu
-* **Databáze**: Databáze SQLite bude vytvořena automaticky
-* **Kontext**: Nastavte úroveň kontextu a možnosti Discordu podle svých preferencí
+- **Frontend**: Nastavte `REACT_APP_API_URL` na URL vaší produkční API
+- **Backend**: Nasaďte složku serveru s tokenem bota a ID kanálu
+- **Databáze**: Databáze SQLite bude vytvořena automaticky
+- **Kontext**: Nastavte úroveň kontextu a možnosti Discordu podle svých preferencí
 
 ## Jak to funguje
 
@@ -140,22 +140,22 @@ Pro produkční nasazení nastavte proměnné prostředí na vaší hostitelské
 
 Mezi vložené příspěvky na Discordu patří:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Popis**: Skutečný obsah komentáře
-* **Autor**: Jméno komentujícího
-* **URL**: Kliknutelný odkaz na přesnou stránku
-* **Pole stránky**: Zobrazuje název stránky s odkazem, na který lze kliknout
-* **Časové razítko**: Kdy byl komentář zveřejněn
-* **Vlákno**: Automaticky vytvořené vlákno pro odpovědi
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Popis**: Skutečný obsah komentáře
+- **Autor**: Jméno komentujícího
+- **URL**: Kliknutelný odkaz na přesnou stránku
+- **Pole stránky**: Zobrazuje název stránky s odkazem, na který lze kliknout
+- **Časové razítko**: Kdy byl komentář zveřejněn
+- **Vlákno**: Automaticky vytvořené vlákno pro odpovědi
 
 ### Zobrazení webových stránek
 
 Webová stránka ukazuje:
 
-* **Původní komentáře**: Odeslání formuláře na webu
-* **Odpovědi na Discordu**: Odpovědi od uživatelů Discordu s avatary a uživatelskými jmény
-* **Aktualizace v reálném čase**: Automatické dotazování na nové odpovědi
-* **Vláknové konverzace**: Organizovaný komentář → struktura odpovědí
+- **Původní komentáře**: Odeslání formuláře na webu
+- **Odpovědi na Discordu**: Odpovědi od uživatelů Discordu s avatary a uživatelskými jmény
+- **Aktualizace v reálném čase**: Automatické dotazování na nové odpovědi
+- **Vláknové konverzace**: Organizovaný komentář → struktura odpovědí
 
 ## Konfigurace kontextu
 
@@ -165,23 +165,23 @@ Nastavte, kolik kontextu se bude zobrazovat ve zprávách na Discordu:
 
 #### `DISCORD_CONTEXT_LEVEL=minimální`
 
-* **Zobrazuje**: Pouze název stránky a obsah komentáře
-* **Případ použití**: Čisté, jednoduché zprávy bez zbytečného kontextu
+- **Zobrazuje**: Pouze název stránky a obsah komentáře
+- **Případ použití**: Čisté, jednoduché zprávy bez zbytečného kontextu
 
 #### `DISCORD_CONTEXT_LEVEL=základní`
 
-* **Zobrazuje**: Název stránky, obsah komentáře a klikatelnou URL stránku
-* **Případ použití**: Střední kontext s důležitými informacemi
+- **Zobrazuje**: Název stránky, obsah komentáře a klikatelnou URL stránku
+- **Případ použití**: Střední kontext s důležitými informacemi
 
 #### `DISCORD_CONTEXT_LEVEL=plná` (výchozí)
 
-* **Zobrazuje**: Veškeré kontextové informace včetně navigace, sekcí a časových razítek
-* **Případ použití**: Maximální kontext pro podrobné diskuse
+- **Zobrazuje**: Veškeré kontextové informace včetně navigace, sekcí a časových razítek
+- **Případ použití**: Maximální kontext pro podrobné diskuse
 
 #### `DISCORD_CONTEXT_LEVEL=vlastní`
 
-* **Zobrazuje**: Pouze kontextové prvky, které povolíte jednotlivě.
-* **Případ použití**: Jemné ovládání zobrazení
+- **Zobrazuje**: Pouze kontextové prvky, které povolíte jednotlivě.
+- **Případ použití**: Jemné ovládání zobrazení
 
 ### Jednotlivé ovládací prvky kontextu
 
@@ -240,7 +240,7 @@ Název vašeho webu • Systém komentářů
 
 ### Styling
 
-Komponenta komentářů na Discordu používá CSS moduly. Vzhled si můžete přizpůsobit úpravou:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Umístění komponent
 
-Komentáře na Discordu se standardně zobrazují pod komentáři na Giscusu. Chcete-li to změnit, upravte:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Proměnné prostředí nefungují
 
-* **Vývoj**: Restartujte frontendové i backendové servery
-* **Produkce**: Znovu nasaďte frontend i backend se správnými proměnnými prostředí.
-* **Předpona**: Předponu `REACT_APP_` používejte pouze pro proměnné frontendu
+- **Vývoj**: Restartujte frontendové i backendové servery
+- **Produkce**: Znovu nasaďte frontend i backend se správnými proměnnými prostředí.
+- **Předpona**: Předponu `REACT_APP_` používejte pouze pro proměnné frontendu
 
 ### Problémy s databází
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Bezpečnostní aspekty
 
-* **Token bota**: Udržujte svůj token bota v tajnosti a nikdy ho neposkytujte systému správy verzí.
-* **Omezení rychlosti**: Discord má omezení rychlosti pro boty (na rozdíl od webhooků)
-* **Ověření vstupu**: Frontend i backend ověřují vstup uživatele.
-* **Zabezpečení databáze**: Databáze SQLite by měla být chráněna správnými oprávněními k souborům
-* **Zabezpečení API**: Zvažte implementaci omezení rychlosti na koncových bodech API
-* **CORS**: Správná konfigurace CORS pro vaši produkční doménu
+- **Token bota**: Udržujte svůj token bota v tajnosti a nikdy ho neposkytujte systému správy verzí.
+- **Omezení rychlosti**: Discord má omezení rychlosti pro boty (na rozdíl od webhooků)
+- **Ověření vstupu**: Frontend i backend ověřují vstup uživatele.
+- **Zabezpečení databáze**: Databáze SQLite by měla být chráněna správnými oprávněními k souborům
+- **Zabezpečení API**: Zvažte implementaci omezení rychlosti na koncových bodech API
+- **CORS**: Správná konfigurace CORS pro vaši produkční doménu
 
 ## Architektura
 
@@ -331,7 +331,7 @@ project/
 
 Komponenta komentářů na Discordu funguje ve všech moderních prohlížečích, které podporují:
 
-* API pro načítání ES6
-* Reagovat 18+
-* CSS mřížka a flexbox
-* Lokální úložiště (pro perzistenci formuláře)
+- API pro načítání ES6
+- Reagovat 18+
+- CSS mřížka a flexbox
+- Lokální úložiště (pro perzistenci formuláře)
