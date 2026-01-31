@@ -1,0 +1,104 @@
+---
+title: Activating Office with Local KMS
+tags:
+  - Office, KMS
+keywords:
+  - Office
+  - KMS
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Activating Microsoft Office using a local KMS (Key Management Service) server is a process that allows volume licensed Office versions to be activated internally, reducing the need for individual Office installations to connect to Microsoft for activation. It's particularly useful for organizations managing multiple Office installations. Below are the instructions tailored for setting up Office activation with a local KMS server.
+
+### Prerequisites
+
+* Ensure you have a local KMS server set up and running within your network.
+* Your Office version must be a volume license edition compatible with KMS activation.
+* Administrative access on the machine where Office is installed.
+
+### Activation Process
+
+#### Step 1: Open Command Prompt as Administrator
+
+1. **Windows Search**: Use the Windows search feature to find `Command Prompt`.
+2. **Right-Click**: Right-click on `Command Prompt` in the search results.
+3. **Run as Administrator**: Select `Run as administrator` from the context menu.
+
+#### Step 2: Navigate to the Office Installation Directory
+
+Microsoft Office's installation directory varies depending on the version and architecture (32-bit or 64-bit) of Office installed. You need to navigate to the directory where Office is installed using the `cd` command in Command Prompt.
+
+For example, for a default 32-bit Office installation on a 64-bit Windows system, the path might be:
+
+```ps
+cd C:\Program Files (x86)\Microsoft Office\Office16
+```
+
+For a 64-bit Office installation or different versions of Office, the path might vary, such as:
+
+* `C:\Program Files\Microsoft Office\Office16` for Office 2016 (64-bit)
+* Replace `Office16` with `Office15` for Office 2013, `Office14` for Office 2010, etc.
+
+#### Step 3: Set the KMS Server Address
+
+Configure your Office installation to use your local KMS server for activation. Replace `<KMS_Server_IP>` with your KMS server's IP address or hostname, the port is not needed:
+
+```ps
+cscript ospp.vbs /sethst:<KMS_Server_IP>
+```
+
+Here, `ospp.vbs` is a script provided with Office for configuring product activation settings, and `/sethst` specifies the KMS host.
+
+#### Step 4: Install License Key
+
+I am Activating Microsoft Office LTSC Professional Plus 2024, you can find keys by going to `<KMS_Server_IP:1688/products>` in your browser.
+
+```ps
+slmgr /ipk XJ2XN-FW8RK-P4HMP-DKDBV-GCVGB
+```
+
+:::note
+If you have multiple office keys then run the command for each one individually.
+For example if you wish to activate an office suite and another office app such as `Office Project` or `Office Visio` which do not come bundled with any Office Suites you will need to install the Office Suite Key and the The Additional App Key.
+:::
+
+#### Step 5: Activate Office
+
+Trigger the Office activation process using the same `ospp.vbs` script:
+
+```ps
+cscript ospp.vbs /act
+```
+
+This command initiates the activation process against the specified KMS server.
+:::note
+You may have to do this more than once to get a `sucessful` message.
+:::
+
+#### Step 6: Verify Activation Status
+
+To confirm that Office has successfully activated, you can check its activation status:
+
+```ps
+cscript ospp.vbs /dstatus
+```
+
+This command displays the current activation status and license details of your Office installation.
+
+#### Step 7: Check status on the KMS Server
+
+In your browser go to `<KMS_Server_IP:1688>`.
+Verify that the Office Installation is registered and shows `Activated`, if it is not `Activated` then repeat steps 4 and 5.
+
+### Additional Notes
+
+* **Firewall Settings**: Ensure the network firewall allows traffic on the KMS service port (default `1688`) from client machines to the KMS server.
+* **KMS Activation Validity**: KMS activations are temporary (180 days) with automatic renewal attempts every 7 days by default when the KMS server is reachable.
+* **Troubleshooting**: If activation fails, ensure accurate KMS server address entry, verify network connectivity, and confirm that the KMS server supports activating the Office version in use.
+
+Activating Microsoft Office via a local KMS server simplifies license management for enterprises and educational institutions, ensuring compliance and centralizing activation processes.
+
+<BuyMeACoffeeButton />
