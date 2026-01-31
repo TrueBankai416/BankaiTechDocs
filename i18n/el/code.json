@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Έκδοση: {versionLabel}",
-    "description": ""
+    "message": "Έκδοση: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Επεξεργαστείτε αυτήν τη σελίδα",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Κανένα αποτέλεσμα",
-    "description": ""
+    "message": "Κανένα αποτέλεσμα"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Δείτε όλα τα αποτελέσματα εκτός \"{context}\"",
-    "description": ""
+    "message": "Δείτε όλα τα αποτελέσματα εκτός \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Δείτε όλα τα αποτελέσματα στο \"{context}\"",
-    "description": ""
+    "message": "Δείτε όλα τα αποτελέσματα στο \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Δείτε όλα τα αποτελέσματα",
-    "description": ""
+    "message": "Δείτε όλα τα αποτελέσματα"
   },
   "theme.SearchBar.label": {
     "message": "Ερευνα",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Παντού",
-    "description": ""
+    "message": "Παντού"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "Βρέθηκε 1 έγγραφο|Βρέθηκαν {count} έγγραφα",
