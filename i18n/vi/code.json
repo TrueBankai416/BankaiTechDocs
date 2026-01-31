@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Phiên bản: {versionLabel}",
-    "description": ""
+    "message": "Phiên bản: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Chỉnh sửa trang này",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Không có kết quả",
-    "description": ""
+    "message": "Không có kết quả"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Xem tất cả kết quả bên ngoài \"{context}\"",
-    "description": ""
+    "message": "Xem tất cả kết quả bên ngoài \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Xem tất cả kết quả trong \"{context}\"",
-    "description": ""
+    "message": "Xem tất cả kết quả trong \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Xem tất cả kết quả",
-    "description": ""
+    "message": "Xem tất cả kết quả"
   },
   "theme.SearchBar.label": {
     "message": "Tìm kiếm",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Mọi nơi",
-    "description": ""
+    "message": "Mọi nơi"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "Tìm thấy 1 tài liệu|{count} tài liệu được tìm thấy",
