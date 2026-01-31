@@ -1,0 +1,633 @@
+---
+title: Git Troubleshooting
+description: Comprehensive Git troubleshooting guide covering divergent branches, merge conflicts, authentication issues, and common Git problems with solutions.
+image: /img/social/github-social.webp
+tags:
+  - GitHub
+  - Git
+  - Troubleshooting
+  - Branches
+  - Pull
+  - Merge
+keywords:
+  - Git
+  - Troubleshooting
+  - Divergent Branches
+  - Pull
+  - Merge
+  - Rebase
+  - Fast-Forward
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Git Troubleshooting Guide**
+
+This guide covers common Git issues you might encounter when working with GitHub repositories, with detailed solutions and best practices to prevent future problems.
+
+## **Divergent Branches Error**
+
+One of the most common issues developers face is the "divergent branches" error when trying to pull from a remote repository.
+
+### **Understanding the Error**
+
+When you see this error message:
+
+```bash
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint:
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+```
+
+This happens when:
+
+* Your local branch has commits that aren't on the remote branch
+* The remote branch has commits that aren't on your local branch
+* Git doesn't know how you want to combine these divergent histories
+
+<Tabs
+  defaultValue="immediate"
+  values={[
+   {label: 'Immediate Solution', value: 'immediate'},
+   {label: 'Understanding Options', value: 'options'},
+   {label: 'Prevention', value: 'prevention'},
+  ]}
+>
+  <TabItem value="immediate">
+    **Quick Fix for the Error:**
+
+    If you're on the wrong branch (common cause):
+
+    ```bash
+    # Check which branch you're on
+    git branch
+
+    # Switch to main branch
+    git checkout main
+
+    # Now pull should work
+    git pull origin main
+    ```
+
+    If you're on the correct branch:
+
+    ```bash
+    # Option 1: Use merge strategy (preserves branch history)
+    git config pull.rebase false
+    git pull
+
+    # Option 2: Use rebase strategy (creates linear history)
+    git config pull.rebase true
+    git pull
+
+    # Option 3: Use fast-forward only (fails if not possible)
+    git config pull.ff only
+    git pull
+    ```
+  </TabItem>
+
+  <TabItem value="options">
+    **The Three Strategies Explained:**
+
+    **1. Merge (pull.rebase false)**
+
+    * Creates a merge commit that combines the histories
+    * Preserves the exact history of both branches
+    * Results in a more complex but complete history
+    * **Use when**: You want to preserve all commit history
+
+    **2. Rebase (pull.rebase true)**
+
+    * Replays your local commits on top of the remote commits
+    * Creates a linear, cleaner history
+    * Rewrites commit hashes for your local commits
+    * **Use when**: You want a clean, linear history
+
+    **3. Fast-Forward Only (pull.ff only)**
+
+    * Only updates if your branch can be fast-forwarded
+    * Fails if there are divergent changes
+    * Prevents accidental merges
+    * **Use when**: You want to ensure no merge commits are created
+  </TabItem>
+
+  <TabItem value="prevention">
+    **Preventing Divergent Branches:**
+
+    **1. Set Global Git Configuration:**
+
+    ```bash
+    # Set your preferred default strategy
+    git config --global pull.rebase false  # or true, or ff
+    ```
+
+    **2. Workflow Best Practices:**
+
+    * Always pull before starting new work
+    * Commit your changes before pulling
+    * Use feature branches for new development
+    * Keep main/master branch clean
+
+    **3. Regular Synchronization:**
+
+    ```bash
+    # Daily workflow
+    git checkout main
+    git pull origin main
+    git checkout your-feature-branch
+    git rebase main  # or merge main
+    ```
+  </TabItem>
+</Tabs>
+
+## **Common Git Issues and Solutions**
+
+<Tabs
+  defaultValue="authentication"
+  values={[
+   {label: 'Authentication Issues', value: 'authentication'},
+   {label: 'Merge Conflicts', value: 'conflicts'},
+   {label: 'Push/Pull Problems', value: 'pushpull'},
+   {label: 'Branch Issues', value: 'branches'},
+  ]}
+>
+  <TabItem value="authentication">
+    **Problem**: Authentication failed when pushing/pulling
+
+    **Symptoms:**
+
+    ```bash
+    remote: Invalid username or password.
+    fatal: Authentication failed for 'https://github.com/...'
+    ```
+
+    **Solutions:**
+
+    **1. Use Personal Access Token (Recommended):**
+
+    ```bash
+    # Generate token at: https://github.com/settings/tokens
+    # Use token as password when prompted
+    git push origin main
+    ```
+
+    **2. Use GitHub CLI:**
+
+    ```bash
+    # Install GitHub CLI: https://cli.github.com/
+    gh auth login
+    # Follow prompts to authenticate
+    ```
+
+    **3. Set Up SSH Keys:**
+
+    ```bash
+    # Generate SSH key
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+
+    # Add to SSH agent
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_ed25519
+
+    # Add public key to GitHub account
+    cat ~/.ssh/id_ed25519.pub
+    # Copy output and add to GitHub Settings > SSH Keys
+
+    # Test connection
+    ssh -T git@github.com
+    ```
+
+    **4. Update Remote URL to Use SSH:**
+
+    ```bash
+    # Change from HTTPS to SSH
+    git remote set-url origin git@github.com:username/repository.git
+    ```
+  </TabItem>
+
+  <TabItem value="conflicts">
+    **Problem**: Merge conflicts during pull or merge
+
+    **Symptoms:**
+
+    ```bash
+    Auto-merging file.txt
+    CONFLICT (content): Merge conflict in file.txt
+    Automatic merge failed; fix conflicts and then commit the result.
+    ```
+
+    **Step-by-Step Resolution:**
+
+    **1. Identify Conflicted Files:**
+
+    ```bash
+    git status
+    # Look for files marked as "both modified"
+    ```
+
+    **2. Edit Conflicted Files:**
+
+    ```
+    <<<<<<< HEAD
+    Your local changes
+    =======
+    Remote changes
+    >>>>>>> branch-name
+    ```
+
+    **3. Resolve Conflicts:**
+
+    * Remove conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+    * Keep the code you want
+    * Save the file
+
+    **4. Complete the Merge:**
+
+    ```bash
+    # Stage resolved files
+    git add filename
+
+    # Commit the merge
+    git commit -m "Resolve merge conflict in filename"
+    ```
+
+    **Tools for Easier Resolution:**
+
+    ```bash
+    # Use Git's built-in merge tool
+    git mergetool
+
+    # Or configure your preferred editor
+    git config --global merge.tool vimdiff  # or code, etc.
+    ```
+  </TabItem>
+
+  <TabItem value="pushpull">
+    **Problem**: Cannot push or pull from repository
+
+    **Common Causes and Solutions:**
+
+    **1. Repository URL Issues:**
+
+    ```bash
+    # Check current remote URL
+    git remote -v
+
+    # Update if incorrect
+    git remote set-url origin https://github.com/username/repo.git
+    ```
+
+    **2. Branch Tracking Issues:**
+
+    ```bash
+    # Set upstream branch
+    git push -u origin branch-name
+
+    # Or set tracking for existing branch
+    git branch --set-upstream-to=origin/main main
+    ```
+
+    **3. Large File Issues:**
+
+    ```bash
+    # If files are too large (>100MB)
+    # Use Git LFS
+    git lfs install
+    git lfs track "*.large-extension"
+    git add .gitattributes
+    git commit -m "Add LFS tracking"
+    ```
+
+    **4. Network/Connectivity Issues:**
+
+    ```bash
+    # Test connectivity
+    ping github.com
+
+    # Try different protocol
+    git remote set-url origin git@github.com:username/repo.git
+    ```
+  </TabItem>
+
+  <TabItem value="branches">
+    **Problem**: Branch-related issues
+
+    **Cannot Switch Branches:**
+
+    ```bash
+    # If you have uncommitted changes
+    git stash
+    git checkout other-branch
+    git stash pop  # Apply changes to new branch
+    ```
+
+    **Branch Not Showing Up:**
+
+    ```bash
+    # Fetch all remote branches
+    git fetch --all
+
+    # List all branches (including remote)
+    git branch -a
+
+    # Create local branch tracking remote
+    git checkout -b local-branch-name origin/remote-branch-name
+    ```
+
+    **Accidental Commits on Wrong Branch:**
+
+    ```bash
+    # Move last commit to different branch
+    git checkout correct-branch
+    git cherry-pick wrong-branch
+    git checkout wrong-branch
+    git reset --hard HEAD~1
+    ```
+
+    **Delete Branches:**
+
+    ```bash
+    # Delete local branch (must not be current branch)
+    git branch -d branch-name
+
+    # Force delete local branch
+    git branch -D branch-name
+
+    # Delete remote branch
+    git push origin --delete branch-name
+    ```
+  </TabItem>
+</Tabs>
+
+## **Advanced Troubleshooting**
+
+<Tabs
+  defaultValue="history"
+  values={[
+   {label: 'History Issues', value: 'history'},
+   {label: 'Repository Corruption', value: 'corruption'},
+   {label: 'Performance Issues', value: 'performance'},
+  ]}
+>
+  <TabItem value="history">
+    **Fixing Commit History Issues:**
+
+    **Undo Last Commit (Keep Changes):**
+
+    ```bash
+    git reset --soft HEAD~1
+    ```
+
+    **Undo Last Commit (Discard Changes):**
+
+    ```bash
+    git reset --hard HEAD~1
+    ```
+
+    **Amend Last Commit:**
+
+    ```bash
+    # Change commit message
+    git commit --amend -m "New message"
+
+    # Add files to last commit
+    git add forgotten-file
+    git commit --amend --no-edit
+    ```
+
+    **Revert a Commit (Safe for Shared History):**
+
+    ```bash
+    git revert commit-hash
+    ```
+
+    **Interactive Rebase (Rewrite History):**
+
+    ```bash
+    # Rebase last 3 commits
+    git rebase -i HEAD~3
+    # Use only on commits not pushed to shared repositories
+    ```
+  </TabItem>
+
+  <TabItem value="corruption">
+    **Repository Corruption Issues:**
+
+    **Verify Repository Integrity:**
+
+    ```bash
+    git fsck --full
+    ```
+
+    **Fix Corrupted Objects:**
+
+    ```bash
+    # Garbage collection and cleanup
+    git gc --aggressive
+
+    # Prune unreachable objects
+    git prune
+    ```
+
+    **Recovery from Backup:**
+
+    ```bash
+    # If corruption is severe, re-clone
+    cd ..
+    rm -rf corrupted-repo
+    git clone https://github.com/username/repo.git
+    ```
+
+    **Recover Lost Commits:**
+
+    ```bash
+    # Find lost commits
+    git reflog
+
+    # Recover specific commit
+    git checkout lost-commit-hash
+    git checkout -b recovery-branch
+    ```
+  </TabItem>
+
+  <TabItem value="performance">
+    **Performance Optimization:**
+
+    **Large Repository Issues:**
+
+    ```bash
+    # Shallow clone for faster downloads
+    git clone --depth 1 https://github.com/username/repo.git
+
+    # Partial clone (Git 2.19+)
+    git clone --filter=blob:none https://github.com/username/repo.git
+    ```
+
+    **Reduce Repository Size:**
+
+    ```bash
+    # Clean up unnecessary files
+    git gc --aggressive --prune=now
+
+    # Remove large files from history (use with caution)
+    git filter-branch --tree-filter 'rm -f large-file' HEAD
+    ```
+
+    **Optimize Network Operations:**
+
+    ```bash
+    # Use SSH instead of HTTPS for better performance
+    git remote set-url origin git@github.com:username/repo.git
+
+    # Configure Git for better performance
+    git config --global core.preloadindex true
+    git config --global core.fscache true
+    git config --global gc.auto 256
+    ```
+  </TabItem>
+</Tabs>
+
+## **Git Configuration Best Practices**
+
+<Tabs
+  defaultValue="global"
+  values={[
+   {label: 'Global Configuration', value: 'global'},
+   {label: 'Repository-Specific', value: 'repo'},
+   {label: 'Aliases & Shortcuts', value: 'aliases'},
+  ]}
+>
+  <TabItem value="global">
+    **Essential Global Git Settings:**
+
+    ```bash
+    # User identity
+    git config --global user.name "Your Name"
+    git config --global user.email "your.email@example.com"
+
+    # Default branch name
+    git config --global init.defaultBranch main
+
+    # Pull strategy (choose one)
+    git config --global pull.rebase false  # merge
+    # git config --global pull.rebase true   # rebase
+    # git config --global pull.ff only       # fast-forward only
+
+    # Push behavior
+    git config --global push.default simple
+
+    # Editor for commit messages
+    git config --global core.editor "code --wait"  # VS Code
+    # git config --global core.editor "vim"          # Vim
+
+    # Diff and merge tools
+    git config --global diff.tool vscode
+    git config --global merge.tool vscode
+
+    # Auto-correct typos
+    git config --global help.autocorrect 1
+
+    # Better diff algorithm
+    git config --global diff.algorithm patience
+    ```
+  </TabItem>
+
+  <TabItem value="repo">
+    **Repository-Specific Settings:**
+
+    ```bash
+    # Different user for work repositories
+    git config user.email "work.email@company.com"
+
+    # Repository-specific pull strategy
+    git config pull.rebase true
+
+    # Custom hooks directory
+    git config core.hooksPath .githooks
+
+    # Ignore file permissions (useful on Windows)
+    git config core.filemode false
+
+    # Line ending handling
+    git config core.autocrlf true   # Windows
+    git config core.autocrlf input  # macOS/Linux
+    ```
+  </TabItem>
+
+  <TabItem value="aliases">
+    **Useful Git Aliases:**
+
+    ```bash
+    # Status shortcuts
+    git config --global alias.st status
+    git config --global alias.co checkout
+    git config --global alias.br branch
+    git config --global alias.ci commit
+
+    # Advanced aliases
+    git config --global alias.unstage 'reset HEAD --'
+    git config --global alias.last 'log -1 HEAD'
+    git config --global alias.visual '!gitk'
+
+    # Pretty log formats
+    git config --global alias.lg "log --oneline --decorate --graph"
+    git config --global alias.lga "log --oneline --decorate --graph --all"
+
+    # Useful shortcuts
+    git config --global alias.amend 'commit --amend --no-edit'
+    git config --global alias.oops 'reset --soft HEAD~1'
+    git config --global alias.sync '!git fetch && git checkout main && git pull'
+    ```
+
+    **Using Aliases:**
+
+    ```bash
+    # Instead of 'git status'
+    git st
+
+    # Instead of 'git log --oneline --decorate --graph'
+    git lg
+
+    # Custom sync command
+    git sync
+    ```
+  </TabItem>
+</Tabs>
+
+## **Emergency Git Commands**
+
+When things go wrong, these commands can help recover:
+
+```bash
+# See what you did recently
+git reflog
+
+# Undo almost anything
+git reset --hard HEAD~1
+
+# Save work in progress
+git stash
+
+# Recover deleted branch
+git checkout -b recovered-branch commit-hash
+
+# Force push (use with extreme caution)
+git push --force-with-lease
+
+# Start over completely
+git reset --hard origin/main
+```
+
+:::caution
+**Warning**: Commands like `reset --hard` and `push --force` can permanently delete work. Always make sure you have backups or that the work isn't needed before using destructive commands.
+:::
+
+<BuyMeACoffeeButton />
