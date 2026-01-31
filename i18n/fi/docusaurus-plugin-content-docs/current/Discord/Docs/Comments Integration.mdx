@@ -1,85 +1,85 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
-image: /img/social/discord-social.jpg
+title: Kommenttien integrointi
+description: Täydellinen opas kaksisuuntaisten Discord-kommenttien integrointiin Docusaurusin kanssa, mukaan lukien asennus, konfigurointi ja vianmääritys.
+image: /img/sosiaalinen/discord-sosiaalinen.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Discord-kommenttien integrointi
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+Tämä dokumentaatiosivusto sisältää **kaksisuuntaisen Discord-kommenttien integraation**, jonka avulla kävijät voivat lähettää kommentteja Discord-palvelimellesi JA näyttää Discord-vastaukset verkkosivustolla olemassa olevien GitHub-pohjaisten Giscus-kommenttien rinnalla.
 
-## Features
+## Ominaisuudet
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **Kaksisuuntainen viestintä**: Verkkosivuston kommentit → Discord, Discord-vastaukset → Verkkosivusto
+* **Kaksoiskommentointijärjestelmä**: Sekä Giscus (GitHub-pohjainen) että Discord-kommentit toimivat yhdessä
+* **Rikkaat Discord-upotukset**: Kommentit näkyvät muotoiltuina upotuksina, joissa on koko sivun konteksti.
+* **Keskusteluketjujen hallinta**: Automaattinen ketjujen luonti järjestettyjä vastauksia varten
+* **Reaaliaikaiset päivitykset**: Verkkosivusto näyttää Discord-vastaukset automaattisesti
+* **Koko sivun konteksti**: Kommentit sisältävät sivun otsikon, URL-osoitteen ja navigoinnin kontekstin
+* **Käyttäjäavatarit**: Discord-vastaukset näyttävät käyttäjien avatarit ja käyttäjätunnukset
+* **Responsiivinen suunnittelu**: Toimii sekä tietokoneella että mobiililaitteilla
 
-## Setup Instructions
+## Asennusohjeet
 
-### 1. Create a Discord Bot
+### 1. Luo Discord-botti
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. Siirry [Discord-kehittäjäportaaliin](https://discord.com/developers/applications)
+2. Luo uusi sovellus
+3. Siirry "Botti"-osioon ja luo botti
+4. Kopioi botin tunnus
+5. Ota käyttöön kohdassa "Privileged Gateway Intents":
+   * **Viestin sisällön tarkoitus**
+   * **Palvelimen jäsenten tarkoitus** (valinnainen)
 
-### 2) Configure Bot Permissions
+### 2) Botin käyttöoikeuksien määrittäminen
 
-Your bot needs these permissions:
+Bottisi tarvitsee nämä käyttöoikeudet:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* Lue viestit
+* Lähetä viestejä
+* Luo julkisia ketjuja
+* Lähetä viestejä ketjuissa
+* Lue viestihistoria
+* Käytä vinoviivakomentoja (valinnainen)
 
-### 3. Invite Bot to Server
+### 3. Kutsu botti palvelimelle
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. Siirry kohtaan OAuth2 > URL-generaattori
+2. Valitse "botti"-laajuus
+3. Valitse yllä luetellut käyttöoikeudet
+4. Kutsu botti palvelimellesi käyttämällä luotua URL-osoitetta
 
-### 4) Configure Environment Variables
+### 4) Ympäristömuuttujien määrittäminen
 
-#### Frontend (.env)
+#### Käyttöliittymä (.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord-botin asetukset
+DISCORD_BOT_TOKEN=bottitunnuksesi_tässä
+DISCORD_CHANNEL_ID=kanavatunnuksesi_tässä
 
-# API Configuration
+# API-asetukset
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# Discord-kontekstin asetukset
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Sivustosi nimi
 ```
 
-#### Backend Server (server/.env)
+#### Taustapalvelin (server/.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord-botin asetukset
+DISCORD_BOT_TOKEN=bottisi_tunnus_tässä
+DISCORD_CHANNEL_ID=kanavasi_tunnus_tässä
 
-# API Configuration
+# API-asetukset
 PORT=3001
 
-# Discord Context Configuration
+# Discord-kontekstin asetukset
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
@@ -89,249 +89,249 @@ DISCORD_SHOW_TIMESTAMP=true
 DISCORD_SHOW_AUTHOR_FIELD=true
 DISCORD_CREATE_THREADS=true
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Sivustosi nimi
 ```
 
-:::warning Security Note
+:::varoitus Turvallisuushuomautus
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* Älä koskaan sisällytä `.env`-tiedostoja versionhallintaan
+* Käytä ympäristömuuttujia tuotannossa
+* Pidä bottitunnuksesi turvassa
   :::
 
-### 5. Install Server Dependencies
+### 5. Asenna palvelinriippuvuudet
 
 ```bash
-cd server
-npm install
+cd-palvelin
+npm-asennus
 ```
 
-### 6. Start the Backend Server
+### 6. Käynnistä taustapalvelin
 
 ```bash
-# Development
-npm run dev
+# Kehitys
+npm suoritus dev
 
-# Production
-npm start
+# Tuotanto
+npm aloitus
 ```
 
-### 7. Deploy Configuration
+### 7. Käyttöönoton määritys
 
-For production deployments, set environment variables in your hosting platform:
+Tuotantoympäristöjen käyttöönottoja varten määritä ympäristömuuttujat hosting-alustallasi:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **Frontend**: Aseta `REACT_APP_API_URL` tuotanto-API-URL:ksi
+* **Taustajärjestelmä**: Ota käyttöön palvelinkansio bottitunnuksella ja kanavatunnuksella
+* **Tietokanta**: SQLite-tietokanta luodaan automaattisesti
+* **Konteksti**: Määritä Discord-kontekstin taso ja asetukset mieltymystesi mukaan.
 
-## How It Works
+## Miten se toimii
 
-### Complete Bidirectional Flow
+### Täydellinen kaksisuuntainen virtaus
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **Verkkosivuston kommentti**: Käyttäjä lähettää kommentin verkkosivuston lomakkeen kautta.
+2. **Discord-viesti**: Botti lähettää muotoillun upotuksen Discord-kanavalle koko sivun kontekstilla
+3. **Keskusteluketjun luonti**: Botti luo automaattisesti ketjun järjestettyjä vastauksia varten.
+4. **Discord-vastaukset**: Discord-käyttäjät vastaavat viestiketjussa tai viestiin.
+5. **Tietokannan tallennus**: Botti tallentaa kaikki kommentit ja vastaukset SQLite-tietokantaan
+6. **Sivuston näyttö**: Frontend-kyselyt API:ssa 30 sekunnin välein ja Discord-vastaukset näytetään.
 
-### Discord Message Format
+### Discord-viestin muoto
 
-Discord embeds include:
+Discord-upotukset sisältävät:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **Kuvaus**: Kommentin varsinainen sisältö
+* **Kirjoittaja**: Kommentoijan nimi
+* **URL**: Klikkattava linkki täsmälleen oikealle sivulle
+* **Sivukenttä**: Näyttää sivun otsikon ja klikattavan linkin
+* **Aikaleima**: Kommentin julkaisuajankohta
+* **Keskusteluketju**: Automaattisesti luotu ketju vastauksia varten
 
-### Website Display
+### Verkkosivuston näyttö
 
-The website shows:
+Verkkosivusto näyttää:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **Alkuperäiset kommentit**: Verkkosivustolomakkeen lähetykset
+* **Discord-vastaukset**: Vastauksia Discord-käyttäjiltä, joilla on avatar ja käyttäjätunnus
+* **Reaaliaikaiset päivitykset**: Automaattinen kysely uusille vastauksille
+* **Ketjutetut keskustelut**: Järjestelmällinen kommentti → vastausrakenne
 
-## Context Configuration
+## Kontekstin konfigurointi
 
-### Context Levels
+### Kontekstitasot
 
-Configure how much context appears in Discord messages:
+Määritä, kuinka paljon kontekstia Discord-viesteissä näkyy:
 
-#### `DISCORD_CONTEXT_LEVEL=minimal`
+#### `DISCORD_CONTEXT_LEVEL=minimaalinen`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **Näyttää**: Vain sivun otsikko ja kommentin sisältö
+* **Käyttötapaus**: Selkeät, yksinkertaiset viestit ilman lisäkontekstia
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **Näyttää**: Sivun otsikon, kommenttien sisällön ja klikattavan sivun URL-osoitteen
+* **Käyttötapaus**: Kohtuullinen konteksti olennaisilla tiedoilla
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (oletus)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **Näyttää**: Kaikki kontekstitiedot, mukaan lukien navigointipolut, osiot ja aikaleimat
+* **Käyttötapaus**: Maksimaalinen konteksti yksityiskohtaisille keskusteluille
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `DISCORD_CONTEXT_LEVEL=mukautettu`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **Näyttää**: Vain ne kontekstielementit, jotka otat käyttöön erikseen
+* **Käyttötapaus**: Hienosäädetty hallinta näkyvien asioiden suhteen
 
-### Individual Context Controls
+### Yksittäiset kontekstisäätimet
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+Kun käytät `DISCORD_CONTEXT_LEVEL=custom`-muuttujaa, voit hallita jokaista elementtiä:
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # Näytä sivun otsikko ja URL-kenttä
+DISCORD_SHOW_BREADCRUMBS=true # Näytä navigoinnin polunmurut
+DISCORD_SHOW_SECTION_INFO=true # Näytä pääosio (Docker, Nextcloud jne.)
+DISCORD_SHOW_PAGE_PATH=false # Näytä koko URL-polku
+DISCORD_SHOW_TIMESTAMP=true # Näytä kommentin lähetysaika
+DISCORD_SHOW_AUTHOR_FIELD=true # Näytä kommentoijan nimi upotettuna kirjoittajana
 ```
 
-### Example Context Outputs
+### Säikeen konfigurointi
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # Luo ketjuja vastauksille
+DISCORD_THREAD_DURATION=1440 # Ketjun automaattisen arkistoinnin aika (minuutteina)
+DISCORD_SITE_NAME=Sivustosi nimi # Sivuston nimi alatunnisteessa
 ```
 
-**Full Context:**
+### Esimerkki kontekstituloksista
+
+**Minimaalinen konteksti:**
 
 ```
-💬 New Comment: Docker Installation Guide
+Dockerin asennusopas
+"Tämä tutoriaali oli todella hyödyllinen! Miten käsittelen porttiristiriitoja?"
+```
+
+**Peruskonteksti:**
+
+```
+💬 Dockerin asennusopas
+"Tämä tutoriaali oli todella hyödyllinen! Miten käsittelen porttiristiriitoja?"
+[Linkki sivulle]
+```
+
+**Koko konteksti:**
+
+```
+💬 Uusi kommentti: Dockerin asennusopas
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+"Tämä tutoriaali oli todella hyödyllinen! Miten käsittelen porttiristiriitoja?"
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 Sivu: Dockerin asennusopas
+📍 Navigointi: Docker > Dokumentaatio > Dockerin asentaminen
+📂 Osa: Docker
+🔗 Polku: /Docker/Docs/Asentaminen%20Docker/Docker%20Eengine
 
-Your Site Name • Comment System
+Sivustosi nimi • Kommentointijärjestelmä
 ```
 
-## Customization
+## Mukauttaminen
 
-### Styling
+### Muotoilu
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Discord-kommenttikomponentti käyttää CSS-moduuleja. Voit muokata ulkoasua muokkaamalla:
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### Viestin muoto
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+Discord-upotusmuodon mukauttamiseksi muokkaa `discordMessage`-objektia kohdassa:
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### Komponenttien sijoittelu
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+Discord-kommentit näkyvät oletuksena Giscus-kommenttien alapuolella. Voit muuttaa tätä muokkaamalla:
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## Vianmääritys
 
-### Bot Not Responding
+### Botti ei vastaa
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **Tarkista botin tunnus**: Varmista, että `DISCORD_BOT_TOKEN` on oikein
+2. **Tarkista käyttöoikeudet**: Varmista, että botilla on tarvittavat käyttöoikeudet kanavalla.
+3. **Tarkista kanavan tunnus**: Varmista, että `DISCORD_CHANNEL_ID` on oikein
+4. **Botti palvelimella**: Varmista, että botti on todella Discord-palvelimellasi.
 
-### Comments Not Appearing
+### Kommentit eivät näy
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. **Palvelin käynnissä**: Tarkista, onko taustapalvelin käynnissä oikeassa portissa
+2. **API-URL**: Varmista, että `REACT_APP_API_URL` osoittaa taustapalvelimellesi
+3. **Tietokanta**: Tarkista, luodaanko SQLite-tietokantaa palvelinkansioon.
+4. **CORS**: Varmista, että CORS on määritetty käyttöliittymäverkkotunnuksellesi.
 
-### Discord Replies Not Showing
+### Discord-vastauksia ei näytetä
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **Viestin sisällön tarkoitus**: Varmista, että tämä on käytössä Discord-kehittäjäportaalissa.
+2. **Botin käyttöoikeudet**: Varmista, että botti voi lukea kanavan viestejä
+3. **Tietokantayhteys**: Tarkista palvelimen lokit tietokantavirheiden varalta
+4. **Kyselyt**: Frontend-kyselyt 30 sekunnin välein – vastausten ilmestyminen voi kestää jonkin aikaa.
 
-### Environment Variables Not Working
+### Ympäristömuuttujat eivät toimi
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **Kehitys**: Käynnistä sekä käyttöliittymä- että taustapalvelimet uudelleen
+* **Tuotanto**: Ota sekä käyttöliittymä että taustajärjestelmä uudelleen käyttöön oikeilla ympäristömuuttujilla
+* **Etuliite**: Käytä `REACT_APP_`-etuliitettä vain käyttöliittymämuuttujille
 
-### Database Issues
+### Tietokantaongelmat
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **Tiedoston käyttöoikeudet**: Varmista, että palvelin voi kirjoittaa tietokantahakemistoon.
+2. **Levytila**: Tarkista SQLite-tietokannan käytettävissä oleva levytila
+3. **Palvelinlokit**: Tarkista palvelinkonsoli tietokantayhteysvirheiden varalta
 
-## Security Considerations
+## Turvallisuusnäkökohdat
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **Bottitunnus**: Pidä bottitunnustasi salassa äläkä koskaan tallenna sitä versionhallintaan.
+* **Nopeusrajoitus**: Discordilla on bottien nopeusrajoituksia (eri kuin webhookien).
+* **Syötteen validointi**: Sekä käyttöliittymä että taustajärjestelmä validoivat käyttäjän syötteen
+* **Tietokannan suojaus**: SQLite-tietokanta tulisi suojata asianmukaisilla tiedosto-oikeuksilla
+* **API-tietoturva**: Harkitse nopeusrajoituksen käyttöönottoa API-päätepisteissäsi
+* **CORS**: Määritä CORS oikein tuotantoympäristöäsi varten
 
-## Architecture
+## Arkkitehtuuri
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+Verkkosivuston käyttöliittymä ←→ Express-API ←→ Discord-botti ←→ Discord-palvelin
                     ↓
-                SQLite Database
+                SQLite-tietokanta
 ```
 
-## File Structure
+## Tiedostorakenne
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # Frontend-komponentti
+├── server/ # Backend-palvelin
+│ ├── api.js # Express-API-palvelin
+│ ├── discord-bot.js # Discord-botin logiikka
+│ ├── database.js # SQLite-tietokantafunktiot
+│ └── package.json # Palvelinriippuvuudet
+└── docs/Discord/Docs/ # Dokumentaatio
 ```
 
-## Browser Support
+## Selaintuki
 
-The Discord comments component works in all modern browsers that support:
+Discord-kommenttikomponentti toimii kaikissa nykyaikaisissa selaimissa, jotka tukevat:
 
-* ES6 fetch API
+* ES6-nouto-API
 * React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* CSS-ruudukko ja Flexbox
+* Paikallinen tallennustila (lomakkeen säilyvyyttä varten)
