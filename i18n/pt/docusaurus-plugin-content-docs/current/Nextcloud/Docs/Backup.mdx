@@ -73,15 +73,16 @@ Create a comprehensive backup script for Docker installations:
 <Tabs
   defaultValue="script"
   values={[
-    {label: 'Backup Script', value: 'script'},
-    {label: 'Configuration', value: 'config'},
-    {label: 'Usage', value: 'usage'},
-  ]}>
+  {label: 'Backup Script', value: 'script'},
+  {label: 'Configuration', value: 'config'},
+  {label: 'Usage', value: 'usage'},
+  ]}
+>
   <TabItem value="script">
+    ```bash title="nextcloud-backup.sh"
+    #!/bin/bash
 
-```bash title="nextcloud-backup.sh"
-#!/bin/bash
-
+````bash title="nextcloud-backup.sh"
 # Nextcloud Docker Backup Script
 # Make sure to modify the variables below for your setup
 
@@ -186,12 +187,14 @@ echo -e "${GREEN}Backup size: ${BACKUP_SIZE}${NC}"
 # Optional: Send notification (uncomment and configure)
 # echo "Nextcloud backup completed: ${BACKUP_NAME} (${BACKUP_SIZE})" | mail -s "Nextcloud Backup Success" admin@yourdomain.com
 ```
+````
 
 </TabItem>
-  <TabItem value="config">
 
-**Before using the script, modify these variables:**
+<TabItem value="config">
+    **Before using the script, modify these variables:**
 
+````bash
 ```bash
 # Update these variables in the script
 BACKUP_DIR="/backup/nextcloud"           # Where to store backups
@@ -206,12 +209,20 @@ DB_PASSWORD="YOUR_PASSWORD_FROM_ENV"     # Your database password from .env file
 ```bash
 chmod +x nextcloud-backup.sh
 ```
+````
+
+**Make the script executable:**
+
+```bash
+chmod +x nextcloud-backup.sh
+```
 
 </TabItem>
-  <TabItem value="usage">
 
-**Run the backup script:**
+<TabItem value="usage">
+    **Run the backup script:**
 
+````bash
 ```bash
 # Run manually
 ./nextcloud-backup.sh
@@ -222,6 +233,20 @@ sudo ./nextcloud-backup.sh
 # Test the script first
 ./nextcloud-backup.sh --dry-run  # (if you add dry-run functionality)
 ```
+
+**Automate with cron:**
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * /path/to/nextcloud-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+
+# Add weekly backup on Sundays at 1 AM
+0 1 * * 0 /path/to/nextcloud-backup.sh >> /var/log/nextcloud-backup.log 2>&1
+```
+````
 
 **Automate with cron:**
 
@@ -374,14 +399,17 @@ find "${BACKUP_DIR}" -maxdepth 1 -name "daily.*" -mtime +30 -exec rm -rf {} \;
 <Tabs
   defaultValue="full"
   values={[
-    {label: 'Full Recovery', value: 'full'},
-    {label: 'Database Only', value: 'database'},
-    {label: 'Files Only', value: 'files'},
-  ]}>
+  {label: 'Full Recovery', value: 'full'},
+  {label: 'Database Only', value: 'database'},
+  {label: 'Files Only', value: 'files'},
+  ]}
+>
   <TabItem value="full">
+    **Complete system recovery from backup:**
 
 **Complete system recovery from backup:**
 
+````bash
 ```bash
 # 1. Stop existing containers
 cd /var/docker/nextcloud
@@ -416,12 +444,14 @@ docker compose up -d
 # 9. Verify restoration
 docker exec -u 33 nextcloud php occ status
 ```
+````
 
 </TabItem>
-  <TabItem value="database">
 
-**Database-only recovery:**
+<TabItem value="database">
+    **Database-only recovery:**
 
+````bash
 ```bash
 # 1. Enable maintenance mode
 docker exec -u 33 nextcloud php occ maintenance:mode --on
@@ -437,12 +467,14 @@ docker exec -u 33 nextcloud php occ db:add-missing-columns
 # 4. Disable maintenance mode
 docker exec -u 33 nextcloud php occ maintenance:mode --off
 ```
+````
 
 </TabItem>
-  <TabItem value="files">
 
-**Files-only recovery:**
+<TabItem value="files">
+    **Files-only recovery:**
 
+````bash
 ```bash
 # 1. Stop containers
 docker compose down
@@ -459,6 +491,7 @@ docker compose up -d
 # 5. Rescan files
 docker exec -u 33 nextcloud php occ files:scan --all
 ```
+````
 
 </TabItem>
 </Tabs>
