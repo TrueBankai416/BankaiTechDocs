@@ -11,46 +11,46 @@ Den här dokumentationssidan inkluderar en **dubbelriktad integration med Discor
 
 ## Drag
 
-* **Dubbelriktad kommunikation**: Kommentarer på webbplatsen → Discord, Discord-svar → Webbplatsen
-* **Dubbelt kommentarssystem**: Både Giscus (GitHub-baserade) och Discord-kommentarer fungerar tillsammans.
-* **Rika Discord-inbäddningar**: Kommentarer visas som formaterade inbäddningar med fullständig sidkontext
-* **Trådhantering**: Automatisk trådskapande för organiserade svar
-* **Uppdateringar i realtid**: Webbplatsen visar Discord-svar automatiskt
-* **Fullständig sidkontext**: Kommentarer inkluderar sidtitel, URL och navigeringskontext
-* **Användaravatarer**: Discord-svar visar användaravatarer och användarnamn
-* **Responsiv design**: Fungerar på både stationära och mobila enheter
+- **Dubbelriktad kommunikation**: Kommentarer på webbplatsen → Discord, Discord-svar → Webbplatsen
+- **Dubbelt kommentarssystem**: Både Giscus (GitHub-baserade) och Discord-kommentarer fungerar tillsammans.
+- **Rika Discord-inbäddningar**: Kommentarer visas som formaterade inbäddningar med fullständig sidkontext
+- **Trådhantering**: Automatisk trådskapande för organiserade svar
+- **Uppdateringar i realtid**: Webbplatsen visar Discord-svar automatiskt
+- **Fullständig sidkontext**: Kommentarer inkluderar sidtitel, URL och navigeringskontext
+- **Användaravatarer**: Discord-svar visar användaravatarer och användarnamn
+- **Responsiv design**: Fungerar på både stationära och mobila enheter
 
 ## Installationsanvisningar
 
-### 1. Skapa en Discord-bot
+### 1. Create a Discord Bot
 
 1. Gå till [Discord-utvecklarportalen](https://discord.com/developers/applications)
 2. Skapa en ny applikation
 3. Gå till avsnittet "Bot" och skapa en bot
 4. Kopiera bot-token
 5. Under "Privilegierade gateway-avsikter" aktiverar du:
-   * **Meddelandets innehållsavsikt**
-   * **Servermedlemmars avsikt** (valfritt)
+   - **Meddelandets innehållsavsikt**
+   - **Servermedlemmars avsikt** (valfritt)
 
-### 2) Konfigurera botbehörigheter
+### 2. Configure Bot Permissions
 
 Din bot behöver dessa behörigheter:
 
-* Läs meddelanden
-* Skicka meddelanden
-* Skapa offentliga trådar
-* Skicka meddelanden i trådar
-* Läs meddelandehistorik
-* Använd snedstreckkommandon (valfritt)
+- Läs meddelanden
+- Skicka meddelanden
+- Skapa offentliga trådar
+- Skicka meddelanden i trådar
+- Läs meddelandehistorik
+- Använd snedstreckkommandon (valfritt)
 
-### 3. Bjud in bot till servern
+### 3. Invite Bot to Server
 
 1. Gå till OAuth2 > URL-generator
 2. Välj omfattningen "bot"
 3. Välj behörigheterna som anges ovan
 4. Använd den genererade URL:en för att bjuda in boten till din server
 
-### 4) Konfigurera miljövariabler
+### 4. Configure Environment Variables
 
 #### Gränssnitt (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Ditt webbplatsnamn
 
 :::varning Säkerhetsmeddelande
 
-* Använd aldrig `.env`-filer för versionshantering
-* Använd miljövariabler i produktion
-* Håll din bot-token säker
+- Använd aldrig `.env`-filer för versionshantering
+- Använd miljövariabler i produktion
+- Håll din bot-token säker
   :::
 
-### 5. Installera serverberoenden
+### 5. Install Server Dependencies
 
 ```bash
 cd-server
 npm-installation
 ```
 
-### 6. Starta backend-servern
+### 6. Start the Backend Server
 
 ```bash
 # Utveckling
@@ -116,14 +116,14 @@ npm kör dev
 npm start
 ```
 
-### 7. Distribuera konfiguration
+### 7. Deploy Configuration
 
 För produktionsdistributioner, ange miljövariabler i din värdplattform:
 
-* **Frontend**: Ange `REACT_APP_API_URL` till din produktions-API-URL
-* **Backend**: Distribuera servermappen med bottoken och kanal-ID
-* **Databas**: SQLite-databasen skapas automatiskt
-* **Kontext**: Konfigurera Discord-kontextnivå och alternativ enligt dina önskemål
+- **Frontend**: Ange `REACT_APP_API_URL` till din produktions-API-URL
+- **Backend**: Distribuera servermappen med bottoken och kanal-ID
+- **Databas**: SQLite-databasen skapas automatiskt
+- **Kontext**: Konfigurera Discord-kontextnivå och alternativ enligt dina önskemål
 
 ## Hur det fungerar
 
@@ -140,22 +140,22 @@ För produktionsdistributioner, ange miljövariabler i din värdplattform:
 
 Discord-inbäddningar inkluderar:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Beskrivning**: Det faktiska innehållet i kommentaren
-* **Författare**: Kommentatorns namn
-* **URL**: Klickbar länk till exakt den sidan
-* **Sidfält**: Visar sidtitel med klickbar länk
-* **Tidsstämpel**: När kommentaren publicerades
-* **Tråd**: Automatiskt skapad tråd för svar
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Beskrivning**: Det faktiska innehållet i kommentaren
+- **Författare**: Kommentatorns namn
+- **URL**: Klickbar länk till exakt den sidan
+- **Sidfält**: Visar sidtitel med klickbar länk
+- **Tidsstämpel**: När kommentaren publicerades
+- **Tråd**: Automatiskt skapad tråd för svar
 
 ### Webbplatsvisning
 
 Webbplatsen visar:
 
-* **Ursprungliga kommentarer**: Inskickade formulär för webbplatsen
-* **Discord-svar**: Svar från Discord-användare med avatarer och användarnamn
-* **Uppdateringar i realtid**: Automatisk omröstning för nya svar
-* **Trådade konversationer**: Organiserad kommentar → svarsstruktur
+- **Ursprungliga kommentarer**: Inskickade formulär för webbplatsen
+- **Discord-svar**: Svar från Discord-användare med avatarer och användarnamn
+- **Uppdateringar i realtid**: Automatisk omröstning för nya svar
+- **Trådade konversationer**: Organiserad kommentar → svarsstruktur
 
 ## Kontextkonfiguration
 
@@ -165,23 +165,23 @@ Konfigurera hur mycket kontext som visas i Discord-meddelanden:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Visar**: Bara sidtitel och kommentarinnehåll
-* **Användningsfall**: Rena, enkla meddelanden utan extra sammanhang
+- **Visar**: Bara sidtitel och kommentarinnehåll
+- **Användningsfall**: Rena, enkla meddelanden utan extra sammanhang
 
 #### `DISCORD_CONTEXT_LEVEL=grundläggande`
 
-* **Visar**: Sidtitel, kommentarinnehåll och klickbar sid-URL
-* **Användningsfall**: Modererat sammanhang med viktig information
+- **Visar**: Sidtitel, kommentarinnehåll och klickbar sid-URL
+- **Användningsfall**: Modererat sammanhang med viktig information
 
 #### `DISCORD_CONTEXT_LEVEL=full` (standard)
 
-* **Visar**: All kontextinformation inklusive brödsmulor, sektioner, tidsstämplar
-* **Användningsfall**: Maximalt sammanhang för detaljerade diskussioner
+- **Visar**: All kontextinformation inklusive brödsmulor, sektioner, tidsstämplar
+- **Användningsfall**: Maximalt sammanhang för detaljerade diskussioner
 
 #### `DISCORD_CONTEXT_LEVEL=anpassad`
 
-* **Visar**: Endast de kontextelement du aktiverar individuellt
-* **Användningsfall**: Finjusterad kontroll över vad som visas
+- **Visar**: Endast de kontextelement du aktiverar individuellt
+- **Användningsfall**: Finjusterad kontroll över vad som visas
 
 ### Individuella kontextkontroller
 
@@ -240,7 +240,7 @@ Ditt webbplatsnamn • Kommentarsystem
 
 ### Styling
 
-Discord-kommentarkomponenten använder CSS-moduler. Du kan anpassa utseendet genom att ändra:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/komponenter/Discordkommentarer/stilar.modul.css
@@ -256,7 +256,7 @@ src/komponenter/Discordkommentarer/index.tsx
 
 ### Komponentplacering
 
-Discord-kommentarerna visas som standard under Giscus-kommentarerna. För att ändra detta, modifiera:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/tema/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/tema/DocItem/Layout/index.js
 
 ### Miljövariabler fungerar inte
 
-* **Utveckling**: Starta om både frontend- och backend-servrar
-* **Produktion**: Omdistribuera både frontend och backend med korrekta miljövariabler
-* **Prefix**: Använd prefixet `REACT_APP_` endast för frontend-variabler
+- **Utveckling**: Starta om både frontend- och backend-servrar
+- **Produktion**: Omdistribuera både frontend och backend med korrekta miljövariabler
+- **Prefix**: Använd prefixet `REACT_APP_` endast för frontend-variabler
 
 ### Databasproblem
 
@@ -299,12 +299,12 @@ src/tema/DocItem/Layout/index.js
 
 ## Säkerhetsöverväganden
 
-* **Bot-token**: Håll din bot-token hemlig och koppla den aldrig till versionshantering.
-* **Hastighetsgränser**: Discord har hastighetsgränser för bottar (skiljer sig från webhooks)
-* **Validering av indata**: Både frontend och backend validerar användarinmatning
-* **Databassäkerhet**: SQLite-databasen bör skyddas med korrekta filbehörigheter
-* **API-säkerhet**: Överväg att implementera hastighetsbegränsningar på dina API-slutpunkter
-* **CORS**: Konfigurera CORS korrekt för din produktionsdomän
+- **Bot-token**: Håll din bot-token hemlig och koppla den aldrig till versionshantering.
+- **Hastighetsgränser**: Discord har hastighetsgränser för bottar (skiljer sig från webhooks)
+- **Validering av indata**: Både frontend och backend validerar användarinmatning
+- **Databassäkerhet**: SQLite-databasen bör skyddas med korrekta filbehörigheter
+- **API-säkerhet**: Överväg att implementera hastighetsbegränsningar på dina API-slutpunkter
+- **CORS**: Konfigurera CORS korrekt för din produktionsdomän
 
 ## Arkitektur
 
@@ -331,7 +331,7 @@ projekt/
 
 Discord-kommentarkomponenten fungerar i alla moderna webbläsare som stöder:
 
-* ES6 hämtnings-API
-* Reagera 18+
-* CSS Grid och Flexbox
-* Lokal lagring (för formulärbeständighet)
+- ES6 hämtnings-API
+- Reagera 18+
+- CSS Grid och Flexbox
+- Lokal lagring (för formulärbeständighet)
