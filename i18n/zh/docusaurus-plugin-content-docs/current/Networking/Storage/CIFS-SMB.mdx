@@ -54,11 +54,14 @@ CIFS/SMB is a network file sharing protocol suite that allows applications to re
 <Tabs
   defaultValue="smb3"
   values={[
-    {label: 'SMB 3.x (Recommended)', value: 'smb3'},
-    {label: 'SMB 2.x', value: 'smb2'},
-    {label: 'SMB 1.x (Legacy)', value: 'smb1'},
-    {label: 'Comparison', value: 'comparison'},
-  ]}>
+  {label: 'SMB 3.x (Recommended)', value: 'smb3'},
+  {label: 'SMB 2.x', value: 'smb2'},
+  {label: 'SMB 1.x (Legacy)', value: 'smb1'},
+  {label: 'Comparison', value: 'comparison'},
+  ]}
+>
+  <TabItem value="smb3">
+    **SMB 3.x (Modern - Recommended)**
 
 <TabItem value="smb3">
 **SMB 3.x (Modern - Recommended)**
@@ -70,26 +73,20 @@ CIFS/SMB is a network file sharing protocol suite that allows applications to re
 - **Recommendation**: Use for all new deployments
 </TabItem>
 
-<TabItem value="smb2">
-**SMB 2.x (Intermediate)**
-- **Performance**: Better than SMB 1.x, supports larger reads/writes
-- **Features**: Compound requests, improved caching
-- **Security**: Better security than SMB 1.x
-- **Compatibility**: Windows Vista+, Windows Server 2008+
-- **Limitations**: No encryption, limited resilience features
-</TabItem>
+* **Performance**: Better than SMB 1.x, supports larger reads/writes
+* **Features**: Compound requests, improved caching
+* **Security**: Better security than SMB 1.x
+* **Compatibility**: Windows Vista+, Windows Server 2008+
+* **Limitations**: No encryption, limited resilience features
 
-<TabItem value="smb1">
-**SMB 1.x (Legacy - Deprecated)**
-- **Status**: Deprecated and insecure
-- **Security**: Multiple known vulnerabilities
-- **Performance**: Poor performance, limited scalability
-- **Recommendation**: Avoid for new deployments
-- **Legacy Support**: Only use if required for very old systems
-</TabItem>
+* **Status**: Deprecated and insecure
+* **Security**: Multiple known vulnerabilities
+* **Performance**: Poor performance, limited scalability
+* **Recommendation**: Avoid for new deployments
+* **Legacy Support**: Only use if required for very old systems
 
 <TabItem value="comparison">
-**Feature Comparison**
+    **Feature Comparison**
 
 | Feature        | SMB 1.x | SMB 2.x | SMB 3.x   |
 | -------------- | ------- | ------- | --------- |
@@ -152,62 +149,85 @@ CIFS/SMB is a network file sharing protocol suite that allows applications to re
 <Tabs
   defaultValue="ubuntu"
   values={[
-    {label: 'Ubuntu/Debian', value: 'ubuntu'},
-    {label: 'CentOS/RHEL', value: 'centos'},
-    {label: 'Windows Server', value: 'windows'},
-  ]}>
+  {label: 'Ubuntu/Debian', value: 'ubuntu'},
+  {label: 'CentOS/RHEL', value: 'centos'},
+  {label: 'Windows Server', value: 'windows'},
+  ]}
+>
+  <TabItem value="ubuntu">
+    ```bash
+    # Update package list
+    sudo apt update
 
-<TabItem value="ubuntu">
-```bash
-# Update package list
-sudo apt update
+<TabItem value="smb2">
+    **SMB 2.x (Intermediate)**
 
-# Install Samba server
+# 1. **Enable File and Printer Sharing**
+   - Open Server Manager
+   - Add Roles and Features
+   - Select "File and Storage Services"
+   - Enable "File Server" role
 
-sudo apt install samba samba-common-bin
+2. **Create Shared Folders**
+   - Open File Explorer
+   - Right-click folder → Properties → Sharing
+   - Click "Advanced Sharing"
+   - Configure share name and permissions
+
+3. **Configure SMB Settings**
+   - Open PowerShell as Administrator
+   - Run: `Set-SmbServerConfiguration -EnableSMB1Protocol $false`
+   - Run: `Set-SmbServerConfiguration -EnableSMB2Protocol $true`
+
+# Install Samba serversudo apt install samba samba-common-bin# Install additional utilitiessudo apt install cifs-utils# Start and enable Samba servicessudo systemctl start smbd
+sudo systemctl enable smbd
+sudo systemctl start nmbd
+sudo systemctl enable nmbd# Check service statussudo systemctl status smbd
+sudo systemctl status nmbd```
+
+```
 
 # Install additional utilities
 
 sudo apt install cifs-utils
 
-# Start and enable Samba services
+# | Feature        | SMB 1.x | SMB 2.x | SMB 3.x   |
+| -------------- | ------- | ------- | --------- |
+| Security       | Poor    | Good    | Excellent |
+| Performance    | Low     | Medium  | High      |
+| Encryption     | No      | No      | Yes       |
+| Multichannel   | No      | No      | Yes       |
+| Resilience     | No      | Limited | Yes       |
+| Recommendation | Avoid   | Legacy  | Use       |
 
-sudo systemctl start smbd
-sudo systemctl enable smbd
-sudo systemctl start nmbd
-sudo systemctl enable nmbd
-
-# Check service status
-
-sudo systemctl status smbd
-sudo systemctl status nmbd
-
-````
-</TabItem>
-
-<TabItem value="centos">
-```bash
-# Install Samba server
-sudo yum install samba samba-client samba-common
-
-# Install CIFS utilities
-sudo yum install cifs-utils
-
-# Start and enable Samba services
-sudo systemctl start smb
+# Install CIFS utilitiessudo yum install cifs-utils# Start and enable Samba servicessudo systemctl start smb
 sudo systemctl enable smb
 sudo systemctl start nmb
-sudo systemctl enable nmb
+sudo systemctl enable nmb# Check service statussudo systemctl status smb
+sudo systemctl status nmb```
+
+```
 
 # Check service status
-sudo systemctl status smb
-sudo systemctl status nmb
+
+- **Security**: End-to-end encryption, secure negotiation
+- **Performance**: Improved throughput, multichannel support
+- **Features**: Scale-out file servers, transparent failover
+- **Resilience**: Continuous availability, automatic recovery
+- **Compatibility**: Windows 8+, Windows Server 2012+, modern Linux
+- **Recommendation**: Use for all new deployments
+
+````
+<TabItem value="centos">
+    ```bash
+    # Install Samba server
+    sudo yum install samba samba-client samba-common
 ````
 
 </TabItem>
 
 <TabItem value="windows">
-**Windows Server SMB Setup**
+    **Windows Server SMB Setup**
 
 1. **Enable File and Printer Sharing**
    - Open Server Manager
@@ -799,15 +819,19 @@ sudo usermod -a -G smb-readwrite smbuser
 <Tabs
   defaultValue="mount-issues"
   values={[
-    {label: 'Mount Issues', value: 'mount-issues'},
-    {label: 'Authentication Problems', value: 'auth'},
-    {label: 'Performance Issues', value: 'performance'},
-    {label: 'Permission Problems', value: 'permissions'},
-  ]}>
+  {label: 'Mount Issues', value: 'mount-issues'},
+  {label: 'Authentication Problems', value: 'auth'},
+  {label: 'Performance Issues', value: 'performance'},
+  {label: 'Permission Problems', value: 'permissions'},
+  ]}
+>
+  <TabItem value="mount-issues">
+    **Mount Failures**
 
-<TabItem value="mount-issues">
-**Mount Failures**
+<TabItem value="smb1">
+    **SMB 1.x (Legacy - Deprecated)**
 
+````bash
 ```bash
 # Test SMB server connectivity
 smbclient -L //192.168.1.100 -U smbuser
@@ -827,12 +851,14 @@ mount -t cifs //192.168.1.100/data /mnt/pve/smb-data -v \
 journalctl -u smbd
 tail -f /var/log/samba/log.smbd
 ```
+````
 
 </TabItem>
 
 <TabItem value="auth">
-**Authentication Issues**
+    **Authentication Issues**
 
+````bash
 ```bash
 # Test user authentication
 smbclient //192.168.1.100/data -U smbuser
@@ -850,12 +876,14 @@ sudo ls -la /etc/cifs-credentials/
 # Test with different SMB versions
 mount -t cifs //192.168.1.100/data /mnt/test -o username=smbuser,vers=2.0
 ```
+````
 
 </TabItem>
 
 <TabItem value="performance">
-**Performance Problems**
+    **Performance Problems**
 
+````bash
 ```bash
 # Check SMB statistics
 smbstatus
@@ -872,12 +900,14 @@ rm /mnt/pve/smb-data/test
 # Check mount options
 mount | grep cifs
 ```
+````
 
 </TabItem>
 
 <TabItem value="permissions">
-**Permission Problems**
+    **Permission Problems**
 
+````bash
 ```bash
 # Check share permissions
 sudo testparm -s
@@ -893,6 +923,7 @@ getent group smbgroup
 touch /mnt/pve/smb-data/test
 ls -la /mnt/pve/smb-data/test
 ```
+````
 
 </TabItem>
 </Tabs>
