@@ -1,7 +1,11 @@
 ---
 title: Linux Firewall Rules
-tags: [VPN, Firewall]
-keywords: [VPN, Firewall]
+tags:
+  - VPN
+  - Firewall
+keywords:
+  - VPN
+  - Firewall
 last_update:
   author: BankaiTech
 ---
@@ -55,8 +59,8 @@ sudo ufw allow out proto udp to 185.203.219.0/24 port 1194 comment 'NordVPN serv
 :::tip Viewing Comments
 To see the comments in your UFW status output, use:
 
-* `sudo ufw status numbered` - shows rules with numbers and comments
-* `sudo ufw status verbose` - shows detailed status with comments
+- `sudo ufw status numbered` - shows rules with numbers and comments
+- `sudo ufw status verbose` - shows detailed status with comments
   :::
 
 ### Enable UFW
