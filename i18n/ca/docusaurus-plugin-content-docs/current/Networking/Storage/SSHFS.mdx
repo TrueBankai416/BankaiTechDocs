@@ -33,19 +33,19 @@ SSHFS is a filesystem client that uses the SSH File Transfer Protocol (SFTP) to 
 
 ### **Benefits of SSHFS**
 
-* ✅ **High Security**: Uses SSH encryption and authentication
-* ✅ **Simple Setup**: Leverages existing SSH infrastructure
-* ✅ **Automatic Reconnection**: Built-in reconnection on network issues
-* ✅ **No Server Configuration**: Minimal server-side setup required
-* ✅ **Cross-Platform**: Works on Linux, macOS, and Windows
-* ✅ **Reliable**: Mature and stable technology
+- ✅ **High Security**: Uses SSH encryption and authentication
+- ✅ **Simple Setup**: Leverages existing SSH infrastructure
+- ✅ **Automatic Reconnection**: Built-in reconnection on network issues
+- ✅ **No Server Configuration**: Minimal server-side setup required
+- ✅ **Cross-Platform**: Works on Linux, macOS, and Windows
+- ✅ **Reliable**: Mature and stable technology
 
 ### **Limitations of SSHFS**
 
-* ❌ **Performance Overhead**: Higher CPU usage than NFS
-* ❌ **SSH Dependency**: Requires SSH service availability
-* ❌ **Single Connection**: Limited concurrent access optimization
-* ❌ **Caching Limitations**: Less sophisticated caching than other protocols
+- ❌ **Performance Overhead**: Higher CPU usage than NFS
+- ❌ **SSH Dependency**: Requires SSH service availability
+- ❌ **Single Connection**: Limited concurrent access optimization
+- ❌ **Caching Limitations**: Less sophisticated caching than other protocols
 
 ## **Architecture Overview**
 
@@ -99,16 +99,16 @@ SSHFS is a filesystem client that uses the SSH File Transfer Protocol (SFTP) to 
 
 ### **Server Requirements**
 
-* SSH server running and accessible
-* User account with appropriate permissions
-* Sufficient storage space
-* Network connectivity to Proxmox host
+- SSH server running and accessible
+- User account with appropriate permissions
+- Sufficient storage space
+- Network connectivity to Proxmox host
 
 ### **Proxmox Requirements**
 
-* SSHFS package installed
-* Network connectivity to storage server
-* Sufficient local resources for SSHFS operations
+- SSHFS package installed
+- Network connectivity to storage server
+- Sufficient local resources for SSHFS operations
 
 ## **Server Side Configuration**
 
@@ -128,51 +128,58 @@ SSHFS is a filesystem client that uses the SSH File Transfer Protocol (SFTP) to 
     sudo apt update
     sudo apt install openssh-server
 
-    # Start and enable SSH service
+<TabItem value="ubuntu">
+```bash
+# Install SSH server (if not already installed)
+sudo apt update
+sudo apt install openssh-server
 
-    sudo systemctl start ssh
-    sudo systemctl enable ssh
+# Start and enable SSH service
 
-    # Check SSH service status
+sudo systemctl start ssh
+sudo systemctl enable ssh
 
-    sudo systemctl status ssh
+# Check SSH service status
 
-    ```
-  </TabItem>
+sudo systemctl status ssh
 
-  <TabItem value="centos">
-    ```bash
-    # Install SSH server (if not already installed)
-    sudo yum install openssh-server
+````
+</TabItem>
 
-    # Start and enable SSH service
-    sudo systemctl start sshd
-    sudo systemctl enable sshd
+<TabItem value="centos">
+```bash
+# Install SSH server (if not already installed)
+sudo yum install openssh-server
 
-    # Check SSH service status
-    sudo systemctl status sshd
-    ```
-  </TabItem>
+# Start and enable SSH service
+sudo systemctl start sshd
+sudo systemctl enable sshd
 
-  <TabItem value="generic">
-    ```bash
-    # Check if SSH is running
-    ps aux | grep sshd
+# Check SSH service status
+sudo systemctl status sshd
+````
 
-    # If not running, start SSH service
+</TabItem>
 
-    sudo service ssh start
+<TabItem value="generic">
+```bash
+# Check if SSH is running
+ps aux | grep sshd
 
-    # or
+# If not running, start SSH service
 
-    sudo systemctl start ssh
+sudo service ssh start
 
-    # Enable SSH to start on boot
+# or
 
-    sudo systemctl enable ssh
+sudo systemctl start ssh
 
-    ```
-  </TabItem>
+# Enable SSH to start on boot
+
+sudo systemctl enable ssh
+
+````
+</TabItem>
 </Tabs>
 
 ### **2. User Account Configuration**
@@ -190,7 +197,7 @@ sudo usermod -a -G users sshfs-user
 # Verify user can access target directories
 sudo -u sshfs-user ls -la /media/server/Processing/
 sudo -u sshfs-user ls -la /media/server/Backups1/
-```
+````
 
 ### **3. Directory Permissions**
 
@@ -337,7 +344,7 @@ mount_sshfs() {
 # Function to check SSH connectivity
 check_ssh_connectivity() {
     echo "$(date): Checking SSH connectivity..."
-    if ssh -i "$SSH_KEY" -o ConnectTimeout=10 "$SERVER_USER@$SERVER_IP" "echo 'SSH connection successful'" >/dev/null 2>&1; then
+    if ssh -i "$SSH_KEY" -o ConnectTimeout=10 "$SERVER_USER@$SERVER_IP" "echo 'SSH connection successful'" >/dev/null 2>&amp;1; then
         echo "$(date): ✓ SSH connectivity verified"
         return 0
     else
@@ -595,95 +602,107 @@ StrictHostKeyChecking=no  # Skip host key verification (use carefully)
 <Tabs
   defaultValue="connection"
   values={[
-  {label: 'Connection Issues', value: 'connection'},
-  {label: 'Permission Problems', value: 'permissions'},
-  {label: 'Performance Issues', value: 'performance'},
-  {label: 'Mount Failures', value: 'mount'},
-  ]}
->
-  <TabItem value="connection">
-    **Connection Problems**
+    {label: 'Connection Issues', value: 'connection'},
+    {label: 'Permission Problems', value: 'permissions'},
+    {label: 'Performance Issues', value: 'performance'},
+    {label: 'Mount Failures', value: 'mount'},
+  ]}>
 
-    ```bash
-    # Test SSH connectivity
-    ssh -i /root/.ssh/id_rsa_sshfs sshfs-user@192.168.1.100
-
-    # Check SSH service on server
-    sudo systemctl status ssh
-
-    # Verify network connectivity
-    ping 192.168.1.100
-    telnet 192.168.1.100 22
-
-    # Check SSH logs
-    tail -f /var/log/auth.log
-
-    # Debug SSHFS connection
-    sshfs -d sshfs-user@192.168.1.100:/path /mnt/point
-    ```
-  </TabItem>
-
-  <TabItem value="permissions">
-    **Permission Issues**
-
-    ```bash
-    # Check file permissions on server
-    ls -la /media/server/Processing/
-
-    # Verify user permissions
-    sudo -u sshfs-user ls /media/server/Processing/
-
-    # Check mount permissions
-    ls -la /mnt/pve/sshfs-downloads/
-
-    # Fix ownership issues
-    sudo chown -R sshfs-user:users /media/server/Processing/
-    ```
-  </TabItem>
-
-  <TabItem value="performance">
+<TabItem value="performance">
     **Performance Problems**
 
-    ```bash
-    # Monitor SSHFS performance
-    iostat -x 1
+````bash
+```bash
+# Monitor SSHFS performance
+iostat -x 1
 
-    # Check network utilization
-    iftop -i eth0
+# Check network utilization
+iftop -i eth0
 
-    # Test transfer speeds
-    dd if=/dev/zero of=/mnt/pve/sshfs-data/test bs=1M count=100
-    rm /mnt/pve/sshfs-data/test
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/sshfs-data/test bs=1M count=100
+rm /mnt/pve/sshfs-data/test
 
-    # Optimize mount options
-    # Add: cache=yes,kernel_cache,compression=yes
-    ```
-  </TabItem>
+# Optimize mount options
+# Add: cache=yes,kernel_cache,compression=yes
+```
+````
 
-  <TabItem value="mount">
+</TabItem>
+
+<TabItem value="mount">
     **Mount Failures**
 
-    ```bash
-    # Check if mount point exists
-    ls -la /mnt/pve/sshfs-downloads/
+````bash
+```bash
+# Check if mount point exists
+ls -la /mnt/pve/sshfs-downloads/
 
-    # Verify SSHFS is installed
-    which sshfs
-    sshfs --version
+# Verify SSHFS is installed
+which sshfs
+sshfs --version
 
-    # Check for existing mounts
-    mount | grep sshfs
-    df -h | grep sshfs
+# Check for existing mounts
+mount | grep sshfs
+df -h | grep sshfs
 
-    # Force unmount if needed
-    fusermount -u /mnt/pve/sshfs-downloads
-    umount -f /mnt/pve/sshfs-downloads
+# Force unmount if needed
+fusermount -u /mnt/pve/sshfs-downloads
+umount -f /mnt/pve/sshfs-downloads
 
-    # Check system logs
-    journalctl -u sshfs-mounts.service
-    tail -f /var/log/sshfs-mount.log
-    ```
-  </TabItem>
+# Check system logs
+journalctl -u sshfs-mounts.service
+tail -f /var/log/sshfs-mount.log
+```
+````
+
+</TabItem>
+
+<TabItem value="performance">
+**Performance Problems**
+
+```bash
+# Monitor SSHFS performance
+iostat -x 1
+
+# Check network utilization
+iftop -i eth0
+
+# Test transfer speeds
+dd if=/dev/zero of=/mnt/pve/sshfs-data/test bs=1M count=100
+rm /mnt/pve/sshfs-data/test
+
+# Optimize mount options
+# Add: cache=yes,kernel_cache,compression=yes
+```
+
+</TabItem>
+
+<TabItem value="mount">
+**Mount Failures**
+
+```bash
+# Check if mount point exists
+ls -la /mnt/pve/sshfs-downloads/
+
+# Verify SSHFS is installed
+which sshfs
+sshfs --version
+
+# Check for existing mounts
+mount | grep sshfs
+df -h | grep sshfs
+
+# Force unmount if needed
+fusermount -u /mnt/pve/sshfs-downloads
+umount -f /mnt/pve/sshfs-downloads
+
+# Check system logs
+journalctl -u sshfs-mounts.service
+tail -f /var/log/sshfs-mount.log
+```
+
+</TabItem>
 </Tabs>
 
 ### **Diagnostic Commands**
@@ -774,7 +793,7 @@ check_mount() {
     local name="$2"
 
     if mountpoint -q "$mount_point"; then
-        if timeout 10 ls "$mount_point" >/dev/null 2>&1; then
+        if timeout 10 ls "$mount_point" >/dev/null 2>&amp;1; then
             echo "$(date): ✓ $name is healthy"
             return 0
         else
