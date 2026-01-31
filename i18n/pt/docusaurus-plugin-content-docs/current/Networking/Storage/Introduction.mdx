@@ -47,48 +47,29 @@ Network storage allows Proxmox hosts to access remote storage resources over the
 <Tabs
   defaultValue="nfs"
   values={[
-    {label: 'NFS', value: 'nfs'},
-    {label: 'CIFS/SMB', value: 'cifs'},
-    {label: 'SSHFS', value: 'sshfs'},
-    {label: 'mergerfs', value: 'mergerfs'},
-  ]}>
-
-<TabItem value="nfs">
-**Network File System (NFS)**
-- **Best For**: Linux-centric environments, high performance requirements
-- **Pros**: Excellent performance, native Linux support, mature protocol
-- **Cons**: Limited Windows compatibility, requires proper network security
-- **Use Cases**: VM storage, container volumes, shared data directories
-- **Performance**: High throughput, low latency
-</TabItem>
+  {label: 'NFS', value: 'nfs'},
+  {label: 'CIFS/SMB', value: 'cifs'},
+  {label: 'SSHFS', value: 'sshfs'},
+  {label: 'mergerfs', value: 'mergerfs'},
+  ]}
+>
+  <TabItem value="nfs">
+    **Network File System (NFS)**
 
 <TabItem value="cifs">
-**Common Internet File System (CIFS/SMB)**
-- **Best For**: Mixed Windows/Linux environments, existing SMB infrastructure
-- **Pros**: Excellent Windows compatibility, built-in authentication, wide support
-- **Cons**: Higher overhead than NFS, more complex configuration
-- **Use Cases**: File sharing, backup storage, mixed-OS environments
-- **Performance**: Good performance with modern SMB versions (3.0+)
-</TabItem>
+    **Common Internet File System (CIFS/SMB)**
+
+* **Best For**: Mixed Windows/Linux environments, existing SMB infrastructure
+* **Pros**: Excellent Windows compatibility, built-in authentication, wide support
+* **Cons**: Higher overhead than NFS, more complex configuration
+* **Use Cases**: File sharing, backup storage, mixed-OS environments
+* **Performance**: Good performance with modern SMB versions (3.0+)
 
 <TabItem value="sshfs">
-**SSH File System (SSHFS)**
-- **Best For**: Secure connections, simple setup, existing SSH infrastructure
-- **Pros**: Uses SSH (very secure), simple setup, automatic reconnection
-- **Cons**: Higher CPU overhead, dependent on SSH service
-- **Use Cases**: Secure remote storage, temporary mounts, development environments
-- **Performance**: Moderate performance, excellent reliability
-</TabItem>
+    **SSH File System (SSHFS)**
 
 <TabItem value="mergerfs">
-**mergerfs (Union Filesystem)**
-- **Best For**: Storage pooling, combining multiple drives, media storage
-- **Pros**: Drive independence, flexible expansion, no parity overhead, mixed drive sizes
-- **Cons**: No built-in redundancy, FUSE overhead, requires external backup
-- **Use Cases**: Media servers, backup aggregation, storage pools, mixed-size drive arrays
-- **Performance**: Good read performance, configurable write policies
-</TabItem>
-</Tabs>
+    **mergerfs (Union Filesystem)**
 
 ## **Storage Architecture Overview**
 
@@ -191,38 +172,31 @@ Network storage can host:
 <Tabs
   defaultValue="nfs-security"
   values={[
-    {label: 'NFS Security', value: 'nfs-security'},
-    {label: 'CIFS Security', value: 'cifs-security'},
-    {label: 'SSHFS Security', value: 'sshfs-security'},
-  ]}>
+  {label: 'NFS Security', value: 'nfs-security'},
+  {label: 'CIFS Security', value: 'cifs-security'},
+  {label: 'SSHFS Security', value: 'sshfs-security'},
+  ]}
+>
+  <TabItem value="nfs-security">
+    **NFS Security Measures**
 
-<TabItem value="nfs-security">
-**NFS Security Measures**
-- Use NFSv4 with Kerberos authentication
-- Implement proper export restrictions
-- Configure secure RPC authentication
-- Use firewalls to restrict NFS port access
-- Consider NFSv4.1+ with pNFS for better security
-</TabItem>
+* Use NFSv4 with Kerberos authentication
+* Implement proper export restrictions
+* Configure secure RPC authentication
+* Use firewalls to restrict NFS port access
+* Consider NFSv4.1+ with pNFS for better security
 
-<TabItem value="cifs-security">
-**CIFS/SMB Security Measures**
-- Use SMB3+ with encryption
-- Implement strong authentication (Active Directory integration)
-- Configure proper share permissions
-- Use signing and encryption features
-- Regular security updates for SMB services
-</TabItem>
+* Use SMB3+ with encryption
+* Implement strong authentication (Active Directory integration)
+* Configure proper share permissions
+* Use signing and encryption features
+* Regular security updates for SMB services
 
-<TabItem value="sshfs-security">
-**SSHFS Security Measures**
-- Use SSH key-based authentication
-- Implement proper SSH hardening
-- Configure SSH connection limits
-- Use strong encryption algorithms
-- Regular SSH service updates
-</TabItem>
-</Tabs>
+* Use SSH key-based authentication
+* Implement proper SSH hardening
+* Configure SSH connection limits
+* Use strong encryption algorithms
+* Regular SSH service updates
 
 ## **High Availability and Redundancy**
 
