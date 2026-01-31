@@ -193,7 +193,7 @@ The container supports multiple VPN providers, but this guide focuses on NordVPN
 4. Copy your service username and password (different from account credentials)
 5. **Download OpenVPN configuration files** for your preferred servers
 
-#### 1) VPN Connection Problems
+#### 2) Place OpenVPN Configuration Files
 
 After starting the container for the first time, it creates the necessary folders:
 
@@ -391,7 +391,7 @@ docker exec qbittorrent-vpn curl -s ifconfig.me
    * Download their test torrent
    * Add to qBittorrent and check reported IP
 
-#### 3) Container Won't Start
+#### 3) Monitor Container Health
 
 ```bash
 # Check container resource usage
@@ -426,7 +426,7 @@ This is useful when:
 
 ### Common Issues
 
-#### 2. WebUI Access Issues
+#### 1. VPN Connection Problems
 
 ```bash
 # Check VPN connection status
@@ -439,7 +439,7 @@ docker compose restart qbittorrent-vpn
 docker exec qbittorrent-vpn cat /config/openvpn/credentials.conf
 ```
 
-#### 4. Download Issues
+#### 2. WebUI Access Issues
 
 **CSRF Protection Error**: Ensure container port matches `WEBUI_PORT`:
 
