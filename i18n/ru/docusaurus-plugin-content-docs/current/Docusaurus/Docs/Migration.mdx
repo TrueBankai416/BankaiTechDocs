@@ -1,0 +1,188 @@
+---
+title: Docusaurus Migration
+description: Guide for migrating Docusaurus sites via GitHub repository including SSH key setup, Git configuration, and dependency installation.
+image: /img/social/docusaurus-social.jpg
+sidebar_position: 2
+tags:
+  - Docusaurus
+  - Migration
+keywords:
+  - Docusaurus
+  - Migration
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Docusaurus Migration via GitHub Repo**
+
+First lets create the root directory on your new host.
+
+```bash
+sudo mkdir /var/websites && sudo mkdir /var/websites/<example> && cd /var/websites/<example>
+```
+
+:::info
+Change `<example>` to whatever you want to name the folder. Mine will be named `BankaiTechDocs`
+:::
+
+## **Installing Dependencies**
+
+```bash
+sudo apt install git && sudo apt install npm
+```
+
+## **Creating local SSH key**
+
+<p>
+  <>Go to your terminal and run this command</>
+</p>
+
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+<p>
+  <>Press `ENTER` and follow the prompts</>
+</p>
+
+![Generate Keys](/img/Docusaurus/Styling/generateKey.jpg)
+
+:::tip[Recommended]
+You do not need to enter a `passphrase` but it is recommended for security
+:::warning
+If you do use a Passphrase, please keep it safe as you will need it every time you run `Git pull` or `Git push`
+:::
+
+<p>
+  <>Run the following command and copy the contents of the result</>
+</p>
+
+```bash
+cat <location of new ssh key>
+```
+
+:::info
+I ran `cat /root/.ssh/id_ed25519.pub`
+:::
+
+### ***Adding SSH key to GitHub***
+
+<p>
+  <>In the upper-right corner of any page, click your profile photo, then click Settings.</>
+</p>
+
+![GitHub Settings](/img/Docusaurus/Styling/githubSettings.png)
+
+<p>
+  <>In the "Access" section of the sidebar, click SSH and GPG keys.</>
+</p>
+
+![SSH and GPG keys](/img/Docusaurus/Styling/sshKeys.jpg)
+
+<p>
+  <>Click `New SSH key`</>
+</p>
+
+![New SSH key](/img/Docusaurus/Styling/NewSSHkey.png)
+
+<p>
+  <>You should now see this screen</>
+</p>
+
+![Paste key](/img/Docusaurus/Styling/addKey.jpg)
+:::note
+I used my repo name `BankaiTechDocs` for the Key name\
+Key type is `Authentication key`
+:::
+
+<p>
+  <>Paste the new SSH key in the box and click `Add SSH key`</>
+</p>
+
+## **Creating a local .git repo**
+
+<p>
+  <>Go to the root directory of your website</>
+</p>
+
+:::note
+This directory will contain your `docusaurus.config.js` or `docusaurus.config.ts` file
+:::
+
+<p>
+  <>In your terminal, run the following commands</>
+</p>
+
+```bash
+git init
+git config --global user.name "<USER_NAME>"
+git config --global user.email "<USER_EMAIL>"
+```
+
+## **Connecting to the remote Repo**
+
+<p>
+  <>We are going to need the SSH url for your repo, we can find that here</>
+</p>
+
+![Repo URL](/img/Docusaurus/Styling/sshUrl.jpg)
+
+<p>
+  <>Run this command to add your remote repo</>
+</p>
+
+```bash
+git remote add origin <SSh Repo URL>
+```
+
+:::note[Example]
+`git@github.com:TrueBankai416/BankaiTechDocs.git`
+:::
+
+### **Security**
+
+#### ***Installing [talisman](https://github.com/thoughtworks/talisman)***
+
+Go to the root directory of your website and run the following
+
+```bash
+sudo apt install curl && curl --silent  https://raw.githubusercontent.com/thoughtworks/talisman/main/global_install_scripts/install.bash > /tmp/install_talisman.bash && /bin/bash /tmp/install_talisman.bash
+```
+
+## **Installing Docusaurus**
+
+```bash
+sudo npm install docusaurus && sudo npm audit fix
+```
+
+### **Installing module for Environment Variables**
+
+```bash
+sudo npm install dotenv --save
+```
+
+## **Pulling Docs from GitHub**
+
+<p>
+  <>Now run the following commands</>
+</p>
+
+```bash
+git pull origin main
+```
+
+<p>
+  <>You should now be able to make changes on GitHub and then run `git pull origin main` to download the changes locally, or you can make changes locally and run `git push origin main` to send the changes to GitHub</>
+</p>
+
+<p>
+  <>Now if you have any environment variables or secrets inside an `.env` file or other file then you will need to move them over to the new host or `npm run build` will fail.</>
+</p>
+
+:::note
+When you run `git pull origin main` you will have to run `npm run build` afterwards to apply the changes
+:::
+
+<BuyMeACoffeeButton />

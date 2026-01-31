@@ -1,0 +1,76 @@
+---
+title: Introduction to KMS
+tags:
+  - Windows
+  - Office
+  - KMS
+keywords:
+  - Windows
+  - KMS
+  - Office
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Key Management Service (KMS) is a technology used by Microsoft to manage the activation of its software products, primarily aimed at reducing the management overhead involved in deploying Windows operating systems and Microsoft Office across a large organization. KMS allows corporate and enterprise customers to activate systems within their own network, eliminating the need for individual computers to connect to Microsoft for product activation.
+
+### How KMS Works
+
+KMS uses a client-server model where the KMS client (the software needing activation) communicates with a KMS server hosted within the organization. The KMS server, in turn, is activated via the internet or by phone with Microsoft. Once activated, the KMS server can then activate any supported KMS clients within the local network.
+
+Clients regularly renew their activation by communicating with the KMS server, typically every 180 days. This process ensures that only current, properly licensed clients are activated. If a client cannot contact the KMS server for a period (e.g., 180 days for many Windows versions), it enters a 30-day grace period and eventually goes into a reduced functionality mode until it can reactivate.
+
+### KMS and Microsoft Windows
+
+KMS activation for Microsoft Windows allows organizations to activate Windows Vista, Windows Server 2008, and later versions including Windows 10 and Windows Server versions within their environments without having to enter a product key on each system. This is particularly beneficial for environments where there is frequent re-imaging of systems or where maintaining unique product keys for each system is impractical.
+
+### KMS and Microsoft Office
+
+Similarly, KMS can be used to activate volume license editions of Microsoft Office, starting from Microsoft Office 2010 to the latest Office versions. This facility allows organizations to deploy and manage Microsoft Office licenses more easily across numerous computers.
+
+### Importance of KMS
+
+1. **Simplifies Activation**: KMS simplifies the process of activating Windows and Office products in large networks, removing the necessity to manually enter or manage product keys on individual systems.
+2. **Network Efficiency**: Since activation requests are managed locally by the KMS server, there's no need for every device to connect to Microsoft's activation servers, saving bandwidth and reducing external network dependencies.
+3. **Compliance and Audit**: KMS helps organizations maintain compliance with Microsoft's licensing requirements by centralizing and simplifying license management and activation.
+
+### Creating a Local KMS Server
+
+To set up a KMS server, you need:
+
+1. A system running a supported Windows Server OS.
+2. A KMS Host Key – This is a special key issued by Microsoft to legally establish a KMS server.
+
+The basic steps include:
+
+1. **Install the KMS Host Key**: Use the `slmgr.vbs` script included with Windows to install the KMS Host Key(license). The command looks like this:
+
+   ```ps
+   slmgr.vbs /ipk <KmsHostKey>
+   ```
+
+2. **Activate the KMS Server with Microsoft**:
+
+   ```ps
+   slmgr.vbs /ato
+   ```
+
+3. **Verify Operation**: Use the `slmgr.vbs` script to verify the status of the KMS server and the number of clients activated:
+
+   ```ps
+   slmgr.vbs /dli
+   ```
+
+   or
+
+   ```ps
+   slmgr.vbs /dlv
+   ```
+
+4. **Clients Setup**: Ensure clients are configured to use KMS for activation. This is typically set up by default when using volume licensed editions, but you can manually configure it with the `slmgr.vbs` script if needed.
+
+Creating a KMS infrastructure within an organization requires careful planning and adherence to Microsoft’s licensing terms. It represents a strategic approach to software activation and compliance, particularly suitable for environments with a significant number of systems.
+
+<BuyMeACoffeeButton />

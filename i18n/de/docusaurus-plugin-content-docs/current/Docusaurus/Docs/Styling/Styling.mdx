@@ -1,0 +1,164 @@
+---
+title: Styling
+description: Comprehensive guide to Docusaurus styling including global CSS customization, theme configuration, and advanced styling techniques.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - Styling
+  - CSS
+keywords:
+  - Docusaurus
+  - Styling
+  - CSS
+  - Customization
+  - Theme
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Styling Overview**
+
+Docusaurus provides several ways to customize the appearance of your documentation site. This guide covers the basics of styling in Docusaurus and points you to more specific styling techniques.
+
+## **Understanding Docusaurus Styling**
+
+Docusaurus uses a combination of global CSS, CSS modules, and Infima (a React-based CSS framework) to provide styling options. You can customize nearly every aspect of your site's appearance through these mechanisms.
+
+### **Where to Find Styling Files**
+
+The main styling files in a Docusaurus project are:
+
+* `src/css/custom.css`: For global CSS overrides
+* Component-specific CSS modules (`.module.css` files)
+* Theme files that can be swapped or customized
+
+## **Basic Styling Methods**
+
+### **Global CSS Customization**
+
+The simplest way to customize your site's appearance is by modifying the `src/css/custom.css` file:
+
+```css
+:root {
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-code-font-size: 95%;
+},
+```
+
+### **Theme Configuration**
+
+You can configure theme settings in your `docusaurus.config.ts` file:
+
+```ts
+module.exports = {
+  themeConfig: {
+    // Color mode configuration
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
+    },
+    // Other theme settings...
+  },
+};
+```
+
+## **Advanced Styling Techniques**
+
+For more advanced styling needs, Docusaurus offers:
+
+1. **Theme Swizzling**: Customizing specific theme components
+2. **Custom CSS Modules**: Creating scoped styles for components
+3. **Custom Plugins**: Extending functionality with styling options
+
+## **Advanced Styling Topics**
+
+Now that you understand the basics, explore these advanced styling features:
+
+### **Interactive Components**
+
+* **[Tabs](./Tabs)** - Create interactive tabbed content for organizing related information
+* **[Collapsible Content](./Collapsible-Content)** - Use details elements and accordions for progressive disclosure
+* **[Advanced Components](./Advanced-Components)** - Master admonitions, callouts, and custom interactive elements
+
+### **Content Enhancement**
+
+* **[Codeblocks & Syntax Highlighting](./Codeblocks)** - Perfect your code presentation with highlighting, line numbers, and titles
+* **[Charts & Visual Elements](./Charts-Visual)** - Add diagrams, flowcharts, and visual elements using Mermaid and other tools
+
+### **Navigation & Layout**
+
+* **[Sidebar Styling](./Sidebar)** - Customize your documentation's navigation structure and appearance
+
+## **Quick Reference**
+
+Here are some commonly used styling patterns:
+
+### **Color Variables**
+
+```css
+:root {
+  /* Primary colors */
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-light: #33925d;
+
+  /* Background colors */
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #f8f9fa;
+
+  /* Text colors */
+  --ifm-font-color-base: #1c1e21;
+  --ifm-color-emphasis-300: #d0d7de;
+}
+```
+
+### **Common Component Overrides**
+
+```css
+/* Code blocks */
+.prism-code {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Admonitions */
+.theme-admonition {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+}
+
+/* Tables */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+```
+
+## **Next Steps**
+
+Start with the topics most relevant to your documentation needs:
+
+1. **For interactive content**: Begin with [Tabs](./Tabs) and [Collapsible Content](./Collapsible-Content)
+2. **For code-heavy docs**: Focus on [Codeblocks & Syntax Highlighting](./Codeblocks)
+3. **For visual documentation**: Explore [Charts & Visual Elements](./Charts-Visual)
+4. **For enhanced messaging**: Learn about [Advanced Components](./Advanced-Components)
+5. **For navigation**: Customize your [Sidebar Styling](./Sidebar)
+
+## **Resources**
+
+* [Official Docusaurus Styling Documentation](https://docusaurus.io/docs/styling-layout)
+* [Infima CSS Framework](https://infima.dev/) - The styling framework used by Docusaurus
+* [CSS Variables](https://docusaurus.io/docs/styling-layout#css-variables) - Complete list of Docusaurus CSS variables
+* [Docusaurus Theme Configuration](https://docusaurus.io/docs/api/themes/configuration) - All available theme configuration options
+* [Theme Classic](https://docusaurus.io/docs/api/themes/@docusaurus/theme-classic) - Documentation for the default Docusaurus theme
+
+<BuyMeACoffeeButton />

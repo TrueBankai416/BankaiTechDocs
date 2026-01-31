@@ -1,0 +1,294 @@
+---
+title: Adding Social Media Images
+description: Complete guide to adding social media images and metadata to Docusaurus documentation for better sharing on social platforms.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - SEO
+  - Social Media
+  - Open Graph
+  - Twitter Cards
+keywords:
+  - Docusaurus
+  - Social Media
+  - Open Graph
+  - Twitter Cards
+  - SEO
+  - Meta Tags
+  - Social Images
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Adding Social Media Images to Docusaurus**
+
+Social media images (also known as Open Graph images or Twitter Cards) are the preview images that appear when your documentation pages are shared on social platforms like Twitter, Facebook, LinkedIn, and Discord. This guide shows you how to add these images to your Docusaurus site.
+
+## **Why Add Social Media Images?**
+
+* **Better Engagement**: Pages with images get more clicks and shares
+* **Professional Appearance**: Branded images make your documentation look polished
+* **Brand Recognition**: Consistent imagery reinforces your brand identity
+* **Platform Optimization**: Different platforms display shared content differently
+
+## **Image Requirements**
+
+### **Recommended Specifications**
+
+* **Dimensions**: 1200x630 pixels (1.91:1 aspect ratio)
+* **File Size**: Under 300KB for optimal loading
+* **Format**: JPG or PNG (avoid WebP for maximum compatibility)
+* **Content**: High contrast text, clear branding, relevant imagery
+
+### **Platform-Specific Guidelines**
+
+* **Twitter**: 1200x628 pixels minimum
+* **Facebook**: 1200x630 pixels recommended
+* **LinkedIn**: 1200x627 pixels optimal
+* **Discord**: 1200x630 pixels works well
+
+## **File Organization**
+
+### **Directory Structure**
+
+Create a dedicated directory for social images:
+
+```
+static/
+└── img/
+    └── social/
+        ├── docusaurus-social.jpg
+        ├── nextcloud-social.webp
+        ├── github-social.jpg
+        └── project-specific-social.png
+```
+
+### **Naming Convention**
+
+Use consistent naming patterns:
+
+* `{section}-social.{ext}` - For section-wide images
+* `{specific-topic}-social.{ext}` - For topic-specific images
+
+**Examples:**
+
+* `docusaurus-social.jpg` - All Docusaurus documentation
+* `nextcloud-memories-social.png` - Specific to Nextcloud Memories
+* `docker-social.jpg` - All Docker-related content
+
+## **Adding Images to Documentation**
+
+### **Basic Frontmatter**
+
+Add the `image` and `description` fields to your MDX file frontmatter:
+
+```mdx title="docs/your-section/your-page.mdx"
+---
+title: Your Page Title
+description: A compelling description that appears in social media previews and search results.
+image: /img/social/your-section-social.jpg
+tags:
+   - Your Tags
+keywords: [Your, Keywords]
+last_update:
+  author: YourName
+---
+
+# Your Page Content
+```
+
+### **Complete Example**
+
+Here's a real example from this documentation:
+
+```mdx title="docs/Docker/Introduction.mdx"
+---
+title: Introduction to Docker
+description: Comprehensive guide to Docker containerization including installation, basic commands, and best practices for development.
+image: /img/social/docker-social.jpg
+tags:
+   - Docker
+   - Containerization
+   - DevOps
+keywords: [Docker, Containers, DevOps, Virtualization]
+last_update:
+  author: BankaiTech
+---
+
+# Docker Introduction Content...
+```
+
+## **Image Path Reference**
+
+### **Static Directory Mapping**
+
+* **Frontmatter path**: `/img/social/image-name.jpg`
+* **File system path**: `static/img/social/image-name.jpg`
+
+The `/img/` prefix in frontmatter maps to the `static/img/` directory in your project.
+
+### **Path Examples**
+
+```
+Frontmatter: image: /img/social/docker-social.jpg
+File location: static/img/social/docker-social.jpg
+
+Frontmatter: image: /img/social/nextcloud-social.webp
+File location: static/img/social/nextcloud-social.webp
+```
+
+## **Creating Social Images**
+
+### **Design Tools**
+
+* **Canva**: Templates for social media images
+* **Figma**: Professional design tool with social templates
+* **Adobe Photoshop**: Full-featured image editor
+* **GIMP**: Free alternative to Photoshop
+* **Sketch**: Mac-only design tool
+
+### **Design Tips**
+
+1. **Keep text large and readable** - Social previews are small
+2. **Use high contrast** - Ensure text stands out from background
+3. **Include your brand/logo** - Build recognition
+4. **Avoid fine details** - They get lost in small previews
+5. **Test on different platforms** - Check how it looks when shared
+
+### **Template Ideas**
+
+* **Logo + Page Title**: Simple and effective
+* **Screenshot + Branding**: Show actual content
+* **Icon + Description**: Clean, minimal approach
+* **Gradient + Text**: Modern, eye-catching design
+
+## **Testing Your Images**
+
+### **Preview Tools**
+
+Test how your images appear on different platforms:
+
+* **Open Graph Debugger**: [developers.facebook.com/tools/debug](https://developers.facebook.com/tools/debug/)
+* **Twitter Card Validator**: [cards-dev.twitter.com/validator](https://cards-dev.twitter.com/validator)
+* **LinkedIn Post Inspector**: [linkedin.com/post-inspector](https://www.linkedin.com/post-inspector/)
+* **OpenGraph.xyz**: [opengraph.xyz](https://www.opengraph.xyz/) - Multi-platform preview
+
+### **Local Testing**
+
+1. **Build your site**: `npm run build`
+2. **Serve locally**: `npm run serve`
+3. **Check meta tags**: View page source and look for:
+   ```html
+   <meta property="og:image" content="/img/social/your-image.jpg">
+   <meta name="twitter:image" content="/img/social/your-image.jpg">
+   ```
+
+## **Bulk Implementation Strategy**
+
+### **Section-by-Section Approach**
+
+1. **Identify sections**: Group related documentation
+2. **Create section images**: One image per major section
+3. **Apply systematically**: Update all files in each section
+4. **Test and refine**: Check social sharing results
+
+### **Example Implementation**
+
+```bash
+# 1. Create images for each major section
+static/img/social/
+├── docker-social.jpg        # All Docker docs
+├── kubernetes-social.jpg    # All Kubernetes docs
+├── nextcloud-social.webp    # General Nextcloud docs
+├── nextcloud-memories-social.png  # Specific feature
+└── troubleshooting-social.jpg     # All troubleshooting
+
+# 2. Update frontmatter in batches
+docs/Docker/           → docker-social.jpg
+docs/Kubernetes/       → kubernetes-social.jpg
+docs/Nextcloud/        → nextcloud-social.webp
+docs/Troubleshooting/  → troubleshooting-social.jpg
+```
+
+## **Advanced Configuration**
+
+### **Custom Meta Tags**
+
+For more control, you can add custom meta tags in `docusaurus.config.ts`:
+
+```typescript title="docusaurus.config.ts"
+module.exports = {
+  themeConfig: {
+    metadata: [
+      {name: 'twitter:card', content: 'summary_large_image'},
+      {name: 'twitter:site', content: '@yourtwitterhandle'},
+    ],
+  },
+};
+```
+
+### **Dynamic Images**
+
+For programmatic image generation, consider:
+
+* **@vercel/og**: Generate images at build time
+* **Puppeteer**: Screenshot-based image generation
+* **Canvas API**: Programmatic image creation
+
+## **Troubleshooting**
+
+### **Image Not Appearing**
+
+1. **Check file path**: Ensure the image exists at the specified location
+2. **Verify frontmatter**: Confirm the `image` field is correctly formatted
+3. **Clear cache**: Social platforms cache images for 24-48 hours
+4. **Test locally**: Build and serve your site to check meta tags
+
+### **Image Too Large**
+
+1. **Compress images**: Use tools like TinyPNG or ImageOptim
+2. **Resize dimensions**: Ensure images are 1200x630 or smaller
+3. **Change format**: Convert PNG to JPG for smaller file sizes
+
+### **Platform-Specific Issues**
+
+* **Twitter**: May not show WebP images on older clients
+* **LinkedIn**: Prefers JPG format for better compatibility
+* **Discord**: Works well with most formats and sizes
+
+## **Best Practices Checklist**
+
+* [ ] **Images are 1200x630 pixels**
+* [ ] **File sizes under 300KB**
+* [ ] **Consistent naming convention**
+* [ ] **Organized in `/static/img/social/` directory**
+* [ ] **Frontmatter includes both `image` and `description`**
+* [ ] **Images tested on multiple platforms**
+* [ ] **Alt text considered for accessibility**
+* [ ] **Brand consistency maintained across images**
+
+## **Maintenance**
+
+### **Regular Updates**
+
+* **Review quarterly**: Check if images need refreshing
+* **Update branding**: Keep images current with brand changes
+* **Monitor performance**: Track social sharing metrics
+* **Optimize sizes**: Compress images as tools improve
+
+### **Version Control**
+
+* **Commit images**: Include social images in your repository
+* **Document changes**: Note image updates in commit messages
+* **Backup originals**: Keep source files for future edits
+
+## **Resources**
+
+* **Docusaurus SEO Guide**: [docusaurus.io/docs/seo](https://docusaurus.io/docs/seo)
+* **Open Graph Protocol**: [ogp.me](https://ogp.me/)
+* **Twitter Cards Guide**: [developer.twitter.com/en/docs/twitter-for-websites/cards](https://developer.twitter.com/en/docs/twitter-for-websites/cards)
+* **Image Optimization**: [web.dev/fast/#optimize-your-images](https://web.dev/fast/#optimize-your-images)
+
+<BuyMeACoffeeButton />

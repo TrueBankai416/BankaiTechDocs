@@ -1,0 +1,35 @@
+---
+title: docker-compose.yaml
+tags:
+  - Arr Suite
+  - Readarr
+keywords:
+  - Arr Suite
+  - Readarr
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+```yaml
+name: readarr
+
+services:
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./readarr:/config
+      - /media/Books:/books #optional
+      - /media/Downloads:/media/Downloads #optional
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+```
+
+<BuyMeACoffeeButton />

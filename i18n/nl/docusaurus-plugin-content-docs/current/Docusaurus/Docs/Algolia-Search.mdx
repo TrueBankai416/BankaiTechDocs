@@ -1,0 +1,162 @@
+---
+title: Algolia Search
+description: Complete guide for installing and configuring Algolia DocSearch for Docusaurus including API setup, environment variables, and crawler configuration.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - Algolia Search
+keywords:
+  - Docusaurus
+  - Algolia Search
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+## **Installing [Algolia DocSearch](https://docusaurus.io/docs/search) for Docusaurus**
+
+Make sure you are in the root of your website, in my case ill run
+
+```bash
+cd /var/websites/"HomeLab Docs"
+```
+
+### ***Applying to the DocSearch Program***
+
+Lets apply for [Algolia DocSearch](https://docsearch.algolia.com/apply/)
+
+:::note
+After clicking the link above and signing up, you should receive an Email with further instructions and a Crawler should have been [automatically setup for you](https://docsearch.algolia.com/docs/templates/#getting-started).
+
+<p>
+  <>This is an updated Doc from Legacy search, this doc may not be 100% accurate because I migrated some time ago and am just now documenting it.</>
+</p>
+
+I apologize for any confusion this may cause.
+
+<p>
+  <>There is however great support from Algolia if you need further assistance, click [HERE](https://discord.gg/docusaurus)</>
+</p>
+
+:::
+
+Now go to the `Settings` page
+
+![Algolia Settings](/img/Docusaurus/AlgoliaSettings.jpg)
+
+Continue to the `API` Page
+
+![Algolia API](/img/Docusaurus/AlgoliaAPI.jpg)
+
+Take note of the ID and Both keys, we will be using them shortly.
+
+![Algolia Keys](/img/Docusaurus/AlgoliaKeys.jpg)
+
+### **Dotenv**
+
+In order to keep your sensitive information hidden, we need to install and configure dotenv
+
+#### ***Installing dotenv***
+
+Run the following command
+
+```bash
+npm install dotenv --save
+```
+
+#### ***Configuring dotenv***
+
+Open \`docusaurus.config.ts using your preferred text editor such as nano.
+Add the following code snippet above your main config near the top.
+
+```ts
+// Environment Variable Config
+import dotenv from 'dotenv';
+require('dotenv').config({path: './.env', debug: true})
+```
+
+#### ***Creating the .env file***
+
+Now lets create an `.env` file.
+
+```bash
+nano .env
+```
+
+Paste your `ID` and `Admin API Key` in the following format
+
+```editorconfig
+ALGOLIA_APP_ID = ""
+ALGOLIA_API_KEY = ""
+```
+
+:::tip\[Hint]
+
+Paste by pressing `CTRL+SHIFT+V`
+Save by pressing `CTRL+X`
+:::
+
+### **Modifying the docusaurus.config.ts file**
+
+```bash
+nano docusaurus.config.ts
+```
+
+Paste the following
+
+```ts title="Modify the highlighted lines if needed"
+    algolia: {
+      appId: process.env.ALGOLIA_APP_ID,
+      apiKey: process.env.ALGOLIA_API_KEY,
+      // highlight-next-line
+      indexName: 'bankai-tech',
+      // Optional: see doc section below
+      contextualSearch: true,
+      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+      replaceSearchResultPathname: {
+        // highlight-next-line
+        from: '/docs/', // or as RegExp: /\/docs\//
+        to: '/',
+      },
+      // Optional: Algolia search parameters
+      searchParameters: {},
+
+      // Optional: path for search page that enabled by default (`false` to disable it)
+      searchPagePath: 'search',
+    },
+```
+
+### **Building the website**
+
+Now build the site.
+
+```bash
+npm run build
+```
+
+### **Start the first Crawl**
+
+Now we should be able to [login](https://dashboard.algolia.com/).
+Go to `Data Sources`
+
+![Algolia Dashboard](/img/Docusaurus/Algolia_Dashboard.png)
+
+Go to `Crawler`
+
+![Algolia Crawler](/img/Docusaurus/Algolia_Crawler.png)
+
+Click on your crawler and then Start Crawl
+
+![Crawler](/img/Docusaurus/Crawl.png)
+
+:::info
+If there are any issues or additional information that can be added to this documentation please comment at the bottom of this page with your solutions and/or suggestions.
+
+<p>
+  <>Thank You for your Support</>
+</p>
+
+:::
+
+<BuyMeACoffeeButton />
