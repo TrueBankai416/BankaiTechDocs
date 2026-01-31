@@ -84,39 +84,39 @@ flowchart TD
 
 ### 1. Request Management
 
-* **Jellyseerr**: Web interface for users to request Movies and TV shows
-* Provides a clean, user-friendly interface for content requests
-* Integrates with Radarr and Sonarr for automated processing
+- **Jellyseerr**: Web interface for users to request Movies and TV shows
+- Provides a clean, user-friendly interface for content requests
+- Integrates with Radarr and Sonarr for automated processing
 
 ### 2. Content Management (\*Arr Suite)
 
-* **Radarr**: Handles movie requests and management
-* **Sonarr**: Manages TV show requests and episode tracking
-* **Prowlarr**: Unified indexer management with Flaresolverr for CloudFlare bypass
-* **Flaresolverr**: Solves CloudFlare challenges for indexer access
-* Configured to move completed downloads directly to Jellyfin libraries
+- **Radarr**: Handles movie requests and management
+- **Sonarr**: Manages TV show requests and episode tracking
+- **Prowlarr**: Unified indexer management with Flaresolverr for CloudFlare bypass
+- **Flaresolverr**: Solves CloudFlare challenges for indexer access
+- Configured to move completed downloads directly to Jellyfin libraries
 
 ### 3. Download Management
 
-* **qBittorrent**: Primary torrent client for downloading content
-* **Usenet Client**: Handles Usenet downloads (SABnzbd, NZBGet, etc.)
-* Downloads to centralized `/downloads` folder
-* Both torrent and Usenet sources managed through Prowlarr
+- **qBittorrent**: Primary torrent client for downloading content
+- **Usenet Client**: Handles Usenet downloads (SABnzbd, NZBGet, etc.)
+- Downloads to centralized `/downloads` folder
+- Both torrent and Usenet sources managed through Prowlarr
 
 ### 4. Storage Management
 
-* **mergerfs**: Union filesystem that pools multiple drives into a single mount point
-* Provides unified storage view for Jellyfin libraries
-* Allows mixing different drive sizes and types
-* Enables easy expansion by adding new drives
-* No RAID overhead - full capacity utilization
+- **mergerfs**: Union filesystem that pools multiple drives into a single mount point
+- Provides unified storage view for Jellyfin libraries
+- Allows mixing different drive sizes and types
+- Enables easy expansion by adding new drives
+- No RAID overhead - full capacity utilization
 
 ### 5. Media Library Integration
 
-* **Direct Integration**: \*Arr applications move content directly to Jellyfin libraries
-* **Automatic Organization**: Files are properly named and organized automatically
-* **Jellyfin**: Media server streams content from mergerfs-pooled storage
-* **Immediate Availability**: Content becomes available for streaming as soon as download completes
+- **Direct Integration**: \*Arr applications move content directly to Jellyfin libraries
+- **Automatic Organization**: Files are properly named and organized automatically
+- **Jellyfin**: Media server streams content from mergerfs-pooled storage
+- **Immediate Availability**: Content becomes available for streaming as soon as download completes
 
 ## Key Benefits
 
@@ -202,28 +202,28 @@ volumes:
 
 ## Additional Considerations
 
-* **Storage Expansion**: Easy to add new drives to the mergerfs pool
-* **Drive Failure**: Only content on failed drive is affected, rest remains accessible
-* **Network Usage**: Usenet typically faster than torrents, reduces bandwidth impact
-* **Monitoring**: Regular checks of drive health and mergerfs status
-* **Backup Strategy**: Important to backup configurations and consider redundancy for critical content
-* **Performance**: Direct file placement eliminates processing delays
-* **Space Management**: mergerfs policies ensure optimal space utilization across drives
+- **Storage Expansion**: Easy to add new drives to the mergerfs pool
+- **Drive Failure**: Only content on failed drive is affected, rest remains accessible
+- **Network Usage**: Usenet typically faster than torrents, reduces bandwidth impact
+- **Monitoring**: Regular checks of drive health and mergerfs status
+- **Backup Strategy**: Important to backup configurations and consider redundancy for critical content
+- **Performance**: Direct file placement eliminates processing delays
+- **Space Management**: mergerfs policies ensure optimal space utilization across drives
 
 ## Usenet Integration
 
 ### Recommended Usenet Clients
 
-* **SABnzbd**: Popular, web-based Usenet client with excellent \*Arr integration
-* **NZBGet**: Lightweight, efficient Usenet downloader
-* Both integrate seamlessly with Prowlarr for indexer management
+- **SABnzbd**: Popular, web-based Usenet client with excellent \*Arr integration
+- **NZBGet**: Lightweight, efficient Usenet downloader
+- Both integrate seamlessly with Prowlarr for indexer management
 
 ### Usenet Benefits
 
-* **Speed**: Typically faster than torrent downloads
-* **Availability**: Better retention for older content
-* **Privacy**: No uploading/seeding requirements
-* **Reliability**: More consistent download speeds
+- **Speed**: Typically faster than torrent downloads
+- **Availability**: Better retention for older content
+- **Privacy**: No uploading/seeding requirements
+- **Reliability**: More consistent download speeds
 
 This streamlined workflow provides a robust, automated solution for media management with minimal manual intervention and maximum storage flexibility.
 
