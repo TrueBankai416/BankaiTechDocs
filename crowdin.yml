@@ -19,18 +19,20 @@ mdx_file_type: &mdx_file_type mdx_v1_2
 files:
   # JSON translation files (code.json, navbar.json, footer.json, etc.)
   - source: /i18n/en/**/*.json
-    translation: /i18n/%two_letters_code%/**/%original_file_name%
+    translation: /i18n/%language%/**/%original_file_name%
     languages_mapping: *languages_mapping
     excluded_languages: [en]
 
   # MDX files in docs
   - source: /docs/**/*.mdx
-    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    translation: /i18n/%language%/docusaurus-plugin-content-docs/current/**/%original_file_name%
     languages_mapping: *languages_mapping
     type: *mdx_file_type
+    excluded_languages: [en]
 
   # Markdown files in docs (ignore MDX files)
   - source: /docs/**/*.md
-    translation: /i18n/%two_letters_code%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    translation: /i18n/%language%/docusaurus-plugin-content-docs/current/**/%original_file_name%
     languages_mapping: *languages_mapping
     ignore: [/**/*.mdx]
+    excluded_languages: [en]
