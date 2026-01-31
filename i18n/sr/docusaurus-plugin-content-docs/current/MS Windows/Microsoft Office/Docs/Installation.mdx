@@ -1,7 +1,9 @@
 ---
 title: Installing Microsoft Office
-tags: [Microsoft Office]
-keywords: [Microsoft Office]
+tags:
+  - Microsoft Office
+keywords:
+  - Microsoft Office
 last_update:
   author: BankaiTech
 ---
@@ -10,17 +12,17 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ### Prerequisites
 
-* Ensure you have a valid license or subscription to install Microsoft Office LTSC Pro Professional Plus 2024.
-* Verify that your system meets the minimum requirements for installation, which typically include an updated version of Windows, sufficient hard drive space, and RAM.
+- Ensure you have a valid license or subscription to install Microsoft Office LTSC Pro Professional Plus 2024.
+- Verify that your system meets the minimum requirements for installation, which typically include an updated version of Windows, sufficient hard drive space, and RAM.
 
 ### Step 1: Download the Office Deployment Tool (ODT)
 
 1. **Download the ODT**: Download the [Office Deployment Tool](https://www.microsoft.com/en-us/download/details.aspx?id=49117) from the Microsoft Download Center.
 2. **Edit or Create config file**:
-   * Go to the folder where you extracted the ODT files.
-   * You'll find a `configuration.xml` file among the extracted files, If the name differs then rename it. Edit this file to specify which Office products to install, including Office LTSC Professional Plus 2024. Microsoft provides detailed instructions and configuration options in its online documentation.
-   * **Tip**: You can easily generate custom configuration.xml files using the [Office Customization Tool](https://config.office.com/deploymentsettings).
-   * **Note**: If you use the generator tool, you will need to edit the generated file and change the `AUTOACTIVATE` value from `1` to `0`.
+   - Go to the folder where you extracted the ODT files.
+   - You'll find a `configuration.xml` file among the extracted files, If the name differs then rename it. Edit this file to specify which Office products to install, including Office LTSC Professional Plus 2024. Microsoft provides detailed instructions and configuration options in its online documentation.
+   - **Tip**: You can easily generate custom configuration.xml files using the [Office Customization Tool](https://config.office.com/deploymentsettings).
+   - **Note**: If you use the generator tool, you will need to edit the generated file and change the `AUTOACTIVATE` value from `1` to `0`.
 
 Example used in this documentation:
 
@@ -91,11 +93,11 @@ You can find supported Product IDs [HERE](https://learn.microsoft.com/en-us/micr
 
 ### Step 2: Installing Office
 
-* Open a Command Prompt as Administrator in the folder where you extracted the ODT files.
-* To install Office, run:
+- Open a Command Prompt as Administrator in the folder where you extracted the ODT files.
+- To install Office, run:
   ```cmd
   setup.exe /configure configuration.xml
   ```
-* Ensure the `configuration.xml` file is modified correctly to specify Office LTSC Pro Professional Plus 2024 and your preferences, working example shown above.
+- Ensure the `configuration.xml` file is modified correctly to specify Office LTSC Pro Professional Plus 2024 and your preferences, working example shown above.
 
 <BuyMeACoffeeButton />
