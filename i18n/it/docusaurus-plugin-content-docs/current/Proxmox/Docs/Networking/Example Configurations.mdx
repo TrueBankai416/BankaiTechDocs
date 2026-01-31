@@ -2,8 +2,20 @@
 title: Proxmox Network Example Configurations
 description: Real-world Proxmox networking implementation guide with complete configuration examples for home lab, business, and enterprise environments.
 image: /img/social/proxmox-social.webp
-tags: [Proxmox, Networking, Examples, Configuration, Setup Guide, Best Practices]
-keywords: [Proxmox, Network Examples, Configuration Guide, Setup, Implementation, Real-world]
+tags:
+  - Proxmox
+  - Networking
+  - Examples
+  - Configuration
+  - Setup Guide
+  - Best Practices
+keywords:
+  - Proxmox
+  - Network Examples
+  - Configuration Guide
+  - Setup
+  - Implementation
+  - Real-world
 last_update:
   author: BankaiTech
 ---
@@ -30,10 +42,10 @@ Internet → Router (192.168.1.1) → Proxmox Host (192.168.1.100) → VMs
 
 **Requirements:**
 
-* Simple network configuration
-* Easy VM access from home network
-* Basic security
-* Cost-effective setup
+- Simple network configuration
+- Easy VM access from home network
+- Basic security
+- Cost-effective setup
 
 <Tabs
   defaultValue="network"
@@ -46,130 +58,179 @@ Internet → Router (192.168.1.1) → Proxmox Host (192.168.1.100) → VMs
   <TabItem value="network">
     **Network Configuration (`/etc/network/interfaces`):**
 
-    ```bash
-    # Loopback interface
-    auto lo
-    iface lo inet loopback
+192.168.40.0/24
 
-    # Physical interface (no IP, bridge member)
-    auto enp0s3
-    iface enp0s3 inet manual
+````bash
+```bash
+# Loopback interface
+auto lo
+iface lo inet loopback
 
-    # Main bridge for VMs
-    auto vmbr0
-    iface vmbr0 inet static
-        address 192.168.1.100/24
-        gateway 192.168.1.1
-        bridge-ports enp0s3
-        bridge-stp off
-        bridge-fd 0
-        dns-nameservers 8.8.8.8 1.1.1.1
-        dns-search home.local
+# Physical interface (no IP, bridge member)
+auto enp0s3
+iface enp0s3 inet manual
 
-    # Apply configuration
-    # ifreload -a
-    ```
+# Main bridge for VMs
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    bridge-ports enp0s3
+    bridge-stp off
+    bridge-fd 0
+    dns-nameservers 8.8.8.8 1.1.1.1
+    dns-search home.local
 
-    **Verification Commands:**
+# Apply configuration
+# ifreload -a
+```
 
-    ```bash
-    # Check interface status
-    ip addr show vmbr0
+**Verification Commands:**
 
-    # Test connectivity
-    ping -c 4 192.168.1.1
-    ping -c 4 8.8.8.8
+```bash
+# Check interface status
+ip addr show vmbr0
 
-    # Verify bridge
-    brctl show vmbr0
-    ```
-  </TabItem>
+# Test connectivity
+ping -c 4 192.168.1.1
+ping -c 4 8.8.8.8
 
-  <TabItem value="vm">
-    **VM Network Configuration:**
+# Verify bridge
+brctl show vmbr0
+```
+````
 
-    ```bash
-    # Example VM configurations
-    # Web Server VM (VM ID 100)
-    net0: virtio=02:00:00:00:01:00,bridge=vmbr0
+**Verification Commands:**
 
-    # Database VM (VM ID 101)
-    net0: virtio=02:00:00:00:01:01,bridge=vmbr0
+```bash
+# Check interface status
+ip addr show vmbr0
 
-    # Development VM (VM ID 102)
-    net0: virtio=02:00:00:00:01:02,bridge=vmbr0
-    ```
+# Test connectivity
+ping -c 4 192.168.1.1
+ping -c 4 8.8.8.8
 
-    **VM IP Assignments:**
+# Verify bridge
+brctl show vmbr0
+```
 
-    ```bash
-    # Static IP configuration inside VMs
-    # Web Server: 192.168.1.110
-    # Database: 192.168.1.111
-    # Development: 192.168.1.112
-    ```
+</TabItem>
 
-    **Router DHCP Reservations:**
-
-    ```bash
-    # Configure DHCP reservations on home router
-    02:00:00:00:01:00 → 192.168.1.110 (WebServer)
-    02:00:00:00:01:01 → 192.168.1.111 (Database)
-    02:00:00:00:01:02 → 192.168.1.112 (Development)
-    ```
-  </TabItem>
-
-  <TabItem value="firewall">
+<TabItem value="firewall">
     **Basic Firewall Configuration:**
 
-    **Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
+````bash
+```bash
+# Example VM configurations
+# Web Server VM (VM ID 100)
+net0: virtio=02:00:00:00:01:00,bridge=vmbr0
 
-    ```bash
-    [OPTIONS]
-    enable: 1
-    policy_in: DROP
-    policy_out: ACCEPT
+# Database VM (VM ID 101)
+net0: virtio=02:00:00:00:01:01,bridge=vmbr0
 
-    [RULES]
-    # Proxmox web interface
-    IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24
+# Development VM (VM ID 102)
+net0: virtio=02:00:00:00:01:02,bridge=vmbr0
+```
 
-    # SSH access
-    IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
+**VM IP Assignments:**
 
-    # VNC console access
-    IN ACCEPT -p tcp --dport 5900:5999 -s 192.168.1.0/24
+```bash
+# Static IP configuration inside VMs
+# Web Server: 192.168.1.110
+# Database: 192.168.1.111
+# Development: 192.168.1.112
+```
 
-    # Ping
-    IN ACCEPT -p icmp
+**Router DHCP Reservations:**
 
-    # Cluster communication (if expanding later)
-    IN ACCEPT -p udp --dport 5404:5405 -s 192.168.1.0/24
-    IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
-    ```
+```bash
+# Configure DHCP reservations on home router
+02:00:00:00:01:00 → 192.168.1.110 (WebServer)
+02:00:00:00:01:01 → 192.168.1.111 (Database)
+02:00:00:00:01:02 → 192.168.1.112 (Development)
+```
+````
 
-    **VM Firewall Examples:**
+VMs
 
-    **Web Server VM (100.fw):**
+```bash
+192.168.20.0/24
+```
 
-    ```bash
-    [OPTIONS]
-    enable: 1
-    policy_in: DROP
-    policy_out: ACCEPT
+**Router DHCP Reservations:**
 
-    [RULES]
-    # Web traffic
-    IN ACCEPT -p tcp --dport 80
-    IN ACCEPT -p tcp --dport 443
+```bash
+# Configure DHCP reservations on home router
+02:00:00:00:01:00 → 192.168.1.110 (WebServer)
+02:00:00:00:01:01 → 192.168.1.111 (Database)
+02:00:00:00:01:02 → 192.168.1.112 (Development)
+```
 
-    # SSH from home network
-    IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
+</TabItem>
 
-    # Database access
-    OUT ACCEPT -p tcp --dport 3306 -d 192.168.1.111
-    ```
-  </TabItem>
+Proxmox, monitoring
+
+**Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
+
+````bash
+**Node Firewall (`/etc/pve/nodes/proxmox/host.fw`):**
+
+```bash
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+# Proxmox web interface
+IN ACCEPT -p tcp --dport 8006 -s 192.168.1.0/24
+
+# SSH access
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
+
+# VNC console access
+IN ACCEPT -p tcp --dport 5900:5999 -s 192.168.1.0/24
+
+# Ping
+IN ACCEPT -p icmp
+
+# Cluster communication (if expanding later)
+IN ACCEPT -p udp --dport 5404:5405 -s 192.168.1.0/24
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
+```
+
+**VM Firewall Examples:**
+
+**Web Server VM (100.fw):**
+
+```bash
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
+
+[RULES]
+# Web traffic
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+
+# SSH from home network
+IN ACCEPT -p tcp --dport 22 -s 192.168.1.0/24
+
+# Database access
+OUT ACCEPT -p tcp --dport 3306 -d 192.168.1.111
+```
+````
+
+**VM Firewall Examples:**
+
+**Web Server VM (100.fw):**
+
+```bash
+192.168.30.0/24
+```
+
+</TabItem>
 </Tabs>
 
 ### **Advanced Home Lab with VLANs**
@@ -216,13 +277,12 @@ iface vmbr0.10 inet static
 ```
 
 **VLAN Planning:**
-
-| VLAN | Purpose     | Network         | VMs                   |
-| ---- | ----------- | --------------- | --------------------- |
-| 10   | Management  | 192.168.10.0/24 | Proxmox, monitoring   |
-| 20   | Production  | 192.168.20.0/24 | Web, database servers |
-| 30   | Development | 192.168.30.0/24 | Testing, staging      |
-| 40   | IoT/Guest   | 192.168.40.0/24 | Isolated devices      |
+| VLAN | Purpose | Network | VMs |
+|------|---------|---------|-----|
+| 10 | Management | 192.168.10.0/24 | Proxmox, monitoring |
+| 20 | Production | 192.168.20.0/24 | Web, database servers |
+| 30 | Development | 192.168.30.0/24 | Testing, staging |
+| 40 | IoT/Guest | 192.168.40.0/24 | Isolated devices |
 
 ## **Small Business Configuration**
 
@@ -232,10 +292,10 @@ iface vmbr0.10 inet static
 
 **Requirements:**
 
-* Separate networks for different purposes
-* High availability for critical services
-* Secure guest network
-* Remote access capability
+- Separate networks for different purposes
+- High availability for critical services
+- Secure guest network
+- Remote access capability
 
 **Network Architecture:**
 
@@ -259,165 +319,200 @@ Internet → Firewall → Core Switch (Bonded) → Proxmox Cluster
   <TabItem value="cluster">
     **Primary Node Configuration:**
 
-    ```bash
-    # /etc/network/interfaces (Node 1)
-    auto lo
-    iface lo inet loopback
+10
 
-    # Bond for redundancy
-    auto bond0
-    iface bond0 inet manual
-        bond-slaves enp0s3 enp0s8
-        bond-miimon 100
-        bond-mode 802.3ad
-        bond-lacp-rate fast
-        bond-xmit-hash-policy layer2+3
+````bash
+```bash
+# /etc/network/interfaces (Node 1)
+auto lo
+iface lo inet loopback
 
-    # Management bridge
-    auto vmbr0
-    iface vmbr0 inet static
-        address 10.0.10.101/24
-        gateway 10.0.10.1
-        bridge-ports bond0
-        bridge-stp off
-        bridge-fd 0
-        bridge-vlan-aware yes
-        bridge-vids 10,20,30,50,99
-        dns-nameservers 10.0.10.1 8.8.8.8
+# Bond for redundancy
+auto bond0
+iface bond0 inet manual
+    bond-slaves enp0s3 enp0s8
+    bond-miimon 100
+    bond-mode 802.3ad
+    bond-lacp-rate fast
+    bond-xmit-hash-policy layer2+3
 
-    # Cluster communication
-    auto vmbr0.10
-    iface vmbr0.10 inet static
-        address 10.0.10.101/24
+# Management bridge
+auto vmbr0
+iface vmbr0 inet static
+    address 10.0.10.101/24
+    gateway 10.0.10.1
+    bridge-ports bond0
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 10,20,30,50,99
+    dns-nameservers 10.0.10.1 8.8.8.8
 
-    # Storage network
-    auto vmbr1
-    iface vmbr1 inet static
-        address 10.0.50.101/24
-        bridge-ports bond0.50
-        bridge-stp off
-        bridge-fd 0
-    ```
+# Cluster communication
+auto vmbr0.10
+iface vmbr0.10 inet static
+    address 10.0.10.101/24
 
-    **Secondary Node Configuration:**
+# Storage network
+auto vmbr1
+iface vmbr1 inet static
+    address 10.0.50.101/24
+    bridge-ports bond0.50
+    bridge-stp off
+    bridge-fd 0
+```
 
-    ```bash
-    # Same as primary but different IPs
-    # Node 2: 10.0.10.102, storage: 10.0.50.102
-    # Node 3: 10.0.10.103, storage: 10.0.50.103
-    ```
+**Secondary Node Configuration:**
 
-    **Cluster Setup:**
+```bash
+# Same as primary but different IPs
+# Node 2: 10.0.10.102, storage: 10.0.50.102
+# Node 3: 10.0.10.103, storage: 10.0.50.103
+```
 
-    ```bash
-    # Initialize cluster on first node
-    pvecm create businesscluster
+**Cluster Setup:**
 
-    # Join other nodes
-    pvecm add 10.0.10.101
-    ```
-  </TabItem>
+```bash
+# Initialize cluster on first node
+pvecm create businesscluster
 
-  <TabItem value="storage">
+# Join other nodes
+pvecm add 10.0.10.101
+```
+````
+
+**Secondary Node Configuration:**
+
+```bash
+# Same as primary but different IPs
+# Node 2: 10.0.10.102, storage: 10.0.50.102
+# Node 3: 10.0.10.103, storage: 10.0.50.103
+```
+
+**Cluster Setup:**
+
+```bash
+# Initialize cluster on first node
+pvecm create businesscluster
+
+# Join other nodes
+pvecm add 10.0.10.101
+```
+
+</TabItem>
+
+<TabItem value="storage">
     **Shared Storage Configuration:**
 
-    **Ceph Storage Network:**
+**Ceph Storage Network:**
 
-    ```bash
-    # Dedicated storage bridge per node
-    auto vmbr-storage
-    iface vmbr-storage inet static
-        address 10.0.50.101/24  # Node-specific IP
-        bridge-ports enp0s9     # Dedicated storage interface
-        bridge-stp off
-        bridge-fd 0
-    ```
+```bash
+# Dedicated storage bridge per node
+auto vmbr-storage
+iface vmbr-storage inet static
+    address 10.0.50.101/24  # Node-specific IP
+    bridge-ports enp0s9     # Dedicated storage interface
+    bridge-stp off
+    bridge-fd 0
+```
 
-    **NFS Storage Configuration:**
+Isolated devices
 
-    ```bash
-    # NFS server on storage VLAN
-    # Add to Proxmox: Datacenter → Storage → Add → NFS
-    ID: nfs-shared
-    Server: 10.0.50.200
-    Export: /export/proxmox
-    Content: VZDump backup file, Disk image, ISO image, Container template
-    ```
+```bash
+# NFS server on storage VLAN
+# Add to Proxmox: Datacenter → Storage → Add → NFS
+ID: nfs-shared
+Server: 10.0.50.200
+Export: /export/proxmox
+Content: VZDump backup file, Disk image, ISO image, Container template
+```
 
-    **iSCSI Configuration:**
+**iSCSI Configuration:**
 
-    ```bash
-    # iSCSI storage setup
-    # Install open-iscsi
-    apt install open-iscsi
+```bash
+# iSCSI storage setup
+# Install open-iscsi
+apt install open-iscsi
 
-    # Configure iSCSI target
-    # Add to Proxmox: Datacenter → Storage → Add → iSCSI
-    Portal: 10.0.50.210
-    Target: iqn.2023-01.local.storage:lun1
-    ```
-  </TabItem>
+# Configure iSCSI target
+# Add to Proxmox: Datacenter → Storage → Add → iSCSI
+Portal: 10.0.50.210
+Target: iqn.2023-01.local.storage:lun1
+```
 
-  <TabItem value="security">
+</TabItem>
+
+<TabItem value="security">
     **Comprehensive Security Configuration:**
 
-    **Datacenter Firewall (`/etc/pve/firewall/cluster.fw`):**
+IoT/Guest
 
-    ```bash
-    [OPTIONS]
-    enable: 1
-    policy_in: DROP
-    policy_out: ACCEPT
+````bash
+**Datacenter Firewall (`/etc/pve/firewall/cluster.fw`):**
 
-    [ALIASES]
-    MGMT_NET 10.0.10.0/24
-    PROD_NET 10.0.20.0/24
-    DEV_NET 10.0.30.0/24
-    STORAGE_NET 10.0.50.0/24
-    ADMIN_HOSTS 10.0.10.10,10.0.10.11
+```bash
+[OPTIONS]
+enable: 1
+policy_in: DROP
+policy_out: ACCEPT
 
-    [GROUPS]
-    [group management]
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
-    IN ACCEPT -p tcp --dport 8006 -s MGMT_NET
-    IN ACCEPT -p icmp -s MGMT_NET
+[ALIASES]
+MGMT_NET 10.0.10.0/24
+PROD_NET 10.0.20.0/24
+DEV_NET 10.0.30.0/24
+STORAGE_NET 10.0.50.0/24
+ADMIN_HOSTS 10.0.10.10,10.0.10.11
 
-    [group webserver]
-    IN ACCEPT -p tcp --dport 80
-    IN ACCEPT -p tcp --dport 443
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+[GROUPS]
+[group management]
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+IN ACCEPT -p tcp --dport 8006 -s MGMT_NET
+IN ACCEPT -p icmp -s MGMT_NET
 
-    [group database]
-    IN ACCEPT -p tcp --dport 3306 -s PROD_NET
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
-    IN REJECT -p tcp --dport 3306
+[group webserver]
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
 
-    [RULES]
-    # Cluster communication
-    IN ACCEPT -p udp --dport 5404:5405 -s MGMT_NET
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
-    ```
+[group database]
+IN ACCEPT -p tcp --dport 3306 -s PROD_NET
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+IN REJECT -p tcp --dport 3306
 
-    **Node Security Groups:**
+[RULES]
+# Cluster communication
+IN ACCEPT -p udp --dport 5404:5405 -s MGMT_NET
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+```
 
-    ```bash
-    # Production web server security
-    [GROUP prod-web]
-    IN ACCEPT -p tcp --dport 80
-    IN ACCEPT -p tcp --dport 443
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
-    OUT ACCEPT -p tcp --dport 3306 -d PROD_NET
-    OUT ACCEPT -p tcp --dport 443 # External APIs
-    IN DROP
+**Node Security Groups:**
 
-    # Development environment (more permissive)
-    [GROUP dev-servers]
-    IN ACCEPT -p tcp --dport 22 -s MGMT_NET
-    IN ACCEPT -p tcp --dport 8000:9000 -s DEV_NET
-    IN ACCEPT -p tcp --dport 3000:3999 -s DEV_NET
-    OUT ACCEPT
-    ```
-  </TabItem>
+```bash
+# Production web server security
+[GROUP prod-web]
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+OUT ACCEPT -p tcp --dport 3306 -d PROD_NET
+OUT ACCEPT -p tcp --dport 443 # External APIs
+IN DROP
+
+# Development environment (more permissive)
+[GROUP dev-servers]
+IN ACCEPT -p tcp --dport 22 -s MGMT_NET
+IN ACCEPT -p tcp --dport 8000:9000 -s DEV_NET
+IN ACCEPT -p tcp --dport 3000:3999 -s DEV_NET
+OUT ACCEPT
+```
+````
+
+**Node Security Groups:**
+
+```bash
+Production
+```
+
+</TabItem>
 </Tabs>
 
 ## **Enterprise Configuration**
@@ -468,216 +563,351 @@ Internet → Firewall → Core Switch (Bonded) → Proxmox Cluster
   <TabItem value="enterprise-net">
     **Enterprise Node Configuration:**
 
-    ```bash
-    # /etc/network/interfaces - Primary datacenter node
-    auto lo
-    iface lo inet loopback
+<TabItem value="vm">
+    **VM Network Configuration:**
 
-    # Out-of-band management
-    auto enp0s3
-    iface enp0s3 inet static
-        address 192.168.99.101/24
-        gateway 192.168.99.1
+````bash
+```bash
+# /etc/network/interfaces - Primary datacenter node
+auto lo
+iface lo inet loopback
 
-    # Primary data bond (LACP)
-    auto bond0
-    iface bond0 inet manual
-        bond-slaves enp1s0 enp2s0
-        bond-miimon 100
-        bond-mode 802.3ad
-        bond-lacp-rate fast
-        bond-xmit-hash-policy layer3+4
+# Out-of-band management
+auto enp0s3
+iface enp0s3 inet static
+    address 192.168.99.101/24
+    gateway 192.168.99.1
 
-    # Storage bond (dedicated)
-    auto bond1
-    iface bond1 inet manual
-        bond-slaves enp3s0 enp4s0
-        bond-miimon 100
-        bond-mode active-backup
+# Primary data bond (LACP)
+auto bond0
+iface bond0 inet manual
+    bond-slaves enp1s0 enp2s0
+    bond-miimon 100
+    bond-mode 802.3ad
+    bond-lacp-rate fast
+    bond-xmit-hash-policy layer3+4
 
-    # Main VLAN-aware bridge
-    auto vmbr0
-    iface vmbr0 inet static
-        address 10.100.0.101/24
-        gateway 10.100.0.1
-        bridge-ports bond0
-        bridge-stp off
-        bridge-fd 0
-        bridge-vlan-aware yes
-        bridge-vids 100,200,300,400,700
+# Storage bond (dedicated)
+auto bond1
+iface bond1 inet manual
+    bond-slaves enp3s0 enp4s0
+    bond-miimon 100
+    bond-mode active-backup
 
-    # Storage bridge
-    auto vmbr1
-    iface vmbr1 inet static
-        address 10.500.0.101/24
-        bridge-ports bond1
-        bridge-stp off
-        bridge-fd 0
+# Main VLAN-aware bridge
+auto vmbr0
+iface vmbr0 inet static
+    address 10.100.0.101/24
+    gateway 10.100.0.1
+    bridge-ports bond0
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids 100,200,300,400,700
 
-    # Backup network bridge
-    auto vmbr2
-    iface vmbr2 inet static
-        address 10.600.0.101/24
-        bridge-ports bond1.600
-        bridge-stp off
-        bridge-fd 0
-    ```
+# Storage bridge
+auto vmbr1
+iface vmbr1 inet static
+    address 10.500.0.101/24
+    bridge-ports bond1
+    bridge-stp off
+    bridge-fd 0
 
-    **Cluster Configuration:**
+# Backup network bridge
+auto vmbr2
+iface vmbr2 inet static
+    address 10.600.0.101/24
+    bridge-ports bond1.600
+    bridge-stp off
+    bridge-fd 0
+```
 
-    ```bash
-    # Initialize enterprise cluster
-    pvecm create enterprise-dc1
+**Cluster Configuration:**
 
-    # Configure corosync for WAN
-    # /etc/pve/corosync.conf
-    totem {
-        version: 2
-        cluster_name: enterprise-dc1
-        transport: knet
-        crypto_cipher: aes256
-        crypto_hash: sha256
+```bash
+# Initialize enterprise cluster
+pvecm create enterprise-dc1
+
+# Configure corosync for WAN
+# /etc/pve/corosync.conf
+totem {
+    version: 2
+    cluster_name: enterprise-dc1
+    transport: knet
+    crypto_cipher: aes256
+    crypto_hash: sha256
+}
+
+nodelist {
+    node {
+        name: proxmox-dc1-01
+        nodeid: 1
+        quorum_votes: 1
+        ring0_addr: 10.100.0.101
     }
+    # Additional nodes...
+}
 
-    nodelist {
-        node {
-            name: proxmox-dc1-01
-            nodeid: 1
-            quorum_votes: 1
-            ring0_addr: 10.100.0.101
-        }
-        # Additional nodes...
+quorum {
+    provider: corosync_votequorum
+}
+```
+````
+
+**Cluster Configuration:**
+
+```bash
+# Initialize enterprise cluster
+pvecm create enterprise-dc1
+
+# Configure corosync for WAN
+# /etc/pve/corosync.conf
+totem {
+    version: 2
+    cluster_name: enterprise-dc1
+    transport: knet
+    crypto_cipher: aes256
+    crypto_hash: sha256
+}
+
+nodelist {
+    node {
+        name: proxmox-dc1-01
+        nodeid: 1
+        quorum_votes: 1
+        ring0_addr: 10.100.0.101
     }
+    # Additional nodes...
+}
 
-    quorum {
-        provider: corosync_votequorum
-    }
-    ```
-  </TabItem>
+quorum {
+    provider: corosync_votequorum
+}
+```
 
-  <TabItem value="ha">
+</TabItem>
+
+<TabItem value="ha">
     **High Availability Configuration:**
 
-    **HA Groups Setup:**
+**HA Groups Setup:**
 
-    ```bash
-    # Create HA groups for different service tiers
-    pvesh create /cluster/ha/groups --group critical-services \
-        --nodes "proxmox-dc1-01:100,proxmox-dc1-02:90,proxmox-dc1-03:80" \
-        --comment "Critical production services"
+````bash
+**HA Groups Setup:**
 
-    pvesh create /cluster/ha/groups --group standard-services \
-        --nodes "proxmox-dc1-01:100,proxmox-dc1-02:100,proxmox-dc1-03:100" \
-        --comment "Standard production services"
-    ```
+```bash
+# Create HA groups for different service tiers
+pvesh create /cluster/ha/groups --group critical-services \
+    --nodes "proxmox-dc1-01:100,proxmox-dc1-02:90,proxmox-dc1-03:80" \
+    --comment "Critical production services"
 
-    **HA Resources Configuration:**
+pvesh create /cluster/ha/groups --group standard-services \
+    --nodes "proxmox-dc1-01:100,proxmox-dc1-02:100,proxmox-dc1-03:100" \
+    --comment "Standard production services"
+```
 
-    ```bash
-    # Critical database servers
-    pvesh create /cluster/ha/resources --sid vm:401 \
-        --group critical-services \
-        --max_restart 3 \
-        --max_relocate 3 \
-        --comment "Primary database server"
+**HA Resources Configuration:**
 
-    # Web application servers
-    pvesh create /cluster/ha/resources --sid vm:301 \
-        --group standard-services \
-        --max_restart 2 \
-        --max_relocate 2 \
-        --comment "Web application server"
-    ```
+```bash
+# Critical database servers
+pvesh create /cluster/ha/resources --sid vm:401 \
+    --group critical-services \
+    --max_restart 3 \
+    --max_relocate 3 \
+    --comment "Primary database server"
 
-    **Fencing Configuration:**
+# Web application servers
+pvesh create /cluster/ha/resources --sid vm:301 \
+    --group standard-services \
+    --max_restart 2 \
+    --max_relocate 2 \
+    --comment "Web application server"
+```
 
-    ```bash
-    # Configure fencing devices
-    pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
-        --type watchdog-mux \
-        --options device=/dev/watchdog
+**Fencing Configuration:**
 
-    # IPMI fencing
-    pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
-        --type ipmi \
-        --options "host=10.100.0.201,username=admin,password=***"
-    ```
-  </TabItem>
+```bash
+# Configure fencing devices
+pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
+    --type watchdog-mux \
+    --options device=/dev/watchdog
 
-  <TabItem value="zones">
+# IPMI fencing
+pvesh create /cluster/ha/fencing --node proxmox-dc1-01 \
+    --type ipmi \
+    --options "host=10.100.0.201,username=admin,password=***"
+```
+````
+
+**HA Resources Configuration:**
+
+```bash
+# Critical database servers
+pvesh create /cluster/ha/resources --sid vm:401 \
+    --group critical-services \
+    --max_restart 3 \
+    --max_relocate 3 \
+    --comment "Primary database server"
+
+# Web application servers
+pvesh create /cluster/ha/resources --sid vm:301 \
+    --group standard-services \
+    --max_restart 2 \
+    --max_relocate 2 \
+    --comment "Web application server"
+```
+
+Testing, staging
+
+````bash
+**Ceph Storage Network:**
+
+```bash
+# Dedicated storage bridge per node
+auto vmbr-storage
+iface vmbr-storage inet static
+    address 10.0.50.101/24  # Node-specific IP
+    bridge-ports enp0s9     # Dedicated storage interface
+    bridge-stp off
+    bridge-fd 0
+```
+
+**NFS Storage Configuration:**
+
+```bash
+# NFS server on storage VLAN
+# Add to Proxmox: Datacenter → Storage → Add → NFS
+ID: nfs-shared
+Server: 10.0.50.200
+Export: /export/proxmox
+Content: VZDump backup file, Disk image, ISO image, Container template
+```
+
+**iSCSI Configuration:**
+
+```bash
+# iSCSI storage setup
+# Install open-iscsi
+apt install open-iscsi
+
+# Configure iSCSI target
+# Add to Proxmox: Datacenter → Storage → Add → iSCSI
+Portal: 10.0.50.210
+Target: iqn.2023-01.local.storage:lun1
+```
+````
+
+</TabItem>
+
+<TabItem value="zones">
     **Security Zone Configuration:**
 
-    **DMZ Zone (VLAN 200):**
+**VLAN Planning:**
 
-    ```bash
-    [GROUP dmz-webserver]
-    # Public access
-    IN ACCEPT -p tcp --dport 80
-    IN ACCEPT -p tcp --dport 443
+````bash
+**DMZ Zone (VLAN 200):**
 
-    # Load balancer health checks
-    IN ACCEPT -p tcp --dport 80 -s 10.200.0.10:10.200.0.20
+```bash
+[GROUP dmz-webserver]
+# Public access
+IN ACCEPT -p tcp --dport 80
+IN ACCEPT -p tcp --dport 443
 
-    # Management access only from infrastructure
-    IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
+# Load balancer health checks
+IN ACCEPT -p tcp --dport 80 -s 10.200.0.10:10.200.0.20
 
-    # Application server access
-    OUT ACCEPT -p tcp --dport 8080 -d 10.300.0.0/24
+# Management access only from infrastructure
+IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
 
-    # Block all other outbound
-    OUT DROP -d 10.0.0.0/8
-    OUT ACCEPT -d 0.0.0.0/0
-    ```
+# Application server access
+OUT ACCEPT -p tcp --dport 8080 -d 10.300.0.0/24
 
-    **Application Zone (VLAN 300):**
+# Block all other outbound
+OUT DROP -d 10.0.0.0/8
+OUT ACCEPT -d 0.0.0.0/0
+```
 
-    ```bash
-    [GROUP app-servers]
-    # Web server access
-    IN ACCEPT -p tcp --dport 8080 -s 10.200.0.0/24
+**Application Zone (VLAN 300):**
 
-    # Database access
-    OUT ACCEPT -p tcp --dport 3306 -d 10.400.0.0/24
-    OUT ACCEPT -p tcp --dport 5432 -d 10.400.0.0/24
+```bash
+[GROUP app-servers]
+# Web server access
+IN ACCEPT -p tcp --dport 8080 -s 10.200.0.0/24
 
-    # Management access
-    IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
+# Database access
+OUT ACCEPT -p tcp --dport 3306 -d 10.400.0.0/24
+OUT ACCEPT -p tcp --dport 5432 -d 10.400.0.0/24
 
-    # Monitoring
-    IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
+# Management access
+IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
 
-    # Block inter-app communication
-    IN DROP -s 10.300.0.0/24
-    OUT DROP -d 10.300.0.0/24
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
 
-    # Block direct internet
-    OUT DROP -d 0.0.0.0/0
-    ```
+# Block inter-app communication
+IN DROP -s 10.300.0.0/24
+OUT DROP -d 10.300.0.0/24
 
-    **Database Zone (VLAN 400):**
+# Block direct internet
+OUT DROP -d 0.0.0.0/0
+```
 
-    ```bash
-    [GROUP database-servers]
-    # Application server access only
-    IN ACCEPT -p tcp --dport 3306 -s 10.300.0.0/24
-    IN ACCEPT -p tcp --dport 5432 -s 10.300.0.0/24
+**Database Zone (VLAN 400):**
 
-    # Backup server access
-    IN ACCEPT -p tcp --dport 3306 -s 10.600.0.0/24
-    OUT ACCEPT -p tcp --dport 22 -d 10.600.0.0/24
+```bash
+[GROUP database-servers]
+# Application server access only
+IN ACCEPT -p tcp --dport 3306 -s 10.300.0.0/24
+IN ACCEPT -p tcp --dport 5432 -s 10.300.0.0/24
 
-    # Management access
-    IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
+# Backup server access
+IN ACCEPT -p tcp --dport 3306 -s 10.600.0.0/24
+OUT ACCEPT -p tcp --dport 22 -d 10.600.0.0/24
 
-    # Monitoring
-    IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
+# Management access
+IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
 
-    # Block everything else
-    IN DROP
-    OUT DROP -d 0.0.0.0/0
-    OUT ACCEPT -d 10.0.0.0/8
-    ```
-  </TabItem>
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
+
+# Block everything else
+IN DROP
+OUT DROP -d 0.0.0.0/0
+OUT ACCEPT -d 10.0.0.0/8
+```
+````
+
+30
+
+```bash
+192.168.10.0/24
+```
+
+Web, database servers
+
+```bash
+[GROUP database-servers]
+# Application server access only
+IN ACCEPT -p tcp --dport 3306 -s 10.300.0.0/24
+IN ACCEPT -p tcp --dport 5432 -s 10.300.0.0/24
+
+# Backup server access
+IN ACCEPT -p tcp --dport 3306 -s 10.600.0.0/24
+OUT ACCEPT -p tcp --dport 22 -d 10.600.0.0/24
+
+# Management access
+IN ACCEPT -p tcp --dport 22 -s 10.100.0.0/24
+
+# Monitoring
+IN ACCEPT -p tcp --dport 9100 -s 10.100.0.50
+
+# Block everything else
+IN DROP
+OUT DROP -d 0.0.0.0/0
+OUT ACCEPT -d 10.0.0.0/8
+```
+
+</TabItem>
 </Tabs>
 
 ## **Specialized Configurations**
