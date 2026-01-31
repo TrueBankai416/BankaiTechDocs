@@ -87,6 +87,17 @@ export default function NavbarWrapper(props: Props): JSX.Element {
             alt="Discord"
           />
         </a>
+        <a
+          href="https://crowdin.com/project/bankai-tech"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Localized"
+        >
+          <img
+            src="https://badges.crowdin.net/bankai-tech/localized.svg"
+            alt="Localized"
+          />
+        </a>
       </div>
     </>
   );

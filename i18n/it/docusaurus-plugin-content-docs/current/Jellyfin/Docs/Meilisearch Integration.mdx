@@ -1,0 +1,260 @@
+---
+title: Meilisearch Integration
+description: Install and configure Meilisearch with Jellyfin using Docker for enhanced search capabilities
+image: img/Jellyfin/Meilisearch/meilisearch_seo.png
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# Meilisearch for Jellyfin
+
+Meilisearch is a powerful, fast, and open-source search engine that can be integrated with Jellyfin to enhance search capabilities.
+
+## Installing Meilisearch with Docker
+
+### Docker Compose Installation
+
+Create a `docker-compose.yaml` file for Meilisearch:
+
+```yaml
+name: meilisearch
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=your-secure-master-key-here
+      - MEILI_ENV=production
+    volumes:
+      - meilisearch_data:/meili_data
+    restart: unless-stopped
+
+volumes:
+  meilisearch_data:
+```
+
+Start the container:
+
+```bash
+sudo docker compose up -d
+```
+
+:::info
+Replace `your-secure-master-key-here` with a strong, unique master key. This key is required for authentication and managing your Meilisearch instance.
+:::
+
+## Updating Meilisearch
+
+:::danger Do Not Upgrade Without Backing Up
+
+If you upgrade without backing up and encounter a version incompatibility, you will see an error like this:
+
+```
+Error: Your database version (1.24.0) is incompatible with your current engine version (1.31.0).
+To migrate data between Meilisearch versions, please follow our guide on
+https://www.meilisearch.com/docs/learn/update_and_migration/updating.
+```
+
+When this happens, your only option is to restore from a dump or rebuild all indexes from scratch.
+:::
+
+### Rolling Back After an Incompatible Upgrade
+
+If you've already updated to a newer version without creating a dump and are seeing the version incompatibility error, you'll need to roll back to your previous version:
+
+1. **Find your previous version** on [Docker Hub Meilisearch Tags](https://hub.docker.com/r/getmeili/meilisearch/tags).
+
+   For example, if the error shows you were on version 1.24.0, search for `1.24` in the tags page. The exact version tag (like `v1.24.0`) may not exist, so you'll need to choose an available tag from that version, such as:
+
+   * `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-5`
+   * `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-4`
+
+2. **Update your `docker-compose.yaml`** to use the older image:
+
+```yaml
+services:
+  meilisearch:
+    //highlight-next-line
+    image: getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-5
+```
+
+3. **Recreate the container**:
+
+```bash
+sudo docker compose down
+sudo docker compose pull
+sudo docker compose up -d --force-recreate
+```
+
+4. **Verify the rollback**:
+
+```bash
+sudo docker logs meilisearch
+```
+
+5. **Create a dump immediately** using the instructions in Step 1 below, then you can safely upgrade following the proper procedure.
+
+### Step 1: Create a Database Dump
+
+Before updating, create a dump of your Meilisearch database:
+
+```bash
+curl -X POST 'http://localhost:7700/dumps' \
+  -H 'Authorization: Bearer your-master-key-here'
+```
+
+This will return a task UID. You can check the status and get the dump file:
+
+```bash
+# Check dump status
+curl 'http://localhost:7700/tasks/{task_uid}' \
+  -H 'Authorization: Bearer your-master-key-here'
+```
+
+The dump will be created in the `/dumps` directory inside the container. To retrieve it: (Optional)
+
+```bash
+# Copy dump from container to host
+sudo docker cp meilisearch:/meili_data/dumps/. ./meilisearch-backup/
+```
+
+:::info Named Volume Location
+
+```bash
+sudo docker volume inspect meilisearch_data
+```
+
+The dump files are stored in the volume at `/meili_data/dumps/`.
+:::
+
+### Step 2: Stop and Remove Old Container
+
+```bash
+# Stop the container
+sudo docker stop meilisearch
+
+# Remove the container
+sudo docker rm meilisearch
+```
+
+### Step 3: Pull New Image and Start
+
+Update your `docker-compose.yaml` to use the latest tag:
+
+```yaml
+services:
+  meilisearch:
+    //highlight-next-line
+    image: getmeili/meilisearch:latest
+```
+
+Then pull and start the new image:
+
+```bash
+# Pull the latest image
+sudo docker pull getmeili/meilisearch:latest
+
+# Start the container again
+sudo docker compose up -d
+```
+
+### Step 4: Check Logs for New API Key
+
+:::warning API Key Regeneration
+After updating, Meilisearch may generate a new API key. Always check the logs after an update to ensure you have the correct credentials.
+:::
+
+```bash
+# Check container logs
+sudo docker logs meilisearch
+
+# Follow logs in real-time
+sudo docker logs -f meilisearch
+```
+
+Look for messages about API keys or authentication tokens. If a new API key was generated, update your Jellyfin configuration accordingly.
+
+### Step 5: Restore from Dump (if needed)
+
+If you need to restore from your backup:
+
+1. **Add the import environment variable** to your `docker-compose.yaml`:
+
+```yaml
+environment:
+  - MEILI_MASTER_KEY=your-secure-master-key-here
+  - MEILI_ENV=production
+  //highlight-next-line
+  - MEILI_IMPORT_DUMP: "/meili_data/dumps/20260105-220227298.dump"
+```
+
+Replace `20260105-220227298.dump` with your actual dump filename.
+
+2. **Delete the current database**:
+
+```bash
+sudo docker compose down
+# Option 1: Delete data from within the volume (Recommended)
+sudo docker run --rm -v meilisearch_data:/meili_data alpine rm -rf /meili_data/data.ms
+
+# Option 2: Remove and recreate the volume (if you want a completely fresh start)
+# sudo docker volume rm meilisearch_data
+# sudo docker volume create meilisearch_data
+```
+
+3. **Recreate the container**:
+
+```bash
+sudo docker compose up -d --force-recreate
+```
+
+4. **Check the logs** to verify the restore completed successfully:
+
+```bash
+sudo docker logs -f meilisearch
+```
+
+Look for messages indicating the dump was successfully imported.
+
+:::tip
+After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` environment variable from your `docker-compose.yaml` and restart the container to prevent it from attempting to import on every restart.
+:::
+
+## Integrating with Jellyfin
+
+1. In Jellyfin, navigate to **Dashboard** → **Plugins** → **Catalog**
+2. Install the Meilisearch plugin
+3. Configure the plugin with:
+   * **Host**: `http://localhost:7700` (or your Meilisearch URL)
+   * **API Key**: Your Meilisearch master key or generated API key
+4. Restart Jellyfin
+5. Trigger a library scan to populate the search index
+
+## Troubleshooting
+
+### Connection Issues
+
+If Jellyfin cannot connect to Meilisearch:
+
+* Verify Meilisearch is running: `sudo docker ps | grep meilisearch`
+* Check logs: `sudo docker logs meilisearch`
+* Ensure the port 7700 is accessible
+* Verify the API key is correct
+
+### Performance Issues
+
+* Increase memory allocation for the container if needed
+* Monitor resource usage: `sudo docker stats meilisearch`
+* Consider adjusting the `MEILI_MAX_INDEXING_MEMORY` environment variable
+
+## Additional Resources
+
+* [Meilisearch Documentation](https://www.meilisearch.com/docs)
+* [Meilisearch Docker Hub](https://hub.docker.com/r/getmeili/meilisearch)
+* [Jellyfin Documentation](https://jellyfin.org/docs/)
+
+<BuyMeACoffeeButton />

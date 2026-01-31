@@ -1,0 +1,248 @@
+---
+title: Tabs
+description: Complete guide to using tabs in Docusaurus for organizing content, creating interactive elements, and improving documentation navigation.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - Styling
+  - Tabs
+  - Components
+keywords:
+  - Docusaurus
+  - Tabs
+  - Components
+  - Interactive
+  - UI
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# **Working with Tabs in Docusaurus**
+
+Tabs are a powerful way to organize related content and provide interactive elements in your documentation. Docusaurus provides built-in tab functionality that's easy to implement and customize.
+
+## **Basic Tab Implementation**
+
+### **Simple Tabs**
+
+Here's the basic syntax for creating tabs in your MDX files:
+
+```jsx
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="apple" label="Apple" default>
+    This is an apple 🍎
+  </TabItem>
+  <TabItem value="orange" label="Orange">
+    This is an orange 🍊
+  </TabItem>
+  <TabItem value="banana" label="Banana">
+    This is a banana 🍌
+  </TabItem>
+</Tabs>
+```
+
+**Result:**
+
+<Tabs>
+  <TabItem value="apple" label="Apple" default>
+    This is an apple 🍎
+  </TabItem>
+
+  <TabItem value="orange" label="Orange">
+    This is an orange 🍊
+  </TabItem>
+
+  <TabItem value="banana" label="Banana">
+    This is a banana 🍌
+  </TabItem>
+</Tabs>
+
+### **Tabs with Code Examples**
+
+Tabs are especially useful for showing different installation methods or code examples:
+
+<Tabs>
+  <TabItem value="npm" label="npm">
+    ```bash
+    npm install docusaurus
+    ```
+  </TabItem>
+
+  <TabItem value="yarn" label="Yarn">
+    ```bash
+    yarn add docusaurus
+    ```
+  </TabItem>
+
+  <TabItem value="pnpm" label="pnpm">
+    ```bash
+    pnpm add docusaurus
+    ```
+  </TabItem>
+</Tabs>
+
+## **Advanced Tab Features**
+
+### **Default Tab Selection**
+
+Use the `default` attribute to specify which tab should be selected by default.
+
+### **Tab Groups and Syncing**
+
+You can sync multiple tab groups across your page using the `groupId` attribute. When users select a tab in one group, all other groups with the same `groupId` will automatically switch to the corresponding tab.
+
+### **Query String Sync**
+
+You can make tab selections persist in the URL by using the `queryString` attribute.
+
+## **Styling Tabs**
+
+### **Custom CSS for Tabs**
+
+You can customize tab appearance by adding CSS to your `src/css/custom.css` file:
+
+```css
+/* Tab navigation styling */
+.tabs {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabs__item {
+  background: var(--ifm-background-color);
+  border-right: 1px solid var(--ifm-color-emphasis-300);
+  transition: background-color 0.2s ease;
+}
+
+.tabs__item:hover {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.tabs__item--active {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+/* Tab content styling */
+.tab-content {
+  padding: 1rem;
+  background: var(--ifm-background-surface-color);
+}
+```
+
+### **Dark Mode Considerations**
+
+Ensure your tab styling works well in both light and dark modes:
+
+```css
+[data-theme='dark'] .tabs__item {
+  background: var(--ifm-background-color);
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .tabs__item--active {
+  background: var(--ifm-color-primary-dark);
+}
+```
+
+## **Best Practices**
+
+### **Content Organization**
+
+* **Related Content**: Use tabs for content that's mutually exclusive but related (like different OS instructions)
+* **Logical Grouping**: Keep similar content types together
+* **Clear Labels**: Use descriptive, concise tab labels
+
+### **User Experience**
+
+* **Default Selection**: Always specify a sensible default tab
+* **Consistent Ordering**: Keep the same tab order across different tab groups
+* **Mobile Consideration**: Ensure tabs work well on mobile devices
+
+## **Common Use Cases**
+
+### **Installation Instructions**
+
+Perfect for showing different installation methods:
+
+<Tabs>
+  <TabItem value="docker" label="Docker">
+    ```bash
+    docker run -d \
+      --name=nextcloud \
+      -p 80:80 \
+      nextcloud:latest
+    ```
+  </TabItem>
+
+  <TabItem value="manual" label="Manual">
+    ```bash
+    # Download and extract
+    wget https://download.nextcloud.com/server/releases/latest.tar.bz2
+    tar -xjf latest.tar.bz2
+    ```
+  </TabItem>
+</Tabs>
+
+### **Configuration Examples**
+
+Show different configuration options:
+
+<Tabs>
+  <TabItem value="basic" label="Basic Config">
+    ```yaml
+    version: '3'
+    services:
+      app:
+        image: nginx
+        ports:
+          - "80:80"
+    ```
+  </TabItem>
+
+  <TabItem value="advanced" label="Advanced Config">
+    ```yaml
+    version: '3'
+    services:
+      app:
+        image: nginx
+        ports:
+          - "80:80"
+        environment:
+          - SSL_ENABLED=true
+        volumes:
+          - ./config:/etc/nginx/conf.d
+    ```
+  </TabItem>
+</Tabs>
+
+## **Troubleshooting**
+
+### **Common Issues**
+
+1. **Tabs not rendering**: Ensure you've imported the required components
+2. **Styling issues**: Check that your custom CSS doesn't conflict with Docusaurus styles
+3. **Sync not working**: Verify that `groupId` values match exactly across tab groups
+
+### **Debug Tips**
+
+* Use browser developer tools to inspect tab elements
+* Check the console for any JavaScript errors
+* Verify that MDX syntax is correct (proper indentation, closed tags)
+
+## **Resources**
+
+* [Official Docusaurus Tabs Documentation](https://docusaurus.io/docs/markdown-features/tabs)
+* [MDX Documentation](https://mdxjs.com/) - For understanding MDX syntax
+* [Infima CSS Framework](https://infima.dev/) - The CSS framework used by Docusaurus
+* [React Tabs Component](https://reactjs.org/docs/conditional-rendering.html) - For understanding the underlying React concepts
+
+<BuyMeACoffeeButton />

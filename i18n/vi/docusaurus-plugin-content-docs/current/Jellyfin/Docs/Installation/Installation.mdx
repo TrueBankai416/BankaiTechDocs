@@ -1,0 +1,81 @@
+---
+title: Installation
+description: Comparison guide for Jellyfin installation methods covering host vs Docker deployment with pros, cons, and best practices for each approach.
+image: /img/social/jellyfin-social.webp
+tags:
+  - Jellyfin
+  - Media Server
+keywords:
+  - Jellyfin
+  - Media Server
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Installing Jellyfin: Host vs. Docker**
+
+Jellyfin, a popular open-source media server, provides flexibility in how it can be deployed. Users can choose between installing it directly on a host operating system (OS) or within a Docker container. Understanding the differences between these two methods is crucial for optimizing your Jellyfin setup according to your technical requirements, convenience preferences, and resource utilization.
+
+## **Jellyfin on the Host**
+
+Installing Jellyfin directly on the host involves downloading and setting up the Jellyfin server software on the operating system of your server or personal computer. This can be Linux, Windows, or macOS.
+
+<Tabs
+  defaultValue="pros"
+  values={[
+   {label: 'Pros', value: 'pros'},
+   {label: 'Cons', value: 'cons'},
+  ]}
+>
+  <TabItem value="pros">
+    * **Performance:** Direct access to the host's hardware may yield slightly better performance, especially for tasks requiring intense computation or disk access, such as media transcoding.
+    * **Simplicity:** For users familiar with their OS environment, setup and management without the additional layer of Docker can be more straightforward.
+    * **Direct Hardware Access:** Easy integration with hardware acceleration features (e.g., NVIDIA or Intel for transcoding) without additional Docker configuration.
+  </TabItem>
+
+  <TabItem value="cons">
+    * **Environment Conflicts:** Potential for dependency conflicts with other applications running on the host.
+    * **Portability:** Migrating or replicating the Jellyfin server setup to another machine or environment can be more cumbersome.
+    * **Isolation:** Limited isolation from the host OS can pose security risks and potential stability issues.
+  </TabItem>
+</Tabs>
+
+## **Jellyfin in Docker**
+
+Docker is a platform and tool for developing, shipping, and running applications in containers. Installing Jellyfin in Docker means running the Jellyfin server inside a container, which uses the host system's kernel but is otherwise isolated.
+
+<Tabs
+  defaultValue="pros"
+  values={[
+   {label: 'Pros', value: 'pros'},
+   {label: 'Cons', value: 'cons'},
+  ]}
+>
+  <TabItem value="pros">
+    * **Isolation:** Running Jellyfin in a container isolates it from the host system, reducing potential conflicts and enhancing security.
+    * **Portability:** Docker containers can be easily moved, backed up, or replicated across different systems and environments, ensuring a consistent operation.
+    * **Version Control and Testing:** Docker makes it easy to run multiple versions of Jellyfin for testing or rollback purposes and manage updates without affecting the host system.
+    * **Ease of Deployment:** Docker images and containers simplify setting up Jellyfin, especially on systems where Jellyfin's dependencies are hard to fulfill.
+  </TabItem>
+
+  <TabItem value="cons">
+    * **Overhead:** While generally minimal, Docker adds a slight performance overhead due to its abstraction layer. For media transcoding, the difference is often negligible but can be more pronounced on lower-end hardware.
+    * **Complexity:** For users not familiar with Docker, the container ecosystem has a learning curve, including understanding how to properly configure volumes, networks, and manage containers.
+    * **Hardware Acceleration:** Configuring hardware acceleration for transcoding within Docker can be more complex, requiring specific Docker configurations and possibly limiting compatibility with certain hardware.
+  </TabItem>
+</Tabs>
+
+## **Conclusion**
+
+Choosing between installing Jellyfin directly on the host or within Docker hinges on several factors including performance requirements, ease of use, system control, and preference for isolation from other system processes.
+
+* **For simplicity and potential performance gains, especially with direct hardware transcoding, installing Jellyfin on the host might be preferred.**
+* **For isolation, portability, and easier version control, Docker provides an excellent environment with its containerization technology.**
+
+Both methods offer unique benefits, and your choice should align with your technical environment, expertise, and specific needs for deploying Jellyfin.
+
+<BuyMeACoffeeButton />

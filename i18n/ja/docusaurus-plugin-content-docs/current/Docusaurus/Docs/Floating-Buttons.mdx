@@ -1,0 +1,495 @@
+---
+sidebar_position: 8
+title: Floating Buttons
+description: Learn how to create and implement floating buttons in Docusaurus including React components, theme swizzling, and positioning techniques.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - React
+  - Components
+  - UI
+keywords:
+  - Docusaurus
+  - Floating Buttons
+  - React
+  - Components
+  - UI
+  - Theme Swizzling
+---
+
+Floating buttons are fixed-position UI elements that remain visible as users scroll through your documentation. They're perfect for call-to-action buttons, social links, or quick access features. This guide shows you how to implement floating buttons like the ones used on this site.
+
+## Overview
+
+Floating buttons in Docusaurus are implemented as:
+
+1. **React Components** - Individual button components with styling and functionality
+2. **Footer Integration** - Using Docusaurus's theme swizzling to inject buttons site-wide
+3. **Fixed Positioning** - CSS positioning to keep buttons visible during scroll
+
+## Current Implementation
+
+This site uses two floating buttons:
+
+* **Discord Widget** - Links to the Discord community (positioned at `right: 245px`)
+* **Buy Me a Coffee Widget** - Links to support page (positioned at `right: 75px`)
+
+## Step-by-Step Implementation
+
+### Step 1: Create the Button Component
+
+Create a new component file for your floating button:
+
+```bash
+mkdir -p src/components/YourFloatingWidget
+```
+
+Create `src/components/YourFloatingWidget/index.tsx`:
+
+```tsx
+import React from 'react';
+
+const YourFloatingWidget: React.FC = () => {
+  const handleClick = () => {
+    window.open('https://your-link.com', '_blank');
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      style={{
+        position: 'fixed',
+        bottom: '15px',
+        right: '15px', // Adjust positioning as needed
+        zIndex: 9999,
+        cursor: 'pointer',
+        backgroundColor: '#your-color', // Customize your color
+        color: 'white',
+        padding: '12px 16px',
+        borderRadius: '50px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        border: 'none',
+        textDecoration: 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05)';
+        e.currentTarget.style.backgroundColor = '#darker-color'; // Hover color
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.backgroundColor = '#your-color'; // Original color
+      }}
+      title="Your button tooltip text"
+    >
+      <span style={{ fontSize: '16px' }}>🔗</span> {/* Your icon */}
+      Your Button Text
+    </div>
+  );
+};
+
+export default YourFloatingWidget;
+```
+
+### Step 2: Swizzle the Footer Component
+
+Docusaurus uses "swizzling" to customize theme components. Create a Footer wrapper:
+
+```bash
+npm run swizzle @docusaurus/theme-classic Footer -- --wrap
+```
+
+This creates `src/theme/Footer/index.tsx`. Modify it to include your floating buttons:
+
+```tsx
+import React from 'react'
+import Footer from '@theme-original/Footer'
+import YourFloatingWidget from '@site/src/components/YourFloatingWidget'
+
+export default function FooterWrapper(props) {
+  return (
+    <>
+      <YourFloatingWidget />
+      <Footer {...props} />
+    </>
+  )
+}
+```
+
+### Step 3: Position Multiple Buttons
+
+When using multiple floating buttons, position them to avoid overlap:
+
+```tsx
+// First button (rightmost)
+right: '15px'
+
+// Second button (to the left of first)
+right: '185px' // Adjust based on first button width + gap
+
+// Third button (to the left of second)
+right: '355px' // Continue the pattern
+```
+
+## Real Examples from This Site
+
+### Discord Floating Widget
+
+```tsx
+import React from 'react';
+
+const DiscordFloatingWidget: React.FC = () => {
+  const handleClick = () => {
+    window.open('https://discord.gg/6THYdvayjg', '_blank');
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      style={{
+        position: 'fixed',
+        bottom: '15px',
+        right: '245px', // Positioned left of Buy Me a Coffee button
+        zIndex: 9999,
+        cursor: 'pointer',
+        backgroundColor: '#7289da', // Discord brand color
+        color: 'white',
+        padding: '12px 16px',
+        borderRadius: '50px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        border: 'none',
+        textDecoration: 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05)';
+        e.currentTarget.style.backgroundColor = '#677bc4';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.backgroundColor = '#7289da';
+      }}
+      title="Join our Discord community!"
+    >
+      <span style={{ fontSize: '16px' }}>💬</span>
+      Join Discord
+    </div>
+  );
+};
+
+export default DiscordFloatingWidget;
+```
+
+### Buy Me a Coffee Widget
+
+```tsx
+import React from 'react';
+
+const BuyMeACoffeeFloatingWidget: React.FC = () => {
+  const handleClick = () => {
+    window.open('https://www.buymeacoffee.com/BankaiTech', '_blank');
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      style={{
+        position: 'fixed',
+        bottom: '15px',
+        right: '75px', // Positioned with some margin from right edge
+        zIndex: 9999,
+        cursor: 'pointer',
+        backgroundColor: '#5F7FFF', // Buy Me a Coffee brand color
+        color: 'white',
+        padding: '12px 16px',
+        borderRadius: '50px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        border: 'none',
+        textDecoration: 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05)';
+        e.currentTarget.style.backgroundColor = '#4F6FEF';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.backgroundColor = '#5F7FFF';
+      }}
+      title="Support me on Buy me a coffee!"
+    >
+      <span style={{ fontSize: '16px' }}>☕</span>
+      Buy me a coffee
+    </div>
+  );
+};
+
+export default BuyMeACoffeeFloatingWidget;
+```
+
+## Styling Options
+
+### Basic Styling Properties
+
+```tsx
+style={{
+  // Positioning
+  position: 'fixed',
+  bottom: '15px',        // Distance from bottom
+  right: '15px',         // Distance from right
+  zIndex: 9999,          // Ensure it's above other content
+
+  // Appearance
+  backgroundColor: '#color',
+  color: 'white',
+  padding: '12px 16px',
+  borderRadius: '50px',   // Rounded pill shape
+  fontSize: '14px',
+  fontWeight: 'bold',
+  fontFamily: 'system-ui, -apple-system, sans-serif',
+
+  // Effects
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  transition: 'all 0.2s ease',
+
+  // Layout
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+
+  // Interactive
+  cursor: 'pointer',
+  border: 'none',
+  textDecoration: 'none',
+}}
+```
+
+### Hover Effects
+
+```tsx
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'scale(1.05)';
+  e.currentTarget.style.backgroundColor = '#hover-color';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'scale(1)';
+  e.currentTarget.style.backgroundColor = '#original-color';
+}}
+```
+
+## Advanced Features
+
+### Conditional Rendering
+
+Show buttons only on certain pages or conditions:
+
+```tsx
+import { useLocation } from '@docusaurus/router';
+
+export default function FooterWrapper(props) {
+  const location = useLocation();
+  const showButtons = !location.pathname.includes('/private');
+
+  return (
+    <>
+      {showButtons && <YourFloatingWidget />}
+      <Footer {...props} />
+    </>
+  )
+}
+```
+
+### Configuration via Docusaurus Config
+
+Add button configuration to `docusaurus.config.ts`:
+
+```tsx
+customFields: {
+  floatingButtons: {
+    discord: {
+      enabled: true,
+      url: 'https://discord.gg/your-invite',
+      position: { bottom: '15px', right: '245px' }
+    },
+    support: {
+      enabled: true,
+      url: 'https://buymeacoffee.com/yourname',
+      position: { bottom: '15px', right: '75px' }
+    }
+  }
+}
+```
+
+Then use it in your component:
+
+```tsx
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+
+const YourFloatingWidget: React.FC = () => {
+  const { siteConfig } = useDocusaurusContext();
+  const config = siteConfig.customFields?.floatingButtons?.discord;
+
+  if (!config?.enabled) return null;
+
+  // Use config.url and config.position
+};
+```
+
+### Responsive Design
+
+Hide buttons on mobile devices:
+
+```tsx
+import { useWindowSize } from '@docusaurus/theme-common';
+
+const YourFloatingWidget: React.FC = () => {
+  const windowSize = useWindowSize();
+
+  if (windowSize === 'mobile') return null;
+
+  // Rest of component
+};
+```
+
+## Best Practices
+
+### 1. Positioning
+
+* Use consistent spacing between multiple buttons
+* Ensure buttons don't overlap with other UI elements
+* Consider mobile responsiveness
+
+### 2. Styling
+
+* Use brand colors for recognition
+* Maintain consistent sizing across buttons
+* Include hover effects for better UX
+
+### 3. Accessibility
+
+* Always include `title` attributes for tooltips
+* Use semantic HTML when possible
+* Ensure sufficient color contrast
+
+### 4. Performance
+
+* Keep components lightweight
+* Use CSS transitions instead of JavaScript animations
+* Consider lazy loading for complex buttons
+
+### 5. User Experience
+
+* Don't overuse floating buttons (2-3 maximum)
+* Make sure they serve a clear purpose
+* Position them where they won't interfere with content
+
+## Troubleshooting
+
+### Button Not Appearing
+
+* Check that the Footer wrapper is properly swizzled
+* Verify the component is imported and rendered
+* Ensure `zIndex` is high enough
+
+### Positioning Issues
+
+* Use browser dev tools to inspect positioning
+* Check for CSS conflicts
+* Verify `position: fixed` is applied
+
+### Hover Effects Not Working
+
+* Ensure event handlers are properly attached
+* Check for CSS transitions
+* Verify color values are correct
+
+### Table of Contents Overlapping Buttons
+
+:::warning TOC Overlap Issue
+If you notice that your Table of Contents (TOC) is being covered by your floating buttons on the right side of the page, you may need to apply a CSS fix to prevent the TOC from extending to the bottom of the viewport.
+:::
+
+#### Symptoms
+
+* The last 2-3 TOC entries overlap with your floating buttons
+* TOC extends too far down on pages with many headings
+
+#### Solution: Add Custom CSS
+
+Follow these steps to fix the TOC overlap:
+
+**Step 1:** Open your custom CSS file at [src/css/custom.css](../../../src/css/custom.css)
+
+**Step 2:** Add the following CSS rules at the end of the file:
+
+```css
+/* Prevent TOC from overlapping with floating widgets at bottom right */
+.table-of-contents {
+  max-height: calc(100vh - 200px) !important;
+  overflow-y: auto !important;
+}
+
+.theme-doc-toc-desktop {
+  max-height: calc(100vh - 200px) !important;
+}
+
+/* Ensure TOC doesn't extend to bottom of viewport */
+.theme-doc-toc-desktop .table-of-contents {
+  padding-bottom: 20px !important;
+}
+```
+
+**Step 3:** Save the file and restart your development server
+
+**Step 4:** Verify the fix by checking:
+
+* TOC now stops 200px from the viewport bottom
+* TOC becomes scrollable when content exceeds the height
+* Floating buttons are fully visible
+* Last TOC entries are accessible via scroll
+
+#### Explanation
+
+This fix works by:
+
+1. **Setting max-height** - Limits the TOC height to `calc(100vh - 200px)`, leaving 200px of space at the bottom for widgets
+2. **Adding overflow-y: auto** - Makes the TOC scrollable when content exceeds the max height
+3. **Adding padding-bottom** - Provides additional buffer space to ensure all TOC entries are accessible
+
+#### Adjusting the Space
+
+If you need more or less space for your buttons, adjust the `200px` value:
+
+* **More space for buttons**: Increase to `250px` or `300px`
+* **Less space for buttons**: Decrease to `150px` or `100px`
+* **Formula**: Total space = button height + margins + comfortable buffer
+
+For example, if you have buttons at `bottom: 15px` with `40px` height each, and two buttons vertically stacked:
+
+```
+200px = 15px (bottom margin) + 40px (button 1) + 10px (gap) + 40px (button 2) + 95px (buffer)
+```
+
+## Conclusion
+
+Floating buttons are a powerful way to provide persistent access to important actions in your Docusaurus site. By following this guide, you can create professional-looking floating buttons that enhance user engagement while maintaining good performance and accessibility.
+
+Remember to test your buttons across different devices and screen sizes to ensure they work well for all users.

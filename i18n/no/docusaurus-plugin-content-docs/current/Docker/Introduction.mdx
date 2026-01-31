@@ -1,0 +1,1823 @@
+---
+title: Introduction to Docker
+tags:
+  - Docker
+  - Docker Compose
+  - Tutorial
+keywords:
+  - Docker
+  - Docker Engine
+  - Tutorial
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Docker: An Essential Tool for Developers**
+
+Docker is a powerful platform that enables developers to build, share, and run applications with ease. By using Docker, you can ensure that your applications run in an isolated environment called a container, which bundles the application's code, libraries, and dependencies in a single package.
+
+## **What is Docker?**
+
+Docker is an open-source project that automates the deployment of applications inside software containers. These containers can be thought of as lightweight, portable, and self-sufficient systems that are able to run any application, on any computing environment, without the overhead of traditional virtual machines. Docker utilizes resource isolation features of the Linux kernel such as cgroups and namespace to allow independent "containers" to run within a single Linux instance, avoiding the overhead of starting and maintaining virtual machines.
+
+## **Key Features of Docker**
+
+* **Containerization**: Docker packages applications and their dependencies into a compact, portable container that can run anywhere, ensuring consistency across environments.
+* **Microservices Architecture Support**: It simplifies the development and deployment of microservices by allowing each service to run in its own container.
+* **Isolation**: Containers are isolated from each other and the host system, providing a secure environment for applications.
+* **Scalability**: Easily scale up or down with minimal setup required, making it ideal for applications with fluctuating demand.
+* **Efficiency**: Docker enables more efficient use of system resources compared to traditional virtual machines, as containers share the host system's kernel rather than requiring their own operating system.
+
+## **Uses of Docker**
+
+<Tabs
+  defaultValue="development"
+  values={[
+   {label: 'Development', value: 'development'},
+   {label: 'Testing', value: 'testing'},
+   {label: 'CI/CD', value: 'ci_cd'},
+   {label: 'Deployment', value: 'deployment'},
+  ]}
+>
+  <TabItem value="development">
+    Docker streamlines the development process by creating a consistent environment for all team members. It eliminates the "it works on my machine" problem by ensuring that the development environment matches production.
+  </TabItem>
+
+  <TabItem value="testing">
+    Testing in Docker containers ensures that tests run in the same environment where the applications are developed and deployed, leading to more reliable testing outcomes.
+  </TabItem>
+
+  <TabItem value="ci_cd">
+    Docker integrates seamlessly into CI/CD pipelines, allowing for the automated building, testing, and deployment of applications with Docker containers.
+  </TabItem>
+
+  <TabItem value="deployment">
+    Docker simplifies deployment by allowing applications to be deployed in containers, which can be easily moved to different environments, scaled, and managed.
+  </TabItem>
+</Tabs>
+
+<Tabs
+  defaultValue="docker_engine"
+  values={[
+   {label: 'Docker Engine', value: 'docker_engine'},
+   {label: 'Docker Compose', value: 'docker_compose'},
+  ]}
+>
+  <TabItem value="docker_engine">
+    Docker Engine is the core of Docker, providing the runtime environment for containers. It allows users to build and containerize applications, then run them as isolated containers. This lightweight and powerful engine supports container orchestration, networking, volume management, and more, making it the backbone of the Docker platform.
+  </TabItem>
+
+  <TabItem value="docker_compose">
+    Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you can use a YAML file to configure your applicationâ€™s services, networks, and volumes, and then create and start all the services from your configuration with a single command. It simplifies the development process by allowing developers to define a complex stack in a file, then manage it with simple commands.
+  </TabItem>
+</Tabs>
+
+## **Docker Profiles**
+
+**Docker profiles** are a powerful feature of Docker Compose that allow you to selectively enable or disable services based on different use cases or environments. Profiles provide a way to organize services into logical groups and control which services are started together, making it easier to manage complex applications with multiple optional components.
+
+### **How Docker Profiles Work**
+
+Profiles are defined in your `docker-compose.yml` file by adding a `profiles` attribute to services. When you run `docker-compose up`, only services without profiles (or with the `default` profile) are started by default. To start services with specific profiles, you use the `--profile` flag.
+
+### **Benefits of Docker Profiles**
+
+* **Flexible Deployment**: Enable different combinations of services for different environments (development, testing, production)
+* **Resource Management**: Start only the services you need, reducing resource consumption
+* **Modular Architecture**: Organize services into logical groups for better maintainability
+* **Environment-Specific Configuration**: Easily switch between different setups without maintaining multiple compose files
+
+### **Basic Profile Configuration**
+
+Here's an example of how to configure profiles in a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  # Core services (no profile - always started)
+  app:
+    image: my-app:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+      - redis
+
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  # Optional services with profiles
+  nginx:
+    image: nginx:alpine
+    profiles:
+      - web
+      - production
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+  collabora:
+    image: collabora/code:latest
+    profiles:
+      - office
+      - full
+    environment:
+      - domain=nextcloud.example.com
+    ports:
+      - "9980:9980"
+
+  monitoring:
+    image: grafana/grafana:latest
+    profiles:
+      - monitoring
+      - production
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+volumes:
+  db_data:
+```
+
+### **Profile Usage Examples**
+
+Based on the configuration above, here are different ways to start your services:
+
+#### **Basic Setup (Core Services Only)**
+
+```bash
+# Starts: app, database, redis
+docker-compose up -d
+```
+
+#### **With Web Server**
+
+```bash
+# Starts: app, database, redis, nginx
+docker-compose --profile web up -d
+```
+
+#### **With Office Integration**
+
+```bash
+# Starts: app, database, redis, collabora
+docker-compose --profile office up -d
+```
+
+#### **Production Setup**
+
+```bash
+# Starts: app, database, redis, nginx, monitoring
+docker-compose --profile production up -d
+```
+
+#### **Full Development Setup**
+
+```bash
+# Starts: app, database, redis, collabora
+docker-compose --profile full up -d
+```
+
+#### **Multiple Profiles**
+
+```bash
+# Starts: app, database, redis, nginx, collabora
+docker-compose --profile web --profile office up -d
+```
+
+#### **All Services**
+
+```bash
+# Starts all services regardless of profiles
+docker-compose --profile web --profile office --profile monitoring up -d
+```
+
+### **Real-World Example: Nextcloud Setup**
+
+Here's a practical example for a Nextcloud deployment with different profiles:
+
+```yaml
+version: '3.8'
+
+services:
+  nextcloud:
+    image: nextcloud:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=password
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - nextcloud_data:/var/www/html
+
+  db:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+
+  # Reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    profiles:
+      - with-nginx
+      - production
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - nextcloud
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+
+  # Document editing (optional)
+  collabora:
+    image: collabora/code:latest
+    profiles:
+      - with-collabora
+      - office
+      - production
+    environment:
+      - domain=nextcloud.example.com
+    ports:
+      - "9980:9980"
+
+  # OnlyOffice alternative (optional)
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    profiles:
+      - with-onlyoffice
+      - office-alt
+    ports:
+      - "8081:80"
+    environment:
+      - JWT_ENABLED=false
+
+volumes:
+  nextcloud_data:
+  db_data:
+```
+
+#### **Usage Commands for Nextcloud Example:**
+
+```bash
+# Basic setup (Nextcloud + DB + Redis)
+docker-compose up -d
+
+# With Nginx reverse proxy
+docker-compose --profile with-nginx up -d
+
+# With document editing (Collabora)
+docker-compose --profile with-collabora up -d
+
+# With alternative office suite (OnlyOffice)
+docker-compose --profile with-onlyoffice up -d
+
+# Full setup with everything
+docker-compose --profile with-nginx --profile with-collabora up -d
+
+# Production setup
+docker-compose --profile production up -d
+```
+
+### **Advanced Profile Techniques**
+
+#### **Profile Inheritance**
+
+Services can belong to multiple profiles, allowing for flexible combinations:
+
+```yaml
+monitoring:
+  image: grafana/grafana:latest
+  profiles:
+    - monitoring
+    - debug
+    - production
+```
+
+#### **Conditional Dependencies**
+
+Use profiles to conditionally include services that depend on profile-specific services:
+
+```yaml
+nginx-exporter:
+  image: nginx/nginx-prometheus-exporter:latest
+  profiles:
+    - monitoring
+  depends_on:
+    - nginx  # This will only work if nginx profile is also enabled
+```
+
+### **Best Practices**
+
+1. **Keep Core Services Profile-Free**: Services that are always needed should not have profiles
+2. **Use Descriptive Profile Names**: Choose names that clearly indicate the purpose (`monitoring`, `development`, `production`)
+3. **Document Your Profiles**: Include comments in your docker-compose.yml explaining what each profile does
+4. **Test Profile Combinations**: Ensure that different profile combinations work together properly
+5. **Use Environment Variables**: Combine profiles with environment variables for even more flexibility
+
+### **Troubleshooting Profiles**
+
+* **Service Not Starting**: Check if the service has a profile that you haven't specified
+* **Dependency Issues**: Ensure dependent services are either profile-free or use the same profiles
+* **Profile Conflicts**: Be aware that some services might conflict when started together
+
+Docker profiles provide a powerful way to manage complex applications with multiple optional components, making your Docker Compose setups more flexible and maintainable.
+
+## **Docker Compose Variable Syntax**
+
+Docker Compose supports variable substitution in YAML files, allowing you to make your configurations more flexible and environment-specific. Understanding the different variable syntax options is crucial for creating robust and maintainable Docker Compose files.
+
+### **Variable Substitution Syntax**
+
+Docker Compose provides several ways to handle environment variables in your `docker-compose.yml` files:
+
+| Syntax            | Description                | Example         |
+| ----------------- | -------------------------- | --------------- |
+| `${VAR}`          | Basic substitution         | `${PORT}`       |
+| `${VAR:-default}` | Use default if unset/empty | `${PORT:-8080}` |
+| `${VAR-default}`  | Use default if unset only  | `${PORT-8080}`  |
+| `${VAR:+value}`   | Use value if set           | `${SSL:+--ssl}` |
+
+### **Default Value Handling: A Critical Difference**
+
+The most important distinction is between basic substitution and default value handling:
+
+#### **Option 1: `${NGINX_INTERNAL_PORT:-11000}` (Recommended)**
+
+```yaml
+ports:
+  - "127.0.0.1:${NGINX_INTERNAL_PORT:-11000}:80"
+```
+
+**Behavior:**
+
+* **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
+* **Variable not set**: → `127.0.0.1:11000:80` (uses default)
+* **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1:11000:80` (uses default)
+
+#### **Option 2: `${NGINX_INTERNAL_PORT}` (Basic)**
+
+```yaml
+ports:
+  - "127.0.0.1:${NGINX_INTERNAL_PORT}:80"
+```
+
+**Behavior:**
+
+* **With variable set**: `NGINX_INTERNAL_PORT=8080` → `127.0.0.1:8080:80`
+* **Variable not set**: → `127.0.0.1::80` ❌ **ERROR!**
+* **Variable empty**: `NGINX_INTERNAL_PORT=` → `127.0.0.1::80` ❌ **ERROR!**
+
+### **What Happens With Errors**
+
+When using basic substitution without defaults, missing variables cause deployment failures:
+
+```bash
+# This will fail without .env file or exported variables:
+docker-compose up -d
+# Error: invalid port specification: "127.0.0.1::80"
+```
+
+With default values, the deployment works gracefully:
+
+```bash
+# This works even without .env file:
+docker-compose up -d
+# Uses default port 11000
+```
+
+### **Practical Examples**
+
+#### **Good Practice - Always Use Defaults**
+
+```yaml
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "127.0.0.1:${NGINX_INTERNAL_PORT:-11000}:80"
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      - NGINX_HOST=${NGINX_HOST:-localhost}
+      - NGINX_PORT=${NGINX_PORT:-80}
+    volumes:
+      - "${CONFIG_PATH:-./config}:/etc/nginx/conf.d"
+
+  database:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=${DB_NAME:-myapp}
+      - POSTGRES_USER=${DB_USER:-user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+    volumes:
+      - "${DB_DATA_PATH:-./data}:/var/lib/postgresql/data"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+```
+
+#### **Bad Practice - No Defaults**
+
+```yaml
+# This will break if variables are not set
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "127.0.0.1:${NGINX_INTERNAL_PORT}:80"  # Will fail if not set
+      - "${HTTP_PORT}:80"                      # Will fail if not set
+      - "${HTTPS_PORT}:443"                    # Will fail if not set
+```
+
+### **Advanced Variable Techniques**
+
+#### **Conditional Values**
+
+Use the `${VAR:+value}` syntax to conditionally include values:
+
+```yaml
+services:
+  app:
+    image: myapp:latest
+    command: >
+      sh -c "
+      myapp
+      ${SSL_ENABLED:+--ssl}
+      ${DEBUG_MODE:+--debug}
+      ${VERBOSE:+--verbose}
+      "
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - SSL_CERT=${SSL_ENABLED:+/certs/cert.pem}
+      - SSL_KEY=${SSL_ENABLED:+/certs/key.pem}
+```
+
+#### **Complex Port Mapping**
+
+```yaml
+services:
+  webserver:
+    image: nginx:alpine
+    ports:
+      # Internal port with default
+      - "127.0.0.1:${INTERNAL_PORT:-8080}:80"
+      # External port only if PUBLIC_ACCESS is set
+      - "${PUBLIC_ACCESS:+80:80}"
+      # HTTPS port with conditional SSL
+      - "${SSL_ENABLED:+443:443}"
+```
+
+### **Environment File Integration**
+
+Create a `.env` file in your project root:
+
+```env
+# .env file
+NGINX_INTERNAL_PORT=8080
+HTTP_PORT=80
+HTTPS_PORT=443
+DB_PASSWORD=supersecret
+SSL_ENABLED=true
+```
+
+Docker Compose automatically loads these variables, but your defaults still provide fallbacks:
+
+```bash
+# Without .env file - uses defaults
+docker-compose up -d
+
+# With .env file - uses custom values
+docker-compose up -d
+
+# Override specific variables
+NGINX_INTERNAL_PORT=9090 docker-compose up -d
+```
+
+### **Best Practices for Variable Syntax**
+
+1. **Always Provide Defaults**: Use `${VAR:-default}` syntax for all variables to prevent failures
+2. **Choose Sensible Defaults**: Defaults should work for basic development setups
+3. **Document Your Variables**: Include comments explaining what each variable does
+4. **Use Descriptive Names**: Variable names should clearly indicate their purpose
+5. **Group Related Variables**: Keep related configuration variables together
+6. **Test Without Variables**: Ensure your setup works with defaults only
+
+### **Common Use Cases**
+
+#### **Multi-Environment Deployment**
+
+```yaml
+services:
+  app:
+    image: myapp:${APP_VERSION:-latest}
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL:-postgres://localhost/myapp}
+      - REDIS_URL=${REDIS_URL:-redis://localhost:6379}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+```
+
+#### **Development vs Production**
+
+```yaml
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      # Development: bind to localhost only
+      - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:80"
+      # Production: might bind to all interfaces
+      # BIND_ADDRESS=0.0.0.0 HTTP_PORT=80
+```
+
+### **Troubleshooting Variable Issues**
+
+* **Empty Port Mappings**: Usually caused by missing variables without defaults
+* **Service Won't Start**: Check if required variables are set or have appropriate defaults
+* **Unexpected Behavior**: Verify that your variable names match between `.env` file and compose file
+* **Testing Variables**: Use `docker-compose config` to see the final configuration with variables resolved
+
+Understanding Docker Compose variable syntax is essential for creating flexible, maintainable, and error-resistant containerized applications.
+
+## **Docker Images**
+
+A **Docker image** is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and config files. Images are the building blocks of Docker containers. An image is essentially a snapshot of an application and its environment at a specific point in time.
+
+### ***Benefits:***
+
+* **Consistency:** Ensures that your application runs the same way in development, testing, and production.
+* **Portability:** Can be shared across different machines, eliminating the "it works on my machine" problem.
+* **Version Control:** You can version images, roll back to previous versions, and manage them just like source code.
+
+## **Docker Containers**
+
+A **Docker container** is a runnable instance of an image. You can think of it as the execution environment for your application. Containers isolate your application from the host system and other containers, providing a private space for the application to run within.
+
+### ***Benefits:***
+
+* **Isolation:** Prevents conflicts between applications or between applications and the host system.
+* **Resource Efficiency:** Containers share the host system’s kernel but can be limited to specific amounts of CPU, memory, and I/O.
+* **Scalability:** Containers can be easily started, stopped, and replicated, which supports modern agile and DevOps practices.
+
+## **Docker Environment Variables**
+
+**Docker environment variables** are key-value pairs that can be set within a Docker image or container to configure behavior without changing the application's code. These variables are particularly useful for managing configuration settings that differ between environments, such as development, testing, and production.
+
+### ***Benefits:***
+
+* **Flexibility:** Quickly change settings without modifying the code or Docker images.
+* **Security:** Keep sensitive information, like database passwords, out of the image and inject it at runtime.
+
+## **Benefits of Interpolation**
+
+**Interpolation** in the context of Docker environment variables allows you to dynamically insert values into your configuration. This is beneficial for creating more dynamic and flexible Docker configurations.
+
+### ***Benefits:***
+
+* **Dynamic Configurations:** Easily adjust your application’s behavior based on the environment without changing the code.
+* **Code Reusability:** Write more generic code and scripts that adapt based on environment variables.
+* **Security and Separation of Concerns:** Keep configuration data separate from code, making it easier to manage security and changes.
+
+In summary, Docker images, containers, and environment variables are foundational concepts in Docker that enable the portability, consistency, and efficient scaling of applications. Interpolation of environment variables enhances the flexibility and security of Docker containers, making it easier to manage applications across different environments, including when deploying websites or services like Docusaurus.
+
+## **Docker Networks**
+
+Docker networks facilitate communication between Docker containers, allowing them to send data to each other or establish connections with external networks. Essentially, Docker networking plays a pivotal role in managing how containers interact both amongst themselves and with the wider world. This framework provides the necessary mechanisms to encapsulate container communication, ensuring that complex architectures can be simplified into more manageable, secure, and isolated systems.
+
+### **How Docker Networks Work**
+
+At its core, Docker abstracts the complexity of network management, allowing developers and administrators to focus on the high-level configuration rather than the intricacies of network implementation. When a Docker environment is set up, it automatically creates a default bridge network, which connects containers to the host, allowing them to communicate and transfer data. This default network provides a basic level of connectivity out of the box.
+
+However, Docker’s networking capabilities extend far beyond this default setup. Docker allows for the creation of multiple network types, each tailored to specific needs and scenarios. This flexibility enables more complex and secure networking schemes, such as network isolation, where only selected containers can communicate with each other, or more open networks where containers can freely exchange information.
+
+### **Benefits of Docker Networks**
+
+#### **DNS and Service Discovery**
+
+On user-defined networks, Docker’s built-in DNS server assigns DNS entries to each container’s name. This way, containers can resolve the names of other containers to their IP addresses, enabling them to communicate using friendly names rather than IP addresses, which can change and be hard to manage.
+
+#### **Simplified Container Communication**
+
+Docker networks simplify the process of establishing communication between containers. Containers on the same network can discover and communicate with each other using container names instead of relying on IP addresses, which can change if a container is restarted.
+
+#### **Network Isolation**
+
+Containers can be segmented into different networks, enhancing security by limiting which services can communicate with each other. This isolation is critical in multi-application or multi-service deployments, ensuring that only containers that need to communicate are allowed to do so.
+
+#### **Controlled External Access**
+
+Docker networks allow for fine-grained control over which containers can communicate with the outside world, enabling a secure environment where only specific entry points are available to external users or systems.
+
+#### **Enhanced Scalability and Flexibility**
+
+The ability to create custom networks tailored to specific requirements or docker-compose setups makes it easier to scale applications horizontally. Each service can be scaled independently within its network, and networks can be configured to match the specific needs of an application or environment.
+
+### **Network Instructions**
+
+#### ***expose:***
+
+* **Purpose**: The `expose` instruction is used to indicate that a container listens on specified network ports during runtime. However, it does not make these ports accessible from the host; it's more about documenting which ports are used for inter-container communication.
+* **Visibility**: Exposed ports are only accessible to linked services within the same Docker network. They are not published to the host, making them invisible to the outside world, including the host machine.
+* **Docker Compose Usage**: In a Docker Compose file, you use `expose` to list the ports that other services in the same Docker network can access.
+
+```yaml
+services:
+  my-service:
+    image: my-image
+    expose:
+      - "3000"
+```
+
+In this example, `my-service` will expose port `3000` to other containers on the same network but not to the host machine or outside world.
+
+#### ***ports:***
+
+* **Purpose**: The `ports` instruction is used to map a container's ports to the host, effectively making a service running inside a container accessible from outside of Docker, including the internet (if allowed by firewall rules), or the local host.
+* **Visibility**: Ports specified under `ports` are published to the host, making a service inside the container reachable from the host machine and potentially from other machines, depending on the network configuration and firewall settings.
+* **Docker Compose Usage**: In a Docker Compose file, `ports` is used to define the port mapping from the host to the containers.
+
+```yaml
+services:
+  my-service:
+    image: my-image
+    ports:
+      - "4000:3000"
+```
+
+In this example, `my-service` maps port `3000` inside the container to port `4000` on the host machine. This means that traffic to the host's port `4000` is forwarded to port `3000` on the container.
+
+#### **Summary:**
+
+* **`expose`** is about container-to-container communication within the same Docker network and is a way of documenting which ports a container uses without opening them to the outside.
+* **`ports`** actively maps and publishes a container's ports to the host, enabling external access to a service running inside a container.
+
+Understanding the difference between these two is crucial for correctly configuring services in Docker and Docker Compose, especially regarding service accessibility, security, and network configuration.
+
+### **Types of Docker Networks and Use Cases**
+
+Docker supports several types of networks, each designed for specific scenarios. Here’s a breakdown:
+
+#### ***Bridge Networks***
+
+* **Default Type:** Automatically created when you run a container without specifying a network.
+* **Use Cases:** Ideal for standalone containers or groups of interconnected containers on the same Docker host. It's the most common network type, suitable for small to medium-scale applications that require communication between containers without the complexity of more sophisticated network topologies.
+
+#### ***Host Networks***
+
+* **Direct Access:** Removes network isolation between the container and the Docker host, allowing the container to use the host’s networking directly.
+* **Use Cases:** Useful for services that need to handle lots of traffic or low-latency applications. However, it exposes the container more directly to the external network, which may not be suitable for all applications.
+
+#### ***Overlay Networks***
+
+* **Distributed Systems:** Supports multi-host networking, enabling containers running on different Docker hosts to communicate as if they were on the same host.
+* **Use Cases:** Perfect for Dockerized applications running in a Swarm or Kubernetes cluster, facilitating communication across nodes in a cloud or data center environment. It’s essential for large-scale applications that require high availability and scalability across multiple servers.
+
+#### ***Macvlan Networks***
+
+* **Physical Interface Emulation:** Makes it appear as if a container has its own physical device connected to the network.
+* **Use Cases:** Ideal when migrating traditional applications that expect to be directly connected to the physical network, not virtualized. It's useful in scenarios where containers need a unique MAC address or direct access to an external network.
+
+#### ***None Network***
+
+* **No Connectivity:** Provides a way to completely disable networking for a container.
+* **Use Cases:** Useful for containers that should run isolated from the network and other containers, typically used for testing or security-sensitive applications that do not require network access to function.
+
+### **Network Examples**
+
+Defining networks in Docker Compose allows you to specify and configure custom networks for your containers to communicate on. Below are examples that illustrate how to define and use networks in a Docker Compose file.
+
+#### ***Example 1: Simple Custom Network***
+
+This example demonstrates how to define a simple custom bridge network and assign containers to it.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - my-network
+
+  database:
+    image: postgres:latest
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+```
+
+In this example, both the `app` and `database` services are connected to a custom network named `my-network`. This enables direct communication between the `app` service and the `database` service.
+
+#### ***Example 2: Multiple Networks***
+
+This example shows how to define multiple networks to segregate traffic between services.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - front-end
+      - back-end
+
+  web:
+    image: nginx:alpine
+    networks:
+      - front-end
+
+  database:
+    image: mysql:latest
+    networks:
+      - back-end
+
+networks:
+  front-end:
+    driver: bridge
+  back-end:
+    driver: bridge
+```
+
+Here, we have three services: `app`, `web`, and `database`. The `app` service is connected to two networks, `front-end` and `back-end`, allowing it to communicate with both the `web` and `database` services. However, the `web` service cannot directly communicate with the `database` service, as they are on separate networks.
+
+#### ***Example 3: External Networks***
+
+Sometimes you might want to connect your services to an existing network outside of Docker Compose.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - external-network
+
+networks:
+  external-network:
+    external: true
+```
+
+In this Docker Compose file, `app` is connected to an external network named `external-network`. The `external: true` parameter indicates that this network is not managed by Docker Compose and must exist before running `docker-compose up`.
+
+#### ***Example 4: Assigning Static IP Addresses***
+
+For scenarios requiring static IP addresses within your custom network, Docker Compose allows you to specify these as well.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      my-network:
+        ipv4_address: 172.25.0.101
+
+  database:
+    image: postgres:latest
+    networks:
+      my-network:
+        ipv4_address: 172.25.0.102
+
+networks:
+  my-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.0.0/24
+```
+
+In this configuration, both the `app` and `database` services are assigned static IP addresses within the `my-network` network. The `ipam` configuration specifies the subnet for the network, allowing Docker to manage IP address allocation within this range.
+
+#### ***Example 5: No Internet Access or Communication***
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - no-network
+
+  database:
+    image: postgres:latest
+    networks:
+      - no-network
+
+networks:
+  no-network:
+    driver: none
+```
+
+In this example, both the `app` and `database` services are connected to a custom network named `no-network`. This uses network `driver: none` meaning that the containers using this network will not be able to communicate with any other containers or the host, Including eachother. The network interface is essentially disabled so no IP addresses are assigned to the containers.
+
+#### ***Example 6: macvlan***
+
+* **Description**: Allows you to assign a MAC address to a container, making it appear as a physical device on your network. The Docker host's networking can be bypassed.
+* **Use Case**: Useful if you require containers to have direct access to an existing network, behaving as though they were physically attached to it. Often used in scenarios where you need to integrate with legacy applications or systems that expect a direct network connection.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - macvlan-net
+
+  database:
+    image: postgres:latest
+    networks:
+      - macvlan-net
+
+networks:
+  macvlan-net:
+    driver: macvlan
+    driver_opts:
+      parent: eth0  # Specifies which host network interface to use
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24  # Should match your physical network's addressing
+          gateway: 192.168.1.1    # Typically your router's IP address
+```
+
+The configuration above shows:
+
+* `parent: eth0`: Specifies which host network interface the macvlan network should use. This is required as macvlan creates virtual network interfaces linked to a physical network interface.
+* `subnet: 192.168.1.0/24`: Defines the IP address range available to containers in this network. This subnet should match your physical network's addressing scheme.
+* `gateway: 192.168.1.1`: Specifies the gateway IP address for the network, typically your router's IP address.
+
+#### ***Example 7: overlay***
+
+* **Description**: Enables Docker Swarm services to communicate across multiple Docker hosts. It leverages network encapsulation to allow containers on different hosts to communicate as if they were on the same host.
+* **Use Case**: Ideal for Docker Swarm deployments where you need to manage services that span multiple nodes in a cluster.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    networks:
+      - overlay-net
+    deploy:
+      replicas: 3
+
+  database:
+    image: postgres:latest
+    networks:
+      - overlay-net
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  overlay-net:
+    driver: overlay
+    attachable: true    # Allows standalone containers to attach to this network
+    driver_opts:
+      encrypted: "true" # Enables encryption for all network traffic
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+```
+
+The configuration above shows:
+
+* `attachable: true`: Allows standalone containers (not just swarm services) to attach to this network.
+* `encrypted: "true"`: Enables encryption for all traffic on this overlay network, providing additional security for container communication across hosts.
+* `deploy`: Configuration specific to swarm mode, defining how services should be deployed across the cluster.
+* `subnet`: Defines the IP range for containers in this overlay network.
+
+#### ***Example 8: network_mode: host***
+
+Using `host` mode allows the container to share the host's network stack. Thus, the container does not get its own IP-address allocated, and it uses the host's IP and port space. Containers running in host mode offer the best network performance and are useful when a container needs to manage or observe the host's network stack.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    network_mode: host
+
+  database:
+    image: postgres:latest
+    network_mode: host
+```
+
+#### ***Example 9: network_mode: none***
+
+This mode disables all networking for the container. Essentially, it provides a container with its own network namespace but without a network interface set up within it. This mode is useful for containers that need to run processes in isolation without requiring network access.
+
+```yaml
+name: example
+services:
+  app:
+    image: my-app:image
+    network_mode: none
+
+  database:
+    image: postgres:latest
+    network_mode: none
+```
+
+#### ***Example 10: network_mode: service:[service name]***
+
+This option allows a container to share the network stack of another container. By specifying the name of another service defined in the same `docker-compose.yml` file, the container inherits the networking configuration of the targeted service. This is useful for closely coupled services that need to share the network stack without being exposed to the wider network.
+
+```yaml
+name: example
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend
+      - backend
+
+  app:
+    image: my-app:image
+    network_mode: "service:web"  # Shares network namespace with web service
+    depends_on:
+      - web
+
+  monitoring:
+    image: prometheus:latest
+    network_mode: "service:web"  # Also shares network namespace with web service
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - web
+
+networks:
+  frontend:
+  backend:
+```
+
+#### ***Example 11: container:[container name/id]***
+
+Similar to the `service:` option, but instead of specifying a service name, you directly specify a container name or ID. The container using this mode will share the network namespace of the target container, allowing it to use the exact network configurations, including the IP address.
+
+```yaml
+name: example
+services:
+  webapp:
+    image: node:latest
+    container_name: webapp-1
+    ports:
+      - "3000:3000"
+    networks:
+      - app-net
+    volumes:
+      - ./app:/usr/src/app
+    command: npm start
+
+  debugger:
+    image: nicolaka/netshoot:latest
+    network_mode: "container:webapp-1"  # Shares network namespace with webapp
+    command: ["sh", "-c", "tcpdump -i any port 3000"]
+
+  metrics:
+    image: prom/node-exporter:latest
+    network_mode: "container:webapp-1"  # Also shares network namespace with webapp
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+
+networks:
+  app-net:
+    driver: bridge
+```
+
+The configuration above demonstrates:
+
+* A main webapp container with its own network configuration
+* A debugging container (netshoot) that can monitor the webapp's network traffic
+* A metrics collection container that shares the same network namespace
+* All containers share:
+  * The same network interfaces
+  * Access to port 3000
+  * The same IP address
+  * Network visibility and DNS resolution
+
+This setup is particularly useful for:
+
+* Network debugging and troubleshooting
+* Performance monitoring and analysis
+* Security auditing of network traffic
+* Adding network-level tooling without modifying the main application
+
+These examples demonstrate the flexibility of Docker Compose in defining and using networks, enabling complex networking setups to be described in a straightforward and declarative manner.
+
+## **Docker Storage**
+
+Docker offers various storage options to manage the data generated by and used by containers. These storage solutions cater to different requirements for persistence, scalability, sharing among containers, and data backup. Here are the primary Docker storage options, detailing their benefits, use cases, and Docker Compose examples for each.
+
+### ***Volumes***
+
+**Benefits:**
+
+* Volumes are stored in a part of the host filesystem which is managed by Docker (`/var/lib/docker/volumes/` on Linux). They are the preferred mechanism for persisting data generated by and used by Docker containers.
+* Completely managed by Docker, independent of the container's lifecycle, meaning data persists even if a container is deleted.
+* Supports sharing among multiple containers and services.
+
+**Use Cases:**
+
+* Persisting database storage, ensuring data survival across container rebuilds.
+* Sharing configuration files between the host and containers or among multiple containers.
+
+**Example:**
+
+```yaml
+name: example
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+```
+
+### ***Bind Mounts***
+
+**Benefits:**
+
+* Bind mounts can be stored anywhere on the host system. They allow for the storage and management of files or directories on the host system.
+* Provide more control over the filesystem as they bypass Docker's management of the volume and allow for the direct inclusion of local host paths.
+* Useful for development purposes where code on the host needs to be tested in a container environment in real-time.
+
+**Use Cases:**
+
+* Live reloading during development, where code changes on the host need to be immediately reflected in the container.
+* Providing access to sensitive configurations that should not be included in images.
+
+**Example:**
+
+```yaml
+name: example
+services:
+  app:
+    image: my-nodejs-app
+    volumes:
+      - type: bind
+        source: ./my-app
+        target: /usr/src/app
+```
+
+### ***tmpfs Mounts***
+
+**Benefits:**
+
+* Mounted directly in the host system’s memory (or swap, depending on system configuration), tmpfs mounts never touch the physical disk. This results in faster read and write times compared to volumes and bind mounts.
+* Data stored in a tmpfs mount is temporary and is cleared when the container is stopped, which can be beneficial for sensitive data or cache.
+
+**Use Cases:**
+
+* Storing cache data or session information that needs quick access but does not need to persist after the container stops.
+* Handling sensitive information which should not be written to disk to avoid data leakage.
+
+**Example:**
+
+```yaml
+name: example
+services:
+  cache:
+    image: redis:alpine
+    tmpfs:
+      - /data
+```
+
+In Docker Compose, adjusting the size of `tmpfs` mounts along with adding other arguments provides you control over the temporary filesystems associated with your services. This allows for optimizing performance and security for containers that need fast, ephemeral storage. Below is an explanation of how to change the `tmpfs` size and include other options in Docker Compose.
+:::warning
+tmpfs uses memory (RAM) adjust the size as needed. Monitor how much RAM the mount utilizes
+:::
+
+#### ***Changing the `tmpfs` Size***
+
+To specify the size of a `tmpfs` mount, you can use the `size` option. The size is set in bytes but can also be expressed in a human-readable manner using units like `k`, `m`, or `g` for kilobytes, megabytes, or gigabytes, respectively.
+
+#### ***Additional `tmpfs` Options***
+
+Apart from setting the size, Docker allows configuring additional parameters for `tmpfs` mounts including:
+
+* **`mode`**: Sets the file mode (permissions) in an octal format. For example, a mode of `700` would restrict access to the owner of the file only.
+* **`uid` and `gid`**: Specify the user ID and group ID for the mount, allowing you to control which user or group owns the `tmpfs` mount.
+
+#### ***Docker Compose Example with `tmpfs` Options***
+
+Here's how you can configure a service with a `tmpfs` mount, including changing its size and setting other options in a Docker Compose file:
+
+```yaml
+name: example
+services:
+  my-service:
+    image: my-image
+    volumes:
+      - type: tmpfs
+        target: /app/tmp
+        tmpfs:
+          size: 100000000 # 100 MB
+          mode: 1777
+          uid: 1000 # User ID
+          gid: 1000 # Group ID
+```
+
+#### ***Explanation:***
+
+* **`type: tmpfs`**: Specifies the volume type as tmpfs.
+* **`target`**: Defines the container path where the tmpfs mount will be located on the containers filesystem.
+* **`tmpfs:size`**: Allocates 100MB of space for the tmpfs mount. Adjust the value as needed for your application requirements.
+* **`tmpfs:mode`**: Sets the permissions for the tmpfs mount to `1777`, which is similar to the `tmp` directory on UNIX systems, allowing all users to create files but preventing them from deleting or modifying files owned by others.
+* **`tmpfs:uid`** and **`tmpfs:gid`**: These options set the ownership of the tmpfs mount. You may need to adjust these values based on your container's user configuration to ensure proper access to the tmpfs mount.
+
+This configuration demonstrates how to effectively use `tmpfs` mounts for temporary storage needs within your Docker containers, optimizing for both performance and security by controlling the size, permissions, and ownership of the tmpfs mount.
+
+### ***Named Pipes or FIFO***
+
+**Benefits:**
+
+* Allows for one-way data flow between the container and the host or between containers. This can be beneficial for processing data streams.
+* Limits data to being in transit, not stored, which can be advantageous for streaming data.
+
+**Use Cases:**
+
+* Real-time event processing where data is consumed by a container, processed, and passed on without the need for persistence.
+* Logs or metrics collection where data is streamed from the container to a host service for processing or analysis.
+
+**Example:** Docker Compose does not directly support named pipes in its syntax, but you can create them on the host and use them within containers through bind mounts.
+
+These storage options allow Docker to support a wide range of applications, from temporary data processing to persistent data storage, offering flexibility in how data is managed within and across containers.
+
+## **Docker Compose Pull Policy**
+
+Docker Compose `pull_policy` is a powerful configuration option that controls when and how Docker images are pulled from registries. This feature gives you precise control over image management in your Docker Compose applications, helping optimize deployment times, ensure consistency, and manage bandwidth usage effectively.
+
+:::info Compatibility Note
+The `pull_policy` feature requires **Docker Compose V2** (docker compose). This section uses the modern `docker compose` CLI syntax. If you're using the legacy `docker-compose` (with hyphen), adjust commands accordingly. For the most up-to-date information, refer to the [official Docker Compose specification](https://docs.docker.com/compose/compose-file/05-services/#pull_policy).
+:::
+
+### **Understanding Pull Policy**
+
+The `pull_policy` directive in Docker Compose determines the behavior for pulling images when you run `docker compose up` or similar commands. By default, Docker Compose uses the `missing` policy, but you can explicitly configure this behavior for each service in your `docker-compose.yml` file.
+
+### **Available Pull Policy Options**
+
+Docker Compose supports three distinct pull policy options:
+
+| Policy    | Behavior                                           | Use Case                            |
+| --------- | -------------------------------------------------- | ----------------------------------- |
+| `missing` | Pull only if image doesn't exist locally (default) | General development and production  |
+| `always`  | Always pull the latest version from registry       | CI/CD pipelines, production updates |
+| `never`   | Never pull, use only local images                  | Offline environments, custom builds |
+
+### **Pull Policy Configuration Syntax**
+
+The `pull_policy` is configured at the service level in your `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  service-name:
+    image: nginx:latest
+    pull_policy: always  # Options: missing, always, never
+```
+
+### **Detailed Pull Policy Examples**
+
+#### **1. Missing Policy (Default)**
+
+The `missing` policy is the default behavior and pulls images only when they don't exist locally:
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    pull_policy: missing  # Optional - this is the default
+    ports:
+      - "80:80"
+
+  database:
+    image: postgres:13
+    # No pull_policy specified = missing (default)
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+```
+
+**When to use `missing`:**
+
+* Standard development environments
+* Production deployments where you want to avoid unnecessary pulls
+* When you want to minimize startup time and bandwidth usage
+
+#### **2. Always Policy**
+
+The `always` policy ensures you get the latest version of the image every time by re-pulling from the registry. Note that this re-pulls the same tag (avoiding stale local copies) but doesn't change the tag/version itself:
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    image: myapp:latest
+    pull_policy: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+  monitoring:
+    image: grafana/grafana:latest
+    pull_policy: always
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+```
+
+**When to use `always`:**
+
+* CI/CD pipelines to ensure latest updates
+* Production deployments with rolling updates
+* When using `latest` tags and you want the newest version
+* Automated deployment systems
+
+#### **3. Never Policy**
+
+The `never` policy uses only locally available images and will fail if the image isn't present:
+
+```yaml
+version: '3.8'
+
+services:
+  custom-app:
+    image: my-custom-app:v1.0.0
+    pull_policy: never
+    ports:
+      - "8080:8080"
+
+  offline-service:
+    image: local-registry/my-service:stable
+    pull_policy: never
+    environment:
+      - OFFLINE_MODE=true
+```
+
+**When to use `never`:**
+
+* Air-gapped or offline environments
+* When using custom-built images that aren't in registries
+* Testing with specific local image versions
+* Environments with restricted internet access
+
+### **Building vs Pulling Images**
+
+While `pull_policy` controls when to pull pre-built images, building images from source is handled differently:
+
+:::note Important
+`pull_policy` is ignored when a service defines `build:`, since Docker Compose builds the image locally instead of pulling it from a registry.
+:::
+
+#### **When to Build Instead of Pull**
+
+* Active development with frequent code changes
+* Custom applications that require building from source
+* When you want to ensure the latest local code is always used
+* Development environments where you're modifying the application
+
+#### **How to Control Building**
+
+**Using build context:**
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      pull: true  # Pull newer base images during build
+    ports:
+      - "3000:3000"
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.worker
+    environment:
+      - WORKER_THREADS=4
+```
+
+**Force rebuilds with CLI:**
+
+```bash
+# Force rebuild all services with build contexts
+docker compose up --build
+
+# Build without using cache
+docker compose build --no-cache
+
+# Pull base images during build
+docker compose build --pull
+```
+
+:::note Important
+Building is controlled by defining a `build:` context in your service, not by `pull_policy`. If both `image:` and `build:` are present, Compose builds the image and tags it with the specified image name. Use `build.pull: true` to pull newer base images during the Dockerfile build process.
+:::
+
+### **Mixed Pull Policy Strategies**
+
+You can use different pull policies for different services in the same compose file:
+
+```yaml
+version: '3.8'
+
+services:
+  # Always get the latest stable database
+  database:
+    image: postgres:13
+    pull_policy: always
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # Use local Redis for development
+  redis:
+    image: redis:alpine
+    pull_policy: never
+    ports:
+      - "6379:6379"
+
+  # Build the main application from source
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+      - redis
+
+  # Use cached nginx for reverse proxy
+  nginx:
+    image: nginx:alpine
+    pull_policy: missing
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+
+volumes:
+  db_data:
+```
+
+### **Environment-Specific Pull Policies**
+
+Use environment variables to control pull policies across different environments:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: myapp:${APP_VERSION:-latest}
+    pull_policy: ${PULL_POLICY:-missing}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+
+  database:
+    image: postgres:13
+    pull_policy: ${DB_PULL_POLICY:-always}
+    environment:
+      - POSTGRES_DB=${DB_NAME:-myapp}
+```
+
+**Environment files for different stages:**
+
+**Development (.env.dev):**
+
+```env
+PULL_POLICY=missing
+DB_PULL_POLICY=missing
+APP_VERSION=dev
+NODE_ENV=development
+```
+
+**Production (.env.prod):**
+
+```env
+PULL_POLICY=always
+DB_PULL_POLICY=always
+APP_VERSION=v1.2.3
+NODE_ENV=production
+```
+
+### **Pull Policy with Docker Compose Profiles**
+
+Combine pull policies with profiles for sophisticated deployment strategies:
+
+```yaml
+version: '3.8'
+
+services:
+  # Core services - always pull latest in production
+  app:
+    image: myapp:latest
+    pull_policy: always
+    ports:
+      - "3000:3000"
+
+  database:
+    image: postgres:13
+    pull_policy: always
+    environment:
+      POSTGRES_DB: myapp
+
+  # Development tools - build locally
+  dev-tools:
+    build:
+      context: ./dev-tools
+    profiles:
+      - development
+    volumes:
+      - .:/workspace
+
+  # Testing services - never pull to ensure consistency
+  test-db:
+    image: postgres:13-test
+    pull_policy: never
+    profiles:
+      - testing
+    environment:
+      POSTGRES_DB: test_db
+```
+
+### **Troubleshooting Pull Policy Issues**
+
+#### **Common Problems and Solutions**
+
+**1. Image Not Found with `never` Policy**
+
+```bash
+# Error: image not found locally
+ERROR: No such image: myapp:latest
+```
+
+**Solution:** Ensure the image exists locally or change to `missing` policy:
+
+```bash
+# Check local images
+docker images | grep myapp
+
+# Or change pull policy
+pull_policy: missing
+```
+
+**2. Slow Deployments with `always` Policy**
+
+```yaml
+# Problem: Always pulling large images
+services:
+  heavy-app:
+    image: tensorflow/tensorflow:latest-gpu  # Large image
+    pull_policy: always  # Slow every time
+```
+
+**Solution:** Use conditional pull policy:
+
+```yaml
+services:
+  heavy-app:
+    image: tensorflow/tensorflow:latest-gpu
+    pull_policy: ${PULL_POLICY:-missing}  # Control via environment
+```
+
+**3. Build Failures**
+
+```yaml
+# Problem: Build context issues
+services:
+  app:
+    build: .  # Fails if Dockerfile missing or context incorrect
+```
+
+**Solution:** Ensure build context is correct:
+
+```yaml
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+```
+
+### **Best Practices for Pull Policy**
+
+#### **1. Environment-Specific Strategies**
+
+**Development:**
+
+```yaml
+# Fast iteration, use local builds
+services:
+  app:
+    build: .  # Build from local source
+
+  database:
+    image: postgres:13
+    pull_policy: missing  # Cache for speed
+```
+
+**Staging:**
+
+```yaml
+# Balance between updates and stability
+services:
+  app:
+    image: myapp:staging
+    pull_policy: always  # Get latest staging builds
+
+  database:
+    image: postgres:13
+    pull_policy: missing  # Stable database
+```
+
+**Production:**
+
+```yaml
+# Explicit versions with controlled updates
+services:
+  app:
+    image: myapp:v1.2.3  # Specific version
+    pull_policy: always  # Ensure we get the right version
+
+  database:
+    image: postgres:13.8  # Specific patch version
+    pull_policy: always
+```
+
+#### **2. Performance Optimization**
+
+```yaml
+# Optimize for different update frequencies
+services:
+  # Frequently updated application
+  api:
+    image: myapi:latest
+    pull_policy: always
+
+  # Stable infrastructure components
+  nginx:
+    image: nginx:1.21-alpine
+    pull_policy: missing
+
+  # Development dependencies
+  redis:
+    image: redis:alpine
+    pull_policy: missing
+```
+
+#### **3. Security Considerations**
+
+```yaml
+# Ensure security updates for base images
+services:
+  web:
+    image: nginx:alpine
+    pull_policy: always  # Get security patches
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      pull: true  # Pull newer base images during build
+```
+
+### **Advanced Pull Policy Patterns**
+
+#### **Conditional Pull Policy with Health Checks**
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: myapp:${VERSION:-latest}
+    pull_policy: ${PULL_POLICY:-missing}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+#### **Multi-Stage Pull Strategy**
+
+```yaml
+# Different policies for different stages of the same app
+version: '3.8'
+
+services:
+  # Base service - stable
+  app-base:
+    image: myapp-base:stable
+    pull_policy: missing
+
+  # Application layer - always updated
+  app:
+    image: myapp:latest
+    pull_policy: always
+    depends_on:
+      - app-base
+
+  # Development overlay - built locally
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    profiles:
+      - development
+```
+
+### **Pull Policy vs CLI Flags**
+
+Docker Compose provides command-line flags that can override pull_policy settings or control building:
+
+#### **Pull Policy Overrides**
+
+| CLI Flag         | Equivalent pull_policy | When to Use                                  |
+| ---------------- | ---------------------- | -------------------------------------------- |
+| `--pull always`  | `pull_policy: always`  | One-time deployments requiring latest images |
+| `--pull missing` | `pull_policy: missing` | Default behavior override                    |
+| `--pull never`   | `pull_policy: never`   | Offline deployments or testing               |
+
+#### **Build Control (Independent of pull_policy)**
+
+| CLI Flag     | Purpose                                    | When to Use                           |
+| ------------ | ------------------------------------------ | ------------------------------------- |
+| `--build`    | Force rebuild services with build contexts | Development/testing with code changes |
+| `--no-cache` | Build without using cache                  | Clean builds after dependency changes |
+
+#### **File-level vs Command-line Settings**
+
+**Use `pull_policy` in compose files when:**
+
+* You want consistent behavior across all deployments
+* Different services need different pull strategies
+* Setting up automated deployments or CI/CD pipelines
+* Documenting intended deployment behavior
+
+**Use `--pull` CLI flags when:**
+
+* Making one-time deployments with special requirements
+* Overriding file settings for testing or debugging
+* Testing different pull behaviors
+
+**Use `--build` CLI flags when:**
+
+* Force rebuilding during development
+* Ensuring fresh builds after code changes
+* One-time builds without modifying compose files
+
+#### **Examples**
+
+```bash
+# Override all services to always pull latest
+docker compose up --pull always
+
+# Force rebuild all services with build contexts
+docker compose up --build
+
+# Combine pull and build flags
+docker compose up --pull always --build
+
+# Build with specific options
+docker compose build --pull --no-cache
+```
+
+### **Monitoring and Logging Pull Policy Behavior**
+
+Enable verbose logging to monitor pull policy behavior:
+
+```bash
+# Enable debug logging
+COMPOSE_LOG_LEVEL=DEBUG docker compose up -d
+
+# Monitor Docker events for image activity (pulls, builds, etc.)
+docker events --filter type=image
+
+# Check which images were pulled
+docker compose images
+```
+
+### **Integration with CI/CD Pipelines**
+
+**GitHub Actions Example:**
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy with Pull Policy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to staging
+        run: |
+          export PULL_POLICY=always
+          export APP_VERSION=${{ github.sha }}
+          docker compose -f docker-compose.staging.yml up -d
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          export PULL_POLICY=always
+          export APP_VERSION=${{ github.sha }}
+          docker compose -f docker-compose.prod.yml up -d
+```
+
+Docker Compose pull policies provide fine-grained control over image management, enabling you to optimize for performance, security, and reliability across different environments and use cases. By understanding and properly configuring pull policies, you can create more efficient and predictable Docker Compose deployments.
+
+### **Additional Resources**
+
+* [Docker Compose Specification - pull_policy](https://docs.docker.com/compose/compose-file/05-services/#pull_policy)
+* [Docker Compose CLI Reference](https://docs.docker.com/compose/reference/)
+* [Docker Compose Best Practices](https://docs.docker.com/compose/production/)
+
+## **Conclusion**
+
+Docker has revolutionized how developers build, deploy, and manage applications. By leveraging Docker, teams can focus on building great software without worrying about inconsistencies between development and production environments. Whether you're developing complex applications, deploying microservices, or automating your development pipeline, Docker provides the tools and flexibility needed to streamline these processes.
+
+## ***Resources:***
+
+[Docker Networking Overview](https://docs.docker.com/engine/network/)\
+[Docker Storage](https://docs.docker.com/engine/storage/)
+
+<BuyMeACoffeeButton />

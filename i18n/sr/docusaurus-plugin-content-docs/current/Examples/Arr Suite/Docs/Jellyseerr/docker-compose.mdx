@@ -1,0 +1,36 @@
+---
+title: docker-compose.yaml
+tags:
+  - Arr Suite
+keywords:
+  - Arr Suite
+  - Jellyseerr
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+```yaml
+name: jellyseerr
+
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    hostname: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/New_York
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr/config:/app/config
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+```
+
+<BuyMeACoffeeButton />

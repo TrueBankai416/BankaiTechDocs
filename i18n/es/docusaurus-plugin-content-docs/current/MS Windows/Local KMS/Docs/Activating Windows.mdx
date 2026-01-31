@@ -1,0 +1,86 @@
+---
+title: Activating Windows with Local KMS
+tags:
+  - Windows, KMS
+keywords:
+  - Windows
+  - KMS
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+To activate Windows using a local KMS (Key Management Service) server, ensure you've already set up a KMS server within your network. This can be a server running on a physical machine, a virtual machine, or within a Docker container, as outlined in previous instructions for setting up a kms server using Docker Compose.
+
+Here's a step-by-step guide to activate Windows using your local KMS server:
+
+### Step 1: Open Powershell as Administrator
+
+1. Press the Windows key.
+2. Type `powershell`.
+3. Right-click on `Powershell` and select `Run as administrator`.
+
+### Step 2: Set the KMS Server Address
+
+In the Command Prompt, use the `slmgr` tool to specify the address of your KMS server. Replace `<KMS_Server_IP>` with the IP address or hostname of your KMS server:
+
+```ps
+slmgr /skms <KMS_Server_IP>:1688
+```
+
+This command configures Windows to use your local KMS server for activation. The default port for KMS services is `1688`, but if you've configured your KMS server to use a different port, replace `1688` with your port number.
+
+### Step 3: Install License Key
+
+Install the License key for the version of windows you want to install, I am using Windows 11 Enterprise. You can find keys by going to `<KMS_Server_IP>:1688/products>` in a browser.
+
+```ps
+slmgr /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43
+```
+
+### Step 4: Activate Windows
+
+Now, instruct Windows to attempt activation through the KMS server:
+
+```ps
+slmgr /ato
+```
+
+This command tells Windows to activate online using the settings you've just configured.
+:::note
+You may need to do this more than once to get a `successfull` message.
+:::
+
+### Step 5: Check Activation Status
+
+To verify that Windows has been successfully activated using elevated powershell:
+
+```ps
+slmgr /dlv
+```
+
+or
+
+```ps
+slmgr /xpr
+```
+
+These commands provide detailed license information and the expiration date of the current activation status, respectively. If Windows was successfully activated via your KMS server, you should see information indicating that the product is activated.
+
+### Step 6: Check status on py-kms
+
+Open a browser and go to `<KMS_Server_IP:1688>` and see if your windows PC is Registered with the KMS Server.
+Check the Actation status, if it does not say `Activated` then repeat steps 3 and 4.
+
+### Additional Notes:
+
+* **Windows Editions**: KMS activation supports volume license editions of Windows. If you're using a retail or OEM version of Windows, this method won't work.
+* **Firewall Considerations**: Ensure that any firewall between your Windows client and the KMS server allows traffic on the KMS service port (default is `1688`).
+* **KMS Activation Period**: Activation through KMS is not permanent. Windows will automatically attempt to re-activate every 7 days by default, requiring periodic access to the KMS server. The activation is valid for 180 days.
+* **KMS Server Requirements**: The KMS server must have had a sufficient number of activation requests to start granting activations (a minimum threshold). For Windows, this is usually 25 different requests.
+* **Troubleshooting**: If activation fails, double-check the IP address or hostname of the KMS server, ensure network connectivity, and verify that the KMS server is properly configured and running.
+
+Activating Windows using a KMS server is an efficient method for managing volume activations across a network, especially suitable for organizations managing multiple Windows installations.
+
+<BuyMeACoffeeButton />

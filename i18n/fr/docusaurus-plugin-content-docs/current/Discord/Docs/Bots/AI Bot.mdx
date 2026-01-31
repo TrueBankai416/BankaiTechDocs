@@ -1,0 +1,236 @@
+---
+title: Creating an AI Bot
+description: Step-by-step guide for creating a Discord AI bot using Python, OpenAI GPT-3.5 Turbo, and Discord.py with systemd service configuration.
+image: /img/social/discord-social.jpg
+tags:
+  - Discord
+  - Bots
+keywords:
+  - Discord
+  - Bot
+  - ChatGPT
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Creating a Discord bot that utilizes OpenAI's GPT-3.5 Turbo model involves several key steps, including setting up a Discord bot account, programming the bot with Python, and integrating the OpenAI API for interaction with the GPT-3.5 Turbo model. Below is a step-by-step guide designed for integration into Docusaurus documentation.
+
+### **Requirements**
+
+Before starting, ensure you have the following:
+
+* Python (version 3.6 or newer) installed on your machine.
+* An OpenAI API key, obtained by creating an account on the [OpenAI platform](https://platform.openai.com/), then going to `Settings` and clicking on `API keys` under Platform.
+* A Discord account to create a bot and obtain a Discord token.
+
+### **Step 1: Setting Up a Discord Bot Account**
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and log in with your Discord account.
+2. Click the “New Application” button, give it a name, and click “Create”.
+3. Navigate to the “Bot” tab on the left side, then click “Add Bot” and confirm by clicking “Yes, do it!”
+4. Under the bot section, you will see the “Token”. Click “Copy” to clipboard. **Keep this token private** as it allows control over your bot. If you did not see your token then click the `Reset Token` button.
+5. Navigate to the "OAUTH2" tab on the left side, then copy the `client id`.
+6. Open the Discord application on your PC and right click on your guild(server) name, Copy the ID
+7. Navigate to the "Installation" tab on the left side, click on the Install Link dropdown and select `None` and save the changes.
+8. Navigate back to the "Bot" tab on the left side and uncheck the `Public Bot` option. Then enable the `Message Content Intent` option and save the changes.
+
+### **Step 2: Creating a Python Environment**
+
+Open your Terminal and run the following commands
+Create the directory for the new files
+
+```
+sudo mkdir /var/discord && cd /var/discord
+```
+
+Creating the Environment
+
+```bash
+python3 -m venv .venv
+```
+
+Activating the environment
+
+```bash
+source .venv/bin/activate
+```
+
+### **Step 3: Installing Required Libraries**
+
+Open your terminal or command prompt and install the following Python libraries:
+
+```bash
+python3 -m pip install discord openai python-dotenv
+```
+
+* `discord`: The library to interact with Discord.
+* `openai`: The official OpenAI library to interact with the GPT-3.5 API.
+* `dotenv`: Loads environment variables from `.env` files.
+
+### **Step 4: Writing the Bot with Python**
+
+Create a new Python file for your bot, e.g., `discord_bot.py`, and add the following code:
+To create the file, run
+
+```bash
+nano discord_bot.py
+```
+
+```python title="Nothing in this file needs to be changed"
+import discord
+import os
+import logging
+from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()  # take environment variables from .env
+
+
+logging.basicConfig(
+    format="[%(asctime)s] [%(filename)s:%(lineno)d] %(message)s", level=logging.INFO
+)
+
+# Create a client instance for the bot
+intents = discord.Intents.default()
+intents.message_content = True # Enables reading messages
+intents.messages = True  # Ensure this is enabled
+intents.guild_messages = True  # Enables receiving messages in guilds
+#intents.direct_messages = True  # Enables receiving direct messages
+permissions = discord.Permissions(permissions=274877992000)
+permissions.read_messages = True
+
+client = discord.Client(intents=intents)
+
+# This is the default and can be omitted
+openai_api_key=os.environ.get("OPENAI_API_KEY"),
+openai_client = OpenAI()
+
+# Access the DISCORD_TOKEN environment variable
+discord_token = os.getenv("DISCORD_BOT_TOKEN")
+
+@client.event
+async def on_ready():
+    print(f'Logged in as {client.user}.')
+
+@client.event
+async def on_message(message):
+    # Don't let the bot respond to its own messages
+    if message.author == client.user:
+        return
+
+    # Check if the message starts with "ask"
+    if message.content.startswith('ask') or message.content.startswith('Ask'):
+        # Remove "ask" from the message to use as the prompt for the OpenAI model
+        prompt = message.content[4:]
+        response = generate_openai_response(prompt)
+        await message.channel.send(response)
+
+def generate_openai_response(prompt):
+    """
+    Generates a response using OpenAI's GPT-3.5-turbo model based on the given prompt.
+    """
+    try:
+        response = openai_client.chat.completions.create(
+          model="gpt-3.5-turbo",
+          messages=[
+            {
+              "role": "user",
+                "content": prompt
+            }
+          ],
+          temperature=1,
+          max_tokens=256,
+          top_p=1,
+          frequency_penalty=0,
+          presence_penalty=0
+          #content = response.choices[0].message.content
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Error generating OpenAI response: {e}")
+        return "Sorry, I can't process that right now."
+
+client.run(discord_token),
+```
+
+Save the file with `CTRL+SHIFT+X`
+
+Create the Environment file `.env`
+Run the following to create the file
+
+```bash
+nano .env
+```
+
+Paste the following contents
+
+```editorconfig title="Modify the highlighted lines" showLineNumbers
+// highlight-start
+OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
+DISCORD_BOT_TOKEN="YOUR_DISCORD_BOT_TOKEN from step 4"
+DISCORD_CLIENT_ID="CLIENT ID from step 5"
+// highlight-end
+
+// highlight-next-line
+ALLOWED_SERVER_IDS="ID copied from step 6"
+SERVER_TO_MODERATION_CHANNEL=1:1
+DEFAULT_MODEL=gpt-3.5-turbo
+```
+
+Replace `YOUR_OPENAI_API_KEY` with your actual OpenAI API key and `YOUR_DISCORD_TOKEN` with your Discord bot token.
+
+### **Step 5: Creating Systemd File to run the bot on system boot**
+
+```bash
+nano /etc/systemd/system/discord_bot.service
+```
+
+Paste the following
+
+```systemd showLineNumbers
+[Unit]
+Description=Discord AI Bot service
+
+[Service]
+User=root
+WorkingDirectory=/var/discord
+ExecStart=/var/discord/.venv/bin/python3 -m discord_bot
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable the service
+
+```bash
+sudo systemctl enable discord_bot.service
+```
+
+Reload daemon
+
+```bash
+sudo systemctl daemon-reload
+```
+
+Start the service
+
+```bash
+sudo systemctl start discord_bot
+```
+
+### **Step 6: Adding the Bot to Your Discord Server**
+
+1. In the Discord Developer Portal, navigate to the “OAuth2” tab.
+2. Under “Scopes,” select “bot” and then set the permissions your bot needs under “Bot Permissions.” At a minimum, your bot will need permission to send messages, read message history, send messages in threads and view channels.
+3. Copy the generated URL under “Scopes,” open it in your web browser, and select the server to add your bot.
+
+### **Testing the Bot**
+
+Once the bot is added to your server, you can test it by sending a command in the format `!ask <your question here>` in any text channel where the bot has permission to read and write messages.
+
+### **Conclusion**
+
+You have now created a Discord bot powered by OpenAI's GPT-3.5 model capable of answering questions or performing tasks based on user input. This bot can be expanded further with additional commands or more complex interactions, leveraging the powerful capabilities of the GPT-3.5 model to enhance your Discord server's functionality and user engagement.
+
+<BuyMeACoffeeButton />
