@@ -193,7 +193,7 @@ The container supports multiple VPN providers, but this guide focuses on NordVPN
 4. Copy your service username and password (different from account credentials)
 5. **Download OpenVPN configuration files** for your preferred servers
 
-#### 2. Place OpenVPN Configuration Files
+#### 3. Supported VPN Providers
 
 After starting the container for the first time, it creates the necessary folders:
 
@@ -221,7 +221,7 @@ environment:
   - OPENVPN_CONFIG=us1234.nordvpn.com.udp  # Specify exact .ovpn file to use
 ```
 
-#### 3. Supported VPN Providers
+#### 4. Advanced VPN Options
 
 The binhex container supports these VPN providers:
 
@@ -233,7 +233,7 @@ The binhex container supports these VPN providers:
 | Private Internet Access | `pia`          | Popular choice              |
 | Custom                  | `custom`       | Use your own OpenVPN config |
 
-#### 4. Advanced VPN Options
+#### 1. Check VPN Status
 
 You can customize VPN behavior with the `VPN_OPTIONS` environment variable:
 
@@ -372,7 +372,7 @@ services:
 
 ### Monitoring and Verification
 
-#### 1. Check VPN Status
+#### 2. Verify IP Address
 
 ```bash
 # View container logs for VPN status
@@ -382,7 +382,7 @@ docker logs qbittorrent-vpn | grep -i "vpn\|connected\|tunnel"
 docker exec qbittorrent-vpn curl -s ifconfig.me
 ```
 
-#### 2. Verify IP Address
+#### 2. WebUI Access Issues
 
 1. Add a test torrent (like Ubuntu ISO)
 2. Check the **Peers** tab to see connected IPs
@@ -391,7 +391,7 @@ docker exec qbittorrent-vpn curl -s ifconfig.me
    - Download their test torrent
    - Add to qBittorrent and check reported IP
 
-#### 3. Monitor Container Health
+#### 3. Container Won't Start
 
 ```bash
 # Check container resource usage
@@ -426,7 +426,7 @@ This is useful when:
 
 ### Common Issues
 
-#### 1. VPN Connection Problems
+#### 4. Download Issues
 
 ```bash
 # Check VPN connection status
@@ -439,7 +439,7 @@ docker compose restart qbittorrent-vpn
 docker exec qbittorrent-vpn cat /config/openvpn/credentials.conf
 ```
 
-#### 2. WebUI Access Issues
+#### 4. Download Issues
 
 **CSRF Protection Error**: Ensure container port matches `WEBUI_PORT`:
 
@@ -457,7 +457,7 @@ environment:
   - LAN_NETWORK=192.168.1.0/24,192.168.9.0/24  # Include your subnet
 ```
 
-#### 3. Container Won't Start
+#### 3. 3. Container Won't Start
 
 ```bash
 # Check container logs for errors
