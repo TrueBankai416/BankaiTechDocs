@@ -1,337 +1,337 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: Kommentarintegration
+description: Komplett guide för att integrera dubbelriktade Discord-kommentarer med Docusaurus, inklusive installation, konfiguration och felsökning.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Integrering av Discord-kommentarer
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+Den här dokumentationssidan inkluderar en **dubbelriktad integration med Discord-kommentarer** som låter besökare skicka kommentarer till din Discord-server OCH visar Discord-svar tillbaka på webbplatsen tillsammans med befintliga GitHub-baserade Giscus-kommentarer.
 
-## Features
+## Drag
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **Dubbelriktad kommunikation**: Kommentarer på webbplatsen → Discord, Discord-svar → Webbplatsen
+* **Dubbelt kommentarssystem**: Både Giscus (GitHub-baserade) och Discord-kommentarer fungerar tillsammans.
+* **Rika Discord-inbäddningar**: Kommentarer visas som formaterade inbäddningar med fullständig sidkontext
+* **Trådhantering**: Automatisk trådskapande för organiserade svar
+* **Uppdateringar i realtid**: Webbplatsen visar Discord-svar automatiskt
+* **Fullständig sidkontext**: Kommentarer inkluderar sidtitel, URL och navigeringskontext
+* **Användaravatarer**: Discord-svar visar användaravatarer och användarnamn
+* **Responsiv design**: Fungerar på både stationära och mobila enheter
 
-## Setup Instructions
+## Installationsanvisningar
 
-### 1. Create a Discord Bot
+### 1. Skapa en Discord-bot
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. Gå till [Discord-utvecklarportalen](https://discord.com/developers/applications)
+2. Skapa en ny applikation
+3. Gå till avsnittet "Bot" och skapa en bot
+4. Kopiera bot-token
+5. Under "Privilegierade gateway-avsikter" aktiverar du:
+   * **Meddelandets innehållsavsikt**
+   * **Servermedlemmars avsikt** (valfritt)
 
-### 2) Configure Bot Permissions
+### 2) Konfigurera botbehörigheter
 
-Your bot needs these permissions:
+Din bot behöver dessa behörigheter:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* Läs meddelanden
+* Skicka meddelanden
+* Skapa offentliga trådar
+* Skicka meddelanden i trådar
+* Läs meddelandehistorik
+* Använd snedstreckkommandon (valfritt)
 
-### 3. Invite Bot to Server
+### 3. Bjud in bot till servern
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. Gå till OAuth2 > URL-generator
+2. Välj omfattningen "bot"
+3. Välj behörigheterna som anges ovan
+4. Använd den genererade URL:en för att bjuda in boten till din server
 
-### 4) Configure Environment Variables
+### 4) Konfigurera miljövariabler
 
-#### Frontend (.env)
+#### Gränssnitt (.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord Bot-konfiguration
+DISCORD_BOT_TOKEN=din_bot_token_här
+DISCORD_CHANNEL_ID=ditt_kanal-id_här
 
-# API Configuration
+# API-konfiguration
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# Discord-kontextkonfiguration
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Ditt webbplatsnamn
 ```
 
-#### Backend Server (server/.env)
+#### Backend-server (server/.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord Bot-konfiguration
+DISCORD_BOT_TOKEN=din_bot_token_här
+DISCORD_CHANNEL_ID=ditt_kanal-id_här
 
-# API Configuration
+# API-konfiguration
 PORT=3001
 
-# Discord Context Configuration
+# Discord-kontextkonfiguration
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
 DISCORD_SHOW_PAGE_PATH=false
-DISCORD_SHOW_TIMESTAMP=true
-DISCORD_SHOW_AUTHOR_FIELD=true
-DISCORD_CREATE_THREADS=true
+DISCORD_SHOW_TIMESTAMP=sant
+DISCORD_SHOW_AUTHOR_FIELD=sant
+DISCORD_CREATE_THREADS=sant
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=Ditt webbplatsnamn
 ```
 
-:::warning Security Note
+:::varning Säkerhetsmeddelande
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* Använd aldrig `.env`-filer för versionshantering
+* Använd miljövariabler i produktion
+* Håll din bot-token säker
   :::
 
-### 5. Install Server Dependencies
+### 5. Installera serverberoenden
 
 ```bash
-cd server
-npm install
+cd-server
+npm-installation
 ```
 
-### 6. Start the Backend Server
+### 6. Starta backend-servern
 
 ```bash
-# Development
-npm run dev
+# Utveckling
+npm kör dev
 
-# Production
+# Produktion
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. Distribuera konfiguration
 
-For production deployments, set environment variables in your hosting platform:
+För produktionsdistributioner, ange miljövariabler i din värdplattform:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **Frontend**: Ange `REACT_APP_API_URL` till din produktions-API-URL
+* **Backend**: Distribuera servermappen med bottoken och kanal-ID
+* **Databas**: SQLite-databasen skapas automatiskt
+* **Kontext**: Konfigurera Discord-kontextnivå och alternativ enligt dina önskemål
 
-## How It Works
+## Hur det fungerar
 
-### Complete Bidirectional Flow
+### Komplett dubbelriktat flöde
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **Kommentar på webbplatsen**: Användaren skickar in en kommentar via ett webbformulär
+2. **Discord-meddelande**: Boten skickar formaterad inbäddning till Discord-kanalen med fullständig sidkontext
+3. **Trådskapande**: Boten skapar automatiskt en tråd för organiserade svar
+4. **Discord-svar**: Discord-användare svarar i tråden eller på meddelandet
+5. **Databaslagring**: Boten lagrar alla kommentarer och svar i SQLite-databasen
+6. **Webbplatsvisning**: Frontend-omröstningar i API:et görs var 30:e sekund och visar Discord-svar
 
-### Discord Message Format
+### Discord-meddelandeformat
 
-Discord embeds include:
+Discord-inbäddningar inkluderar:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **Beskrivning**: Det faktiska innehållet i kommentaren
+* **Författare**: Kommentatorns namn
+* **URL**: Klickbar länk till exakt den sidan
+* **Sidfält**: Visar sidtitel med klickbar länk
+* **Tidsstämpel**: När kommentaren publicerades
+* **Tråd**: Automatiskt skapad tråd för svar
 
-### Website Display
+### Webbplatsvisning
 
-The website shows:
+Webbplatsen visar:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **Ursprungliga kommentarer**: Inskickade formulär för webbplatsen
+* **Discord-svar**: Svar från Discord-användare med avatarer och användarnamn
+* **Uppdateringar i realtid**: Automatisk omröstning för nya svar
+* **Trådade konversationer**: Organiserad kommentar → svarsstruktur
 
-## Context Configuration
+## Kontextkonfiguration
 
-### Context Levels
+### Kontextnivåer
 
-Configure how much context appears in Discord messages:
+Konfigurera hur mycket kontext som visas i Discord-meddelanden:
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **Visar**: Bara sidtitel och kommentarinnehåll
+* **Användningsfall**: Rena, enkla meddelanden utan extra sammanhang
 
-#### `DISCORD_CONTEXT_LEVEL=basic`
+#### `DISCORD_CONTEXT_LEVEL=grundläggande`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **Visar**: Sidtitel, kommentarinnehåll och klickbar sid-URL
+* **Användningsfall**: Modererat sammanhang med viktig information
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (standard)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **Visar**: All kontextinformation inklusive brödsmulor, sektioner, tidsstämplar
+* **Användningsfall**: Maximalt sammanhang för detaljerade diskussioner
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `DISCORD_CONTEXT_LEVEL=anpassad`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **Visar**: Endast de kontextelement du aktiverar individuellt
+* **Användningsfall**: Finjusterad kontroll över vad som visas
 
-### Individual Context Controls
+### Individuella kontextkontroller
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+När du använder `DISCORD_CONTEXT_LEVEL=custom` kan du styra varje element:
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # Visa sidtitel och URL-fält
+DISCORD_SHOW_BREADCRUMBS=true # Visa navigationsbrödsmulor
+DISCORD_SHOW_SECTION_INFO=true # Visa huvudsektion (Docker, Nextcloud, etc.)
+DISCORD_SHOW_PAGE_PATH=false # Visa fullständig URL-sökväg
+DISCORD_SHOW_TIMESTAMP=true # Visa när kommentaren publicerades
+DISCORD_SHOW_AUTHOR_FIELD=true # Visa kommentatorns namn som inbäddad författare
 ```
 
-### Example Context Outputs
+### Trådkonfiguration
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # Skapa trådar för svar
+DISCORD_THREAD_DURATION=1440 # Tid för automatisk arkivering av tråd (minuter)
+DISCORD_SITE_NAME=Ditt webbplatsnamn # Webbplatsnamn i sidfoten
 ```
 
-**Full Context:**
+### Exempel på kontextutdata
+
+**Minimal kontext:**
 
 ```
-💬 New Comment: Docker Installation Guide
+Docker installationsguide
+"Den här handledningen var verkligen hjälpsam! Hur hanterar jag portkonflikter?"
+```
+
+**Grundläggande kontext:**
+
+```
+💬 Docker installationsguide
+"Den här handledningen var verkligen hjälpsam! Hur hanterar jag portkonflikter?"
+[Länk till sida]
+```
+
+**Fullständig kontext:**
+
+```
+💬 Ny kommentar: Docker installationsguide
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+"Den här handledningen var verkligen hjälpsam! Hur hanterar jag portkonflikter?"
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 Sida: Docker installationsguide
+📍 Navigering: Docker > Dokument > Installera Docker
+📂 Avsnitt: Docker
+🔗 Sökväg: /Docker/Dokumentar/Installerar%20Docker/Docker%20Eengine
 
-Your Site Name • Comment System
+Ditt webbplatsnamn • Kommentarsystem
 ```
 
-## Customization
+## Anpassning
 
 ### Styling
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Discord-kommentarkomponenten använder CSS-moduler. Du kan anpassa utseendet genom att ändra:
 
 ```
-src/components/DiscordComments/styles.module.css
+src/komponenter/Discordkommentarer/stilar.modul.css
 ```
 
-### Message Format
+### Meddelandeformat
 
-To customize the Discord embed format, edit the `discordMessage` object in:
-
-```
-src/components/DiscordComments/index.tsx
-```
-
-### Component Placement
-
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+För att anpassa Discord-inbäddningsformatet, redigera `discordMessage`-objektet i:
 
 ```
-src/theme/DocItem/Layout/index.js
+src/komponenter/Discordkommentarer/index.tsx
 ```
 
-## Troubleshooting
+### Komponentplacering
 
-### Bot Not Responding
-
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
-
-### Comments Not Appearing
-
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
-
-### Discord Replies Not Showing
-
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
-
-### Environment Variables Not Working
-
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
-
-### Database Issues
-
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
-
-## Security Considerations
-
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
-
-## Architecture
+Discord-kommentarerna visas som standard under Giscus-kommentarerna. För att ändra detta, modifiera:
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+src/tema/DocItem/Layout/index.js
+```
+
+## Felsökning
+
+### Boten svarar inte
+
+1. **Kontrollera bot-token**: Se till att `DISCORD_BOT_TOKEN` är korrekt
+2. **Verifiera behörigheter**: Se till att boten har nödvändiga behörigheter i kanalen
+3. **Kontrollera kanal-ID**: Se till att `DISCORD_CHANNEL_ID` är korrekt
+4. **Bot på servern**: Verifiera att boten faktiskt finns på din Discord-server
+
+### Kommentarer visas inte
+
+1. **Servern körs**: Kontrollera om backend-servern körs på rätt port
+2. **API-URL**: Verifiera att `REACT_APP_API_URL` pekar mot din backend-server
+3. **Databas**: Kontrollera om SQLite-databasen skapas i servermappen
+4. **CORS**: Se till att CORS är konfigurerat för din frontend-domän
+
+### Discord-svar visas inte
+
+1. **Meddelandets innehållsavsikt**: Se till att detta är aktiverat i Discord Developer Portal
+2. **Botbehörigheter**: Verifiera att boten kan läsa meddelanden i kanalen
+3. **Databasanslutning**: Kontrollera serverloggarna för databasfel
+4. **Omröstning**: Omröstningar från frontend var 30:e sekund – det kan ta tid innan svaren visas
+
+### Miljövariabler fungerar inte
+
+* **Utveckling**: Starta om både frontend- och backend-servrar
+* **Produktion**: Omdistribuera både frontend och backend med korrekta miljövariabler
+* **Prefix**: Använd prefixet `REACT_APP_` endast för frontend-variabler
+
+### Databasproblem
+
+1. **Filbehörigheter**: Se till att servern kan skriva till databaskatalogen
+2. **Diskutrymme**: Kontrollera tillgängligt diskutrymme för SQLite-databasen
+3. **Serverloggar**: Kontrollera serverkonsolen för databasanslutningsfel
+
+## Säkerhetsöverväganden
+
+* **Bot-token**: Håll din bot-token hemlig och koppla den aldrig till versionshantering.
+* **Hastighetsgränser**: Discord har hastighetsgränser för bottar (skiljer sig från webhooks)
+* **Validering av indata**: Både frontend och backend validerar användarinmatning
+* **Databassäkerhet**: SQLite-databasen bör skyddas med korrekta filbehörigheter
+* **API-säkerhet**: Överväg att implementera hastighetsbegränsningar på dina API-slutpunkter
+* **CORS**: Konfigurera CORS korrekt för din produktionsdomän
+
+## Arkitektur
+
+```
+Webbplatsens frontend ←→ Express API ←→ Discord Bot ←→ Discord-server
                     ↓
-                SQLite Database
+                SQLite-databas
 ```
 
-## File Structure
+## Filstruktur
 
 ```
-project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+projekt/
+├── src/komponenter/Discordkommentarer/ # Frontend-komponent
+├── server/ # Backend-server
+│ ├── api.js # Express API-server
+│ ├── discord-bot.js # Discord-botlogik
+│ ├── database.js # SQLite-databasfunktioner
+│ └── package.json # Serverberoenden
+└── docs/Discord/Dokument/ # Dokumentation
 ```
 
-## Browser Support
+## Webbläsarstöd
 
-The Discord comments component works in all modern browsers that support:
+Discord-kommentarkomponenten fungerar i alla moderna webbläsare som stöder:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* ES6 hämtnings-API
+* Reagera 18+
+* CSS Grid och Flexbox
+* Lokal lagring (för formulärbeständighet)
