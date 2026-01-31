@@ -11,14 +11,14 @@ Questo sito di documentazione include un'**integrazione bidirezionale dei commen
 
 ## Caratteristiche
 
-* **Comunicazione bidirezionale**: Commenti sul sito web → Discord, Risposte Discord → Sito web
-* **Doppio sistema di commenti**: i commenti di Giscus (basato su GitHub) e Discord funzionano insieme
-* **Incorporamenti Discord avanzati**: i commenti vengono visualizzati come incorporamenti formattati con contesto a pagina intera
-* **Gestione thread**: creazione automatica di thread per risposte organizzate
-* **Aggiornamenti in tempo reale**: il sito web visualizza automaticamente le risposte Discord
-* **Contesto pagina intera**: i commenti includono il titolo della pagina, l'URL e il contesto di navigazione
-* **Avatar utente**: le risposte Discord mostrano gli avatar e i nomi utente degli utenti
-* **Design reattivo**: funziona sia su dispositivi desktop che mobili
+- **Comunicazione bidirezionale**: Commenti sul sito web → Discord, Risposte Discord → Sito web
+- **Doppio sistema di commenti**: i commenti di Giscus (basato su GitHub) e Discord funzionano insieme
+- **Incorporamenti Discord avanzati**: i commenti vengono visualizzati come incorporamenti formattati con contesto a pagina intera
+- **Gestione thread**: creazione automatica di thread per risposte organizzate
+- **Aggiornamenti in tempo reale**: il sito web visualizza automaticamente le risposte Discord
+- **Contesto pagina intera**: i commenti includono il titolo della pagina, l'URL e il contesto di navigazione
+- **Avatar utente**: le risposte Discord mostrano gli avatar e i nomi utente degli utenti
+- **Design reattivo**: funziona sia su dispositivi desktop che mobili
 
 ## Istruzioni di installazione
 
@@ -29,28 +29,28 @@ Questo sito di documentazione include un'**integrazione bidirezionale dei commen
 3. Vai alla sezione "Bot" e crea un bot
 4. Copia il token del bot
 5. In "Privileged Gateway Intents", abilita:
-   * **Intento del contenuto del messaggio**
-   * **Intento dei membri del server** (facoltativo)
+   - **Intento del contenuto del messaggio**
+   - **Intento dei membri del server** (facoltativo)
 
-### 3) Invite Bot to Server
+### 7. Configurazione di distribuzione
 
 Il tuo bot necessita di queste autorizzazioni:
 
-* Leggi i messaggi
-* Invia messaggi
-* Crea discussioni pubbliche
-* Invia messaggi in thread
-* Leggi la cronologia dei messaggi
-* Utilizzare i comandi slash (facoltativo)
+- Leggi i messaggi
+- Invia messaggi
+- Crea discussioni pubbliche
+- Invia messaggi in thread
+- Leggi la cronologia dei messaggi
+- Utilizzare i comandi slash (facoltativo)
 
-### 6. Start the Backend Server
+### 6. Avviare il server backend
 
 1. Vai su OAuth2 > Generatore URL
 2. Seleziona l'ambito "bot"
 3. Seleziona le autorizzazioni elencate sopra
 4. Utilizza l'URL generato per invitare il bot sul tuo server
 
-### 7) Deploy Configuration
+### 5. Installa le dipendenze del server
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Il nome del tuo sito
 
 :::warning Nota di sicurezza
 
-* Non inviare mai i file `.env` al controllo di versione
-* Utilizzare le variabili di ambiente in produzione
-* Mantieni sicuro il tuo token bot
+- Non inviare mai i file `.env` al controllo di versione
+- Utilizzare le variabili di ambiente in produzione
+- Mantieni sicuro il tuo token bot
   :::
 
-### 5. Installa le dipendenze del server
+### 6. Start the Backend Server
 
 ```bash
 cd server
 installazione npm
 ```
 
-### 6. Avviare il server backend
+### 6. Start the Backend Server
 
 ```bash
 # Sviluppo
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Configurazione di distribuzione
+### 7. 7. Deploy Configuration
 
 Per le distribuzioni di produzione, imposta le variabili di ambiente nella tua piattaforma di hosting:
 
-* **Frontend**: imposta `REACT_APP_API_URL` sull'URL della tua API di produzione
-* **Backend**: distribuisci la cartella del server con il token bot e l'ID del canale
-* **Database**: il database SQLite verrà creato automaticamente
-* **Contesto**: configura il livello di contesto e le opzioni di Discord in base alle tue preferenze
+- **Frontend**: imposta `REACT_APP_API_URL` sull'URL della tua API di produzione
+- **Backend**: distribuisci la cartella del server con il token bot e l'ID del canale
+- **Database**: il database SQLite verrà creato automaticamente
+- **Contesto**: configura il livello di contesto e le opzioni di Discord in base alle tue preferenze
 
 ## Come funziona
 
@@ -140,22 +140,22 @@ Per le distribuzioni di produzione, imposta le variabili di ambiente nella tua p
 
 Gli incorporamenti di Discord includono:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Descrizione**: Il contenuto effettivo del commento
-* **Autore**: Nome del commentatore
-* **URL**: Link cliccabile alla pagina esatta
-* **Campo pagina**: mostra il titolo della pagina con collegamento cliccabile
-* **Timestamp**: Quando è stato pubblicato il commento
-* **Discussione**: Discussione creata automaticamente per le risposte
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Descrizione**: Il contenuto effettivo del commento
+- **Autore**: Nome del commentatore
+- **URL**: Link cliccabile alla pagina esatta
+- **Campo pagina**: mostra il titolo della pagina con collegamento cliccabile
+- **Timestamp**: Quando è stato pubblicato il commento
+- **Discussione**: Discussione creata automaticamente per le risposte
 
 ### Visualizzazione del sito web
 
 Il sito web mostra:
 
-* **Commenti originali**: Invio di moduli al sito web
-* **Risposte Discord**: Risposte degli utenti Discord con avatar e nomi utente
-* **Aggiornamenti in tempo reale**: sondaggio automatico per nuove risposte
-* **Conversazioni a thread**: struttura commento organizzato → risposta
+- **Commenti originali**: Invio di moduli al sito web
+- **Risposte Discord**: Risposte degli utenti Discord con avatar e nomi utente
+- **Aggiornamenti in tempo reale**: sondaggio automatico per nuove risposte
+- **Conversazioni a thread**: struttura commento organizzato → risposta
 
 ## Configurazione del contesto
 
@@ -165,23 +165,23 @@ Configura la quantità di contesto visualizzata nei messaggi Discord:
 
 #### `DISCORD_CONTEXT_LEVEL=minimo`
 
-* **Mostra**: Solo il titolo della pagina e il contenuto del commento
-* **Caso d'uso**: messaggi puliti e semplici senza contesto aggiuntivo
+- **Mostra**: Solo il titolo della pagina e il contenuto del commento
+- **Caso d'uso**: messaggi puliti e semplici senza contesto aggiuntivo
 
 #### `DISCORD_CONTEXT_LEVEL=base`
 
-* **Mostra**: Titolo della pagina, contenuto del commento e URL della pagina cliccabile
-* **Caso d'uso**: contesto moderato con informazioni essenziali
+- **Mostra**: Titolo della pagina, contenuto del commento e URL della pagina cliccabile
+- **Caso d'uso**: contesto moderato con informazioni essenziali
 
 #### `DISCORD_CONTEXT_LEVEL=full` (predefinito)
 
-* **Mostra**: Tutte le informazioni di contesto, inclusi breadcrumb, sezioni, timestamp
-* **Caso d'uso**: Contesto massimo per discussioni dettagliate
+- **Mostra**: Tutte le informazioni di contesto, inclusi breadcrumb, sezioni, timestamp
+- **Caso d'uso**: Contesto massimo per discussioni dettagliate
 
 #### `DISCORD_CONTEXT_LEVEL=personalizzato`
 
-* **Mostra**: Solo gli elementi di contesto che abiliti individualmente
-* **Caso d'uso**: Controllo preciso su ciò che appare
+- **Mostra**: Solo gli elementi di contesto che abiliti individualmente
+- **Caso d'uso**: Controllo preciso su ciò che appare
 
 ### Controlli contestuali individuali
 
@@ -287,9 +287,9 @@ src/tema/DocItem/Layout/index.js
 
 ### Variabili d'ambiente non funzionanti
 
-* **Sviluppo**: riavviare entrambi i server frontend e backend
-* **Produzione**: ridistribuire sia il frontend che il backend con le variabili di ambiente corrette
-* **Prefisso**: utilizzare il prefisso `REACT_APP_` solo per le variabili frontend
+- **Sviluppo**: riavviare entrambi i server frontend e backend
+- **Produzione**: ridistribuire sia il frontend che il backend con le variabili di ambiente corrette
+- **Prefisso**: utilizzare il prefisso `REACT_APP_` solo per le variabili frontend
 
 ### Problemi di database
 
@@ -299,12 +299,12 @@ src/tema/DocItem/Layout/index.js
 
 ## Considerazioni sulla sicurezza
 
-* **Token del bot**: mantieni segreto il tuo token del bot e non sottoporlo mai al controllo di versione
-* **Limitazione della frequenza**: Discord ha dei limiti di frequenza per i bot (diversi dai webhook)
-* **Convalida dell'input**: sia il frontend che il backend convalidano l'input dell'utente
-* **Sicurezza del database**: il database SQLite deve essere protetto con le autorizzazioni file appropriate
-* **Sicurezza API**: valuta l'implementazione di una limitazione della velocità sugli endpoint API
-* **CORS**: configura CORS correttamente per il tuo dominio di produzione
+- **Token del bot**: mantieni segreto il tuo token del bot e non sottoporlo mai al controllo di versione
+- **Limitazione della frequenza**: Discord ha dei limiti di frequenza per i bot (diversi dai webhook)
+- **Convalida dell'input**: sia il frontend che il backend convalidano l'input dell'utente
+- **Sicurezza del database**: il database SQLite deve essere protetto con le autorizzazioni file appropriate
+- **Sicurezza API**: valuta l'implementazione di una limitazione della velocità sugli endpoint API
+- **CORS**: configura CORS correttamente per il tuo dominio di produzione
 
 ## Architettura
 
@@ -331,7 +331,7 @@ project/
 
 Il componente commenti di Discord funziona in tutti i browser moderni che supportano:
 
-* API di recupero ES6
-* Reagisci 18+
-* Griglia CSS e Flexbox
-* Archiviazione locale (per la persistenza del modulo)
+- API di recupero ES6
+- Reagisci 18+
+- Griglia CSS e Flexbox
+- Archiviazione locale (per la persistenza del modulo)
