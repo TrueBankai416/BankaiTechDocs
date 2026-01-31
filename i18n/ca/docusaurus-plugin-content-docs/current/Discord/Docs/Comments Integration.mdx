@@ -11,46 +11,46 @@ Aquest lloc de documentació inclou una **integració de comentaris bidirecciona
 
 ## Característiques
 
-* **Comunicació bidireccional**: Comentaris del lloc web → Discord, respostes de Discord → Lloc web
-* **Sistema de comentaris duals**: Els comentaris de Giscus (basat en GitHub) i Discord funcionen conjuntament.
-* **Incrustacions enriquides de Discord**: els comentaris apareixen com a incrustacions formatades amb context de pàgina completa
-* **Gestió de fils**: Creació automàtica de fils per a respostes organitzades
-* **Actualitzacions en temps real**: El lloc web mostra les respostes de Discord automàticament
-* **Context de pàgina completa**: els comentaris inclouen el títol de la pàgina, l'URL i el context de navegació
-* **Avatars d'usuari**: Les respostes de Discord mostren els avatars i els noms d'usuari dels usuaris
-* **Disseny responsiu**: Funciona tant en ordinadors d'escriptori com en dispositius mòbils
+- **Comunicació bidireccional**: Comentaris del lloc web → Discord, respostes de Discord → Lloc web
+- **Sistema de comentaris duals**: Els comentaris de Giscus (basat en GitHub) i Discord funcionen conjuntament.
+- **Incrustacions enriquides de Discord**: els comentaris apareixen com a incrustacions formatades amb context de pàgina completa
+- **Gestió de fils**: Creació automàtica de fils per a respostes organitzades
+- **Actualitzacions en temps real**: El lloc web mostra les respostes de Discord automàticament
+- **Context de pàgina completa**: els comentaris inclouen el títol de la pàgina, l'URL i el context de navegació
+- **Avatars d'usuari**: Les respostes de Discord mostren els avatars i els noms d'usuari dels usuaris
+- **Disseny responsiu**: Funciona tant en ordinadors d'escriptori com en dispositius mòbils
 
 ## Instruccions de configuració
 
-### 1. Crea un bot de Discord
+### 1. Create a Discord Bot
 
 1. Ves al [Portal de desenvolupadors de Discord](https://discord.com/developers/applications)
 2. Crea una nova aplicació
 3. Ves a la secció "Bot" i crea un bot
 4. Copia el testimoni del bot
 5. A "Intencions de passarel·la privilegiada", activeu:
-   * **Intenció del contingut del missatge**
-   * **Intenció dels membres del servidor** (opcional)
+   - **Intenció del contingut del missatge**
+   - **Intenció dels membres del servidor** (opcional)
 
-### 2) Configura els permisos del bot
+### 2. Configure Bot Permissions
 
 El vostre bot necessita aquests permisos:
 
-* Llegir missatges
-* Enviar missatges
-* Crea fils públics
-* Enviar missatges en fils de discussió
-* Llegeix l'historial de missatges
-* Utilitzeu ordres de barra inclinada (opcional)
+- Llegir missatges
+- Enviar missatges
+- Crea fils públics
+- Enviar missatges en fils de discussió
+- Llegeix l'historial de missatges
+- Utilitzeu ordres de barra inclinada (opcional)
 
-### 3. Convida el bot al servidor
+### 3. Invite Bot to Server
 
 1. Aneu a OAuth2 > Generador d'URL
 2. Selecciona l'àmbit "bot"
 3. Seleccioneu els permisos que figuren a dalt
 4. Utilitzeu l'URL generada per convidar el bot al vostre servidor
 
-### 4) Configura les variables d'entorn
+### 4. Configure Environment Variables
 
 #### Frontend (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Nom del vostre lloc web
 
 :::avís Nota de seguretat
 
-* No commit mai els fitxers `.env` al control de versions
-* Utilitzar variables d'entorn en producció
-* Mantingueu el testimoni del vostre bot segur
+- No commit mai els fitxers `.env` al control de versions
+- Utilitzar variables d'entorn en producció
+- Mantingueu el testimoni del vostre bot segur
   :::
 
-### 5. Instal·lar dependències del servidor
+### 5. Install Server Dependencies
 
 ```bash
 instal·lació npm del servidor cd
 
 ```
 
-### 6. Inicia el servidor backend
+### 6. Start the Backend Server
 
 ```bash
 # Desenvolupament
@@ -116,14 +116,14 @@ npm run dev
 npm start
 ```
 
-### 7. Implementa la configuració
+### 7. Deploy Configuration
 
 Per a implementacions de producció, definiu variables d'entorn a la vostra plataforma d'allotjament:
 
-* **Frontend**: Estableix `REACT_APP_API_URL` com a URL de l'API de producció
-* **Backend**: Implementa la carpeta del servidor amb el testimoni del bot i l'ID del canal
-* **Base de dades**: la base de dades SQLite es crearà automàticament
-* **Context**: Configura el nivell de context i les opcions de Discord segons les teves preferències
+- **Frontend**: Estableix `REACT_APP_API_URL` com a URL de l'API de producció
+- **Backend**: Implementa la carpeta del servidor amb el testimoni del bot i l'ID del canal
+- **Base de dades**: la base de dades SQLite es crearà automàticament
+- **Context**: Configura el nivell de context i les opcions de Discord segons les teves preferències
 
 ## Com funciona
 
@@ -140,22 +140,22 @@ Per a implementacions de producció, definiu variables d'entorn a la vostra plat
 
 Les insercions de Discord inclouen:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Descripció**: El contingut real del comentari
-* **Autor**: Nom del comentarista
-* **URL**: Enllaç clicable a la pàgina exacta
-* **Camp de pàgina**: Mostra el títol de la pàgina amb un enllaç en què es pot fer clic
-* **Marca de temps**: Quan es va publicar el comentari
-* **Fil**: Fil creat automàticament per a respostes
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Descripció**: El contingut real del comentari
+- **Autor**: Nom del comentarista
+- **URL**: Enllaç clicable a la pàgina exacta
+- **Camp de pàgina**: Mostra el títol de la pàgina amb un enllaç en què es pot fer clic
+- **Marca de temps**: Quan es va publicar el comentari
+- **Fil**: Fil creat automàticament per a respostes
 
 ### Visualització del lloc web
 
 El lloc web mostra:
 
-* **Comentaris originals**: Enviaments de formularis de lloc web
-* **Respostes de Discord**: Respostes d'usuaris de Discord amb avatars i noms d'usuari
-* **Actualitzacions en temps real**: Sondeig automàtic per a noves respostes
-* **Converses en fils**: Comentari organitzat → estructura de resposta
+- **Comentaris originals**: Enviaments de formularis de lloc web
+- **Respostes de Discord**: Respostes d'usuaris de Discord amb avatars i noms d'usuari
+- **Actualitzacions en temps real**: Sondeig automàtic per a noves respostes
+- **Converses en fils**: Comentari organitzat → estructura de resposta
 
 ## Configuració del context
 
@@ -165,23 +165,23 @@ Configura quant context apareix als missatges de Discord:
 
 #### `DISCORD_CONTEXT_LEVEL=mínim`
 
-* **Programes**: Només el títol de la pàgina i el contingut dels comentaris
-* **Cas d'ús**: Missatges nets i senzills sense context addicional
+- **Programes**: Només el títol de la pàgina i el contingut dels comentaris
+- **Cas d'ús**: Missatges nets i senzills sense context addicional
 
 #### `DISCORD_CONTEXT_LEVEL=bàsic`
 
-* **Mostra**: Títol de la pàgina, contingut dels comentaris i URL de la pàgina en què es pot fer clic
-* **Cas d'ús**: Context moderat amb informació essencial
+- **Mostra**: Títol de la pàgina, contingut dels comentaris i URL de la pàgina en què es pot fer clic
+- **Cas d'ús**: Context moderat amb informació essencial
 
 #### `DISCORD_CONTEXT_LEVEL=full` (per defecte)
 
-* **Mostra**: Tota la informació de context, incloent-hi les rutes de navegació, les seccions i les marques de temps
-* **Cas d'ús**: Context màxim per a debats detallats
+- **Mostra**: Tota la informació de context, incloent-hi les rutes de navegació, les seccions i les marques de temps
+- **Cas d'ús**: Context màxim per a debats detallats
 
 #### `DISCORD_CONTEXT_LEVEL=personalitzat`
 
-* **Mostra**: Només els elements de context que activeu individualment
-* **Cas d'ús**: Control precís sobre el que apareix
+- **Mostra**: Només els elements de context que activeu individualment
+- **Cas d'ús**: Control precís sobre el que apareix
 
 ### Controls de context individuals
 
@@ -240,7 +240,7 @@ Nom del vostre lloc • Sistema de comentaris
 
 ### Estilisme
 
-El component de comentaris de Discord utilitza mòduls CSS. Podeu personalitzar l'aspecte modificant:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Col·locació de components
 
-Els comentaris de Discord apareixen per defecte a sota dels comentaris de Giscus. Per canviar això, modifiqueu:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Les variables d'entorn no funcionen
 
-* **Desenvolupament**: Reinicieu els servidors frontend i backend
-* **Producció**: Redistribuïu tant el frontend com el backend amb les variables d'entorn correctes
-* **Prefix**: Utilitzeu el prefix `REACT_APP_` només per a variables de frontend
+- **Desenvolupament**: Reinicieu els servidors frontend i backend
+- **Producció**: Redistribuïu tant el frontend com el backend amb les variables d'entorn correctes
+- **Prefix**: Utilitzeu el prefix `REACT_APP_` només per a variables de frontend
 
 ### Problemes de base de dades
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Consideracions de seguretat
 
-* **Token del bot**: Mantingueu el token del bot en secret i no el commiteixi mai al control de versions
-* **Limitació de velocitat**: Discord té límits de velocitat per als bots (diferents dels webhooks)
-* **Validació d'entrada**: Tant el frontend com el backend validen l'entrada de l'usuari
-* **Seguretat de la base de dades**: la base de dades SQLite ha d'estar protegida amb els permisos de fitxer adequats.
-* **Seguretat de l'API**: Penseu en implementar una limitació de velocitat als punts finals de l'API.
-* **CORS**: Configureu CORS correctament per al vostre domini de producció
+- **Token del bot**: Mantingueu el token del bot en secret i no el commiteixi mai al control de versions
+- **Limitació de velocitat**: Discord té límits de velocitat per als bots (diferents dels webhooks)
+- **Validació d'entrada**: Tant el frontend com el backend validen l'entrada de l'usuari
+- **Seguretat de la base de dades**: la base de dades SQLite ha d'estar protegida amb els permisos de fitxer adequats.
+- **Seguretat de l'API**: Penseu en implementar una limitació de velocitat als punts finals de l'API.
+- **CORS**: Configureu CORS correctament per al vostre domini de producció
 
 ## Arquitectura
 
@@ -331,7 +331,7 @@ project/
 
 El component de comentaris de Discord funciona en tots els navegadors moderns que admeten:
 
-* API de recuperació d'ES6
-* Reacciona 18+
-* CSS Grid i Flexbox
-* Emmagatzematge local (per a la persistència de formularis)
+- API de recuperació d'ES6
+- Reacciona 18+
+- CSS Grid i Flexbox
+- Emmagatzematge local (per a la persistència de formularis)
