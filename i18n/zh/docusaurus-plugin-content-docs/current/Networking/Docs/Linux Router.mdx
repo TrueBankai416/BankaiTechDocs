@@ -1040,7 +1040,7 @@ curl --proxy http://username:password@proxy.company.com:8080 http://httpbin.org/
 
 ```bash
 # Try different domain formats
-login = "DOMAIN\\username";     # Windows format
+login = "DOMAIN\username";     # Windows format
 login = "username@domain.com";  # UPN format
 login = "domain/username";      # Alternative format
 ```
@@ -1049,7 +1049,7 @@ login = "domain/username";      # Alternative format
 
 ```bash
 # Escape special characters in redsocks.conf
-password = "pass\\word";        # Backslash
+password = "pass\word";        # Backslash
 password = "pass\"word";        # Quote
 ```
 
@@ -1607,7 +1607,7 @@ Wants=network.target
 
 [Service]
 ExecStartPre=/bin/sleep 15
-ExecStartPre=/bin/bash -c 'until nmcli dev show wlan0 | grep -q "GENERAL.STATE.*connected\\|disconnected"; do sleep 2; done'
+ExecStartPre=/bin/bash -c 'until nmcli dev show wlan0 | grep -q "GENERAL.STATE.*connected\|disconnected"; do sleep 2; done'
 ```
 
 **Solution 2: Unmanage interface before starting lnxrouter**
