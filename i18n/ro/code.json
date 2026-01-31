@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Versiune: {versionLabel}",
-    "description": ""
+    "message": "Versiune: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Editați această pagină",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Niciun rezultat",
-    "description": ""
+    "message": "Niciun rezultat"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Vedeți toate rezultatele în afara „{context}”",
-    "description": ""
+    "message": "Vedeți toate rezultatele în afara „{context}”"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Vedeți toate rezultatele în „{context}”",
-    "description": ""
+    "message": "Vedeți toate rezultatele în „{context}”"
   },
   "theme.SearchBar.seeAll": {
-    "message": "Vedeți toate rezultatele",
-    "description": ""
+    "message": "Vedeți toate rezultatele"
   },
   "theme.SearchBar.label": {
     "message": "Căutare",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Pretutindeni",
-    "description": ""
+    "message": "Pretutindeni"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 document găsit|{count} documente găsite",

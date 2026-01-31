@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Verze: {versionLabel}",
-    "description": ""
+    "message": "Verze: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Upravit tuto stránku",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Žádné výsledky",
-    "description": ""
+    "message": "Žádné výsledky"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Zobrazit všechny výsledky mimo „{context}“",
-    "description": ""
+    "message": "Zobrazit všechny výsledky mimo „{context}“"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Zobrazit všechny výsledky v „{context}“",
-    "description": ""
+    "message": "Zobrazit všechny výsledky v „{context}“"
   },
   "theme.SearchBar.seeAll": {
-    "message": "Zobrazit všechny výsledky",
-    "description": ""
+    "message": "Zobrazit všechny výsledky"
   },
   "theme.SearchBar.label": {
     "message": "Vyhledávání",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Všude",
-    "description": ""
+    "message": "Všude"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "Nalezen 1 dokument| nalezeno {count} dokumentů",

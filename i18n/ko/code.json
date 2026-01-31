@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "버전: {versionLabel}",
-    "description": ""
+    "message": "버전: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "이 페이지를 편집하세요",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "결과 없음",
-    "description": ""
+    "message": "결과 없음"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "\"{context}\" 외부의 모든 결과 보기",
-    "description": ""
+    "message": "\"{context}\" 외부의 모든 결과 보기"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "\"{context}\" 내의 모든 결과 보기",
-    "description": ""
+    "message": "\"{context}\" 내의 모든 결과 보기"
   },
   "theme.SearchBar.seeAll": {
-    "message": "모든 결과 보기",
-    "description": ""
+    "message": "모든 결과 보기"
   },
   "theme.SearchBar.label": {
     "message": "찾다",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "어디에나",
-    "description": ""
+    "message": "어디에나"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "문서 1개 발견됨|문서 {count}개 발견됨",

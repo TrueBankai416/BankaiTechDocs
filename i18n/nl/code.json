@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Versie: {versionLabel}",
-    "description": ""
+    "message": "Versie: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Bewerk deze pagina",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Geen resultaten",
-    "description": ""
+    "message": "Geen resultaten"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Bekijk alle resultaten buiten \"{context}\"",
-    "description": ""
+    "message": "Bekijk alle resultaten buiten \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Bekijk alle resultaten binnen \"{context}\"",
-    "description": ""
+    "message": "Bekijk alle resultaten binnen \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Bekijk alle resultaten",
-    "description": ""
+    "message": "Bekijk alle resultaten"
   },
   "theme.SearchBar.label": {
     "message": "Zoekopdracht",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Overal",
-    "description": ""
+    "message": "Overal"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 document gevonden|{count} documenten gevonden",

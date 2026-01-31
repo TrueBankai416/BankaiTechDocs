@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Version: {versionLabel}",
-    "description": ""
+    "message": "Version: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Rediger denne side",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Ingen resultater",
-    "description": ""
+    "message": "Ingen resultater"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Se alle resultater uden for \"{context}\"",
-    "description": ""
+    "message": "Se alle resultater uden for \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Se alle resultater i \"{context}\"",
-    "description": ""
+    "message": "Se alle resultater i \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Se alle resultater",
-    "description": ""
+    "message": "Se alle resultater"
   },
   "theme.SearchBar.label": {
     "message": "Søge",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Overalt",
-    "description": ""
+    "message": "Overalt"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 dokument fundet|{count} dokumenter fundet",

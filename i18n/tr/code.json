@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Sürüm: {versionLabel}",
-    "description": ""
+    "message": "Sürüm: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Bu sayfayı düzenle",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Sonuç yok",
-    "description": ""
+    "message": "Sonuç yok"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "\"{context}\" dışındaki tüm sonuçları görün",
-    "description": ""
+    "message": "\"{context}\" dışındaki tüm sonuçları görün"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "\"{context}\" kapsamındaki tüm sonuçları görün",
-    "description": ""
+    "message": "\"{context}\" kapsamındaki tüm sonuçları görün"
   },
   "theme.SearchBar.seeAll": {
-    "message": "Tüm sonuçları görün",
-    "description": ""
+    "message": "Tüm sonuçları görün"
   },
   "theme.SearchBar.label": {
     "message": "Aramak",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Her yer",
-    "description": ""
+    "message": "Her yer"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 belge bulundu|{count} belge bulundu",

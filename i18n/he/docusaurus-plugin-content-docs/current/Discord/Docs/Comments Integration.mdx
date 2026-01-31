@@ -1,337 +1,337 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: שילוב תגובות
+description: מדריך מלא לשילוב תגובות דו-כיווניות בדיסקורד עם Docusaurus כולל הגדרה, תצורה ופתרון בעיות.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# שילוב תגובות בדיסקורד
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+אתר תיעוד זה כולל **שילוב דו-כיווני של תגובות דיסקורד** המאפשר למבקרים לשלוח תגובות לשרת דיסקורד שלכם וגם להציג תשובות דיסקורד באתר לצד תגובות גיסקוס קיימות מבוססות GitHub.
 
-## Features
+## תכונות
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **תקשורת דו-כיוונית**: תגובות לאתר → דיסקורד, תשובות דיסקורד → אתר
+* **מערכת תגובות כפולה**: גם תגובות של Giscus (מבוססות GitHub) וגם תגובות של Discord פועלות יחד.
+* **הטמעות עשירות בדיסקורד**: תגובות מופיעות כהטמעות מעוצבים עם הקשר מלא של הדף
+* **ניהול שרשורים**: יצירת שרשורים אוטומטית לתגובות מאורגנות
+* **עדכונים בזמן אמת**: האתר מציג תשובות דיסקורד באופן אוטומטי
+* **הקשר מלא של הדף**: ההערות כוללות את כותרת הדף, כתובת האתר והקשר הניווט
+* **אווטארים של משתמשים**: תגובות דיסקורד מציגות אווטארים ושמות משתמש של משתמשים
+* **עיצוב רספונסיבי**: עובד גם על מחשבים שולחניים וגם על מכשירים ניידים
 
-## Setup Instructions
+## הוראות התקנה
 
-### 1. Create a Discord Bot
+### 1. צור בוט דיסקורד
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. עבור אל [פורטל המפתחים של דיסקורד](https://discord.com/developers/applications)
+2. צור יישום חדש
+3. עבור אל הקטע "בוט" וצור בוט
+4. העתק את אסימון הבוט
+5. תחת "כוונות שער מורשות", הפעל:
+   * **כוונת תוכן ההודעה**
+   * **כוונת חברי השרת** (אופציונלי)
 
-### 2) Configure Bot Permissions
+### 2) הגדרת הרשאות בוט
 
-Your bot needs these permissions:
+הבוט שלך זקוק להרשאות הבאות:
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* קרא הודעות
+* שלח הודעות
+* צור שרשורים ציבוריים
+* שלח הודעות בשרשורים
+* קרא היסטוריית הודעות
+* השתמש בפקודות סלאש (אופציונלי)
 
-### 3. Invite Bot to Server
+### 3. הזמן את הבוט לשרת
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. עבור אל OAuth2 > מחולל כתובות URL
+2. בחר טווח "בוט"
+3. בחר את ההרשאות המפורטות למעלה
+4. השתמש בכתובת ה-URL שנוצרה כדי להזמין את הבוט לשרת שלך
 
-### 4) Configure Environment Variables
+### 4) הגדרת משתני סביבה
 
-#### Frontend (.env)
+#### ממשק קצה (.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# תצורת בוט של דיסקורד
+DISCORD_BOT_TOKEN=אסימון_הבוט_שלך_כאן
+DISCORD_CHANNEL_ID=מזהה_הערוץ_שלך_כאן
 
-# API Configuration
+# תצורת API
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# תצורת הקשר של דיסקורד
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=שם האתר שלך
 ```
 
-#### Backend Server (server/.env)
+#### שרת Backend (server/.env)
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# תצורת בוט של דיסקורד
+DISCORD_BOT_TOKEN=אסימון_הבוט_שלך_כאן
+DISCORD_CHANNEL_ID=מזהה_הערוץ_שלך_כאן
 
-# API Configuration
+# תצורת API
 PORT=3001
 
-# Discord Context Configuration
-DISCORD_CONTEXT_LEVEL=full
-DISCORD_SHOW_PAGE_CONTEXT=true
-DISCORD_SHOW_BREADCRUMBS=true
-DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SHOW_PAGE_PATH=false
-DISCORD_SHOW_TIMESTAMP=true
-DISCORD_SHOW_AUTHOR_FIELD=true
-DISCORD_CREATE_THREADS=true
+# תצורת הקשר של דיסקורד
+DISCORD_CONTEXT_LEVEL=מלא
+DISCORD_SHOW_PAGE_CONTEXT=נכון
+DISCORD_SHOW_BREADCRUMBS=נכון
+DISCORD_SHOW_SECTION_INFO=נכון
+DISCORD_SHOW_PAGE_PATH=שקר
+DISCORD_SHOW_TIMESTAMP=נכון
+DISCORD_SHOW_AUTHOR_FIELD=נכון
+DISCORD_CREATE_THREADS=נכון
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=שם האתר שלך
 ```
 
-:::warning Security Note
+:::אזהרה הערת אבטחה
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* לעולם אל תעביר קבצי `.env` לבקרת גרסאות
+* שימוש במשתני סביבה בתהליכי ייצור
+* שמור על אבטחת אסימון הבוט שלך
   :::
 
-### 5. Install Server Dependencies
+### 5. התקנת תלויות שרת
 
 ```bash
-cd server
-npm install
+שרת cd
+התקנת npm
 ```
 
-### 6. Start the Backend Server
+### 6. הפעל את שרת ה-backend
 
 ```bash
-# Development
+# פיתוח
 npm run dev
 
-# Production
+# ייצור
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. פריסת תצורה
 
-For production deployments, set environment variables in your hosting platform:
+עבור פריסות ייצור, הגדר משתני סביבה בפלטפורמת האירוח שלך:
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **ממשק קצה**: הגדר `REACT_APP_API_URL` לכתובת ה-URL של ה-API של הייצור שלך
+* **Backend**: פריסת תיקיית השרת עם אסימון הבוט ומזהה הערוץ
+* **מסד נתונים**: מסד הנתונים של SQLite ייווצר באופן אוטומטי
+* **הקשר**: הגדרת רמת ההקשר והאפשרויות של דיסקורד בהתאם להעדפותיך
 
-## How It Works
+## איך זה עובד
 
-### Complete Bidirectional Flow
+### זרימה דו-כיוונית מלאה
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **תגובה לאתר**: המשתמש שולח תגובה באמצעות טופס באתר
+2. **הודעת דיסקורד**: בוט שולח הטמעה מעוצבת לערוץ דיסקורד עם הקשר מלא של הדף
+3. **יצירת שרשור**: בוט יוצר אוטומטית שרשור לתגובות מאורגנות
+4. **תגובות דיסקורד**: משתמשי דיסקורד מגיבים בשרשור או להודעה
+5. **אחסון מסד נתונים**: הבוט מאחסן את כל התגובות והתשובות במסד הנתונים של SQLite
+6. **תצוגת אתר**: סקרים ב-API של Frontend כל 30 שניות ומציג תשובות דיסקורד
 
-### Discord Message Format
+### פורמט הודעת דיסקורד
 
-Discord embeds include:
+הטמעות דיסקורד כוללות:
 
 * **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **תיאור**: תוכן התגובה בפועל
+* **מחבר**: שם המגיב
+* **קישור**: קישור לדף המדויק
+* **שדה עמוד**: מציג את כותרת העמוד עם קישור הניתן ללחיצה
+* **חותמת זמן**: מתי פורסמה התגובה
+* **שרשור**: שרשור שנוצר אוטומטית לתגובות
 
-### Website Display
+### תצוגת אתר אינטרנט
 
-The website shows:
+האתר מציג:
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **הערות מקוריות**: הגשת טופס לאתר
+* **תגובות דיסקורד**: תגובות ממשתמשי דיסקורד עם אווטארים ושמות משתמש
+* **עדכונים בזמן אמת**: סקר אוטומטי לתשובות חדשות
+* **שיחות משורשרות**: תגובה מאורגנת → מבנה תשובה
 
-## Context Configuration
+## תצורת הקשר
 
-### Context Levels
+### רמות הקשר
 
-Configure how much context appears in Discord messages:
+הגדר כמה הקשר יופיע בהודעות דיסקורד:
 
-#### `DISCORD_CONTEXT_LEVEL=minimal`
+#### `DISCORD_CONTEXT_LEVEL=מינימלי`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **הצגות**: רק כותרת העמוד ותוכן התגובות
+* **תרחיש שימוש**: הודעות נקיות ופשוטות ללא הקשר נוסף
 
-#### `DISCORD_CONTEXT_LEVEL=basic`
+#### `DISCORD_CONTEXT_LEVEL=בסיסי`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **מציג**: כותרת העמוד, תוכן התגובות וכתובת URL של העמוד הניתנת ללחיצה
+* **מקרה שימוש**: הקשר מתון עם מידע חיוני
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full` (ברירת מחדל)
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **מציג**: כל מידע ההקשר כולל פירורי לחם, מדורים וחותמות זמן
+* **מקרה שימוש**: הקשר מקסימלי לדיונים מפורטים
 
-#### `DISCORD_CONTEXT_LEVEL=custom`
+#### `DISCORD_CONTEXT_LEVEL=מותאם אישית`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **מציג**: רק את רכיבי ההקשר שאתה מפעיל בנפרד
+* **תרחיש שימוש**: שליטה מכוונת על מה שמופיע
 
-### Individual Context Controls
+### בקרות הקשר אישיות
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+בעת שימוש ב-`DISCORD_CONTEXT_LEVEL=custom`, ניתן לשלוט בכל אלמנט:
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # הצג את כותרת העמוד ושדה כתובת ה-URL
+DISCORD_SHOW_BREADCRUMBS=true # הצג פירורי לחם לניווט
+DISCORD_SHOW_SECTION_INFO=true # הצג את המדור הראשי (Docker, Nextcloud וכו')
+DISCORD_SHOW_PAGE_PATH=false # הצג את נתיב ה-URL המלא
+DISCORD_SHOW_TIMESTAMP=true # הצג מתי פורסמה התגובה
+DISCORD_SHOW_AUTHOR_FIELD=true # הצג את שם המגיב ככותב ההטמעה
 ```
 
-### Example Context Outputs
+### תצורת חוט
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # צור שרשורים לתגובות
+DISCORD_THREAD_DURATION=1440 # זמן ארכיון אוטומטי של השרשור (בדקות)
+DISCORD_SITE_NAME=שם האתר שלך # שם האתר בתחתית העמוד
 ```
 
-**Full Context:**
+### דוגמאות לפלטי הקשר
+
+**הקשר מינימלי:**
 
 ```
-💬 New Comment: Docker Installation Guide
-👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
-
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
-
-Your Site Name • Comment System
+מדריך התקנה של Docker
+"מדריך זה היה ממש מועיל! איך אני מטפל בקונפליקטים של פורטים?"
 ```
 
-## Customization
+**הקשר בסיסי:**
 
-### Styling
+```
+💬 מדריך התקנה של Docker
+"המדריך הזה היה ממש מועיל! איך אני מטפל בקונפליקטים של פורטים?"
+[קישור לדף]
+```
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+**הקשר מלא:**
+
+```
+💬 תגובה חדשה: מדריך התקנת Docker
+👤 ג'ון דו
+"המדריך הזה היה ממש מועיל! איך אני מטפל בקונפליקטים של פורטים?"
+
+📄 עמוד: מדריך התקנת Docker
+📍 ניווט: Docker > מסמכים > התקנת Docker
+📂 מדור: Docker
+🔗 נתיב: /Docker/Docs/Installing%20Docker/Docker%20Eengine
+
+שם האתר שלך • מערכת תגובות
+```
+
+## התאמה אישית
+
+### סִגנוּן
+
+רכיב התגובות של דיסקורד משתמש במודולי CSS. ניתן להתאים אישית את המראה על ידי שינוי:
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### פורמט הודעה
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+כדי להתאים אישית את פורמט ההטמעה של Discord, ערכו את האובייקט `discordMessage` ב:
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### מיקום רכיבים
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+תגובות הדיסקורד מופיעות כברירת מחדל מתחת לתגובות גיסקוס. כדי לשנות זאת, ערכו:
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## פתרון בעיות
 
-### Bot Not Responding
+### הבוט לא מגיב
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **בדיקת אסימון בוט**: ודא ש-`DISCORD_BOT_TOKEN` נכון
+2. **אמת הרשאות**: ודא שלבוט יש את ההרשאות הנדרשות בערוץ
+3. **בדיקת מזהה הערוץ**: ודא ש-`DISCORD_CHANNEL_ID` נכון
+4. **בוט בשרת**: ודא שהבוט אכן נמצא בשרת הדיסקורד שלך
 
-### Comments Not Appearing
+### תגובות לא מופיעות
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. **שרת פועל**: בדוק אם שרת ה-backend פועל בפורט הנכון
+2. **כתובת URL של API**: אימות ש-`REACT_APP_API_URL` מצביע על שרת ה-backend שלך
+3. **מסד נתונים**: בדוק אם מסד נתונים של SQLite נוצר בתיקיית השרת
+4. **CORS**: ודא ש-CORS מוגדר עבור דומיין הקצה הקדמי שלך
 
-### Discord Replies Not Showing
+### תגובות דיסקורד לא מוצגות
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **כוונת תוכן הודעה**: ודא שהאפשרות הזו מופעלת בפורטל המפתחים של דיסקורד
+2. **הרשאות בוט**: אימות שהבוט יכול לקרוא הודעות בערוץ
+3. **חיבור למסד נתונים**: בדוק את יומני השרת לאיתור שגיאות במסד הנתונים
+4. **סקרים**: סקרים קדמיים כל 30 שניות - ייתכן שיחלוף זמן עד להופעת התשובות
 
-### Environment Variables Not Working
+### משתני סביבה לא פועלים
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **פיתוח**: הפעלה מחדש של שרתי הקצה הקדמי והקצה האחורי
+* **ייצור**: פריסה מחדש של הקצה הקדמי והקצה האחורי עם משתני סביבה נכונים
+* **קידומת**: השתמש בקידומת `REACT_APP_` רק עבור משתני ממשק משתמש
 
-### Database Issues
+### בעיות במסד הנתונים
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **הרשאות קובץ**: ודא שהשרת יכול לכתוב לתיקיית מסד הנתונים
+2. **שטח דיסק**: בדוק שטח דיסק פנוי עבור מסד הנתונים SQLite
+3. **יומני שרת**: בדוק את קונסולת השרת לאיתור שגיאות חיבור למסד הנתונים
 
-## Security Considerations
+## שיקולי אבטחה
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **אסימון בוט**: שמור את אסימון הבוט שלך בסוד ואל תעביר אותו לעולם לבקרת גרסאות
+* **הגבלת קצב**: לדיסקורד יש מגבלות קצב עבור בוטים (שונות מ-webhooks)
+* **אימות קלט**: גם הקצה הקדמי וגם הקצה האחורי מאמתים קלט מהמשתמש
+* **אבטחת מסד נתונים**: יש להגן על מסד הנתונים SQLite באמצעות הרשאות קבצים מתאימות
+* **אבטחת API**: שקלו ליישם הגבלת קצב בנקודות הקצה של ה-API שלכם
+* **CORS**: קבע את ההגדרה של CORS כראוי עבור תחום הייצור שלך
 
-## Architecture
+## אַדְרִיכָלוּת
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+ממשק חזית אתר ←→ Express API ←→ Discord Bot ←→ Discord Server
                     ↓
-                SQLite Database
+                מסד נתונים SQLite
 ```
 
-## File Structure
+## מבנה הקובץ
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # רכיב Frontend
+├── server/ # שרת Backend
+│ ├── api.js # שרת Express API
+│ ├── discord-bot.js # לוגיקת בוט של Discord
+│ ├── database.js # פונקציות מסד נתונים SQLite
+│ └── package.json # תלויות שרת
+└── docs/Discord/Docs/ # תיעוד
 ```
 
-## Browser Support
+## תמיכה בדפדפנים
 
-The Discord comments component works in all modern browsers that support:
+רכיב התגובות של דיסקורד עובד בכל הדפדפנים המודרניים התומכים ב:
 
-* ES6 fetch API
-* React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* ממשק API של אחזור ES6
+* ריאקט 18+
+* רשת CSS ו-Flexbox
+* אחסון מקומי (לשמירה על טופס)

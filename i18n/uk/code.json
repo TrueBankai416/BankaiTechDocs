@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Версія: {versionLabel}",
-    "description": ""
+    "message": "Версія: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Редагувати цю сторінку",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Результатів немає",
-    "description": ""
+    "message": "Результатів немає"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Переглянути всі результати за межами \"{context}\"",
-    "description": ""
+    "message": "Переглянути всі результати за межами \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Переглянути всі результати в \"{context}\"",
-    "description": ""
+    "message": "Переглянути всі результати в \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Переглянути всі результати",
-    "description": ""
+    "message": "Переглянути всі результати"
   },
   "theme.SearchBar.label": {
     "message": "Пошук",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "всюди",
-    "description": ""
+    "message": "всюди"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 документ знайдено|{count} документів знайдено",

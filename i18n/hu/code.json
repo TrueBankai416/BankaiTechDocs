@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Verzió: {versionLabel}",
-    "description": ""
+    "message": "Verzió: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Szerkessze ezt az oldalt",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Nincs eredmény",
-    "description": ""
+    "message": "Nincs eredmény"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Az összes eredmény megtekintése a \"{context}\" címen kívül",
-    "description": ""
+    "message": "Az összes eredmény megtekintése a \"{context}\" címen kívül"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Az összes találat megtekintése a következőn belül: \"{context}\"",
-    "description": ""
+    "message": "Az összes találat megtekintése a következőn belül: \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Az összes eredmény megtekintése",
-    "description": ""
+    "message": "Az összes eredmény megtekintése"
   },
   "theme.SearchBar.label": {
     "message": "Keresés",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Mindenhol",
-    "description": ""
+    "message": "Mindenhol"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 dokumentum található|{count} dokumentum található",

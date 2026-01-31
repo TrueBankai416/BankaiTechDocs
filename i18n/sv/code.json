@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Version: {versionLabel}",
-    "description": ""
+    "message": "Version: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Redigera den här sidan",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Inga resultat",
-    "description": ""
+    "message": "Inga resultat"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Se alla resultat utanför \"{context}\"",
-    "description": ""
+    "message": "Se alla resultat utanför \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Se alla resultat inom \"{context}\"",
-    "description": ""
+    "message": "Se alla resultat inom \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Se alla resultat",
-    "description": ""
+    "message": "Se alla resultat"
   },
   "theme.SearchBar.label": {
     "message": "Söka",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Överallt",
-    "description": ""
+    "message": "Överallt"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 dokument hittades|{count} dokument hittades",

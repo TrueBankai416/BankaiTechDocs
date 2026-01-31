@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Versio: {versionLabel}",
-    "description": ""
+    "message": "Versio: {versionLabel}"
   },
   "theme.common.editThisPage": {
     "message": "Muokkaa tätä sivua",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Ei tuloksia",
-    "description": ""
+    "message": "Ei tuloksia"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Näytä kaikki tulokset \"{context}\" ulkopuolella",
-    "description": ""
+    "message": "Näytä kaikki tulokset \"{context}\" ulkopuolella"
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Näytä kaikki tulokset alueella \"{context}\"",
-    "description": ""
+    "message": "Näytä kaikki tulokset alueella \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Katso kaikki tulokset",
-    "description": ""
+    "message": "Katso kaikki tulokset"
   },
   "theme.SearchBar.label": {
     "message": "Haku",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "Kaikkialla",
-    "description": ""
+    "message": "Kaikkialla"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 asiakirja löydetty|{count} asiakirjaa löydetty",
