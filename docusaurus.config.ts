@@ -208,6 +208,11 @@ const config: Config = {
           label: 'MS Windows',
         },
         {
+          href: 'https://crowdin.com/project/bankai-tech',
+          label: 'Help me Translate!',
+          position: 'right',
+        },
+        {
           type: 'localeDropdown',
           position: 'right',
         },
