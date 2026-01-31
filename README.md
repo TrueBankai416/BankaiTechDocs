@@ -6,6 +6,7 @@
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/TrueBankai416/BankaiTechDocs)
 ![Docker Pulls](https://img.shields.io/docker/pulls/bankaitech/nextcloud?label=nextcloud%20docker%20pulls)
 ![Discord](https://img.shields.io/discord/1217932881301737523?label=Discord)
+![localized](https://badges.crowdin.net/bankai-tech/localized.svg)
 
 This repository contains the source code for [My Homelab](https://docs.bankai-tech.com) documentation. Built with [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
 
