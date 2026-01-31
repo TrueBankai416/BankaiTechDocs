@@ -30,11 +30,11 @@ Linux Router (lnxrouter) is a powerful command-line tool that allows you to turn
 
 lnxrouter is a bash script that sets up Linux as a router, enabling you to:
 
-* **Share Internet connection** from any interface to another
-* **Create WiFi hotspots** to share your wired or wireless connection
-* **Provide NAT routing** for virtual machines and containers
-* **Set up transparent proxies** for advanced networking scenarios
-* **Manage multiple network instances** simultaneously
+- **Share Internet connection** from any interface to another
+- **Create WiFi hotspots** to share your wired or wireless connection
+- **Provide NAT routing** for virtual machines and containers
+- **Set up transparent proxies** for advanced networking scenarios
+- **Manage multiple network instances** simultaneously
 
 It's essentially a modern, feature-rich successor to the original `create_ap` tool with enhanced capabilities.
 
@@ -43,29 +43,29 @@ It's essentially a modern, feature-rich successor to the original `create_ap` to
 ### **Common Use Cases**
 
 1. **Internet Sharing**
-   * Share your laptop's wired Internet connection via WiFi
-   * Share your WiFi connection through another WiFi adapter
-   * Provide Internet to devices that don't support your network's security protocols
+   - Share your laptop's wired Internet connection via WiFi
+   - Share your WiFi connection through another WiFi adapter
+   - Provide Internet to devices that don't support your network's security protocols
 
 2. **Travel and Remote Work**
-   * Create a personal hotspot in hotels with wired-only Internet
-   * Share a single hotel WiFi connection among multiple devices
-   * Bypass device limits on public WiFi networks
+   - Create a personal hotspot in hotels with wired-only Internet
+   - Share a single hotel WiFi connection among multiple devices
+   - Bypass device limits on public WiFi networks
 
 3. **Development and Testing**
-   * Provide isolated networks for testing
-   * Route traffic through development proxies
-   * Create controlled network environments for applications
+   - Provide isolated networks for testing
+   - Route traffic through development proxies
+   - Create controlled network environments for applications
 
 4. **Legacy Device Support**
-   * Connect older devices that don't support modern WiFi security
-   * Bridge different network protocols and standards
-   * Provide connectivity to IoT devices with limited network capabilities
+   - Connect older devices that don't support modern WiFi security
+   - Bridge different network protocols and standards
+   - Provide connectivity to IoT devices with limited network capabilities
 
 5. **Privacy and Security**
-   * Create isolated networks for guest devices
-   * Route traffic through VPNs or Tor (with proper configuration)
-   * Monitor and control network traffic
+   - Create isolated networks for guest devices
+   - Route traffic through VPNs or Tor (with proper configuration)
+   - Monitor and control network traffic
 
 ## **Installation**
 
@@ -146,8 +146,8 @@ iwconfig 2>/dev/null | grep -E '^[a-z]' | cut -d' ' -f1
 
 **Example interface name substitution:**
 
-* If your interface is `wlp2s0`, change `--ap wlan0` to `--ap wlp2s0`
-* If your interface is `wlo1`, change `--ap wlan0` to `--ap wlo1`
+- If your interface is `wlp2s0`, change `--ap wlan0` to `--ap wlp2s0`
+- If your interface is `wlo1`, change `--ap wlan0` to `--ap wlo1`
 
 ## **Basic Usage**
 
@@ -239,9 +239,9 @@ sudo lnxrouter -i eth1 --dhcp-dns 8.8.8.8,1.1.1.1
 
 #### **Requirements for Multiple Hotspots**
 
-* **Multiple WiFi adapters** (each hotspot needs its own WiFi interface)
-* **Different IP ranges** for each network (use `-g` option)
-* **Different SSIDs and passwords**
+- **Multiple WiFi adapters** (each hotspot needs its own WiFi interface)
+- **Different IP ranges** for each network (use `-g` option)
+- **Different SSIDs and passwords**
 
 #### **Creating Multiple Hotspots**
 
@@ -319,8 +319,8 @@ sudo lnxrouter --stop all
    ```
 
 3. **Use `--daemon` for Background Running**
-   * Always use `--daemon` when running multiple instances
-   * Allows you to close terminal without stopping networks
+   - Always use `--daemon` when running multiple instances
+   - Allows you to close terminal without stopping networks
 
 4. **Monitor Resource Usage**
    ```bash
@@ -365,10 +365,10 @@ sudo lnxrouter --daemon --ap wlan2 "Conference-VIP" -p "vip2024" \
 
 #### **Limitations**
 
-* **One WiFi adapter per hotspot** (you can't create multiple APs on the same adapter)
-* **System resources** - each instance uses CPU/memory
-* **Bandwidth sharing** - all instances share your internet connection
-* **Driver limitations** - some WiFi drivers may not support multiple concurrent APs
+- **One WiFi adapter per hotspot** (you can't create multiple APs on the same adapter)
+- **System resources** - each instance uses CPU/memory
+- **Bandwidth sharing** - all instances share your internet connection
+- **Driver limitations** - some WiFi drivers may not support multiple concurrent APs
 
 ## **Network Interface Compatibility**
 
@@ -377,16 +377,16 @@ sudo lnxrouter --daemon --ap wlan2 "Conference-VIP" -p "vip2024" \
 **⚠️ Not all network interfaces support Access Point (AP) mode while connected to a network:**
 
 1. **Single WiFi Adapter Limitation**
-   * Most WiFi adapters cannot simultaneously connect to a network AND create an AP
-   * Solution: Use virtual interface creation or multiple adapters
+   - Most WiFi adapters cannot simultaneously connect to a network AND create an AP
+   - Solution: Use virtual interface creation or multiple adapters
 
 2. **Driver Support**
-   * Some WiFi drivers don't support AP mode at all
-   * Check your adapter's capabilities before attempting
+   - Some WiFi drivers don't support AP mode at all
+   - Check your adapter's capabilities before attempting
 
 3. **Hardware Constraints**
-   * USB WiFi adapters often have limited AP mode support
-   * Built-in adapters typically have better compatibility
+   - USB WiFi adapters often have limited AP mode support
+   - Built-in adapters typically have better compatibility
 
 ### **Check Interface Capabilities**
 
@@ -480,11 +480,11 @@ sudo lnxrouter --ap wlan0 "MyHotspot" -p "password" -o eth0
 
 **USB WiFi Card Limitations:**
 
-* Most USB WiFi adapters cannot do station + AP simultaneously, even with virtual interfaces
-* **Important**: Even if your adapter specs claim "AP mode support" (like Realtek RTL8812BU/RTL8822BU), it may still fail with this error due to driver limitations
-* The adapter may support AP mode individually but not while connected to another network
-* Consider getting a dedicated USB WiFi adapter for hotspot use, or disconnect from current WiFi first
-* Built-in WiFi adapters often have better dual-mode support
+- Most USB WiFi adapters cannot do station + AP simultaneously, even with virtual interfaces
+- **Important**: Even if your adapter specs claim "AP mode support" (like Realtek RTL8812BU/RTL8822BU), it may still fail with this error due to driver limitations
+- The adapter may support AP mode individually but not while connected to another network
+- Consider getting a dedicated USB WiFi adapter for hotspot use, or disconnect from current WiFi first
+- Built-in WiFi adapters often have better dual-mode support
 
 #### **"Operation not supported"**
 
@@ -559,9 +559,9 @@ sudo dnf install wireless-tools  # Fedora
 
 **Common locations for `iw`:**
 
-* `/usr/sbin/iw` (most common)
-* `/sbin/iw`
-* `/usr/bin/iw`
+- `/usr/sbin/iw` (most common)
+- `/sbin/iw`
+- `/usr/bin/iw`
 
 ### **Connection Issues**
 
@@ -698,9 +698,9 @@ sudo lnxrouter -i eth0 -o wlan0 --dhcp-dns 8.8.8.8
 ### **Best Practices**
 
 1. **Use Strong Passwords**
-   * Minimum 12 characters
-   * Mix of letters, numbers, and symbols
-   * Avoid dictionary words
+   - Minimum 12 characters
+   - Mix of letters, numbers, and symbols
+   - Avoid dictionary words
 
 2. **Enable Client Isolation**
 
@@ -728,10 +728,10 @@ sudo lnxrouter -i eth0 -o wlan0 --dhcp-dns 8.8.8.8
 
 ### **Privacy Considerations**
 
-* Be aware that you're routing others' traffic
-* Consider legal implications in your jurisdiction
-* Log traffic if required by local regulations
-* Use `--ban-priv` to protect your private network
+- Be aware that you're routing others' traffic
+- Consider legal implications in your jurisdiction
+- Log traffic if required by local regulations
+- Use `--ban-priv` to protect your private network
 
 ## **Transparent Proxy Configuration**
 
@@ -744,20 +744,20 @@ A transparent proxy intercepts network traffic automatically without requiring c
 ### **Common Use Cases**
 
 1. **Privacy and Anonymity**
-   * Route traffic through Tor for enhanced privacy
-   * Use VPN-like functionality at the network level
+   - Route traffic through Tor for enhanced privacy
+   - Use VPN-like functionality at the network level
 
 2. **Content Filtering**
-   * Block malicious websites and content
-   * Implement parental controls
+   - Block malicious websites and content
+   - Implement parental controls
 
 3. **Traffic Monitoring**
-   * Log and analyze network traffic
-   * Monitor bandwidth usage per client
+   - Log and analyze network traffic
+   - Monitor bandwidth usage per client
 
 4. **Development and Testing**
-   * Intercept API calls for debugging
-   * Test applications with modified network conditions
+   - Intercept API calls for debugging
+   - Test applications with modified network conditions
 
 ### **Basic Transparent Proxy Setup**
 
@@ -783,16 +783,16 @@ sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
 
 **Common Issues:**
 
-* **Connected but no internet**: Usually means Tor service isn't running or configured properly
-* **DNS not working**: Tor DNSPort configuration missing
-* **IP address mismatch**: Tor configuration must match lnxrouter gateway IP
+- **Connected but no internet**: Usually means Tor service isn't running or configured properly
+- **DNS not working**: Tor DNSPort configuration missing
+- **IP address mismatch**: Tor configuration must match lnxrouter gateway IP
 
 **Understanding the IP Addresses:**
 
-* `192.168.55.1` is the IP address lnxrouter assigns to itself in the network it creates
-* You can change this with the `-g` option (e.g., `-g 10.0.50.1` or `-g 172.16.100.1`)
-* The `.55.1` part means "IP ending in .55.1" - you can use any valid private IP
-* IPv6 `fd00:5:6:7::` is a private IPv6 prefix - also customizable
+- `192.168.55.1` is the IP address lnxrouter assigns to itself in the network it creates
+- You can change this with the `-g` option (e.g., `-g 10.0.50.1` or `-g 172.16.100.1`)
+- The `.55.1` part means "IP ending in .55.1" - you can use any valid private IP
+- IPv6 `fd00:5:6:7::` is a private IPv6 prefix - also customizable
 
 **Quick Tor Configuration:**
 
@@ -828,9 +828,9 @@ sudo lnxrouter --ap wlan0 "TorHotspot" -p "torpassword123" \
 
 **Understanding Proxy Configuration:**
 
-* `YOUR_PROXY_IP`: The IP address of your proxy server (e.g., `127.0.0.1` for local, `10.0.0.100` for network proxy)
-* `YOUR_PROXY_PORT`: The port your proxy listens on (e.g., `8080`, `3128`, `1080`)
-* `local_ip`: Must match your lnxrouter IP (set with `-g` option)
+- `YOUR_PROXY_IP`: The IP address of your proxy server (e.g., `127.0.0.1` for local, `10.0.0.100` for network proxy)
+- `YOUR_PROXY_PORT`: The port your proxy listens on (e.g., `8080`, `3128`, `1080`)
+- `local_ip`: Must match your lnxrouter IP (set with `-g` option)
 
 **Common Proxy Examples:**
 
@@ -1108,9 +1108,9 @@ sudo lnxrouter --ap wlan0 "TorHotspot" -p "password" \
 
 **When to use each:**
 
-* **Tor Direct**: Simpler, better performance, recommended for most Tor use cases
-* **Redsocks → Tor**: Useful if you need HTTP proxy features or proxy chaining
-* **Separate purposes**: Use Tor for some traffic, different proxy for other traffic
+- **Tor Direct**: Simpler, better performance, recommended for most Tor use cases
+- **Redsocks → Tor**: Useful if you need HTTP proxy features or proxy chaining
+- **Separate purposes**: Use Tor for some traffic, different proxy for other traffic
 
 ### **Transparent Proxy Limitations**
 
@@ -1130,37 +1130,37 @@ Sandbox networks provide isolated, controlled environments where clients can acc
 
 A sandbox network creates a secure, isolated environment where:
 
-* Clients can access the Internet normally
-* Clients cannot access your local private network (192.168.x.x, 10.x.x.x, etc.)
-* Clients cannot communicate with each other
-* Your personal information and local services remain protected
+- Clients can access the Internet normally
+- Clients cannot access your local private network (192.168.x.x, 10.x.x.x, etc.)
+- Clients cannot communicate with each other
+- Your personal information and local services remain protected
 
 ### **Sandbox Use Cases**
 
 1. **Guest Networks**
-   * Provide Internet to visitors without exposing your private network
-   * Protect smart home devices and local services
+   - Provide Internet to visitors without exposing your private network
+   - Protect smart home devices and local services
 
 2. **Public WiFi Scenarios**
-   * Share Internet safely in public spaces
-   * Protect against malicious clients
+   - Share Internet safely in public spaces
+   - Protect against malicious clients
 
 3. **Testing and Development**
-   * Isolate test devices and applications
-   * Create controlled network environments
+   - Isolate test devices and applications
+   - Create controlled network environments
 
 4. **IoT Device Management**
-   * Isolate smart devices that don't need local network access
-   * Prevent IoT devices from accessing sensitive resources
+   - Isolate smart devices that don't need local network access
+   - Prevent IoT devices from accessing sensitive resources
 
 ### **Basic Sandbox Setup**
 
 **Understanding Sandbox IPs:**
 
-* lnxrouter creates its own private network with IPs like `192.168.xxx.xxx`
-* You can customize the IP range with `-g` option
-* Default behavior: lnxrouter automatically picks an available IP range
-* Example: `-g 192.168.100.1` creates network 192.168.100.0/24 with gateway at .100.1
+- lnxrouter creates its own private network with IPs like `192.168.xxx.xxx`
+- You can customize the IP range with `-g` option
+- Default behavior: lnxrouter automatically picks an available IP range
+- Example: `-g 192.168.100.1` creates network 192.168.100.0/24 with gateway at .100.1
 
 ```bash
 # Create isolated guest network (automatic IP assignment)
@@ -1205,11 +1205,11 @@ sudo lnxrouter -i eth1 \
 
 When using `--ban-priv`, clients cannot access:
 
-* `192.168.0.0/16` - Most home networks
-* `10.0.0.0/8` - Enterprise networks
-* `172.16.0.0/12` - Private networks
-* `127.0.0.0/8` - Localhost
-* `169.254.0.0/16` - Link-local addresses
+- `192.168.0.0/16` - Most home networks
+- `10.0.0.0/8` - Enterprise networks
+- `172.16.0.0/12` - Private networks
+- `127.0.0.0/8` - Localhost
+- `169.254.0.0/16` - Link-local addresses
 
 ### **Monitoring Sandbox Networks**
 
@@ -1286,12 +1286,12 @@ sudo lnxrouter --ap wlan0 "SecureGuest" -p "SecurePass2024!" \
 
 This configuration provides:
 
-* Complete network isolation from your private network
-* All traffic routed through Tor for enhanced privacy
-* Client isolation preventing lateral movement
-* DNS monitoring and logging
-* Hidden network reducing discoverability
-* Random MAC address preventing AP tracking
+- Complete network isolation from your private network
+- All traffic routed through Tor for enhanced privacy
+- Client isolation preventing lateral movement
+- DNS monitoring and logging
+- Hidden network reducing discoverability
+- Random MAC address preventing AP tracking
 
 ### **Troubleshooting Sandbox Networks**
 
@@ -1500,7 +1500,7 @@ sudo tee /usr/local/bin/start-lnxrouter.sh << 'EOF'
 
 # Wait for network interfaces
 echo "Waiting for network interfaces..."
-while ! ip link show wlan0 >/dev/null 2>&1; do
+while ! ip link show wlan0 >/dev/null 2>&amp;1; do
     sleep 2
 done
 
@@ -1562,7 +1562,7 @@ whereis lnxrouter
 ip link show
 
 # Add dependency checking to scripts
-if ! ip link show wlan0 >/dev/null 2>&1; then
+if ! ip link show wlan0 >/dev/null 2>&amp;1; then
     echo "Error: wlan0 interface not found"
     exit 1
 fi
@@ -1639,7 +1639,7 @@ echo "Waiting for NetworkManager to initialize..."
 sleep 20
 
 # Check if interface exists
-if ! ip link show "$INTERFACE" >/dev/null 2>&1; then
+if ! ip link show "$INTERFACE" >/dev/null 2>&amp;1; then
     echo "Error: Interface $INTERFACE not found"
     exit 1
 fi
@@ -1731,7 +1731,7 @@ PASSWORD="MyPassword123"
 echo "Starting WiFi reset sequence..."
 
 # Check if rfkill is available
-if command -v rfkill >/dev/null 2>&1; then
+if command -v rfkill >/dev/null 2>&amp;1; then
     echo "Using rfkill for WiFi reset..."
 
     # Step 1: Turn off WiFi completely
@@ -1777,7 +1777,7 @@ fi
 # Wait for interface to come up
 echo "Waiting for $INTERFACE to initialize..."
 timeout=30
-while [ $timeout -gt 0 ] && ! ip link show "$INTERFACE" >/dev/null 2>&1; do
+while [ $timeout -gt 0 ] && ! ip link show "$INTERFACE" >/dev/null 2>&amp;1; do
     sleep 1
     ((timeout--))
 done
@@ -1801,7 +1801,7 @@ if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
     echo "Hotspot started successfully"
 
     # Step 6: Now we can unblock WiFi since lnxrouter has control
-    if command -v rfkill >/dev/null 2>&1; then
+    if command -v rfkill >/dev/null 2>&amp;1; then
         echo "Unblocking WiFi now that hotspot is established..."
         rfkill unblock wifi
     fi
@@ -1811,7 +1811,7 @@ if /usr/local/bin/lnxrouter --list-running | grep -q "$INTERFACE"; then
 else
     echo "Failed to start hotspot after WiFi reset"
     nmcli dev set "$INTERFACE" managed yes
-    if command -v rfkill >/dev/null 2>&1; then
+    if command -v rfkill >/dev/null 2>&amp;1; then
         rfkill unblock wifi
     fi
     exit 1
@@ -1850,11 +1850,11 @@ sudo systemctl status lnxrouter-hotspot.service
 
 **When to use WiFi Radio Reset:**
 
-* Other solutions still show "Device or resource busy"
-* WiFi interface appears "stuck" or unresponsive
-* Manual process of airplane mode toggle works
-* Certain Intel WiFi chipsets (like CNVi in your case)
-* USB WiFi adapters with problematic drivers
+- Other solutions still show "Device or resource busy"
+- WiFi interface appears "stuck" or unresponsive
+- Manual process of airplane mode toggle works
+- Certain Intel WiFi chipsets (like CNVi in your case)
+- USB WiFi adapters with problematic drivers
 
 **Quick Debug Commands:**
 
@@ -1983,11 +1983,11 @@ lnxrouter automatically cleans up when stopped, but some changes persist:
 
 **Persistent Changes:**
 
-* IP forwarding enabled (`/proc/sys/net/ipv4/ip_forward = 1`)
-* IPv6 forwarding enabled
-* WiFi interface unblocked (`rfkill`)
-* WiFi country code setting
-* Some AppArmor policy changes
+- IP forwarding enabled (`/proc/sys/net/ipv4/ip_forward = 1`)
+- IPv6 forwarding enabled
+- WiFi interface unblocked (`rfkill`)
+- WiFi country code setting
+- Some AppArmor policy changes
 
 **Manual Cleanup (if needed):**
 
@@ -2012,10 +2012,10 @@ Remember that not all WiFi adapters support simultaneous connection and AP mode,
 
 **Key Takeaways:**
 
-* Always run with `sudo` for proper permissions
-* Check WiFi adapter AP mode compatibility before starting
-* Use virtual interfaces when sharing the same WiFi adapter
-* Monitor connected clients and maintain security best practices
-* Understand that some system changes persist after shutdown
+- Always run with `sudo` for proper permissions
+- Check WiFi adapter AP mode compatibility before starting
+- Use virtual interfaces when sharing the same WiFi adapter
+- Monitor connected clients and maintain security best practices
+- Understand that some system changes persist after shutdown
 
 <BuyMeACoffeeButton />
