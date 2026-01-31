@@ -1,85 +1,85 @@
 ---
-title: Comments Integration
-description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
+title: 评论集成
+description: 完整指南：如何将 Discord 双向评论与 Docusaurus 集成，包括设置、配置和故障排除。
 image: /img/social/discord-social.jpg
 sidebar_position: 2
 ---
 
-# Discord Comments Integration
+# Discord评论集成
 
-This documentation site includes a **bidirectional Discord comments integration** that allows visitors to send comments to your Discord server AND displays Discord replies back on the website alongside the existing GitHub-based Giscus comments.
+该文档网站包含一个**双向 Discord 评论集成**，允许访问者向您的 Discord 服务器发送评论，并在网站上显示 Discord 回复以及现有的基于 GitHub 的 Giscus 评论。
 
-## Features
+## 特征
 
-* **Bidirectional Communication**: Website comments → Discord, Discord replies → Website
-* **Dual Comment System**: Both Giscus (GitHub-based) and Discord comments work together
-* **Rich Discord Embeds**: Comments appear as formatted embeds with full page context
-* **Thread Management**: Automatic thread creation for organized replies
-* **Real-time Updates**: Website displays Discord replies automatically
-* **Full Page Context**: Comments include page title, URL, and navigation context
-* **User Avatars**: Discord replies show user avatars and usernames
-* **Responsive Design**: Works on both desktop and mobile devices
+* **双向沟通**：网站评论→Discord，Discord回复→网站
+* **双重评论系统**：Giscus（基于GitHub）和Discord评论功能协同工作。
+* **丰富的 Discord 嵌入内容**：评论以格式化的嵌入内容形式显示，并包含完整的页面上下文。
+* **主题管理**：自动创建主题以进行有序回复
+* **实时更新**：网站自动显示 Discord 回复
+* **完整页面上下文**：评论包含页面标题、URL 和导航上下文
+* **用户头像**：Discord 回复会显示用户头像和用户名
+* **响应式设计**：同时适用于桌面和移动设备
 
-## Setup Instructions
+## 安装说明
 
-### 1. Create a Discord Bot
+### 1. 创建一个 Discord 机器人
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application
-3. Go to "Bot" section and create a bot
-4. Copy the bot token
-5. Under "Privileged Gateway Intents", enable:
-   * **Message Content Intent**
-   * **Server Members Intent** (optional)
+1. 前往[Discord开发者门户](https://discord.com/developers/applications)
+2. 创建新应用程序
+3. 前往“机器人”部分并创建一个机器人
+4. 复制机器人令牌
+5. 在“特权网关意图”下，启用：
+   * **消息内容意图**
+   * **服务器成员意图**（可选）
 
-### 2) Configure Bot Permissions
+### 2) 配置机器人权限
 
-Your bot needs these permissions:
+您的机器人需要以下权限：
 
-* Read Messages
-* Send Messages
-* Create Public Threads
-* Send Messages in Threads
-* Read Message History
-* Use Slash Commands (optional)
+* 已读消息
+* 发送消息
+* 创建公共讨论串
+* 在对话中发送消息
+* 查看消息历史记录
+* 使用斜杠命令（可选）
 
-### 3. Invite Bot to Server
+### 3. 邀请机器人加入服务器
 
-1. Go to OAuth2 > URL Generator
-2. Select "bot" scope
-3. Select the permissions listed above
-4. Use the generated URL to invite the bot to your server
+1. 前往 OAuth2 > URL 生成器
+2. 选择“机器人”范围
+3. 请选择以上列出的权限。
+4. 使用生成的 URL 将机器人邀请到您的服务器
 
-### 4) Configure Environment Variables
+### 4) 配置环境变量
 
-#### Frontend (.env)
+#### 前端（.env）
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord 机器人配置
+DISCORD_BOT_TOKEN=你的机器人令牌
+DISCORD_CHANNEL_ID=你的频道 ID
 
-# API Configuration
+# API 配置
 REACT_APP_API_URL=http://localhost:3001
 
-# Discord Context Configuration
+# Discord 上下文配置
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_BREADCRUMBS=true
 DISCORD_SHOW_SECTION_INFO=true
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=你的站点名称
 ```
 
-#### Backend Server (server/.env)
+#### 后端服务器（server/.env）
 
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your_bot_token_here
-DISCORD_CHANNEL_ID=your_channel_id_here
+# Discord 机器人配置
+DISCORD_BOT_TOKEN=你的机器人令牌
+DISCORD_CHANNEL_ID=你的频道 ID
 
-# API Configuration
+# API 配置
 PORT=3001
 
-# Discord Context Configuration
+# Discord 上下文配置
 DISCORD_CONTEXT_LEVEL=full
 DISCORD_SHOW_PAGE_CONTEXT=true
 DISCORD_SHOW_BREADCRUMBS=true
@@ -89,249 +89,249 @@ DISCORD_SHOW_TIMESTAMP=true
 DISCORD_SHOW_AUTHOR_FIELD=true
 DISCORD_CREATE_THREADS=true
 DISCORD_THREAD_DURATION=1440
-DISCORD_SITE_NAME=Your Site Name
+DISCORD_SITE_NAME=您的网站名称
 ```
 
-:::warning Security Note
+:::警告 安全提示
 
-* Never commit `.env` files to version control
-* Use environment variables in production
-* Keep your bot token secure
+* 永远不要将 `.env` 文件提交到版本控制系统中。
+* 在生产环境中使用环境变量
+* 请妥善保管您的机器人令牌
   :::
 
-### 5. Install Server Dependencies
+### 5. 安装服务器依赖项
 
 ```bash
 cd server
 npm install
 ```
 
-### 6. Start the Backend Server
+### 6. 启动后端服务器
 
 ```bash
-# Development
+# 开发环境
 npm run dev
 
-# Production
+# 生产环境
 npm start
 ```
 
-### 7. Deploy Configuration
+### 7. 部署配置
 
-For production deployments, set environment variables in your hosting platform:
+对于生产环境部署，请在您的托管平台中设置环境变量：
 
-* **Frontend**: Set `REACT_APP_API_URL` to your production API URL
-* **Backend**: Deploy the server folder with bot token and channel ID
-* **Database**: SQLite database will be created automatically
-* **Context**: Configure Discord context level and options per your preferences
+* **前端**：将 `REACT_APP_API_URL` 设置为您的生产 API URL
+* **后端**：部署包含机器人令牌和频道 ID 的服务器文件夹
+* **数据库**：将自动创建 SQLite 数据库。
+* **上下文**：根据您的喜好配置 Discord 上下文级别和选项
 
-## How It Works
+## 工作原理
 
-### Complete Bidirectional Flow
+### 完全双向流
 
-1. **Website Comment**: User submits comment via website form
-2. **Discord Message**: Bot sends formatted embed to Discord channel with full page context
-3. **Thread Creation**: Bot automatically creates a thread for organized replies
-4. **Discord Replies**: Discord users reply in the thread or to the message
-5. **Database Storage**: Bot stores all comments and replies in SQLite database
-6. **Website Display**: Frontend polls API every 30 seconds and displays Discord replies
+1. **网站评论**：用户通过网站表单提交评论
+2. **Discord 消息**：机器人向 Discord 频道发送包含完整页面内容的格式化嵌入消息
+3. **主题创建**：机器人会自动创建一个主题，用于有序回复。
+4. **Discord 回复**：Discord 用户可以在帖子或消息中回复。
+5. **数据库存储**：机器人将所有评论和回复存储在 SQLite 数据库中。
+6. **网站显示**：前端每 30 秒通过 API 发起一次投票，并显示 Discord 回复。
 
-### Discord Message Format
+### Discord 消息格式
 
-Discord embeds include:
+Discord嵌入内容包括：
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Description**: The actual comment content
-* **Author**: The commenter's name
-* **URL**: Clickable link to the exact page
-* **Page Field**: Shows page title with clickable link
-* **Timestamp**: When the comment was posted
-* **Thread**: Auto-created thread for replies
+* **标题**: "💬 新评论: \{页面标题}"
+* **描述**：实际评论内容
+* **作者**：评论者姓名
+* **URL**：指向确切页面的可点击链接
+* **页面字段**：显示页面标题及可点击链接
+* **时间戳**：评论发布时间
+* **主题帖**：自动创建的回复主题帖
 
-### Website Display
+### 网站显示
 
-The website shows:
+网站显示：
 
-* **Original Comments**: Website form submissions
-* **Discord Replies**: Replies from Discord users with avatars and usernames
-* **Real-time Updates**: Automatic polling for new replies
-* **Threaded Conversations**: Organized comment → reply structure
+* **原始评论**：网站表单提交
+* **Discord 回复**：来自带有头像和用户名的 Discord 用户的回复
+* **实时更新**：自动轮询以获取新回复
+* **主题式对话**：有条理的评论→回复结构
 
-## Context Configuration
+## 上下文配置
 
-### Context Levels
+### 上下文层次
 
-Configure how much context appears in Discord messages:
+配置 Discord 消息中显示的上下文信息量：
 
 #### `DISCORD_CONTEXT_LEVEL=minimal`
 
-* **Shows**: Just page title and comment content
-* **Use case**: Clean, simple messages without extra context
+* **显示内容**：仅显示页面标题和评论内容
+* **使用场景**：简洁明了的消息，无需额外上下文。
 
 #### `DISCORD_CONTEXT_LEVEL=basic`
 
-* **Shows**: Page title, comment content, and clickable page URL
-* **Use case**: Moderate context with essential information
+* **显示内容**：页面标题、评论内容和可点击的页面网址
+* **使用场景**：包含必要信息的适度上下文
 
-#### `DISCORD_CONTEXT_LEVEL=full` (default)
+#### `DISCORD_CONTEXT_LEVEL=full`（默认值）
 
-* **Shows**: All context information including breadcrumbs, sections, timestamps
-* **Use case**: Maximum context for detailed discussions
+* **显示**：所有上下文信息，包括面包屑导航、章节、时间戳
+* **使用场景**：为详细讨论提供最大程度的背景信息
 
 #### `DISCORD_CONTEXT_LEVEL=custom`
 
-* **Shows**: Only the context elements you enable individually
-* **Use case**: Fine-tuned control over what appears
+* **显示**：仅显示您单独启用的上下文元素。
+* **使用场景**：对显示内容进行精细控制
 
-### Individual Context Controls
+### 个体背景控制
 
-When using `DISCORD_CONTEXT_LEVEL=custom`, you can control each element:
-
-```env
-DISCORD_SHOW_PAGE_CONTEXT=true      # Show page title and URL field
-DISCORD_SHOW_BREADCRUMBS=true       # Show navigation breadcrumbs
-DISCORD_SHOW_SECTION_INFO=true      # Show main section (Docker, Nextcloud, etc.)
-DISCORD_SHOW_PAGE_PATH=false        # Show full URL path
-DISCORD_SHOW_TIMESTAMP=true         # Show when comment was posted
-DISCORD_SHOW_AUTHOR_FIELD=true      # Show commenter name as embed author
-```
-
-### Thread Configuration
+使用 `DISCORD_CONTEXT_LEVEL=custom` 时，您可以控制每个元素：
 
 ```env
-DISCORD_CREATE_THREADS=true         # Create threads for replies
-DISCORD_THREAD_DURATION=1440        # Thread auto-archive time (minutes)
-DISCORD_SITE_NAME=Your Site Name    # Site name in footer
+DISCORD_SHOW_PAGE_CONTEXT=true # 显示页面标题和 URL 字段
+DISCORD_SHOW_BREADCRUMBS=true # 显示导航面包屑
+DISCORD_SHOW_SECTION_INFO=true # 显示主要部分（Docker、Nextcloud 等）
+DISCORD_SHOW_PAGE_PATH=false # 显示完整 URL 路径
+DISCORD_SHOW_TIMESTAMP=true # 显示评论发布时间
+DISCORD_SHOW_AUTHOR_FIELD=true # 将评论者姓名显示为嵌入作者
 ```
 
-### Example Context Outputs
+### 线程配置
 
-**Minimal Context:**
-
-```
-Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-```
-
-**Basic Context:**
-
-```
-💬 Docker Installation Guide
-"This tutorial was really helpful! How do I handle port conflicts?"
-[Link to page]
+```env
+DISCORD_CREATE_THREADS=true # 创建回复主题
+DISCORD_THREAD_DURATION=1440 # 主题自动存档时间（分钟）
+DISCORD_SITE_NAME=您的网站名称 # 页脚中的网站名称
 ```
 
-**Full Context:**
+### 示例上下文输出
+
+**最简背景：**
 
 ```
-💬 New Comment: Docker Installation Guide
+Docker 安装指南
+“这个教程真的很有帮助！我该如何处理端口冲突？”
+```
+
+**基本背景：**
+
+```
+💬 Docker 安装指南
+“这个教程真的很有帮助！我该如何处理端口冲突？”
+[页面链接]
+```
+
+**完整上下文：**
+
+```
+💬 新评论：Docker 安装指南
 👤 John Doe
-"This tutorial was really helpful! How do I handle port conflicts?"
+“这篇教程真的很有帮助！我该如何处理端口冲突？”
 
-📄 Page: Docker Installation Guide
-📍 Navigation: Docker > Docs > Installing Docker
-📂 Section: Docker
-🔗 Path: /Docker/Docs/Installing%20Docker/Docker%20Engine
+📄 页面：Docker 安装指南
+📍 导航：Docker > 文档 > 安装 Docker
+📂 部分：Docker
+🔗 路径：/Docker/Docs/Installing%20Docker/Docker%20Engine
 
-Your Site Name • Comment System
+您的网站名称 • 评论系统
 ```
 
-## Customization
+## 定制
 
-### Styling
+### 造型
 
-The Discord comments component uses CSS modules. You can customize the appearance by modifying:
+Discord评论组件使用了CSS模块。 您可以通过修改以下内容来自定义外观：
 
 ```
 src/components/DiscordComments/styles.module.css
 ```
 
-### Message Format
+### 消息格式
 
-To customize the Discord embed format, edit the `discordMessage` object in:
+要自定义 Discord 嵌入格式，请编辑以下位置的 `discordMessage` 对象：
 
 ```
 src/components/DiscordComments/index.tsx
 ```
 
-### Component Placement
+### 元件放置
 
-The Discord comments appear below the Giscus comments by default. To change this, modify:
+默认情况下，Discord 评论显示在 Giscus 评论下方。 要更改此设置，请修改：
 
 ```
 src/theme/DocItem/Layout/index.js
 ```
 
-## Troubleshooting
+## 故障排除
 
-### Bot Not Responding
+### 机器人无响应
 
-1. **Check bot token**: Ensure `DISCORD_BOT_TOKEN` is correct
-2. **Verify permissions**: Make sure bot has required permissions in the channel
-3. **Check channel ID**: Ensure `DISCORD_CHANNEL_ID` is correct
-4. **Bot in server**: Verify bot is actually in your Discord server
+1. **检查机器人令牌**：确保 `DISCORD_BOT_TOKEN` 正确
+2. **验证权限**：确保机器人拥有频道所需的权限。
+3. **检查频道 ID**：确保 `DISCORD_CHANNEL_ID` 正确
+4. **服务器中的机器人**：请确认机器人确实在您的 Discord 服务器上。
 
-### Comments Not Appearing
+### 评论未显示
 
-1. **Server running**: Check if backend server is running on correct port
-2. **API URL**: Verify `REACT_APP_API_URL` points to your backend server
-3. **Database**: Check if SQLite database is being created in server folder
-4. **CORS**: Ensure CORS is configured for your frontend domain
+1. 服务器运行中：检查后端服务器是否在正确的端口上运行
+2. **API URL**：请验证 `REACT_APP_API_URL` 是否指向您的后端服务器。
+3. **数据库**：检查服务器文件夹中是否正在创建 SQLite 数据库
+4. **CORS**：请确保已为您的前端域配置 CORS
 
-### Discord Replies Not Showing
+### Discord回复不显示
 
-1. **Message Content Intent**: Ensure this is enabled in Discord Developer Portal
-2. **Bot permissions**: Verify bot can read messages in the channel
-3. **Database connection**: Check server logs for database errors
-4. **Polling**: Frontend polls every 30 seconds - replies may take time to appear
+1. **消息内容意图**：请确保已在 Discord 开发者门户中启用此功能。
+2. **机器人权限**：验证机器人是否可以读取频道中的消息
+3. **数据库连接**：检查服务器日志是否存在数据库错误
+4. **轮询**：前端每 30 秒进行一次轮询 - 回复可能需要一些时间才能显示。
 
-### Environment Variables Not Working
+### 环境变量不起作用
 
-* **Development**: Restart both frontend and backend servers
-* **Production**: Redeploy both frontend and backend with correct environment variables
-* **Prefix**: Use `REACT_APP_` prefix only for frontend variables
+* **开发**：重启前端和后端服务器
+* **生产环境**：使用正确的环境变量重新部署前端和后端。
+* **前缀**：仅前端变量使用 `REACT_APP_` 前缀
 
-### Database Issues
+### 数据库问题
 
-1. **File permissions**: Ensure server can write to the database directory
-2. **Disk space**: Check available disk space for SQLite database
-3. **Server logs**: Check server console for database connection errors
+1. **文件权限**：确保服务器可以写入数据库目录
+2. **磁盘空间**：检查 SQLite 数据库的可用磁盘空间
+3. 服务器日志：检查服务器控制台是否存在数据库连接错误
 
-## Security Considerations
+## 安全考量
 
-* **Bot Token**: Keep your bot token secret and never commit it to version control
-* **Rate Limiting**: Discord has rate limits for bots (different from webhooks)
-* **Input Validation**: Both frontend and backend validate user input
-* **Database Security**: SQLite database should be protected with proper file permissions
-* **API Security**: Consider implementing rate limiting on your API endpoints
-* **CORS**: Configure CORS properly for your production domain
+* **机器人令牌**：请妥善保管您的机器人令牌，切勿将其提交到版本控制系统中。
+* **速率限制**：Discord 对机器人有速率限制（与 Webhook 不同）。
+* **输入验证**：前端和后端都会验证用户输入
+* **数据库安全**：SQLite 数据库应使用适当的文件权限进行保护。
+* **API 安全**：考虑对您的 API 端点实施速率限制。
+* **CORS**：请为您的生产域正确配置 CORS。
 
-## Architecture
+## 建筑学
 
 ```
-Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
+网站前端 ←→ Express API ←→ Discord 机器人 ←→ Discord 服务器
                     ↓
-                SQLite Database
+                SQLite 数据库
 ```
 
-## File Structure
+## 文件结构
 
 ```
 project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
+├── src/components/DiscordComments/ # 前端组件
+├── server/ # 后端服务器
+│ ├── api.js # Express API 服务器
+│ ├── discord-bot.js # Discord 机器人逻辑
+│ ├── database.js # SQLite 数据库函数
+│ └── package.json # 服务器依赖项
+└── docs/Discord/Docs/ # 文档
 ```
 
-## Browser Support
+## 浏览器支持
 
-The Discord comments component works in all modern browsers that support:
+Discord评论组件可在所有支持以下功能的现代浏览器中使用：
 
 * ES6 fetch API
 * React 18+
-* CSS Grid and Flexbox
-* Local Storage (for form persistence)
+* CSS Grid 和 Flexbox
+* 本地存储（用于表单持久化）
