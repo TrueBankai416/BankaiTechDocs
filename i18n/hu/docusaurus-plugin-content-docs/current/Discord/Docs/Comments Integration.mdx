@@ -11,46 +11,46 @@ Ez a dokumentációs oldal egy **kétirányú Discord hozzászólásintegráció
 
 ## Jellemzők
 
-* **Kétirányú kommunikáció**: Weboldalhozzászólások → Discord, Discord válaszok → Weboldal
-* **Kettős kommentrendszer**: A Giscus (GitHub-alapú) és a Discord kommentek együtt működnek.
-* **Részletes Discord beágyazások**: A hozzászólások formázott beágyazásként jelennek meg, teljes oldalas kontextussal.
-* **Témakezelés**: Automatikus témalétrehozás a rendszerezett válaszokhoz
-* **Valós idejű frissítések**: A weboldal automatikusan megjeleníti a Discord válaszokat
-* **Teljes oldal kontextusa**: A megjegyzések tartalmazzák az oldal címét, URL-címét és navigációs kontextusát.
-* **Felhasználói avatarok**: A Discord válaszok felhasználói avatarokat és felhasználóneveket mutatnak.
-* **Reszponzív dizájn**: Asztali gépen és mobileszközökön is működik
+- **Kétirányú kommunikáció**: Weboldalhozzászólások → Discord, Discord válaszok → Weboldal
+- **Kettős kommentrendszer**: A Giscus (GitHub-alapú) és a Discord kommentek együtt működnek.
+- **Részletes Discord beágyazások**: A hozzászólások formázott beágyazásként jelennek meg, teljes oldalas kontextussal.
+- **Témakezelés**: Automatikus témalétrehozás a rendszerezett válaszokhoz
+- **Valós idejű frissítések**: A weboldal automatikusan megjeleníti a Discord válaszokat
+- **Teljes oldal kontextusa**: A megjegyzések tartalmazzák az oldal címét, URL-címét és navigációs kontextusát.
+- **Felhasználói avatarok**: A Discord válaszok felhasználói avatarokat és felhasználóneveket mutatnak.
+- **Reszponzív dizájn**: Asztali gépen és mobileszközökön is működik
 
 ## Beállítási utasítások
 
-### 1. Hozz létre egy Discord Botot
+### 1. Create a Discord Bot
 
 1. Menj a [Discord fejlesztői portálra](https://discord.com/developers/applications)
 2. Új alkalmazás létrehozása
 3. Lépj a „Bot” részhez, és hozz létre egy botot.
 4. Másolja a bot tokent
 5. A „Privileged Gateway Intents” (Kiemelt átjáró szándékai) alatt engedélyezze a következőket:
-   * **Üzenet tartalmának szándéka**
-   * **Szervertagok szándéka** (opcionális)
+   - **Üzenet tartalmának szándéka**
+   - **Szervertagok szándéka** (opcionális)
 
-### 2) Botengedélyek konfigurálása
+### 2. Configure Bot Permissions
 
 A botodnak ezekre az engedélyekre van szüksége:
 
-* Üzenetek olvasása
-* Üzenetek küldése
-* Nyilvános szálak létrehozása
-* Üzenetek küldése szálakban
-* Üzenetelőzmények olvasása
-* Perjelparancsok használata (opcionális)
+- Üzenetek olvasása
+- Üzenetek küldése
+- Nyilvános szálak létrehozása
+- Üzenetek küldése szálakban
+- Üzenetelőzmények olvasása
+- Perjelparancsok használata (opcionális)
 
-### 3. Bot meghívása a szerverre
+### 3. Invite Bot to Server
 
 1. Lépjen az OAuth2 > URL-generátor menüpontra.
 2. Válassza ki a „bot” hatókört
 3. Válassza ki a fent felsorolt jogosultságokat
 4. A létrehozott URL használatával hívd meg a botot a szerveredre
 
-### 4) Környezeti változók konfigurálása
+### 4. Configure Environment Variables
 
 #### Előtétprogram (.env)
 
@@ -94,19 +94,19 @@ DISCORD_SITE_NAME=Az oldalad neve
 
 :::figyelmeztetés Biztonsági megjegyzés
 
-* Soha ne véglegesítsd a `.env` fájlokat verziókövetésbe
-* Környezeti változók használata éles környezetben
-* Tartsa biztonságban a bot tokenjét
+- Soha ne véglegesítsd a `.env` fájlokat verziókövetésbe
+- Környezeti változók használata éles környezetben
+- Tartsa biztonságban a bot tokenjét
   :::
 
-### 5. Szerverfüggőségek telepítése
+### 5. Install Server Dependencies
 
 ```bash
 cd szerver
 npm telepítés
 ```
 
-### 6. Indítsa el a háttérkiszolgálót
+### 6. Start the Backend Server
 
 ```bash
 # Fejlesztés
@@ -116,14 +116,14 @@ npm futás dev
 npm indítás
 ```
 
-### 7. Telepítési konfiguráció
+### 7. Deploy Configuration
 
 Éles környezetben történő telepítésekhez állítsa be a környezeti változókat a tárhelyplatformon:
 
-* **Frontend**: Állítsa be a `REACT_APP_API_URL`-t az éles API URL-címére
-* **Háttér**: Szervermappa telepítése bot tokennel és csatornaazonosítóval
-* **Adatbázis**: Az SQLite adatbázis automatikusan létrejön
-* **Kontextus**: A Discord kontextus szintjének és beállításainak konfigurálása a preferenciáid szerint.
+- **Frontend**: Állítsa be a `REACT_APP_API_URL`-t az éles API URL-címére
+- **Háttér**: Szervermappa telepítése bot tokennel és csatornaazonosítóval
+- **Adatbázis**: Az SQLite adatbázis automatikusan létrejön
+- **Kontextus**: A Discord kontextus szintjének és beállításainak konfigurálása a preferenciáid szerint.
 
 ## Hogyan működik
 
@@ -140,22 +140,22 @@ npm indítás
 
 A Discord beágyazások a következőket tartalmazzák:
 
-* **Title**: "💬 New Comment: \{Page Title}"
-* **Leírás**: A hozzászólás tényleges tartalma
-* **Szerző**: A hozzászóló neve
-* **URL**: Kattintható link a pontos oldalra
-* **Oldalmező**: Megjeleníti az oldal címét kattintható hivatkozással
-* **Időbélyeg**: Mikor jelent meg a hozzászólás
-* **Téma**: Automatikusan létrehozott téma a válaszokhoz
+- **Title**: "💬 New Comment: \{Page Title}"
+- **Leírás**: A hozzászólás tényleges tartalma
+- **Szerző**: A hozzászóló neve
+- **URL**: Kattintható link a pontos oldalra
+- **Oldalmező**: Megjeleníti az oldal címét kattintható hivatkozással
+- **Időbélyeg**: Mikor jelent meg a hozzászólás
+- **Téma**: Automatikusan létrehozott téma a válaszokhoz
 
 ### Weboldal megjelenítése
 
 A weboldal a következőket mutatja:
 
-* **Eredeti hozzászólások**: Weboldal űrlap beküldései
-* **Discord válaszok**: Discord felhasználók válaszai avatarokkal és felhasználónevekkel
-* **Valós idejű frissítések**: Automatikus lekérdezés az új válaszokról
-* **Témaszálakba rendezett beszélgetések**: Rendezett hozzászólás → válaszstruktúra
+- **Eredeti hozzászólások**: Weboldal űrlap beküldései
+- **Discord válaszok**: Discord felhasználók válaszai avatarokkal és felhasználónevekkel
+- **Valós idejű frissítések**: Automatikus lekérdezés az új válaszokról
+- **Témaszálakba rendezett beszélgetések**: Rendezett hozzászólás → válaszstruktúra
 
 ## Kontextus konfiguráció
 
@@ -165,23 +165,23 @@ A weboldal a következőket mutatja:
 
 #### `DISCORD_CONTEXT_LEVEL=minimális`
 
-* **Megjeleníti**: Csak az oldal címét és a hozzászólás tartalmát
-* **Használati eset**: Tiszta, egyszerű üzenetek extra kontextus nélkül
+- **Megjeleníti**: Csak az oldal címét és a hozzászólás tartalmát
+- **Használati eset**: Tiszta, egyszerű üzenetek extra kontextus nélkül
 
 #### `DISCORD_CONTEXT_LEVEL=alap`
 
-* **Megjeleníti**: Oldal címét, a hozzászólások tartalmát és a kattintható oldal URL-címét
-* **Használati eset**: Mérsékelt kontextus lényeges információkkal
+- **Megjeleníti**: Oldal címét, a hozzászólások tartalmát és a kattintható oldal URL-címét
+- **Használati eset**: Mérsékelt kontextus lényeges információkkal
 
 #### `DISCORD_CONTEXT_LEVEL=full` (alapértelmezett)
 
-* **Megjeleníti**: Minden kontextuális információt, beleértve a navigációs útvonalakat, szakaszokat és időbélyegeket
-* **Használati eset**: Maximális kontextus a részletes megbeszélésekhez
+- **Megjeleníti**: Minden kontextuális információt, beleértve a navigációs útvonalakat, szakaszokat és időbélyegeket
+- **Használati eset**: Maximális kontextus a részletes megbeszélésekhez
 
 #### `DISCORD_CONTEXT_LEVEL=egyéni`
 
-* **Megjeleníti**: Csak azokat a kontextuselemeket jeleníti meg, amelyeket egyenként engedélyez
-* **Használati eset**: Finomhangolt kontroll a megjelenés felett
+- **Megjeleníti**: Csak azokat a kontextuselemeket jeleníti meg, amelyeket egyenként engedélyez
+- **Használati eset**: Finomhangolt kontroll a megjelenés felett
 
 ### Egyéni kontextusvezérlők
 
@@ -240,7 +240,7 @@ Az oldalad neve • Hozzászólásrendszer
 
 ### Stílus
 
-A Discord hozzászólások komponense CSS modulokat használ. A megjelenést a következő módosításokkal testreszabhatja:
+The Discord comments component uses CSS modules. You can customize the appearance by modifying:
 
 ```
 src/components/DiscordComments/styles.module.css
@@ -256,7 +256,7 @@ src/components/DiscordComments/index.tsx
 
 ### Alkatrészek elhelyezése
 
-A Discord hozzászólások alapértelmezés szerint a Giscus hozzászólások alatt jelennek meg. Ennek megváltoztatásához módosítsa:
+The Discord comments appear below the Giscus comments by default. To change this, modify:
 
 ```
 src/theme/DocItem/Layout/index.js
@@ -287,9 +287,9 @@ src/theme/DocItem/Layout/index.js
 
 ### Környezeti változók nem működnek
 
-* **Fejlesztés**: Indítsd újra mind a frontend, mind a backend szervereket
-* **Éles**: Telepítse újra mind a frontend, mind a backend környezetet a megfelelő környezeti változókkal
-* **Előtag**: Csak a `REACT_APP_` előtagot használja a frontend változókhoz
+- **Fejlesztés**: Indítsd újra mind a frontend, mind a backend szervereket
+- **Éles**: Telepítse újra mind a frontend, mind a backend környezetet a megfelelő környezeti változókkal
+- **Előtag**: Csak a `REACT_APP_` előtagot használja a frontend változókhoz
 
 ### Adatbázis-problémák
 
@@ -299,12 +299,12 @@ src/theme/DocItem/Layout/index.js
 
 ## Biztonsági szempontok
 
-* **Bot Token**: Tartsd titokban a bot tokenedet, és soha ne véglegesítsd a verziókövetésben.
-* **Sebességkorlátozás**: A Discord sebességkorlátozásokkal rendelkezik a botok számára (eltér a webhookoktól).
-* **Bevitel validálása**: Mind a felhasználói felület, mind a háttérrendszer validálja a felhasználói bevitelt.
-* **Adatbázis-biztonság**: Az SQLite adatbázist megfelelő fájlengedélyekkel kell védeni.
-* **API biztonság**: Fontolja meg a sebességkorlátozás bevezetését az API végpontokon
-* **CORS**: Konfigurálja megfelelően a CORS-t az éles környezetéhez
+- **Bot Token**: Tartsd titokban a bot tokenedet, és soha ne véglegesítsd a verziókövetésben.
+- **Sebességkorlátozás**: A Discord sebességkorlátozásokkal rendelkezik a botok számára (eltér a webhookoktól).
+- **Bevitel validálása**: Mind a felhasználói felület, mind a háttérrendszer validálja a felhasználói bevitelt.
+- **Adatbázis-biztonság**: Az SQLite adatbázist megfelelő fájlengedélyekkel kell védeni.
+- **API biztonság**: Fontolja meg a sebességkorlátozás bevezetését az API végpontokon
+- **CORS**: Konfigurálja megfelelően a CORS-t az éles környezetéhez
 
 ## Építészet
 
@@ -331,7 +331,7 @@ project/
 
 A Discord hozzászólások komponense minden modern böngészőben működik, amely támogatja a következőket:
 
-* ES6 lekérési API
-* React 18+
-* CSS Grid és Flexbox
-* Helyi tárhely (űrlapmegőrző funkció)
+- ES6 lekérési API
+- React 18+
+- CSS Grid és Flexbox
+- Helyi tárhely (űrlapmegőrző funkció)
