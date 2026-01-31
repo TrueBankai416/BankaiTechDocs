@@ -117,10 +117,16 @@ SSHFS is a filesystem client that uses the SSH File Transfer Protocol (SFTP) to 
 <Tabs
   defaultValue="ubuntu"
   values={[
-    {label: 'Ubuntu/Debian', value: 'ubuntu'},
-    {label: 'CentOS/RHEL', value: 'centos'},
-    {label: 'Generic Linux', value: 'generic'},
-  ]}>
+  {label: 'Ubuntu/Debian', value: 'ubuntu'},
+  {label: 'CentOS/RHEL', value: 'centos'},
+  {label: 'Generic Linux', value: 'generic'},
+  ]}
+>
+  <TabItem value="ubuntu">
+    ```bash
+    # Install SSH server (if not already installed)
+    sudo apt update
+    sudo apt install openssh-server
 
 <TabItem value="ubuntu">
 ```bash
@@ -130,39 +136,37 @@ sudo apt install openssh-server
 
 # Start and enable SSH service
 
-sudo systemctl start ssh
-sudo systemctl enable ssh
+# Start and enable SSH servicesudo systemctl start ssh
+sudo systemctl enable ssh# Check SSH service statussudo systemctl status ssh```
+
+```
 
 # Check SSH service status
 
 sudo systemctl status ssh
 
 ````
-</TabItem>
-
 <TabItem value="centos">
-```bash
-# Install SSH server (if not already installed)
-sudo yum install openssh-server
-
-# Start and enable SSH service
-sudo systemctl start sshd
-sudo systemctl enable sshd
-
-# Check SSH service status
-sudo systemctl status sshd
+    ```bash
+    # Install SSH server (if not already installed)
+    sudo yum install openssh-server
 ````
 
 </TabItem>
 
 <TabItem value="generic">
-```bash
-# Check if SSH is running
-ps aux | grep sshd
+    ```bash
+    # Check if SSH is running
+    ps aux | grep sshd
 
-# If not running, start SSH service
+# # If not running, start SSH servicesudo service ssh start# orsudo systemctl start ssh# Enable SSH to start on bootsudo systemctl enable ssh```
 
-sudo service ssh start
+```
+
+# Start and enable SSH servicesudo systemctl start sshd
+sudo systemctl enable sshd# Check SSH service statussudo systemctl status sshd```
+
+```
 
 # or
 
@@ -172,13 +176,7 @@ sudo systemctl start ssh
 
 sudo systemctl enable ssh
 
-````
-</TabItem>
-</Tabs>
-
-### **2. User Account Configuration**
-
-```bash
+```
 # Create dedicated user for SSHFS (optional but recommended)
 sudo useradd -m -s /bin/bash sshfs-user
 
@@ -191,7 +189,7 @@ sudo usermod -a -G users sshfs-user
 # Verify user can access target directories
 sudo -u sshfs-user ls -la /media/server/Processing/
 sudo -u sshfs-user ls -la /media/server/Backups1/
-````
+```
 
 ### **3. Directory Permissions**
 
@@ -596,57 +594,19 @@ StrictHostKeyChecking=no  # Skip host key verification (use carefully)
 <Tabs
   defaultValue="connection"
   values={[
-    {label: 'Connection Issues', value: 'connection'},
-    {label: 'Permission Problems', value: 'permissions'},
-    {label: 'Performance Issues', value: 'performance'},
-    {label: 'Mount Failures', value: 'mount'},
-  ]}>
-
-<TabItem value="connection">
-**Connection Problems**
-
-```bash
-# Test SSH connectivity
-ssh -i /root/.ssh/id_rsa_sshfs sshfs-user@192.168.1.100
-
-# Check SSH service on server
-sudo systemctl status ssh
-
-# Verify network connectivity
-ping 192.168.1.100
-telnet 192.168.1.100 22
-
-# Check SSH logs
-tail -f /var/log/auth.log
-
-# Debug SSHFS connection
-sshfs -d sshfs-user@192.168.1.100:/path /mnt/point
-```
-
-</TabItem>
-
-<TabItem value="permissions">
-**Permission Issues**
-
-```bash
-# Check file permissions on server
-ls -la /media/server/Processing/
-
-# Verify user permissions
-sudo -u sshfs-user ls /media/server/Processing/
-
-# Check mount permissions
-ls -la /mnt/pve/sshfs-downloads/
-
-# Fix ownership issues
-sudo chown -R sshfs-user:users /media/server/Processing/
-```
-
-</TabItem>
+  {label: 'Connection Issues', value: 'connection'},
+  {label: 'Permission Problems', value: 'permissions'},
+  {label: 'Performance Issues', value: 'performance'},
+  {label: 'Mount Failures', value: 'mount'},
+  ]}
+>
+  <TabItem value="connection">
+    **Connection Problems**
 
 <TabItem value="performance">
-**Performance Problems**
+    **Performance Problems**
 
+````bash
 ```bash
 # Monitor SSHFS performance
 iostat -x 1
@@ -661,12 +621,14 @@ rm /mnt/pve/sshfs-data/test
 # Optimize mount options
 # Add: cache=yes,kernel_cache,compression=yes
 ```
+````
 
 </TabItem>
 
 <TabItem value="mount">
-**Mount Failures**
+    **Mount Failures**
 
+````bash
 ```bash
 # Check if mount point exists
 ls -la /mnt/pve/sshfs-downloads/
@@ -687,6 +649,53 @@ umount -f /mnt/pve/sshfs-downloads
 journalctl -u sshfs-mounts.service
 tail -f /var/log/sshfs-mount.log
 ```
+````
+
+</TabItem>
+
+<TabItem value="permissions">
+    **Permission Issues**
+
+````bash
+```bash
+# Test SSH connectivity
+ssh -i /root/.ssh/id_rsa_sshfs sshfs-user@192.168.1.100
+
+# Check SSH service on server
+sudo systemctl status ssh
+
+# Verify network connectivity
+ping 192.168.1.100
+telnet 192.168.1.100 22
+
+# Check SSH logs
+tail -f /var/log/auth.log
+
+# Debug SSHFS connection
+sshfs -d sshfs-user@192.168.1.100:/path /mnt/point
+```
+````
+
+</TabItem>
+
+<TabItem value="mount">
+**Mount Failures**
+
+````bash
+```bash
+# Check file permissions on server
+ls -la /media/server/Processing/
+
+# Verify user permissions
+sudo -u sshfs-user ls /media/server/Processing/
+
+# Check mount permissions
+ls -la /mnt/pve/sshfs-downloads/
+
+# Fix ownership issues
+sudo chown -R sshfs-user:users /media/server/Processing/
+```
+````
 
 </TabItem>
 </Tabs>
