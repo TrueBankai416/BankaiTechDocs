@@ -70,8 +70,8 @@ If you've already updated to a newer version without creating a dump and are see
 
    For example, if the error shows you were on version 1.24.0, search for `1.24` in the tags page. The exact version tag (like `v1.24.0`) may not exist, so you'll need to choose an available tag from that version, such as:
 
-   * `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-5`
-   * `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-4`
+   - `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-5`
+   - `getmeili/meilisearch:prototype-v1.24.0.s3-snapshots-4`
 
 2. **Update your `docker-compose.yaml`** to use the older image:
 
@@ -229,8 +229,8 @@ After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` env
 1. In Jellyfin, navigate to **Dashboard** → **Plugins** → **Catalog**
 2. Install the Meilisearch plugin
 3. Configure the plugin with:
-   * **Host**: `http://localhost:7700` (or your Meilisearch URL)
-   * **API Key**: Your Meilisearch master key or generated API key
+   - **Host**: `http://localhost:7700` (or your Meilisearch URL)
+   - **API Key**: Your Meilisearch master key or generated API key
 4. Restart Jellyfin
 5. Trigger a library scan to populate the search index
 
@@ -240,21 +240,21 @@ After the restore is complete, remove or comment out the `MEILI_IMPORT_DUMP` env
 
 If Jellyfin cannot connect to Meilisearch:
 
-* Verify Meilisearch is running: `sudo docker ps | grep meilisearch`
-* Check logs: `sudo docker logs meilisearch`
-* Ensure the port 7700 is accessible
-* Verify the API key is correct
+- Verify Meilisearch is running: `sudo docker ps | grep meilisearch`
+- Check logs: `sudo docker logs meilisearch`
+- Ensure the port 7700 is accessible
+- Verify the API key is correct
 
 ### Performance Issues
 
-* Increase memory allocation for the container if needed
-* Monitor resource usage: `sudo docker stats meilisearch`
-* Consider adjusting the `MEILI_MAX_INDEXING_MEMORY` environment variable
+- Increase memory allocation for the container if needed
+- Monitor resource usage: `sudo docker stats meilisearch`
+- Consider adjusting the `MEILI_MAX_INDEXING_MEMORY` environment variable
 
 ## Additional Resources
 
-* [Meilisearch Documentation](https://www.meilisearch.com/docs)
-* [Meilisearch Docker Hub](https://hub.docker.com/r/getmeili/meilisearch)
-* [Jellyfin Documentation](https://jellyfin.org/docs/)
+- [Meilisearch Documentation](https://www.meilisearch.com/docs)
+- [Meilisearch Docker Hub](https://hub.docker.com/r/getmeili/meilisearch)
+- [Jellyfin Documentation](https://jellyfin.org/docs/)
 
 <BuyMeACoffeeButton />
