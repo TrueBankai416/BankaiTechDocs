@@ -104,8 +104,7 @@
     "description": "The label used for the latest version suggestion link label"
   },
   "theme.docs.versionBadge.label": {
-    "message": "Versión: {etiquetaversión}",
-    "description": ""
+    "message": "Versión: {etiquetaversión}"
   },
   "theme.common.editThisPage": {
     "message": "Editar esta página",
@@ -284,20 +283,16 @@
     "description": "The result label of the live codeblocks"
   },
   "theme.SearchBar.noResultsText": {
-    "message": "Sin resultados",
-    "description": ""
+    "message": "Sin resultados"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": "Ver todos los resultados fuera de \"{context}\"",
-    "description": ""
+    "message": "Ver todos los resultados fuera de \"{context}\""
   },
   "theme.SearchBar.searchInContext": {
-    "message": "Ver todos los resultados dentro de \"{context}\"",
-    "description": ""
+    "message": "Ver todos los resultados dentro de \"{context}\""
   },
   "theme.SearchBar.seeAll": {
-    "message": "Ver todos los resultados",
-    "description": ""
+    "message": "Ver todos los resultados"
   },
   "theme.SearchBar.label": {
     "message": "Buscar",
@@ -312,8 +307,7 @@
     "description": "The search page title for empty query"
   },
   "theme.SearchPage.searchContext.everywhere": {
-    "message": "En todos lados",
-    "description": ""
+    "message": "En todos lados"
   },
   "theme.SearchPage.documentsFound.plurals": {
     "message": "1 documento encontrado|{count} documentos encontrados",
