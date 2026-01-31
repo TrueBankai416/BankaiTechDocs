@@ -1,0 +1,496 @@
+---
+title: Connecting to GitHub
+description: Complete guide for connecting Docusaurus to GitHub including SSH key setup, repository configuration, GitLeaks security, and last updated features.
+image: /img/social/docusaurus-social.jpg
+tags:
+  - Docusaurus
+  - GitHub
+keywords:
+  - Docusaurus
+  - GitHub
+last_update:
+  author: BankaiTech
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+## **Adding Last Updated Feature**
+
+<h3>
+  <>*Official Docs can be found here. [Link](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#last_update)*</>
+</h3>
+
+![Example](/img/Docusaurus/Styling/lastUpdate.jpg)
+
+### ***Creating a GitHub Repository***
+
+<p>
+  <>First we need to create a [GitHub Repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/quickstart-for-repositories).</>
+</p>
+
+<p>
+  <>When you are done creating your new repository we will have to add `SSH Keys` to your account</>
+</p>
+
+<p>
+  <>In the upper-right corner of any page, click your profile photo, then click Settings.</>
+</p>
+
+![GitHub Settings](/img/Docusaurus/Styling/githubSettings.png)
+
+<p>
+  <>In the "Access" section of the sidebar, click SSH and GPG keys.</>
+</p>
+
+![SSH and GPG keys](/img/Docusaurus/Styling/sshKeys.jpg)
+
+<p>
+  <>Click `New SSH key`</>
+</p>
+
+![New SSH key](/img/Docusaurus/Styling/NewSSHkey.png)
+
+<p>
+  <>You should now see this screen</>
+</p>
+
+![Paste key](/img/Docusaurus/Styling/addKey.jpg)
+:::note
+I used my repo name `BankaiTechDocs` for the Key name\
+Key type is `Authentication key`
+:::
+
+### ***Creating local SSH key***
+
+<p>
+  <>Go to your temninal and run this command</>
+</p>
+
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+<p>
+  <>Press `ENTER` and follow the prompts</>
+</p>
+
+![Generate Keys](/img/Docusaurus/Styling/generateKey.jpg)
+
+:::tip[Recommended]
+You do not need to enter a `passphrase` but it is recommended for security
+:::warning
+If you do use a Passphrase, please keep it safe as you will need it every time you run `Git pull` or `Git push`
+:::
+
+<p>
+  <>Run the following command and copy the contents of the result</>
+</p>
+
+```bash
+cat /root/.ssh/<id_key.pub>
+```
+
+:::info
+I ran `cat /root/.ssh/id_ed25519.pub`
+:::
+
+### ***Adding SSH key to GitHub***
+
+<p>
+  <>Go back over to GitHub and Paste the SSH key you just copied</>
+</p>
+
+![key](/img/Docusaurus/Styling/key.jpg)
+
+<p>
+  <>Press `Add SSH key`</>
+</p>
+
+## **Creating a local .git repo**
+
+<p>
+  <>Go to the root directory of your website</>
+</p>
+
+:::note
+This directory will contain your `docusaurus.config.js` or `docusaurus.config.ts` file
+:::
+
+<p>
+  <>In your terminal, run the following commands</>
+</p>
+
+```bash
+git init
+git config --global user.name "<USER_NAME>"
+git config --global user.email "<USER_EMAIL>"
+```
+
+## **Connecting to the remote Repo**
+
+<p>
+  <>We are going to need the SSH url for your repo, we can find that here</>
+</p>
+
+![Repo URL](/img/Docusaurus/Styling/sshUrl.jpg)
+
+<p>
+  <>Run this command to add your remote repo</>
+</p>
+
+```bash
+git remote add origin <SSh Repo URL>
+```
+
+:::note[Example]
+`git@github.com:TrueBankai416/BankaiTechDocs.git`
+:::
+
+## **Security**
+
+### ***Installing [talisman](https://github.com/thoughtworks/talisman)***
+
+Go to the root directory of your website and run the following
+
+```bash
+curl --silent  https://raw.githubusercontent.com/thoughtworks/talisman/main/global_install_scripts/install.bash > /tmp/install_talisman.bash && /bin/bash /tmp/install_talisman.bash
+```
+
+### ***Setting Up [GitLeaks](https://github.com/gitleaks/gitleaks)***
+
+#### *Creating a GitHub API Key*
+
+<p>
+  <>Click the user icon at the top right and go to `Settings`</>
+</p>
+
+![GitHub Profile](/img/Docusaurus/GitHub_Profile.png)
+
+<p>
+  <>On the bottom left go to `Developer Settings`</>
+</p>
+
+![GitHub Developer Settings](/img/Docusaurus/GitHub_Developer.png)
+
+##### *Creating a new Token (classic)*
+
+<p>
+  <>Click on `Tokens (classic)` and then Generate a new Token</>
+</p>
+
+![GitHub Tokens](/img/Docusaurus/GitHub_Token.png)
+
+<p>
+  <>Name the new Token and Select an Expiration Date</>
+</p>
+
+:::info
+It is recommended that you set an expiration date instead of having no Expiration, For security reasons.
+:::
+
+<p>
+  <>Check the `Repo` and `Projects` checkboxes and Generate the Token</>
+</p>
+
+![Token Repo](/img/Docusaurus/Token_Repo.png)
+![Token Project](/img/Docusaurus/Token_Project.png)
+
+##### *Creating Action Secrets for GitLeaks*
+
+<p>
+  <>Go to `Settings` and then `Secrets and Variables > Actions` and create a new Repository Secret</>
+</p>
+
+![GitLeaks Secret](/img/Docusaurus/GitLeaks_Secrets.png)
+
+<p>
+  <>For the name, type in `GIT_TOKEN`</>
+</p>
+
+Paste your GitHub API Key into the secret field and then save.
+
+#### *Creating the GitLeaks Workflow Action*
+
+<p>
+  <>Go to `Actions` and then Click `New Workflow`</>
+</p>
+
+![GitLeaks](/img/Docusaurus/GitLeaks1.png)
+
+<p>
+  <>Set up a New Workflow</>
+</p>
+
+![Workflow](/img/Docusaurus/GitLeaks_Workflow.png)
+
+<p>
+  <>Paste the Following Snippet</>
+</p>
+
+```editorconfig
+name: gitleaks
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *" # run once a day at 4 AM
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITLEAKS_NOTIFY_USER_LIST: "@<YOUR_GITHUB_USER>"
+```
+
+##### *Running the Action*
+
+Run the New GitLeaks Workflow
+
+![Run Workflow](/img/Docusaurus/Run_Workflow.png)
+
+## **Pushing to GitHub**
+
+<p>
+  <>Now run the following commands</>
+</p>
+
+```bash
+git add -A
+git commit -m 'main'
+git push  origin master
+git pull origin main
+```
+
+<p>
+  <>You should now be able to make changes on GitHub and then run `git pull origin main` to download the changes locally, or you can make changes locally and run `git push origin main` to send the changes to GitHub</>
+</p>
+
+:::note
+When you run `git pull origin main` you will have to run `npm run build` afterwards to apply the changes
+:::
+
+## **Enabling the last updated footer**
+
+### ***Editing the docusaurus config file***
+
+<Tabs groupId="Java-Type">
+  <TabItem value="js" label="Javascript">
+    <p>
+      <>We will need to first make some changes in your `docusaurus.config.js` file</>
+    </p>
+
+    ```bash
+    nano docusaurus.config.js
+    ```
+
+    <p>
+      <>Find the following Snippet of code</>
+    </p>
+
+    ```js
+      presets: [
+        [
+          'classic',
+          {
+            docs: {
+              routeBasePath: '/', // Serve the docs at the site's root
+              sidebarPath: './sidebars.js',
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            },
+            blog: false, //{
+          //    showReadingTime: true,
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+           // },
+            theme: {
+              customCss: './src/css/custom.css',
+            },
+          } satisfies Preset.Options,
+        ],
+      ],
+    ```
+
+    <p>
+      <>Add the following lines in the `docs` section</>
+    </p>
+
+    ```js
+              showLastUpdateAuthor: true,
+              showLastUpdateTime: true,
+    ```
+
+    :::important
+    Setting `routeBasePath: '/', // Serve the docs at the site's root` is strongly recommended and also required when deploying on Cloudflare Pages to show accurate git history.
+    :::
+
+    <p>
+      <>The snippet of code should now look like this</>
+    </p>
+
+    ```js
+      presets: [
+        [
+          'classic',
+          {
+            docs: {
+              showLastUpdateAuthor: true,
+              showLastUpdateTime: true,
+              routeBasePath: '/', // Serve the docs at the site's root
+              sidebarPath: './sidebars.js',
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            },
+            blog: false, //{
+          //    showReadingTime: true,
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+           // },
+            theme: {
+              customCss: './src/css/custom.css',
+            },
+          } satisfies Preset.Options,
+        ],
+      ],
+    ```
+  </TabItem>
+
+  <TabItem value="ts" label="Typescript">
+    <p>
+      <>We will need to first make some changes in your `docusaurus.config.ts` file</>
+    </p>
+
+    ```bash
+    nano docusaurus.config.ts
+    ```
+
+    <p>
+      <>Find the following Snippet of code</>
+    </p>
+
+    ```ts
+      presets: [
+        [
+          'classic',
+          {
+            docs: {
+              routeBasePath: '/', // Serve the docs at the site's root
+              sidebarPath: './sidebars.ts',
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            },
+            blog: false, //{
+          //    showReadingTime: true,
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+           // },
+            theme: {
+              customCss: './src/css/custom.css',
+            },
+          } satisfies Preset.Options,
+        ],
+      ],
+    ```
+
+    <p>
+      <>Add the following lines in the `docs` section</>
+    </p>
+
+    ```ts
+              showLastUpdateAuthor: true,
+              showLastUpdateTime: true,
+    ```
+
+    <p>
+      <>The snippet of code should now look like this</>
+    </p>
+
+    ```ts
+      presets: [
+        [
+          'classic',
+          {
+            docs: {
+              showLastUpdateAuthor: true,
+              showLastUpdateTime: true,
+              routeBasePath: '/', // Serve the docs at the site's root
+              sidebarPath: './sidebars.ts',
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            },
+            blog: false, //{
+          //    showReadingTime: true,
+              // Please change this to your repo.
+              // Remove this to remove the "edit this page" links.
+            //  editUrl:
+            //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+           // },
+            theme: {
+              customCss: './src/css/custom.css',
+            },
+          } satisfies Preset.Options,
+        ],
+      ],
+    ```
+  </TabItem>
+</Tabs>
+
+### ***Adding the last updated to Font Matter***
+
+:::note
+By default it will show the GitHub user that last updated the file. Setting this will override the GitHub name.
+:::
+
+<p>
+  <>Open up one of your `.md` files in `/docs`</>
+</p>
+
+<p>
+  <>Add the following lines to the top of the file</>
+</p>
+
+```
+---
+last_update:
+  author: custom author name
+---
+```
+
+<p>
+  <>Now every time you run `git pull origin main` and `npm run build` it will update the `last_updated` line from `git history`</>
+</p>
+
+## **References**
+
+[Font Matter Options](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#markdown-front-matter)\
+[Introduction to GIT](https://learn.microsoft.com/en-us/training/modules/intro-to-git/2-exercise-configure-git)\
+[How to Push Existing Project to GitHub](https://www.digitalocean.com/community/tutorials/how-to-push-an-existing-project-to-github)\
+[GitHub Remote Repositories](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories)\
+[Adding SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)\
+[Generating SSH key to local System](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+
+<BuyMeACoffeeButton />
