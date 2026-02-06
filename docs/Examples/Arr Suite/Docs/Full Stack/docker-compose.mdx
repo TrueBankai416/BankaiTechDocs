@@ -13,6 +13,41 @@ name: media-management
 
 services:
 
+  # Server
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    user: 1000:1000
+    networks:
+      - media-network
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - type: bind
+        source: /media/merged
+        target: /media
+        read_only: false
+      # Optional - extra fonts to be used during transcoding with subtitle burn-in
+      #- type: bind
+      #  source: /path/to/fonts
+      #  target: /usr/local/share/fonts/custom
+      #  read_only: true
+    restart: 'unless-stopped'
+    # Optional - alternative address used for autodiscovery
+   # environment:
+   #   - JELLYFIN_PublishedServerUrl=http://example.com
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
   # Core Services
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -199,6 +234,10 @@ services:
 networks:
   media-network:
     driver: bridge
+
+volumes:
+  jellyfin-config:
+  jellyfin-cache:
 ```
 
 <BuyMeACoffeeButton />
