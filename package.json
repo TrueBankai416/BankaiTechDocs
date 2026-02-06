@@ -49,7 +49,7 @@
     "@giscus/react": "^3.1.0",
     "@rspack/cli": "^1.7.5",
     "@rspack/core": "^1.7.4",
-    "cspell": "^9.6.2",
+    "cspell": "^9.6.4",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "markdown-link-check": "^3.14.2",
