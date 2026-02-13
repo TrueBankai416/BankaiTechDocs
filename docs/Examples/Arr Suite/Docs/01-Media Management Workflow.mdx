@@ -115,30 +115,34 @@ flowchart TD
 
 ## Folder Structure
 
-```
-/media/merged/         # mergerfs mount point
-├── movies/            # Jellyfin Movies library
-├── tv/                # Jellyfin TV Shows library
-├── music/             # Jellyfin Music library (if using Lidarr)
-├── books/             # Jellyfin Books library (if using Readarr)
-├── downloads/         # Download location (bind mount)
-    └── Torrent/       # qBittorrent download location
-        ├── temp/      # Temp download location
-        ├── radarr/
-        └── tv-sonarr/
-    └── Usenet/        # Usenet download location
-        └── temp/      # Usenet temp download location
-├── cache/             # Tdarr cache location (bind mount)
-    └── tdarr_cache/
+<Trees title="/media/merged" badge="(main bind mount)">
+  <Folder label="movies" badge="Jellyfin Movies library" />
+  <Folder label="tv" badge="Jellyfin TV Shows library" />
+  <Folder label="music" badge="Jellyfin Music library (if using Lidarr)" />
+  <Folder label="books" badge="Jellyfin Books library (if using Readarr)" />
+  <Folder label="downloads" badge="Download location" expanded>
+    <Folder label="Torrent" badge="qBittorrent download location" expanded>
+      <Folder label="temp" badge="Temp download location" />
+      <Folder label="radarr" />
+      <Folder label="tv-sonarr" />
+    </Folder>
+    <Folder label="Usenet" badge="Usenet download location" expanded>
+      <Folder label="temp" badge="Usenet temp download location" />
+    </Folder>
+  </Folder>
+  <Folder label="cache" badge="Tdarr cache location (bind mount)" expanded>
+    <Folder label="tdarr_cache" />
+  </Folder>
+</Trees>
 
-/mnt/               # Individual drive mount points
-├── disk1/          # First storage drive
-├── disk2/          # Second storage drive
-├── disk3/          # Third storage drive
-└── diskN/          # Additional drives as needed
+<Trees title="/mnt">
+  <Folder label="disk1" badge="First storage drive" />
+  <Folder label="disk2" badge="Second storage drive" />
+  <Folder label="disk3" badge="Third storage drive" />
+  <Folder label="diskN" badge="Additional drives as needed" />
+</Trees>
 
-# mergerfs pools all /mnt/disk* into /media/merged
-```
+mergerfs pools all `/mnt/disk*` into `/media/merged`.
 
 ## mergerfs Configuration
 
