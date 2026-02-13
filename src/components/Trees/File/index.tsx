@@ -10,7 +10,7 @@ interface FileProps {
 }
 
 export default function File({
-  icon,
+  icon = 'vscode-icons:default-file',
   iconSize = 20,
   badge,
   label,

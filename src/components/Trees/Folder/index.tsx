@@ -12,7 +12,7 @@ interface FolderProps {
 }
 
 export default function Folder({
-  icon,
+  icon = 'vscode-icons:default-folder',
   iconSize = 24,
   badge,
   label,
