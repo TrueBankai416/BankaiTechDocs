@@ -47,39 +47,47 @@ When you are done with the new sidebar, you will have to update the `docusaurus.
    },
 ```
 
-```bash title="Directory Tree | All content in the Docs folder will auto-generate in the sidebar" {3-6} showLineNumbers
-└── docs/
-    └── Docker/
-        ├── Docs/
-        │   ├── Installing Docker/
-        │   ├── Helpful Commands.mdx
-        │   └── Troubleshooting.mdx
-        └── Introduction.mdx
-```
+<Trees title="docs">
+  <Folder label="Docker" expanded>
+    <Folder label="Docs" expanded>
+      <Folder label="Installing Docker" />
+      <File label="Helpful Commands.mdx" />
+      <File label="Troubleshooting.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+</Trees>
 
 ### _Example with Multiple Directories_
 
-```bash title="Directory Tree | All content in the Docs folder will auto-generate in the sidebar" {3-6,9-10,13,14,17,18} showLineNumbers
-└── docs/
-    ├── Docker/
-    │   ├── Docs/
-    │   │   ├── Installing Docker/
-    │   │   ├── Helpful Commands.mdx
-    │   │   └── Troubleshooting.mdx
-    │   └── Introduction.mdx
-    ├── Nextcloud/
-    │   ├── Docs/
-    │   │   └── Example.mdx
-    │   └── Introduction.mdx
-    ├── NextcloudPI/
-    │   ├── Docs/
-    │   │   └── Example.mdx
-    │   └── Introduction.mdx
-    └── MariaDB/
-        ├── Docs/
-        │   └── Example.mdx
-        └── Introduction.mdx
-```
+<Trees title="docs">
+  <Folder label="Docker" expanded>
+    <Folder label="Docs" expanded>
+      <Folder label="Installing Docker" />
+      <File label="Helpful Commands.mdx" />
+      <File label="Troubleshooting.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="Nextcloud" expanded>
+    <Folder label="Docs" expanded>
+      <File label="Example.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="NextcloudPI" expanded>
+    <Folder label="Docs" expanded>
+      <File label="Example.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="MariaDB" expanded>
+    <Folder label="Docs" expanded>
+      <File label="Example.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+</Trees>
 
 ```ts title="./sidebars/yourNewSidebar.ts" showLineNumbers
 {
@@ -137,15 +145,16 @@ When you are done with the new sidebar, you will have to update the `docusaurus.
 
 ![Doc Link Dropdown](/img/Docusaurus/Styling/Sidebar/Link_Dropdown.png)
 
-```bash title="Directory Tree | Introduction.mdx is linked to the Folder named Docker" {2,7} showLineNumbers
-└── docs/
-    └── Docker/
-        ├── Docs/
-        │   ├── Installing Docker/
-        │   ├── Helpful Commands.mdx
-        │   └── Troubleshooting.mdx
-        └── Introduction.mdx
-```
+<Trees title="docs">
+  <Folder label="Docker" expanded>
+    <Folder label="Docs" expanded>
+      <Folder label="Installing Docker" />
+      <File label="Helpful Commands.mdx" />
+      <File label="Troubleshooting.mdx" />
+    </Folder>
+    <File label="Introduction.mdx" />
+  </Folder>
+</Trees>
 
 ```ts title="./sidebars/yourNewSidebar.ts | Change Introduction to the Desired Filename" showLineNumbers
 {
@@ -167,50 +176,62 @@ When you are done with the new sidebar, you will have to update the `docusaurus.
 **This will show a specified file when clicking on a dropdown menu within another dropdown menu in the sidebar instead of simply just opening the sidebar content.**
 ![Doc Link subDropdown](/img/Docusaurus/Styling/Sidebar/Link_subDropdown.png)
 
-```bash title="Directory Tree | Files with the same name as their parent directory will open when the Dropdown Menu is Clicked" {5,9} showLineNumbers
-└── docs/
-    ├── Reverse Proxy/
-    │   └── Introduction.mdx
-    └── Docs/
-        ├── Certbot/
-        │   ├── Cloudflare/
-        │   │   ├── Cloudflare.mdx
-        │   │   └── Installation.mdx
-        │   └── Certbot.mdx
-        └── Nginx/
-            ├── Nginx.mdx
-            └── Installing Nginx.mdx
-```
+<Trees title="docs">
+  <Folder label="Reverse Proxy" expanded>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="Docs" expanded>
+    <Folder label="Certbot" expanded>
+      <Folder label="Cloudflare" expanded>
+        <File label="Cloudflare.mdx" />
+        <File label="Installation.mdx" />
+      </Folder>
+      <File label="Certbot.mdx" />
+    </Folder>
+    <Folder label="Nginx" expanded>
+      <File label="Nginx.mdx" />
+      <File label="Installing Nginx.mdx" />
+    </Folder>
+  </Folder>
+</Trees>
 
-```bash title="Directory Tree | Files with the same name as their parent directory will open when the Dropdown Menu is Clicked" {6,7} showLineNumbers
-└── docs/
-    ├── Reverse Proxy/
-    │   └── Introduction.mdx
-    └── Docs/
-        ├── Certbot/
-        │   ├── Cloudflare/
-        │   │   ├── Cloudflare.mdx
-        │   │   └── Installation.mdx
-        │   └── Certbot.mdx
-        └── Nginx/
-            ├── Nginx.mdx
-            └── Installing Nginx.mdx
-```
+<Trees title="docs">
+  <Folder label="Reverse Proxy" expanded>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="Docs" expanded>
+    <Folder label="Certbot" expanded>
+      <Folder label="Cloudflare" expanded>
+        <File label="Cloudflare.mdx" />
+        <File label="Installation.mdx" />
+      </Folder>
+      <File label="Certbot.mdx" />
+    </Folder>
+    <Folder label="Nginx" expanded>
+      <File label="Nginx.mdx" />
+      <File label="Installing Nginx.mdx" />
+    </Folder>
+  </Folder>
+</Trees>
 
-```bash title="Directory Tree | Files with the same name as their parent directory will open when the Dropdown Menu is Clicked" {10,11} showLineNumbers
-└── docs/
-    ├── Reverse Proxy/
-    │   └── Introduction.mdx
-    └── Docs/
-        ├── Certbot/
-        │   ├── Cloudflare/
-        │   │   ├── Cloudflare.mdx
-        │   │   └── Installation.mdx
-        │   └── Certbot.mdx
-        └── Nginx/
-            ├── Nginx.mdx
-            └── Installing Nginx.mdx
-```
+<Trees title="docs">
+  <Folder label="Reverse Proxy" expanded>
+    <File label="Introduction.mdx" />
+  </Folder>
+  <Folder label="Docs" expanded>
+    <Folder label="Certbot" expanded>
+      <Folder label="Cloudflare" expanded>
+        <File label="Cloudflare.mdx" />
+        <File label="Installation.mdx" />
+      </Folder>
+      <File label="Certbot.mdx" />
+    </Folder>
+    <Folder label="Nginx" expanded>
+      <File label="Nginx.mdx" />
+      <File label="Installing Nginx.mdx" />
+    </Folder>
+  </Folder>
+</Trees>
 
 When you Click on the Dropdown menu named `Certbot` you will start viewing the file named `Certbot.mdx`, If you click on the Dropdown menu named `Cloudflare` it will view the file named `Cloudflare.mdx`.
 and so on.
