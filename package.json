@@ -34,7 +34,7 @@
     "discord-webhook-node": "^1.1.8",
     "discord.js": "^14.25.1",
     "disqus-react": "^1.1.7",
-    "dotenv": "^17.2.4",
+    "dotenv": "^17.3.1",
     "posthog-docusaurus": "^2.0.5",
     "prism-react-renderer": "^2.4.1",
     "react": "19.2.4",
