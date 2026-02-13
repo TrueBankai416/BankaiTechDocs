@@ -115,7 +115,11 @@ flowchart TD
 
 ## Folder Structure
 
-<Trees title="/media/merged" badge="(main bind mount)">
+:::warning Bind Mount Consistency Required
+Use the same media path mapping in every related container (Sonarr, Radarr, qBittorrent, and others). The host bind-mount path and the in-container mount path must be consistent across services, or import/move operations can fail.
+:::
+
+<Trees title="/media/merged">
   <Folder label="movies" badge="Jellyfin Movies library" />
   <Folder label="tv" badge="Jellyfin TV Shows library" />
   <Folder label="music" badge="Jellyfin Music library (if using Lidarr)" />
