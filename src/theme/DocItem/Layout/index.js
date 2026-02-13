@@ -16,6 +16,7 @@ import Giscus from '@giscus/react';
 import { useColorMode } from '@docusaurus/theme-common';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import DiscordComments from '@site/src/components/DiscordComments';
+import Updated from '@site/src/components/Docs/Updated';
 /**
  * Decide if the toc should be rendered, on mobile or desktop viewports
  */
@@ -76,6 +77,7 @@ export default function DocItemLayout({ children }) {
             <DocVersionBadge />
             {docTOC.mobile}
             <DocItemContent>{children}</DocItemContent>
+            <Updated updates={metadata?.frontMatter?.updates} />
             <DocItemFooter />
           </article>
           <DocItemPaginator />
