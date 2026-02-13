@@ -275,6 +275,65 @@ npm install --save @docusaurus/core @docusaurus/preset-classic
 - Optimize images and assets
 - Use Cloudflare's image optimization features
 
+### **_Cannot Delete a Pages Project with Many Deployments_**
+
+If your Cloudflare Pages project has a high number of deployments (typically over 100), Cloudflare may block project deletion until old deployments are removed.
+
+Official reference: [Cloudflare Docs - Delete a project with a high number of deployments](https://developers.cloudflare.com/pages/platform/known-issues/#delete-a-project-with-a-high-number-of-deployments).
+
+**Requirements**
+
+- Node.js and npm installed.
+- Cloudflare API token with **Cloudflare Pages Edit** permission.
+- Your Cloudflare `CF_ACCOUNT_ID`.
+- Your Pages `CF_PAGES_PROJECT_NAME`.
+- A local copy of the `delete-all-deployments` folder from the repository.
+
+Use the local script in this repository:
+
+- [Cloudflare/delete-all-deployments/delete-cf-pages.sh](https://github.com/TrueBankai416/BankaiTechDocs/tree/main/Cloudflare/delete-all-deployments)
+
+1. Open `delete-cf-pages.sh` and set:
+   - `CF_API_TOKEN`
+   - `CF_ACCOUNT_ID`
+   - `CF_PAGES_PROJECT_NAME`
+   - `CF_DELETE_ALIASED_DEPLOYMENTS=true` (optional; include aliased previews in deletion)
+2. Run the commands for your operating system:
+
+<Tabs groupId="delete-cf-pages-os">
+  <TabItem value="windows" label="Windows (Git Bash)">
+
+If Git Bash is not installed, install **Git for Windows** from [git-scm.com](https://git-scm.com/download/win) first.
+
+Use a **Git Bash** terminal for this workflow (not Command Prompt/CMD and not PowerShell).
+
+```bash
+cd /path/to/delete-all-deployments # Wherever you downloaded the folder to.
+npm install
+bash ./delete-cf-pages.sh
+```
+
+:::warning[Git Bash Input Note]
+Do not paste commands into Git Bash for this workflow. Type the commands manually so they parse correctly in your shell setup.
+:::
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+Use any regular terminal (for example, bash, zsh, or your desktop terminal app).
+
+```bash
+cd /path/to/delete-all-deployments # Wherever you downloaded the folder to.
+chmod +x ./delete-cf-pages.sh
+npm install
+./delete-cf-pages.sh
+```
+
+  </TabItem>
+</Tabs>
+
+After deployments are removed, return to Cloudflare Dashboard and delete the Pages project.
+
 ### **_Performance Optimization_**
 
 **Enable Cloudflare Features**
