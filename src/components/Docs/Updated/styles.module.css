@@ -61,6 +61,15 @@
   flex: 1;
 }
 
+.timelineEntry {
+  background-color: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-left: 3px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+  padding: 0.75rem 1rem;
+}
+
 .timelineDate {
   font-weight: 700;
   font-size: 1rem;

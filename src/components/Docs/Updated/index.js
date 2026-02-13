@@ -39,21 +39,23 @@ export default function Updated({updates}) {
               <span aria-hidden="true">📅</span>
             </div>
             <div className={styles.timelineContent}>
-              <div className={styles.timelineDate}>
-                <time dateTime={update.date}>
-                  {new Date(update.date).toLocaleDateString(i18n.currentLocale, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </time>
+              <div className={styles.timelineEntry}>
+                <div className={styles.timelineDate}>
+                  <time dateTime={update.date}>
+                    {new Date(update.date).toLocaleDateString(i18n.currentLocale, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </time>
+                </div>
+                <div
+                  className={styles.timelineDescription}
+                  dangerouslySetInnerHTML={{
+                    __html: parseMarkdown(update.note),
+                  }}
+                />
               </div>
-              <div
-                className={styles.timelineDescription}
-                dangerouslySetInnerHTML={{
-                  __html: parseMarkdown(update.note),
-                }}
-              />
             </div>
           </div>
         ))}
