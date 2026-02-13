@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 # **Repository Management**
-
+TEST
 Effective repository management is crucial for maintaining organized, secure, and collaborative projects on GitHub. This guide covers everything from basic repository settings to advanced security configurations and organizational best practices.
 
 ## **Repository Settings Overview**
@@ -176,20 +176,20 @@ Effective repository management is crucial for maintaining organized, secure, an
   ]}>
   <TabItem value="structure">
     **Standard Repository Structure:**
-    ```
-my-project/
-├── .github/
-│   ├── workflows/          # GitHub Actions
-│   ├── ISSUE_TEMPLATE/     # Issue templates
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/                   # Documentation
-├── src/                    # Source code
-├── tests/                  # Test files
-├── .gitignore             # Git ignore rules
-├── README.md              # Project overview
-├── LICENSE                # License file
-└── package.json           # Dependencies (for Node.js)
-    ```
+    <Trees title="my-project">
+      <Folder label=".github" expanded>
+        <Folder label="workflows" badge="GitHub Actions" />
+        <Folder label="ISSUE_TEMPLATE" badge="Issue templates" />
+        <File label="PULL_REQUEST_TEMPLATE.md" />
+      </Folder>
+      <Folder label="docs" badge="Documentation" />
+      <Folder label="src" badge="Source code" />
+      <Folder label="tests" badge="Test files" />
+      <File label=".gitignore" badge="Git ignore rules" />
+      <File label="README.md" badge="Project overview" />
+      <File label="LICENSE" badge="License file" />
+      <File label="package.json" badge="Dependencies (for Node.js)" />
+    </Trees>
 
     **Essential Files:**
     - **README.md**: Project description, setup instructions, usage examples

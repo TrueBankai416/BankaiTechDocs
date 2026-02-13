@@ -212,10 +212,10 @@ const config: Config = {
           label: 'Help me Translate!',
           position: 'right',
         },
-        {
-          type: 'localeDropdown',
-          position: 'right',
-        },
+    //    {
+    //      type: 'localeDropdown',
+    //      position: 'right',
+    //    },
         { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
         //    {to: '/blog', label: 'Blog', position: 'left'},
       ],
