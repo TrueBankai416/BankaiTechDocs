@@ -284,6 +284,7 @@ const config: Config = {
         'bash',
         'apacheconf',
         'docker',
+        'json',
       ],
     },
   } satisfies Preset.ThemeConfig,
