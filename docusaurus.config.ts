@@ -248,6 +248,10 @@ const config: Config = {
               label: 'Discord',
               href: 'https://discord.gg/6THYdvayjg',
             },
+            {
+              label: 'Matrix',
+              href: 'https://matrix.to/#/#bankai-tech:matrix.bankai-tech.com',
+            },
           ],
         },
         {
