@@ -75,18 +75,21 @@ It is strongly recommended to use relative path links in your docs. This ensures
 
 **Directory Structure Example:**
 
-```
-docs/
-├── Docusaurus/
-│   ├── Introduction.mdx
-│   └── Docs/
-│       ├── Docs Only Mode.mdx  ← You are here
-│       └── Configuration.mdx
-└── Docker/
-    ├── Introduction.mdx
-    └── Docs/
-        └── Installation.mdx
-```
+<Trees title="docs">
+  <Folder label="Docusaurus" expanded>
+    <File label="Introduction.mdx" />
+    <Folder label="Docs" expanded>
+      <File label="Docs Only Mode.mdx" badge="You are here" />
+      <File label="Configuration.mdx" />
+    </Folder>
+  </Folder>
+  <Folder label="Docker" expanded>
+    <File label="Introduction.mdx" />
+    <Folder label="Docs" expanded>
+      <File label="Installation.mdx" />
+    </Folder>
+  </Folder>
+</Trees>
 
 **Examples:**
 
