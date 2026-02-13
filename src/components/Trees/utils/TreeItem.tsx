@@ -1,4 +1,5 @@
 import React, {Children, isValidElement, useMemo, useState, type ReactNode} from 'react';
+import {Icon} from '@iconify/react';
 import styles from '../styles.module.css';
 
 interface TreeItemProps {
@@ -58,7 +59,9 @@ export default function TreeItem({
         {hasChildren ? <span className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</span> : null}
 
         <span className={styles.nodeIcon}>
-          {icon === null ? null : (
+          {icon === null ? null : typeof icon === 'string' && icon.trim().length > 0 ? (
+            <Icon icon={icon} width={iconSize} height={iconSize} aria-hidden="true" />
+          ) : (
             <span style={{fontSize: `${iconSize}px`, lineHeight: 1}}>{defaultEmoji ?? '•'}</span>
           )}
           <span className={styles.nodeLabel}>{label}</span>
