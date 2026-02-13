@@ -176,20 +176,20 @@ Effective repository management is crucial for maintaining organized, secure, an
   ]}>
   <TabItem value="structure">
     **Standard Repository Structure:**
-    ```
-my-project/
-├── .github/
-│   ├── workflows/          # GitHub Actions
-│   ├── ISSUE_TEMPLATE/     # Issue templates
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/                   # Documentation
-├── src/                    # Source code
-├── tests/                  # Test files
-├── .gitignore             # Git ignore rules
-├── README.md              # Project overview
-├── LICENSE                # License file
-└── package.json           # Dependencies (for Node.js)
-    ```
+    <Trees title="my-project">
+      <Folder label=".github" icon="vscode-icons:default-folder" expanded>
+        <Folder label="workflows" icon="vscode-icons:folder-type-github" badge="GitHub Actions" />
+        <Folder label="ISSUE_TEMPLATE" icon="vscode-icons:default-folder" badge="Issue templates" />
+        <File label="PULL_REQUEST_TEMPLATE.md" icon="vscode-icons:file-type-markdown" />
+      </Folder>
+      <Folder label="docs" icon="vscode-icons:folder-type-docs" badge="Documentation" />
+      <Folder label="src" icon="vscode-icons:folder-type-src" badge="Source code" />
+      <Folder label="tests" icon="vscode-icons:folder-type-test" badge="Test files" />
+      <File label=".gitignore" icon="vscode-icons:file-type-git" badge="Git ignore rules" />
+      <File label="README.md" icon="vscode-icons:file-type-readme" badge="Project overview" />
+      <File label="LICENSE" icon="vscode-icons:file-type-license" badge="License file" />
+      <File label="package.json" icon="vscode-icons:file-type-node" badge="Dependencies (for Node.js)" />
+    </Trees>
 
     **Essential Files:**
     - **README.md**: Project description, setup instructions, usage examples

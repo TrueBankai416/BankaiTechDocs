@@ -1,0 +1,89 @@
+.treeContainer {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  padding: 16px;
+  margin: 16px 0;
+  background-color: var(--ifm-background-surface-color);
+}
+
+.treeTitle {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  padding-bottom: 8px;
+}
+
+.treeContent {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.treeNode {
+  margin: 0;
+}
+
+.nodeContent {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 6px 8px;
+  border-radius: var(--ifm-global-radius);
+  transition: background-color 0.2s ease;
+}
+
+.nodeContent.hasChildren {
+  cursor: pointer;
+}
+
+.nodeContent:hover {
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+.expandIcon {
+  width: 20px;
+  min-width: 20px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--ifm-color-emphasis-700);
+  user-select: none;
+}
+
+.nodeIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.nodeContent:not(.hasChildren) .nodeIcon {
+  margin-left: 24px;
+}
+
+.nodeLabel {
+  font-size: 0.95rem;
+  color: var(--ifm-color-content);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.nodeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background-color: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+}
+
+.nodeChildren {
+  margin-left: 20px;
+  border-left: 1px solid var(--ifm-color-emphasis-300);
+  padding-left: 8px;
+}
+
+[data-theme='dark'] .nodeContent:hover {
+  background-color: var(--ifm-color-emphasis-200);
+}

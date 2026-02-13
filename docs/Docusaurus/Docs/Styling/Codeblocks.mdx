@@ -465,8 +465,6 @@ services:
     image: nginx
 ```
 
-````
-
 ### **Line Highlighting Guidelines**
 
 - Highlight the most important lines
@@ -477,18 +475,21 @@ services:
 
 Show complete file structures when helpful:
 
-```bash title="Project Structure"
-my-project/
-├── src/
-│   ├── components/
-│   │   └── Header.jsx
-│   ├── pages/
-│   │   └── Home.jsx
-│   └── index.js
-├── public/
-│   └── index.html
-└── package.json
-````
+<Trees title="my-project">
+  <Folder label="src" expanded>
+    <Folder label="components" expanded>
+      <File label="Header.jsx" />
+    </Folder>
+    <Folder label="pages" expanded>
+      <File label="Home.jsx" />
+    </Folder>
+    <File label="index.js" />
+  </Folder>
+  <Folder label="public" expanded>
+    <File label="index.html" />
+  </Folder>
+  <File label="package.json" />
+</Trees>
 
 ## **Common Use Cases**
 
