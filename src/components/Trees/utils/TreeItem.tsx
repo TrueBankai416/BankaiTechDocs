@@ -13,6 +13,39 @@ interface TreeItemProps {
   defaultEmoji?: string;
 }
 
+const fileIconMap: Record<string, string> = {
+  mdx: 'vscode-icons:file-type-mdx',
+  md: 'vscode-icons:file-type-markdown',
+  json: 'vscode-icons:file-type-json',
+  js: 'vscode-icons:file-type-js-official',
+  jsx: 'vscode-icons:file-type-reactjs',
+  ts: 'vscode-icons:file-type-typescript-official',
+  tsx: 'vscode-icons:file-type-reactts',
+  yml: 'vscode-icons:file-type-yaml',
+  yaml: 'vscode-icons:file-type-yaml',
+  css: 'vscode-icons:file-type-css',
+  html: 'vscode-icons:file-type-html',
+  sh: 'vscode-icons:file-type-shell',
+  env: 'vscode-icons:file-type-dotenv',
+};
+
+function resolveFileIcon(label: string, icon: string | null | undefined): string | null | undefined {
+  if (icon === null) {
+    return null;
+  }
+
+  if (typeof icon === 'string' && icon.trim().length > 0 && icon !== 'vscode-icons:default-file') {
+    return icon;
+  }
+
+  const match = label.toLowerCase().match(/\.([a-z0-9]+)$/);
+  if (match?.[1]) {
+    return fileIconMap[match[1]] ?? 'vscode-icons:default-file';
+  }
+
+  return 'vscode-icons:default-file';
+}
+
 export default function TreeItem({
   icon,
   iconSize = 20,
@@ -30,6 +63,7 @@ export default function TreeItem({
     [children],
   );
   const hasChildren = childElements.length > 0;
+  const resolvedIcon = hasChildren ? icon : resolveFileIcon(label, icon);
 
   const toggleExpand = () => {
     if (hasChildren) {
@@ -59,8 +93,9 @@ export default function TreeItem({
         {hasChildren ? <span className={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</span> : null}
 
         <span className={styles.nodeIcon}>
-          {icon === null ? null : typeof icon === 'string' && icon.trim().length > 0 ? (
-            <Icon icon={icon} width={iconSize} height={iconSize} aria-hidden="true" />
+          {resolvedIcon === null ? null :
+          typeof resolvedIcon === 'string' && resolvedIcon.trim().length > 0 ? (
+            <Icon icon={resolvedIcon} width={iconSize} height={iconSize} aria-hidden="true" />
           ) : (
             <span style={{fontSize: `${iconSize}px`, lineHeight: 1}}>{defaultEmoji ?? '•'}</span>
           )}
