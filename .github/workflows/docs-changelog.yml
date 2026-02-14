@@ -59,3 +59,14 @@ jobs:
           git add docs
           git commit -m "docs: update automatic changelog [skip ci]"
           git push
+
+      - name: Trigger Cloudflare Pages deploy hook
+        env:
+          CLOUDFLARE_PAGES_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$CLOUDFLARE_PAGES_DEPLOY_HOOK_URL" ]; then
+            echo "CLOUDFLARE_PAGES_DEPLOY_HOOK_URL is not set. Skipping deploy hook."
+            exit 0
+          fi
+
+          curl -fsS -X POST "$CLOUDFLARE_PAGES_DEPLOY_HOOK_URL"
