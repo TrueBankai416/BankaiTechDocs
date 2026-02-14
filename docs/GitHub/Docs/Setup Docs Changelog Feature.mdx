@@ -1,0 +1,156 @@
+---
+title: Setup Docs Changelog Feature
+description: Complete implementation guide for enabling the changelog feature in Docusaurus docs using frontmatter updates and a custom DocItem integration.
+image: /img/social/github-social.webp
+tags: [GitHub, Docusaurus, Changelog, Docs]
+keywords: [Docusaurus changelog, frontmatter updates, DocItem layout, docs updated component]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-02-13
+    note: "Add implementation guide for docs changelog feature setup and validation"
+---
+
+# **Setup Docs Changelog Feature**
+
+This guide covers how to set up the changelog feature itself inside your Docusaurus docs site. It focuses on rendering changelog entries from `updates` frontmatter in each document.
+
+> If you also want automatic changelog generation in CI, follow [Configure Docs Changelog CI with GitHub Actions](./Configure%20Docs%20Changelog%20CI).
+
+## **Feature overview**
+
+The changelog feature works by:
+
+1. Reading an `updates` array from doc frontmatter
+2. Rendering entries in a `Updated` component
+3. Injecting that component into the doc page layout
+
+This means every doc can have a local, visible changelog with date + note entries.
+
+---
+
+## **1) Add `updates` to doc frontmatter**
+
+In any doc file, add an `updates` array in YAML frontmatter:
+
+```yaml
+---
+title: My Doc
+description: Example page
+updates:
+  - date: 2026-02-13
+    note: "Add initial guide and setup instructions"
+  - date: 2026-02-10
+    note: "Improve examples and formatting"
+---
+```
+
+### **Frontmatter schema**
+
+- `updates`: array of changelog items
+- `date`: `YYYY-MM-DD` (recommended)
+- `note`: short markdown-supported description
+
+Supported note formatting in the current component:
+
+- `**bold**`
+- `*italic*`
+- `` `inline code` ``
+- `[link](https://example.com)`
+
+---
+
+## **2) Ensure the `Updated` component exists**
+
+Component path:
+
+- `src/components/Docs/Updated/index.js`
+- `src/components/Docs/Updated/styles.module.css`
+
+Current behavior in `index.js`:
+
+- Accepts `updates` prop
+- Returns `null` if there are no entries
+- Sorts entries by date (newest first)
+- Renders a timeline/card-style changelog section
+
+---
+
+## **3) Inject the component into DocItem layout**
+
+In your swizzled layout at `src/theme/DocItem/Layout/index.js`, render:
+
+```jsx
+<Updated updates={metadata?.frontMatter?.updates} />
+```
+
+Recommended placement is after the doc content and before footer/paginator, so changelog appears as part of the document body context.
+
+---
+
+## **4) Keep styling aligned with your theme**
+
+The feature styling should use Docusaurus theme tokens, for example:
+
+- `var(--ifm-color-primary)`
+- `var(--ifm-background-surface-color)`
+- `var(--ifm-color-emphasis-300)`
+
+This keeps light/dark theme behavior consistent and avoids hard-coded colors.
+
+---
+
+## **5) Add entries consistently**
+
+When updating docs manually, add one `updates` item per meaningful change.
+
+Suggested note patterns:
+
+- `Add setup instructions for <topic>`
+- `Clarify troubleshooting for <issue>`
+- `Update screenshots and command examples`
+
+Keep notes concise, specific, and user-facing.
+
+---
+
+## **6) Validate the feature**
+
+Validation checklist:
+
+- [ ] Doc with `updates` shows a Changelog section
+- [ ] Doc without `updates` does not render the section
+- [ ] Entries are sorted newest first
+- [ ] Markdown in notes renders correctly
+- [ ] Styling is readable in both light and dark themes
+
+---
+
+## **Common issues**
+
+### **Changelog section does not appear**
+
+Check:
+
+- `updates` exists in the doc frontmatter
+- YAML indentation is valid
+- Layout includes `<Updated updates={metadata?.frontMatter?.updates} />`
+
+### **Dates look wrong or sort incorrectly**
+
+Use ISO format (`YYYY-MM-DD`) for all entries.
+
+### **Links or markdown not rendering in notes**
+
+Ensure note syntax matches supported patterns (`**bold**`, `*italic*`, `` `code` ``, `[text](url)`).
+
+---
+
+## **Next step: automate updates**
+
+Once manual setup is working, you can automate changelog updates in CI using your updater script and workflow:
+
+- Script: `scripts/update-doc-changelog.mjs`
+- Workflow: `.github/workflows/docs-changelog.yml`
+
+Follow [Configure Docs Changelog CI with GitHub Actions](./Configure%20Docs%20Changelog%20CI) to complete automation.
