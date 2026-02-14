@@ -6,30 +6,84 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #274a7a;
+  --ifm-color-primary-dark: #23436e;
+  --ifm-color-primary-darker: #213f68;
+  --ifm-color-primary-darkest: #1b3456;
+  --ifm-color-primary-light: #2b5186;
+  --ifm-color-primary-lighter: #2d558c;
+  --ifm-color-primary-lightest: #34629f;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --ifm-link-color: #0d40cc;
+  --ifm-link-color: var(--ifm-color-primary-lightest);
+  --ifm-background-color: #f2f4f8;
+  --ifm-navbar-background-color: rgba(245, 247, 251, 0.92);
+  --ifm-footer-background-color: #11161e;
+  --ifm-font-color-base: #171c25;
+  --ifm-heading-color: #0f141c;
+  --ifm-toc-border-color: rgba(39, 74, 122, 0.3);
+  --ifm-card-background-color: rgba(255, 255, 255, 0.9);
   --floating-widget-clearance: 225px; /* Greater the number = more clearance reserved for widgets (shorter TOC) */
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #0090c9;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #7ab9ff;
+  --ifm-color-primary-dark: #5ea9ff;
+  --ifm-color-primary-darker: #4fa0ff;
+  --ifm-color-primary-darkest: #2689ff;
+  --ifm-color-primary-light: #96c9ff;
+  --ifm-color-primary-lighter: #a5d2ff;
+  --ifm-color-primary-lightest: #c5e2ff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  --ifm-link-color: #68e4f5;
+  --ifm-link-color: #a4d4ff;
+  --ifm-background-color: #090d14;
+  --ifm-navbar-background-color: rgba(9, 13, 20, 0.9);
+  --ifm-footer-background-color: #06090e;
+  --ifm-font-color-base: #d9e2f3;
+  --ifm-heading-color: #f3f7ff;
+  --ifm-toc-border-color: rgba(122, 185, 255, 0.3);
+  --ifm-card-background-color: rgba(14, 20, 31, 0.8);
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 12%, rgba(122, 185, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 88% 16%, rgba(68, 109, 165, 0.16), transparent 25%),
+    var(--ifm-background-color);
+}
+
+[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(122, 185, 255, 0.14), transparent 30%),
+    radial-gradient(circle at 84% 15%, rgba(57, 88, 132, 0.22), transparent 30%),
+    linear-gradient(180deg, #090d14 0%, #05070c 100%);
+}
+
+.navbar {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+.theme-doc-sidebar-container,
+.theme-doc-sidebar-menu {
+  background: color-mix(in srgb, var(--ifm-background-color) 94%, var(--ifm-color-primary) 6%);
+}
+
+.card,
+.pagination-nav__link,
+.table-of-contents,
+.menu {
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 12px;
+}
+
+.button.button--primary {
+  box-shadow: 0 0 0 1px rgba(122, 185, 255, 0.28), 0 8px 24px rgba(18, 38, 66, 0.35);
+}
+
+code {
+  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 40%, transparent);
 }
 
 /* Prevent TOC from overlapping with floating widgets at bottom right */
