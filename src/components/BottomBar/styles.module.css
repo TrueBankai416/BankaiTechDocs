@@ -51,6 +51,16 @@
   transform: scale(1.05);
 }
 
+.matrixButton {
+  background-color: var(--ifm-color-success);
+  color: var(--ifm-color-success-contrast-foreground);
+}
+
+.matrixButton:hover {
+  background-color: var(--ifm-color-success-dark);
+  transform: scale(1.05);
+}
+
 .coffeeButton {
   background-color: #5F7FFF;
   color: white;
@@ -65,32 +75,36 @@
   font-size: 16px;
 }
 
+.matrixIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .text {
   white-space: nowrap;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .container {
     padding: 10px 15px;
     gap: 12px;
   }
-  
+
   .button {
     font-size: 13px;
     padding: 8px 16px;
   }
-  
+
   .text {
     display: none;
   }
-  
+
   .icon {
     font-size: 18px;
   }
 }
 
-/* Add padding to body to prevent content from being hidden behind the bottom bar */
 :global(body) {
   padding-bottom: 60px;
 }
