@@ -21,3 +21,11 @@
   align-items: center;
   justify-content: center;
 }
+
+.heroGif {
+  margin-top: 1.25rem;
+  max-width: 100%;
+  width: min(520px, 90vw);
+  height: auto;
+  border-radius: 12px;
+}

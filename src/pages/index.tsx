@@ -15,6 +15,12 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <h2>For Ubuntu Systems</h2>
+        <img
+          className={styles.heroGif}
+          src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
+          alt="Animated homepage graphic"
+          loading="lazy"
+        />
       </div>
     </header>
   );
