@@ -6,6 +6,7 @@ tags: [Discord]
 keywords: [Discord, Bot]
 last_update:
   author: BankaiTech
+updates:
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';

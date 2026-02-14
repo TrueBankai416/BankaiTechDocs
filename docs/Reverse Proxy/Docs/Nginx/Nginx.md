@@ -6,6 +6,7 @@ tags: [Reverse Proxy, Nginx]
 keywords: [Reverse Proxy, Nginx]
 last_update:
   author: BankaiTech
+updates:
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
