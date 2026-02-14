@@ -9,31 +9,38 @@ function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
+      <div className={clsx('container', styles.heroContent)}>
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <h2>For Ubuntu Systems</h2>
+        <h2 className={styles.heroSectionTitle}>For Ubuntu Systems</h2>
+        <div className={styles.heroAccent} aria-hidden="true" />
         <div className={styles.heroGifRow}>
-          <img
-            className={`${styles.heroGif} ${styles.heroGifSide}`}
-            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFqNTB0anN4bjE0ZHF3dnQ1MGttcGpkMThiaXZxd2N4dXBrdHI5YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JRiAeFnqoFLtrHqttI/giphy.gif"
-            alt="Animated homepage graphic left"
-            loading="lazy"
-          />
-          <img
-            className={`${styles.heroGif} ${styles.heroGifCenter}`}
-            src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
-            alt="Animated homepage graphic center"
-            loading="lazy"
-          />
-          <img
-            className={`${styles.heroGif} ${styles.heroGifSide}`}
-            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGM1MHQyM3ByZTVzdW1pMTZnN240M3RyYmV3eGNuYWZmMjBsMzE0bCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT9IgzoKnwFNmISR8I/giphy.gif"
-            alt="Animated homepage graphic right"
-            loading="lazy"
-          />
+          <div className={clsx(styles.heroMediaCard, styles.heroMediaCardSide)}>
+            <img
+              className={`${styles.heroGif} ${styles.heroGifSide}`}
+              src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFqNTB0anN4bjE0ZHF3dnQ1MGttcGpkMThiaXZxd2N4dXBrdHI5YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JRiAeFnqoFLtrHqttI/giphy.gif"
+              alt="Animated homepage graphic left"
+              loading="lazy"
+            />
+          </div>
+          <div className={clsx(styles.heroMediaCard, styles.heroMediaCardCenter)}>
+            <img
+              className={`${styles.heroGif} ${styles.heroGifCenter}`}
+              src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
+              alt="Animated homepage graphic center"
+              loading="lazy"
+            />
+          </div>
+          <div className={clsx(styles.heroMediaCard, styles.heroMediaCardSide)}>
+            <img
+              className={`${styles.heroGif} ${styles.heroGifSide}`}
+              src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGM1MHQyM3ByZTVzdW1pMTZnN240M3RyYmV3eGNuYWZmMjBsMzE0bCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT9IgzoKnwFNmISR8I/giphy.gif"
+              alt="Animated homepage graphic right"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
     </header>
