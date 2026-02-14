@@ -123,6 +123,16 @@ jobs:
 
 `GITHUB_TOKEN` often cannot bypass strict protection rules on `main`. A GitHub App token can, if the app is added to your ruleset bypass list.
 
+### **Personal repo shortcut (temporary)**
+
+If this is a personal repository and `main` is currently unprotected, you can run this workflow with `GITHUB_TOKEN` only:
+
+- Leave `DOCS_BOT_APP_ID` and `DOCS_BOT_PRIVATE_KEY` unset
+- Keep `permissions: contents: write`
+- The checkout step falls back to `${{ github.token }}` automatically
+
+This is fine for short-term use while you research rulesets. Re-enable branch protection later and then configure the GitHub App + bypass path.
+
 ---
 
 ## **3) Create and install a GitHub App**
