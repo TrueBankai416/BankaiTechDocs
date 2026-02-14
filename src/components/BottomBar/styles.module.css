@@ -29,8 +29,11 @@
 .button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 20px;
+  width: 170px;
+  height: 44px;
+  padding: 0 14px;
   border: none;
   border-radius: 50px;
   font-size: 14px;
@@ -62,23 +65,44 @@
 }
 
 .coffeeButton {
-  background-color: #5F7FFF;
-  color: white;
+  background-color: #c49a6c;
+  color: #2f1f12;
 }
 
 .coffeeButton:hover {
-  background-color: #4F6FEF;
+  background-color: #b18558;
   transform: scale(1.05);
 }
 
 .icon {
   font-size: 16px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.discordIcon {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .matrixIcon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: block;
+}
+
+.coffeeIcon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  overflow: visible;
+}
+
+.coffeeImage {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(1.65);
 }
 
 .text {
@@ -93,7 +117,10 @@
 
   .button {
     font-size: 13px;
-    padding: 8px 16px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    gap: 0;
   }
 
   .text {
