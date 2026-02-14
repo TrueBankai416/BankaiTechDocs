@@ -15,12 +15,20 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <h2>For Ubuntu Systems</h2>
-        <img
-          className={styles.heroGif}
-          src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
-          alt="Animated homepage graphic"
-          loading="lazy"
-        />
+        <div className={styles.heroGifRow}>
+          <img
+            className={styles.heroGif}
+            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFqNTB0anN4bjE0ZHF3dnQ1MGttcGpkMThiaXZxd2N4dXBrdHI5YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JRiAeFnqoFLtrHqttI/giphy.gif"
+            alt="Animated homepage graphic left"
+            loading="lazy"
+          />
+          <img
+            className={styles.heroGif}
+            src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
+            alt="Animated homepage graphic right"
+            loading="lazy"
+          />
+        </div>
       </div>
     </header>
   );

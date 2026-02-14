@@ -22,10 +22,24 @@
   justify-content: center;
 }
 
-.heroGif {
+.heroGifRow {
   margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.heroGif {
   max-width: 100%;
-  width: min(520px, 90vw);
+  width: min(420px, 90vw);
   height: auto;
   border-radius: 12px;
+}
+
+@media screen and (max-width: 996px) {
+  .heroGifRow {
+    flex-direction: column;
+  }
 }
