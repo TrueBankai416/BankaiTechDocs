@@ -1,0 +1,116 @@
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--ifm-background-surface-color);
+  border-top: 1px solid var(--ifm-toc-border-color);
+  z-index: 9999;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .bottomBar {
+  background-color: var(--ifm-background-surface-color);
+  border-top-color: var(--ifm-toc-border-color);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.discordButton {
+  background-color: #7289da;
+  color: white;
+}
+
+.discordButton:hover {
+  background-color: #677bc4;
+  transform: scale(1.05);
+}
+
+.matrixButton {
+  background-color: var(--ifm-color-success);
+  color: var(--ifm-color-success-contrast-foreground);
+}
+
+.matrixButton:hover {
+  background-color: var(--ifm-color-success-dark);
+  transform: scale(1.05);
+}
+
+.coffeeButton {
+  background-color: #5F7FFF;
+  color: white;
+}
+
+.coffeeButton:hover {
+  background-color: #4F6FEF;
+  transform: scale(1.05);
+}
+
+.icon {
+  font-size: 16px;
+}
+
+.matrixIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.text {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px 15px;
+    gap: 12px;
+  }
+
+  .button {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .text {
+    display: none;
+  }
+
+  .icon {
+    font-size: 18px;
+  }
+}
+
+:global(body) {
+  padding-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+  :global(body) {
+    padding-bottom: 50px;
+  }
+}
