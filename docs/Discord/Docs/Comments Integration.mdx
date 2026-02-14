@@ -3,6 +3,15 @@ title: Comments Integration
 description: Complete guide to integrating bidirectional Discord comments with Docusaurus including setup, configuration, and troubleshooting.
 image: /img/social/discord-social.jpg
 sidebar_position: 2
+updates:
+  - date: 2026-02-13
+    note: "Convert Comments Integration file tree to Trees component"
+  - date: 2025-07-18
+    note: "Add Docusaurus configuration for comment systems"
+  - date: 2025-07-17
+    note: "Add configurable Discord context system with granular controls"
+  - date: 2025-07-17
+    note: "Add Discord comments integration alongside existing Giscus comments"
 ---
 
 # Discord Comments Integration
@@ -316,16 +325,16 @@ Website Frontend ←→ Express API ←→ Discord Bot ←→ Discord Server
 
 ## File Structure
 
-```
-project/
-├── src/components/DiscordComments/     # Frontend component
-├── server/                            # Backend server
-│   ├── api.js                        # Express API server
-│   ├── discord-bot.js                # Discord bot logic
-│   ├── database.js                   # SQLite database functions
-│   └── package.json                  # Server dependencies
-└── docs/Discord/Docs/                # Documentation
-```
+<Trees title="project">
+  <Folder label="src/components/DiscordComments" badge="Frontend component" />
+  <Folder label="server" badge="Backend server" expanded>
+    <File label="api.js" badge="Express API server" />
+    <File label="discord-bot.js" badge="Discord bot logic" />
+    <File label="database.js" badge="SQLite database functions" />
+    <File label="package.json" badge="Server dependencies" />
+  </Folder>
+  <Folder label="docs/Discord/Docs" badge="Documentation" />
+</Trees>
 
 ## Browser Support
 

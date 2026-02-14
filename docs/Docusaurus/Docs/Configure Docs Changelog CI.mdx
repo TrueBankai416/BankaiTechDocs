@@ -1,0 +1,254 @@
+---
+title: Configure Docs Changelog CI with GitHub Actions
+description: Step-by-step guide to automate docs changelog frontmatter updates with GitHub Actions, GitHub App authentication, and branch protection rulesets.
+image: /img/social/github-social.webp
+tags: [GitHub, GitHub Actions, CI, Docusaurus, Changelog]
+keywords: [GitHub Actions, changelog, docs, Docusaurus, ruleset, protected branch, GitHub App]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-02-13
+    note: "docs(changelog): move guides to Docusaurus section"
+  - date: 2026-02-13
+    note: "docs(changelog): add setup and CI configuration guides"
+---
+
+# **Configure Docs Changelog CI with GitHub Actions**
+
+This guide explains how to automatically update `updates` frontmatter in your docs using GitHub Actions, including the protected-branch setup required to avoid `GH006` push failures.
+
+For the base feature setup (component integration, frontmatter shape, and rendering), see [Setup Docs Changelog Feature](./Setup%20Docs%20Changelog%20Feature).
+
+## **What this pipeline does**
+
+On every push to `main` that affects docs-related files, the workflow:
+
+1. Runs `npm run changelog:docs`
+2. Updates `updates:` frontmatter entries inside docs files
+3. Commits the generated changes
+4. Pushes the commit back to `main`
+
+---
+
+## **Prerequisites**
+
+- A repository with Docusaurus docs under `docs/`
+- A changelog updater script (example: `scripts/update-doc-changelog.mjs`)
+- A workflow file (example: `.github/workflows/docs-changelog.yml`)
+- Admin access (or equivalent) to configure rules and app installation
+
+---
+
+## **1) Add the npm command**
+
+In `package.json`, ensure a script exists:
+
+```json
+{
+  "scripts": {
+    "changelog:docs": "node scripts/update-doc-changelog.mjs"
+  }
+}
+```
+
+---
+
+## **2) Add the workflow**
+
+Create `.github/workflows/docs-changelog.yml`:
+
+```yaml
+name: Docs Changelog Updater
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'scripts/update-doc-changelog.mjs'
+      - '.github/workflows/docs-changelog.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs-changelog:
+    if: ${{ !endsWith(github.actor, '[bot]') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub App token (optional)
+        id: app-token
+        if: vars.DOCS_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token || github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Update docs changelog frontmatter
+        run: npm run changelog:docs
+
+      - name: Commit and push changes
+        run: |
+          if [ -n "${{ steps.app-token.outputs.token }}" ]; then
+            git config user.name "docs-changelog-bot[bot]"
+            git config user.email "docs-changelog-bot[bot]@users.noreply.github.com"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fi
+
+          if git diff --quiet -- docs; then
+            echo "No changelog updates detected."
+            exit 0
+          fi
+
+          git add docs
+          git commit -m "docs: update automatic changelog [skip ci]"
+          git push
+```
+
+### **Why the GitHub App token matters**
+
+`GITHUB_TOKEN` often cannot bypass strict protection rules on `main`. A GitHub App token can, if the app is added to your ruleset bypass list.
+
+### **Personal repo shortcut (temporary)**
+
+If this is a personal repository and `main` is currently unprotected, you can run this workflow with `GITHUB_TOKEN` only:
+
+- Leave `DOCS_BOT_APP_ID` and `DOCS_BOT_PRIVATE_KEY` unset
+- Keep `permissions: contents: write`
+- The checkout step falls back to `${{ github.token }}` automatically
+
+This is fine for short-term use while you research rulesets. Re-enable branch protection later and then configure the GitHub App + bypass path.
+
+---
+
+## **3) Create and install a GitHub App**
+
+Go to **GitHub Settings → Developer settings → GitHub Apps → New GitHub App**.
+
+Recommended app values:
+
+- **GitHub App name:** `bankaitech-docs-changelog-bot` (or your own unique name)
+- **Homepage URL:** your repository URL
+- **Webhook:** disabled (unless required by your policy)
+- **Repository permissions:**
+  - `Contents: Read and write` ✅
+  - `Metadata: Read-only` (mandatory)
+  - All others: `No access`
+
+After creation:
+
+1. Generate a private key (download once)
+2. Install the app on your target repository
+3. Note the App ID from the app settings
+
+---
+
+## **4) Add repository secret + variable**
+
+In **Repository Settings → Secrets and variables → Actions**:
+
+- **Secret:** `DOCS_BOT_PRIVATE_KEY` → paste the full app private key (`.pem` contents)
+- **Variable:** `DOCS_BOT_APP_ID` → paste the numeric App ID
+
+Also confirm:
+
+- **Settings → Actions → General → Workflow permissions:** `Read and write permissions`
+
+---
+
+## **5) Configure branch protection with rulesets**
+
+If `main` is protected, you must allow the app to bypass relevant restrictions.
+
+In **Settings → Rules → Rulesets**:
+
+1. Open the ruleset that targets `main`
+2. In **Bypass list**, add your GitHub App
+3. Set bypass mode to **Always allow**
+4. Save
+
+> Important: If you still get `GH006`, check for overlapping protections (another active ruleset or a classic branch rule on `main`).
+
+---
+
+## **6) Validate the setup**
+
+Use **Actions → Docs Changelog Updater → Run workflow**.
+
+Expected result:
+
+- Workflow runs successfully
+- A commit like `docs: update automatic changelog [skip ci]` appears on `main`
+- Push is accepted (no `GH006`)
+
+If no docs were changed, the run should log: `No changelog updates detected.`
+
+---
+
+## **Troubleshooting**
+
+### **Error: GH006 Protected branch update failed**
+
+Common causes:
+
+- App not in the active ruleset bypass list
+- A second ruleset also matches `main` and blocks push
+- Classic branch rule on `main` still requires PR and has no bypass actor
+
+Fix checklist:
+
+- Verify app bypass entry exists on every active rule targeting `main`
+- Remove duplicate/legacy classic branch rule, or add bypass actor there too
+- Confirm workflow uses app token path (not fallback only)
+
+### **Error: Context access might be invalid for vars/secrets**
+
+Editors may show warnings before secrets/vars exist. Once `DOCS_BOT_APP_ID` and `DOCS_BOT_PRIVATE_KEY` are created, runs will work.
+
+### **Workflow keeps retriggering**
+
+Use the actor guard on the job:
+
+```yaml
+if: ${{ !endsWith(github.actor, '[bot]') }}
+```
+
+If you need other bots to run this workflow, switch to a specific guard for your changelog app bot only.
+
+---
+
+## **Operational notes**
+
+- Keep commit messages machine-readable and consistent.
+- Scope `on.push.paths` to docs/changelog-related files only.
+- Keep the updater script deterministic to avoid churn.
+- Review generated frontmatter quality periodically and tune filters in the updater script as needed.
+
+---
+
+## **Quick checklist**
+
+- [ ] `changelog:docs` script exists in `package.json`
+- [ ] Workflow file added in `.github/workflows/docs-changelog.yml`
+- [ ] GitHub App created and installed
+- [ ] `DOCS_BOT_PRIVATE_KEY` secret set
+- [ ] `DOCS_BOT_APP_ID` variable set
+- [ ] Ruleset bypass list contains the app (`Always allow`)
+- [ ] Actions workflow permissions set to `Read and write`
+- [ ] Manual run succeeds on `main`

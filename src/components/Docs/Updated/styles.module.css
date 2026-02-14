@@ -1,0 +1,84 @@
+.revisionHistoryContainer {
+  background-color: var(--ifm-color-emphasis-100);
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  padding: 1.25rem;
+}
+
+.revisionHistoryTitle {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ifm-color-primary);
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 17px;
+  height: calc(100% - 10px);
+  width: 2px;
+  background: var(--ifm-color-emphasis-300);
+}
+
+.timelineItem {
+  display: flex;
+  position: relative;
+  margin-bottom: 1.5rem;
+  min-height: 34px;
+}
+
+.timelineItem:last-child {
+  margin-bottom: 0;
+}
+
+.timelineIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--ifm-color-emphasis-100);
+  border: 2px solid var(--ifm-color-success);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.timelineContent {
+  padding-left: 45px;
+  flex: 1;
+}
+
+.timelineEntry {
+  background-color: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-left: 3px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+  padding: 0.75rem 1rem;
+}
+
+.timelineDate {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ifm-color-success-dark);
+  margin-bottom: 0.25rem;
+}
+
+.timelineDescription {
+  line-height: 1.5;
+  color: var(--ifm-color-content);
+  font-size: 0.95rem;
+}

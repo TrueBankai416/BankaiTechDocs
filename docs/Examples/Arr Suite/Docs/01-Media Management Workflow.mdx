@@ -1,14 +1,20 @@
 ---
 title: Media Management Workflow
-tags:
-    - Arr Suite
-    - Workflow
-    - Media Management
-    - mergerfs
-    - Usenet
+tags: [Arr Suite, Workflow, Media Management, mergerfs, Usenet]
 keywords: [Arr Suite, Workflow, Media Management, Jellyseerr, Radarr, Sonarr, Prowlarr, qBittorrent, Usenet, mergerfs, Jellyfin]
 last_update:
   author: BankaiTech
+updates:
+  - date: 2026-02-13
+    note: "Add bind-mount consistency warning above folder structure"
+  - date: 2026-02-13
+    note: "Convert Arr Suite folder structure to Trees component"
+  - date: 2025-08-23
+    note: "Fix Mermaid diagram color consistency"
+  - date: 2025-08-23
+    note: "Final polish: fix Mermaid colors and Docker integration examples"
+  - date: 2025-08-23
+    note: "Final cleanup: fix Mermaid classes and folder structure"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -120,30 +126,38 @@ flowchart TD
 
 ## Folder Structure
 
-```
-/media/merged/         # mergerfs mount point
-├── movies/            # Jellyfin Movies library
-├── tv/                # Jellyfin TV Shows library
-├── music/             # Jellyfin Music library (if using Lidarr)
-├── books/             # Jellyfin Books library (if using Readarr)
-├── downloads/         # Download location (bind mount)
-    └── Torrent/       # qBittorrent download location
-        ├── temp/      # Temp download location
-        ├── radarr/
-        └── tv-sonarr/
-    └── Usenet/        # Usenet download location
-        └── temp/      # Usenet temp download location
-├── cache/             # Tdarr cache location (bind mount)
-    └── tdarr_cache/
+:::warning Bind Mount Consistency Required
+Use the same media path mapping in every related container (Sonarr, Radarr, qBittorrent, and others). The host bind-mount path and the in-container mount path must be consistent across services, or import/move operations can fail.
+:::
 
-/mnt/               # Individual drive mount points
-├── disk1/          # First storage drive
-├── disk2/          # Second storage drive
-├── disk3/          # Third storage drive
-└── diskN/          # Additional drives as needed
+<Trees title="/media/merged">
+  <Folder label="movies" badge="Jellyfin Movies library" />
+  <Folder label="tv" badge="Jellyfin TV Shows library" />
+  <Folder label="music" badge="Jellyfin Music library (if using Lidarr)" />
+  <Folder label="books" badge="Jellyfin Books library (if using Readarr)" />
+  <Folder label="downloads" badge="Download location" expanded>
+    <Folder label="Torrent" badge="qBittorrent download location" expanded>
+      <Folder label="temp" badge="Temp download location" />
+      <Folder label="radarr" />
+      <Folder label="tv-sonarr" />
+    </Folder>
+    <Folder label="Usenet" badge="Usenet download location" expanded>
+      <Folder label="temp" badge="Usenet temp download location" />
+    </Folder>
+  </Folder>
+  <Folder label="cache" badge="Tdarr cache location (bind mount)" expanded>
+    <Folder label="tdarr_cache" />
+  </Folder>
+</Trees>
 
-# mergerfs pools all /mnt/disk* into /media/merged
-```
+<Trees title="/mnt">
+  <Folder label="disk1" badge="First storage drive" />
+  <Folder label="disk2" badge="Second storage drive" />
+  <Folder label="disk3" badge="Third storage drive" />
+  <Folder label="diskN" badge="Additional drives as needed" />
+</Trees>
+
+mergerfs pools all `/mnt/disk*` into `/media/merged`.
 
 ## mergerfs Configuration
 

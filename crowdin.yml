@@ -1,0 +1,46 @@
+project_id: Bankai-Tech
+api_token_env: CROWDIN_PERSONAL_TOKEN
+languages_mapping:
+  locale:
+    af-ZA: af
+    ar-SA: ar
+    ca-ES: ca
+    cs-CZ: cs
+    da-DK: da
+    de-DE: de
+    el-GR: el
+    es-ES: es
+    fi-FI: fi
+    fr-FR: fr
+    he-IL: he
+    hu-HU: hu
+    it-IT: it
+    ja-JP: ja
+    ko-KR: ko
+    nl-NL: nl
+    'no': 'no'
+    pl-PL: pl
+    pt-BR: pt
+    ro-RO: ro
+    ru-RU: ru
+    sr: sr
+    sv-SE: sv
+    tr-TR: tr
+    uk-UA: uk
+    vi-VN: vi
+    zh-CN: zh
+mdx_file_type: mdx_v1_2
+preserve_hierarchy: 1
+files:
+  - source: /i18n/en/**/*.json
+    translation: /i18n/%locale%/**/%original_file_name%
+    languages_mapping: []
+  - source: /docs/**/*.mdx
+    translation: /i18n/%locale%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    languages_mapping: []
+    type: mdx_v1_2
+  - source: /docs/**/*.md
+    translation: /i18n/%locale%/docusaurus-plugin-content-docs/current/**/%original_file_name%
+    languages_mapping: []
+    ignore:
+      - /**/*.mdx

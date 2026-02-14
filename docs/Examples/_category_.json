@@ -1,7 +1,6 @@
 {
   "label": "Examples",
-  "position": 4,
-  "link": {
+  "position": 4,  "key": "examples-main",  "link": {
     "type": "generated-index",
     "description": "Example configuration files and more."
   }

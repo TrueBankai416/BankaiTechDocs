@@ -2,29 +2,21 @@
 title: Nginx Examples
 description: Comprehensive collection of Nginx reverse proxy configuration examples for popular applications including Nextcloud, Jellyfin, Home Assistant, and more.
 image: /img/social/Examples/nginx-configuration-examples-dark.png
-tags:
-   - Reverse Proxy
-   - Nginx
-   - Nextcloud
-   - Adguard Home
-   - Authelia
-   - HomeBridge
-   - Home Assistant
-   - Jellyfin | JFA-GO
-   - Jellyseerr
-   - Arr Suite
-   - Radarr
-   - Sonarr
-   - Prowlarr
-   - Lidarr
-   - Immich
-   - Portainer
-   - Vaultwarden
-   - Uptime Kuma
-   - Snippets
+tags: [Reverse Proxy, Nginx, Nextcloud, Adguard Home, Authelia, HomeBridge, Home Assistant, Jellyfin | JFA-GO, Jellyseerr, Arr Suite, Radarr, Sonarr, Prowlarr, Lidarr, Immich, Portainer, Vaultwarden, Uptime Kuma, Snippets]
 keywords: [Reverse Proxy,Nginx,Nextcloud,Adguard,Authelia,HomeBridge,Home Assistant,Jellyfin,JFA-GO,Jellyseer,Radarr,Sonarr,Prowlarr,Lidarr,Arr Suite,Immich,Portainer,Vaultwarden,Uptime Kuma,Snippets]
 last_update:
   author: BankaiTech
+updates:
+  - date: 2026-01-30
+    note: "docs: comment out Authelia location block includes in Nginx examples"
+  - date: 2026-01-30
+    note: "docs: clarify Nginx configuration file references and emphasize security considerations"
+  - date: 2026-01-30
+    note: "docs: enhance Nginx documentation with configuration file guidance and snippet references"
+  - date: 2026-01-01
+    note: "Standardize HTTP redirect blocks and fix example snippet"
+  - date: 2026-01-01
+    note: "Refactor Nginx configuration to use dynamic host redirection for HTTP to HTTPS"
 ---
 
 import Tabs from '@theme/Tabs';
@@ -33,6 +25,10 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 :::note
 These examples may include references to additional Nginx configuration files (such as `security-headers.conf`, `authelia-location.conf`, `proxy.conf`, etc.) that are not included by default with Nginx. These snippet files can be found in the [Nginx Snippets](#nginx-snippets) section below and should be manually created in `/etc/nginx/snippets/`. Alternatively, if you don't want to use these snippet files, you can simply comment out the `include` lines in the configuration.
+:::
+
+:::warning Security Consideration
+While you can comment out non-essential snippet includes (like `proxy.conf` or `authelia-location.conf`), **do not comment out `security-headers.conf`** without implementing the security headers directly in your configuration. These headers protect against common web vulnerabilities including XSS attacks, clickjacking, MIME sniffing, and other security threats. Removing them significantly increases your security risk.
 :::
 
 ## Nextcloud
@@ -135,8 +131,6 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
-    #                         Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -238,8 +232,6 @@ server {
 // highlight-next-line
         proxy_bind 192.168.4.204;
     }
-    #              Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -355,7 +347,7 @@ server {
         proxy_cache_background_update on;
     }
     #             Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -411,7 +403,7 @@ server {
         proxy_cache_background_update on;
     }
     #            Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+ #   include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -566,7 +558,7 @@ server {
         proxy_set_header Connection "upgrade";
     }
     #                     Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
 }
 ```
 
@@ -610,7 +602,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -656,7 +648,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -701,7 +693,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -746,7 +738,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                      Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                      Connect to backend server
     location / {
 // highlight-next-line
@@ -863,7 +855,7 @@ server {
     proxy_send_timeout 600s;
     send_timeout 600s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -921,7 +913,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -976,7 +968,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line
@@ -1034,7 +1026,7 @@ server {
     client_body_buffer_size 50m;
     client_body_timeout 300s;
     #                    Include Authelia location block
-    include /etc/nginx/snippets/authelia-location.conf;
+#    include /etc/nginx/snippets/authelia-location.conf;
     #                    Connect to backend server
     location / {
 // highlight-next-line

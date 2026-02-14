@@ -1,7 +1,6 @@
 {
   "label": "Docker",
-  "position": 1,
-  "link": {
+  "position": 1,  "key": "docker-main",  "link": {
     "type": "generated-index",
     "description": "Tutorials showing you how to run Self-Hosted systems using Docker."
   }

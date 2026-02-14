@@ -67,10 +67,10 @@ const config: Config = {
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
-  },
+//  i18n: {
+//    defaultLocale: 'en',
+//    locales: ['en'],
+//  },
 
   presets: [
     [
@@ -207,6 +207,15 @@ const config: Config = {
           position: 'left',
           label: 'MS Windows',
         },
+        {
+          href: 'https://crowdin.com/project/bankai-tech',
+          label: 'Help me Translate!',
+          position: 'right',
+        },
+    //    {
+    //      type: 'localeDropdown',
+    //      position: 'right',
+    //    },
         { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
         //    {to: '/blog', label: 'Blog', position: 'left'},
       ],
@@ -238,6 +247,10 @@ const config: Config = {
             {
               label: 'Discord',
               href: 'https://discord.gg/6THYdvayjg',
+            },
+            {
+              label: 'Matrix',
+              href: 'https://matrix.to/#/#bankai-tech:matrix.bankai-tech.com',
             },
           ],
         },

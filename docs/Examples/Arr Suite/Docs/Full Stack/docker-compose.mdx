@@ -1,10 +1,18 @@
 ---
 title: docker-compose.yaml
-tags:
-    - Arr Suite
+tags: [Arr Suite]
 keywords: [Arr Suite]
 last_update:
   author: BankaiTech
+updates:
+  - date: 2026-02-06
+    note: "fix: update docker-compose configuration for jellyfin service with additional settings and volume mappings"
+  - date: 2025-08-23
+    note: "Add Flaresolverr service to docker-compose example"
+  - date: 2025-08-23
+    note: "Fix docker-compose volume mappings and dependencies"
+  - date: 2025-08-23
+    note: "Update media flow example to include Usenet and mergerfs integration"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -13,6 +21,41 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 name: media-management
 
 services:
+
+  # Server
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    user: 1000:1000
+    networks:
+      - media-network
+    ports:
+      - 8096:8096/tcp
+      - 7359:7359/udp
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - type: bind
+        source: /media/merged
+        target: /media
+        read_only: false
+      # Optional - extra fonts to be used during transcoding with subtitle burn-in
+      #- type: bind
+      #  source: /path/to/fonts
+      #  target: /usr/local/share/fonts/custom
+      #  read_only: true
+    restart: 'unless-stopped'
+    # Optional - alternative address used for autodiscovery
+   # environment:
+   #   - JELLYFIN_PublishedServerUrl=http://example.com
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   # Core Services
   prowlarr:
@@ -200,6 +243,10 @@ services:
 networks:
   media-network:
     driver: bridge
+
+volumes:
+  jellyfin-config:
+  jellyfin-cache:
 ```
 
 <BuyMeACoffeeButton />

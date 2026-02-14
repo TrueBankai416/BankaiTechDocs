@@ -3,16 +3,21 @@ title: Install with Collabora
 description: Nextcloud installation with Collabora Code integration for online document editing, including Redis, MariaDB, and office suite functionality.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 2
-tags:
-   - Docker
-   - Docker Compose
-   - Tutorial
-   - Nextcloud
-   - Collabora Code
-   - Nextcloud Office
+tags: [Docker, Docker Compose, Tutorial, Nextcloud, Collabora Code, Nextcloud Office]
 keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
 last_update:
   author: BankaiTech
+updates:
+  - date: 2025-12-20
+    note: "Update installation guides to use /opt/docker instead of /var/docker for directory creation and ownership commands"
+  - date: 2025-12-19
+    note: "Add volume definitions to all docker-compose.yaml examples"
+  - date: 2025-12-19
+    note: "Update .env examples to use named Docker volumes instead of relative paths"
+  - date: 2025-12-19
+    note: "Update DATA_LOCATION volume default value"
+  - date: 2025-12-19
+    note: "Update database volume configuration in Collabora docs"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';

@@ -1,5 +1,6 @@
 {
   "label": "Arr Suite",
+  "key": "arr-suite-examples",
   "link": {
     "type": "generated-index",
     "description": "Examples of *Arr application yaml files."

@@ -1,0 +1,220 @@
+---
+title: Trees Component
+description: Detailed guide for adding interactive folder/file trees in Docusaurus using MDX components and Iconify icons.
+image: /img/social/docusaurus-social.jpg
+tags: [Docusaurus, Styling, Trees, MDX, Iconify]
+keywords: [Docusaurus, Trees, Folder, File, MDX Components, Iconify, Documentation]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-02-13
+    note: "Add Trees Component documentation for interactive file/folder trees"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Trees Component (Interactive File Trees)**
+
+This guide explains how to build and use an interactive Trees component in Docusaurus, including native emoji mode and Iconify icon mode.
+
+## **What This Adds**
+
+- Collapsible folder/file trees directly in `.mdx` docs
+- Reusable components: `Trees`, `Folder`, and `File`
+- Global MDX support (usable without local imports)
+- Optional Iconify icons with extension-aware defaults (including `.mdx`)
+
+## **Implementation in This Repo**
+
+The current implementation lives in:
+
+- `src/components/Trees/index.tsx`
+- `src/components/Trees/Folder/index.tsx`
+- `src/components/Trees/File/index.tsx`
+- `src/components/Trees/utils/TreeItem.tsx`
+- `src/components/Trees/styles.module.css`
+- `src/theme/MDXComponents.tsx`
+
+## **Step 1: Install Iconify**
+
+Install Iconify for Mode 2 icon rendering:
+
+```bash
+npm install @iconify/react
+```
+
+## **Step 2: Register MDX Components Globally**
+
+Register `Trees`, `Folder`, and `File` in `src/theme/MDXComponents.tsx`:
+
+```tsx
+import MDXComponents from '@theme-original/MDXComponents';
+import type {MDXComponentsObject} from '@theme/MDXComponents';
+import Trees from '@site/src/components/Trees';
+import Folder from '@site/src/components/Trees/Folder';
+import File from '@site/src/components/Trees/File';
+
+const components: MDXComponentsObject = {
+  ...MDXComponents,
+  Trees,
+  Folder,
+  File,
+};
+
+export default components;
+```
+
+After this, all docs can use `<Trees>`, `<Folder>`, and `<File>` directly.
+
+## **Step 3: Use in MDX**
+
+### **Mode 1: Native/Default**
+
+```mdx
+<Trees title="my-project">
+  <Folder label="src" expanded>
+    <File label="index.ts" />
+    <File label="App.tsx" />
+  </Folder>
+  <File label="package.json" />
+</Trees>
+```
+
+**Visual Example:**
+
+<Trees title="mode-1-default">
+  <Folder label="src" expanded>
+    <File label="index.ts" />
+    <File label="App.tsx" />
+  </Folder>
+  <File label="package.json" />
+</Trees>
+
+### **Mode 2: Iconify Icons**
+
+```mdx
+<Trees title="my-project">
+  <Folder label="src" icon="vscode-icons:folder-type-src" expanded>
+    <File label="App.tsx" icon="vscode-icons:file-type-reactts" />
+    <File label="styles.css" icon="vscode-icons:file-type-css" />
+  </Folder>
+  <File label="README.md" icon="vscode-icons:file-type-readme" />
+</Trees>
+```
+
+**Visual Example:**
+
+<Trees title="mode-2-iconify">
+  <Folder label="src" icon="vscode-icons:folder-type-src" expanded>
+    <File label="App.tsx" icon="vscode-icons:file-type-reactts" />
+    <File label="styles.css" icon="vscode-icons:file-type-css" />
+  </Folder>
+  <File label="README.md" icon="vscode-icons:file-type-readme" />
+</Trees>
+
+### **Mode 3: No Icon**
+
+```mdx
+<Trees title="minimal">
+  <File label="notes.txt" icon={null} />
+</Trees>
+```
+
+**Visual Example:**
+
+<Trees title="mode-3-no-icon">
+  <Folder label="notes" icon={null} expanded>
+    <File label="notes.txt" icon={null} />
+    <File label="todo.md" icon={null} />
+  </Folder>
+</Trees>
+
+## **Options Reference (With Examples)**
+
+### **`<Trees>` Options**
+
+- `title` (optional): Tree title shown at the top
+- `children` (required): Nested `Folder` / `File` components
+
+```mdx
+<Trees title="Project Files">
+  <File label="README.md" />
+</Trees>
+```
+
+### **`<Folder>` Options**
+
+- `label` (required): Folder name
+- `icon` (optional): Iconify icon string, or `null` to hide icon
+- `iconSize` (optional): Icon size in pixels
+- `badge` (optional): Context label shown on the right
+- `expanded` (optional): Initial expanded/collapsed state
+- `children` (optional): Nested folders/files
+
+```mdx
+<Trees title="Folder Options">
+  <Folder
+    label="src"
+    icon="vscode-icons:folder-type-src"
+    iconSize={22}
+    badge="core"
+    expanded
+  >
+    <File label="index.ts" />
+  </Folder>
+
+  <Folder label="hidden-icon-folder" icon={null}>
+    <File label="notes.md" />
+  </Folder>
+</Trees>
+```
+
+### **`<File>` Options**
+
+- `label` (required): File name
+- `icon` (optional): Iconify icon string, or `null` to hide icon
+- `iconSize` (optional): Icon size in pixels
+- `badge` (optional): Context label shown on the right
+
+```mdx
+<Trees title="File Options">
+  <File label="README.md" icon="vscode-icons:file-type-readme" iconSize={20} badge="docs" />
+  <File label="package.json" badge="config" />
+  <File label="no-icon.txt" icon={null} />
+</Trees>
+```
+
+### **Behavior Notes**
+
+- `level` is internal and automatically managed (do not set manually)
+- Explicit `icon="..."` overrides extension-based auto mapping
+- `icon={null}` always disables icon rendering
+
+## **Automatic File-Type Icon Mapping**
+
+This repo maps common extensions in `TreeItem` so file labels automatically get better icons when no explicit icon is set.
+
+Examples:
+
+- `.mdx` → `vscode-icons:file-type-mdx`
+- `.md` → `vscode-icons:file-type-markdown`
+- `.json` → `vscode-icons:file-type-json`
+- `.ts/.tsx` → TypeScript icons
+
+Unknown extensions fall back to `vscode-icons:default-file`.
+
+## **Best Practices**
+
+- Keep tree depth reasonable for readability
+- Use `expanded` only on key folders to reduce noise
+- Use badges for context (e.g. `badge="Config"`)
+- Keep icon pack style consistent across a page
+
+## **References**
+
+- [Docux Trees Component](https://docuxlab.com/blog/trees-component-docusaurus/)
+- [Docux Columns Component](https://docuxlab.com/blog/columns-component-docusaurus-infima/)
+- [Docusaurus MDX Component Scope](https://docusaurus.io/docs/markdown-features/react#mdx-component-scope)
+- [Iconify Icon Sets](https://icon-sets.iconify.design/)
+
+<BuyMeACoffeeButton />

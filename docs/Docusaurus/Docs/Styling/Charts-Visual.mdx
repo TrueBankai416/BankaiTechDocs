@@ -2,15 +2,17 @@
 title: Charts & Visual Elements
 description: Complete guide to adding charts and visual elements in Docusaurus using Mermaid diagrams, custom components, and third-party libraries.
 image: /img/social/docusaurus-social.jpg
-tags:
-   - Docusaurus
-   - Charts
-   - Visualization
-   - Mermaid
-   - Diagrams
+tags: [Docusaurus, Charts, Visualization, Mermaid, Diagrams]
 keywords: [Docusaurus, Charts, Mermaid, Diagrams, Visualization, Graphs]
 last_update:
   author: BankaiTech
+updates:
+  - date: 2026-02-13
+    note: "Convert Charts-Visual directory structure to Trees component"
+  - date: 2025-07-13
+    note: "Update MDX syntax to follow Docusaurus best practices"
+  - date: 2025-07-13
+    note: "Add comprehensive Docusaurus styling documentation"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -547,27 +549,33 @@ Use monospace fonts for ASCII diagrams:
 
 Show directory structures clearly:
 
-```
-project/
-├── src/
-│   ├── components/
-│   │   ├── Header/
-│   │   │   ├── Header.jsx
-│   │   │   └── Header.css
-│   │   └── Footer/
-│   │       ├── Footer.jsx
-│   │       └── Footer.css
-│   ├── pages/
-│   │   ├── Home.jsx
-│   │   └── About.jsx
-│   └── utils/
-│       └── helpers.js
-├── public/
-│   ├── index.html
-│   └── favicon.ico
-├── package.json
-└── README.md
-```
+<Trees title="project">
+  <Folder label="src" expanded>
+    <Folder label="components" expanded>
+      <Folder label="Header" expanded>
+        <File label="Header.jsx" />
+        <File label="Header.css" />
+      </Folder>
+      <Folder label="Footer" expanded>
+        <File label="Footer.jsx" />
+        <File label="Footer.css" />
+      </Folder>
+    </Folder>
+    <Folder label="pages" expanded>
+      <File label="Home.jsx" />
+      <File label="About.jsx" />
+    </Folder>
+    <Folder label="utils" expanded>
+      <File label="helpers.js" />
+    </Folder>
+  </Folder>
+  <Folder label="public" expanded>
+    <File label="index.html" />
+    <File label="favicon.ico" />
+  </Folder>
+  <File label="package.json" />
+  <File label="README.md" />
+</Trees>
 
 ## **Third-Party Chart Libraries**
 
