@@ -50,7 +50,7 @@
     "@eslint/js": "^9.39.2",
     "@giscus/react": "^3.1.0",
     "@rspack/cli": "^1.7.6",
-    "@rspack/core": "^1.7.4",
+    "@rspack/core": "^1.7.6",
     "cspell": "^9.6.4",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
