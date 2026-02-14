@@ -19,10 +19,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Create GitHub App token (optional)
+        id: app-token
+        if: vars.DOCS_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token || github.token }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,8 +43,13 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "${{ steps.app-token.outputs.token }}" ]; then
+            git config user.name "docs-changelog-bot[bot]"
+            git config user.email "docs-changelog-bot[bot]@users.noreply.github.com"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fi
 
           if git diff --quiet -- docs; then
             echo "No changelog updates detected."
