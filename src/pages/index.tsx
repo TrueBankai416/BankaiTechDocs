@@ -17,14 +17,20 @@ function HomepageHeader() {
         <h2>For Ubuntu Systems</h2>
         <div className={styles.heroGifRow}>
           <img
-            className={styles.heroGif}
+            className={`${styles.heroGif} ${styles.heroGifSide}`}
             src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFqNTB0anN4bjE0ZHF3dnQ1MGttcGpkMThiaXZxd2N4dXBrdHI5YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/JRiAeFnqoFLtrHqttI/giphy.gif"
             alt="Animated homepage graphic left"
             loading="lazy"
           />
           <img
-            className={styles.heroGif}
+            className={`${styles.heroGif} ${styles.heroGifCenter}`}
             src="https://media.giphy.com/media/o7RZbs4KAA6tvM4H6j/giphy.gif"
+            alt="Animated homepage graphic center"
+            loading="lazy"
+          />
+          <img
+            className={`${styles.heroGif} ${styles.heroGifSide}`}
+            src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGM1MHQyM3ByZTVzdW1pMTZnN240M3RyYmV3eGNuYWZmMjBsMzE0bCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT9IgzoKnwFNmISR8I/giphy.gif"
             alt="Animated homepage graphic right"
             loading="lazy"
           />
