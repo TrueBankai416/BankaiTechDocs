@@ -61,8 +61,13 @@ body {
 }
 
 .navbar {
-  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+@media (min-width: 997px) {
+  .navbar {
+    backdrop-filter: blur(8px);
+  }
 }
 
 .theme-doc-sidebar-container,
@@ -105,9 +110,17 @@ code {
   .navbar-sidebar {
     background: color-mix(in srgb, var(--ifm-background-color) 92%, var(--ifm-color-primary) 8%);
     z-index: 1001;
+    visibility: visible;
   }
 
   .navbar-sidebar__backdrop {
     z-index: 1000;
+  }
+
+  html.navbar-sidebar--show .navbar-sidebar,
+  body.navbar-sidebar--show .navbar-sidebar {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
