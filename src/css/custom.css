@@ -56,7 +56,7 @@ html {
   background-color: var(--ifm-background-color);
 }
 
-[data-theme='dark'] html {
+html[data-theme='dark'] {
   background:
     radial-gradient(circle at 12% 10%, rgba(122, 185, 255, 0.14), transparent 30%),
     radial-gradient(circle at 84% 15%, rgba(57, 88, 132, 0.22), transparent 30%),
@@ -73,10 +73,6 @@ body {
   background: transparent !important;
 }
 
-.main-wrapper {
-  background: transparent;
-}
-
 .navbar {
   border-bottom: 1px solid var(--ifm-toc-border-color);
 }
@@ -89,6 +85,7 @@ body {
 
 .theme-doc-sidebar-container,
 .theme-doc-sidebar-menu {
+  background: var(--ifm-background-color);
   background: color-mix(in srgb, var(--ifm-background-color) 94%, var(--ifm-color-primary) 6%);
 }
 
@@ -104,6 +101,7 @@ body {
 }
 
 code {
+  border: 1px solid var(--ifm-color-primary);
   border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 40%, transparent);
 }
 
@@ -124,9 +122,9 @@ code {
 
 @media (max-width: 996px) {
   .navbar-sidebar {
+    background: var(--ifm-background-color);
     background: color-mix(in srgb, var(--ifm-background-color) 92%, var(--ifm-color-primary) 8%);
     z-index: 1001;
-    visibility: visible;
   }
 
   .navbar-sidebar__backdrop {
