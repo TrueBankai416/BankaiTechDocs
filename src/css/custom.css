@@ -46,18 +46,35 @@
   --ifm-card-background-color: rgba(14, 20, 31, 0.8);
 }
 
-body {
+html {
   background:
     radial-gradient(circle at 10% 12%, rgba(122, 185, 255, 0.14), transparent 28%),
     radial-gradient(circle at 88% 16%, rgba(68, 109, 165, 0.16), transparent 25%),
     var(--ifm-background-color);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: var(--ifm-background-color);
 }
 
-[data-theme='dark'] body {
+[data-theme='dark'] html {
   background:
     radial-gradient(circle at 12% 10%, rgba(122, 185, 255, 0.14), transparent 30%),
     radial-gradient(circle at 84% 15%, rgba(57, 88, 132, 0.22), transparent 30%),
     linear-gradient(180deg, #090d14 0%, #05070c 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: var(--ifm-background-color);
+}
+
+.main-wrapper,
+.theme-layout-main,
+main,
+body {
+  background: transparent !important;
+}
+
+.main-wrapper {
+  background: transparent;
 }
 
 .navbar {
@@ -96,7 +113,6 @@ code {
   overflow-y: auto !important;
 }
 
-/* Constrain the TOC desktop container as well */
 .theme-doc-toc-desktop {
   max-height: calc(100vh - var(--floating-widget-clearance)) !important;
 }
