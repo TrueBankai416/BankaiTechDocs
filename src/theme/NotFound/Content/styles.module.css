@@ -1,0 +1,48 @@
+
+
+.notFoundBg {
+	min-height: calc(100dvh - var(--ifm-navbar-height, 0px));
+	background: url('/img/404bg.webp') no-repeat center center fixed;
+	/* Fill the screen: crop if necessary */
+	background-size: cover;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	overflow: hidden; 
+}
+
+/* Mobile adaptation: avoid "fixed" and show more of the image */
+@media (max-width: 768px) {
+  .notFoundBg {
+    background-attachment: scroll; 
+    background-position: center top;
+    background-size: contain; 
+    /* use modern svh unit to handle mobile URL bar */
+    min-height: calc(100svh - var(--ifm-navbar-height, 0px));
+  }
+}
+.hideh1 {
+    display:none;
+}
+
+
+
+/* Mobile: dedicated image + adapted typography */
+@media (max-width: 768px) {
+  .notFoundBg {
+    background-image: url('/img/404mobile.webp');
+    background-attachment: scroll;
+    background-position: center top;
+    background-size: cover;
+    min-height: calc(100svh - var(--ifm-navbar-height, 0px));
+  }
+
+  .notFoundBg p {
+    font-size: clamp(1rem, 4.5vw, 1.25rem);
+    line-height: 1.6;
+    padding: 0 1rem;
+  }
+}
