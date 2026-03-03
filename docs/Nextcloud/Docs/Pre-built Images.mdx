@@ -14,52 +14,107 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 ## **My Docker Hub Repo**
 
 <h2>I will push my images to [my Docker Repo](https://hub.docker.com/r/bankaitech/nextcloud)</h2>
+
 :::tip[tag]
 The `latest` tag will be the most up to date image
 :::
 
-### **_Nextcloud 28.0.4_**
+## **Available Tags**
 
-`bankaitech/nextcloud:28.0.4-custom`
+| Tag | Description |
+|-----|-------------|
+| `latest` | Most up to date image (currently 32.0.6) |
+| `32.0.6` | Nextcloud 32.0.6 |
+| `32.0.5` | Nextcloud 32.0.5 |
+| `32.0.4` | Nextcloud 32.0.4 |
+| `32.0.3` | Nextcloud 32.0.3 |
+| `32.0.2` | Nextcloud 32.0.2 |
+| `32.0.1` | Nextcloud 32.0.1 |
+| `31.0.14` | Nextcloud 31.0.14 |
+| `31.0.13` | Nextcloud 31.0.13 |
+| `31.0.8` | Nextcloud 31.0.8 |
 
+---
+
+## **Image Features**
+
+These images are based on `nextcloud:production` and include additional packages and configurations for enhanced functionality.
+
+### **Installed Packages**
+
+```bash
+cmake
+ffmpeg
+ghostscript
+git
+imagemagick
+libmagickcore-7.q16-10-extra
+inotify-tools
+libbz2-dev
+liblapack-dev
+libopenblas-dev
+libx11-dev
+libdlib-dev
+sudo
+nano
+exiftool
+supervisor
+curl
+wget
+gnupg2
+unzip
+gosu
 ```
-    cmake \
-    ffmpeg \
-    ghostscript \
-    git \
-    imagemagick \
-    inotify-tools \
-    libbz2-dev \
-    liblapack-dev \
-    libopenblas-dev \
-    libx11-dev \
-    sudo \
-    nano \
+
+### **PHP Extensions**
+
+- `inotify` - File change notifications
+- `pdlib` - PHP extension for dlib (face recognition)
+- `bz2` - Bzip2 compression
+- `smbclient` - SMB/CIFS support
+
+### **Additional Features**
+
+- **Apache Modules**: `proxy`, `proxy_http`, `proxy_wstunnel`, `headers`, `rewrite`
+- **dlib**: Machine learning toolkit for face recognition (Memories/Recognize apps)
+- **notify_push**: High Performance Backend for Nextcloud (auto-installed from latest release)
+- **Supervisor**: Process manager for running multiple services
+- **Cron Jobs**: Pre-configured cron schedules for Nextcloud background tasks
+- **Docker Healthcheck**: Built-in health monitoring
+- **PHP Memory Limit**: Increased to 1024M
+- **Opcache Memory**: Increased to 512M
+
+### **Pre-configured Cron Jobs**
+
+| Schedule | Task |
+|----------|------|
+| Every 5 min | Nextcloud cron.php |
+| Every 10 min | General background tasks |
+| 2:15 AM | Memories indexing |
+| 2:30 AM | Face recognition |
+| 2:45 AM | Recognize processing |
+| 3:00 AM | Preview generation |
+| 3:30 AM | Preview pre-generator |
+
+---
+
+## **Quick Start**
+
+```bash
+docker pull bankaitech/nextcloud:latest
 ```
 
-### **_Nextcloud 28.0.5_**
+Or for a specific version:
 
-`bankaitech/nextcloud:28.0.5-custom`
-
-```
-    cmake \
-    ffmpeg \
-    ghostscript \
-    git \
-    imagemagick \
-    inotify-tools \
-    libbz2-dev \
-    liblapack-dev \
-    libopenblas-dev \
-    libx11-dev \
-    sudo \
-    nano \
+```bash
+docker pull bankaitech/nextcloud:32.0.6
 ```
 
-#### _Changes_
+### **Exposed Ports**
 
-```
-Added Docker Healthcheck Feature
-```
+| Port | Service |
+|------|---------|
+| `80` | Apache (Nextcloud) |
+| `7867` | notify_push (High Performance Backend) |
 
 <BuyMeACoffeeButton />
