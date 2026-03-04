@@ -1,0 +1,80 @@
+---
+slug: proxmox-vs-esxi-homelab-2026
+title: "Proxmox vs ESXi in 2026: A Homelab Perspective"
+authors: [bankai]
+tags: [proxmox, virtualization, homelab, comparison]
+---
+
+With VMware's acquisition by Broadcom and subsequent licensing changes, many homelabbers have been reconsidering their virtualization platform. Here's my take on Proxmox vs ESXi in 2026.
+
+<!--truncate-->
+
+## The Landscape Has Changed
+
+In late 2023, Broadcom acquired VMware and subsequently made significant changes to licensing, including discontinuing the free ESXi hypervisor. This sent shockwaves through the homelab community.
+
+## Why I Switched to Proxmox
+
+After running ESXi for years, I made the switch to Proxmox. Here's why:
+
+### 1. It's Truly Free (and Open Source)
+
+Proxmox VE is free to use without artificial limitations. The paid subscription gets you enterprise support and access to the stable repository, but the free tier is fully functional.
+
+### 2. Built-in Container Support
+
+Proxmox supports both VMs and LXC containers out of the box. Running lightweight services in containers instead of full VMs saves significant resources.
+
+```bash
+# Create a container from template
+pct create 100 local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
+  -hostname mycontainer \
+  -memory 2048 \
+  -cores 2 \
+  -rootfs local-lvm:8
+```
+
+### 3. Web-Based Management
+
+The Proxmox web UI is modern and capable. No need for a Windows machine to run vSphere Client.
+
+### 4. Excellent ZFS Integration
+
+Native ZFS support means I can create pools, snapshots, and replications directly from the UI.
+
+### 5. Clustering is Free
+
+Want to cluster multiple nodes? It's included. No additional licensing required.
+
+## What I Miss from ESXi
+
+Let's be fair - there are things VMware did well:
+
+- **vMotion** - Live migration in ESXi was incredibly smooth
+- **Ecosystem** - Third-party tool support was extensive  
+- **Enterprise features** - VMware's enterprise tooling is mature
+
+## Performance Comparison
+
+In my testing with identical hardware (Dell R720, dual Xeon E5-2670, 128GB RAM):
+
+| Metric | ESXi 7.0 | Proxmox 8.1 |
+|--------|----------|-------------|
+| Boot time | 45s | 30s |
+| Memory overhead | ~1.2GB | ~800MB |
+| VM startup | Similar | Similar |
+| Storage throughput | Similar | Similar |
+
+Real-world performance is virtually identical for homelab workloads.
+
+## My Recommendation
+
+For homelabs in 2026, **Proxmox is the clear winner**. The combination of zero licensing costs, LXC container support, and an active community makes it hard to justify ESXi unless you have specific enterprise requirements.
+
+## Getting Started
+
+If you're ready to make the switch, check out my [Proxmox installation guide](/Proxmox/Introduction) for a step-by-step walkthrough.
+
+---
+
+*What's your virtualization platform of choice? Share your experiences in the comments or on [Discord](https://discord.gg/6THYdvayjg)!*

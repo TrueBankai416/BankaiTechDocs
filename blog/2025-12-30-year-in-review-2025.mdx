@@ -1,0 +1,91 @@
+---
+slug: homelab-year-in-review-2025
+title: "Homelab Year in Review: 2025"
+authors: [bankai]
+tags: [homelab, year-review, personal]
+---
+
+As we wrap up 2025, I wanted to reflect on the changes to my homelab setup, what worked, what didn't, and plans for the new year.
+
+<!--truncate-->
+
+## The Numbers
+
+Let's start with some stats from this year:
+
+- **40+** containers running daily
+- **99.7%** uptime (excluding planned maintenance)
+- **12TB** of data managed
+- **3** major outages (all self-inflicted 😅)
+- **0** security incidents
+
+## Major Additions
+
+### Jellyfin Migration
+
+Finally made the switch from Plex to Jellyfin. The reasons:
+
+1. No account required for local streaming
+2. Hardware transcoding works great without a subscription
+3. Open source = no surprise feature removals
+4. Active community development
+
+The migration was smoother than expected. All my users adjusted within a week.
+
+### Arr Stack Overhaul
+
+Rebuilt my entire Arr stack from scratch using the [full stack guide](/Examples/Arr%20Suite/Docs/Full%20Stack/docker-compose). Key improvements:
+
+- Moved to hardlinks for storage efficiency
+- Implemented proper folder structure
+- Added Recyclarr for automated quality profiles
+- Set up cross-seed for ratio maintenance
+
+### Network Upgrade
+
+Upgraded my network infrastructure:
+
+- Replaced my aging USG with a UDM Pro
+- Added 10GbE between NAS and Proxmox host
+- Implemented proper VLANs (finally!)
+- Set up Pi-hole in HA configuration
+
+## What Didn't Work
+
+### Kubernetes at Home
+
+Tried running k3s for a few months. The overhead wasn't worth it for my scale. Docker Compose remains king for homelabs under 50 containers in my opinion.
+
+### Automated Everything
+
+Tried to automate too much, too fast. Spent more time fixing automation than it would have taken to just do things manually. Lesson learned: automate incrementally.
+
+## Lessons Learned
+
+1. **Backups are mandatory** - Lost a week of work when a drive failed. Now running 3-2-1 backup strategy religiously.
+
+2. **Document as you go** - Future you will thank present you.
+
+3. **Start simple** - The fancy solution isn't always the right solution.
+
+4. **The community is helpful** - Don't be afraid to ask questions. Everyone was a beginner once.
+
+## Plans for 2026
+
+Here's what's on the roadmap:
+
+- [ ] Set up proper monitoring with Grafana/Prometheus
+- [ ] Implement GitOps for configuration management
+- [ ] Build a dedicated backup server
+- [ ] Explore Immich as a Google Photos replacement
+- [ ] Write more documentation and blog posts!
+
+## Thank You
+
+Thanks to everyone who's used this documentation, joined the Discord, or just stopped by. Building this community has been one of the highlights of my year.
+
+Here's to more uptime, fewer 3 AM debugging sessions, and continued learning in 2026!
+
+---
+
+*What were your homelab highlights of 2025? Share them in the [Discord](https://discord.gg/6THYdvayjg)!*
