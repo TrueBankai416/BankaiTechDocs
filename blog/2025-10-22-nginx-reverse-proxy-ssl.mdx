@@ -59,17 +59,18 @@ sudo nginx -t
 
 Nginx configuration files:
 
-```
-/etc/nginx/
-├── nginx.conf           # Main config
-├── sites-available/     # Available site configs
-│   ├── default
-│   └── jellyfin.conf
-├── sites-enabled/       # Symlinks to active sites
-│   └── jellyfin.conf -> ../sites-available/jellyfin.conf
-├── conf.d/              # Additional configs
-└── snippets/            # Reusable config snippets
-```
+<Trees title="/etc/nginx/">
+  <Folder label="nginx.conf" badge="Main config" />
+  <Folder label="sites-available" badge="Available site configs" expanded>
+    <Folder label="default" />
+    <Folder label="jellyfin.conf" />
+  </Folder>
+  <Folder label="sites-enabled" badge="Symlinks to active sites" expanded>
+    <Folder label="jellyfin.conf" badge="→ ../sites-available/jellyfin.conf" />
+  </Folder>
+  <Folder label="conf.d" badge="Additional configs" />
+  <Folder label="snippets" badge="Reusable config snippets" />
+</Trees>
 
 ## SSL with Certbot (Let's Encrypt)
 

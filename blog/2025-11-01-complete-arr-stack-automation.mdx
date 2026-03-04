@@ -133,21 +133,24 @@ volumes:
 
 This is where most people go wrong. Use a unified structure:
 
-```
-/data
-├── downloads/
-│   ├── torrents/
-│   │   ├── movies/
-│   │   └── tv/
-│   └── usenet/
-│       ├── movies/
-│       └── tv/
-├── media/
-│   ├── movies/
-│   ├── tv/
-│   └── music/
-└── recycle/
-```
+<Trees title="/data">
+  <Folder label="downloads" expanded>
+    <Folder label="torrents" expanded>
+      <Folder label="movies" />
+      <Folder label="tv" />
+    </Folder>
+    <Folder label="usenet" expanded>
+      <Folder label="movies" />
+      <Folder label="tv" />
+    </Folder>
+  </Folder>
+  <Folder label="media" expanded>
+    <Folder label="movies" />
+    <Folder label="tv" />
+    <Folder label="music" />
+  </Folder>
+  <Folder label="recycle" badge="For deleted files" />
+</Trees>
 
 **Why this matters**: When Radarr/Sonarr imports a download, it can create a **hardlink** instead of copying. Same file, two paths, instant import with zero disk space used.
 
