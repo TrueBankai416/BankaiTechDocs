@@ -1,0 +1,252 @@
+---
+slug: nfs-vs-smb-homelab-storage
+title: "NFS vs SMB: Choosing the Right Network Storage Protocol"
+authors: [bankai]
+tags: [storage, networking, nfs, smb, tutorials]
+---
+
+Sharing storage across your homelab network? The two main protocols are NFS and SMB (CIFS). Here's when to use each and how to set them up.
+
+<!--truncate-->
+
+## Quick Comparison
+
+| Feature | NFS | SMB/CIFS |
+|---------|-----|----------|
+| Best for | Linux clients | Windows/mixed |
+| Performance | Higher | Good |
+| Setup complexity | Medium | Low |
+| Windows support | Limited | Native |
+| Linux support | Native | Good |
+| macOS support | Good | Good |
+| Authentication | UID/GID | User/password |
+
+## When to Use NFS
+
+Choose NFS when:
+- All clients are Linux
+- Performance is critical
+- Docker containers need shared storage
+- Proxmox/KVM shared storage
+- Simple permission model works
+
+## When to Use SMB
+
+Choose SMB when:
+- Windows clients exist
+- Mixed environment (Windows + Linux + Mac)
+- User-based permissions needed
+- Media streaming to TVs/devices
+- Samba AD integration required
+
+## NFS Setup (Server)
+
+### Install NFS Server
+
+```bash
+sudo apt install nfs-kernel-server
+```
+
+### Create Export
+
+```bash
+sudo mkdir -p /srv/nfs/media
+sudo chown nobody:nogroup /srv/nfs/media
+```
+
+### Configure Exports
+
+```bash title="/etc/exports"
+/srv/nfs/media    192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)
+```
+
+Options explained:
+- `rw` - Read/write access
+- `sync` - Write to disk before confirming
+- `no_subtree_check` - Improves reliability
+- `no_root_squash` - Allow root access (use carefully!)
+
+### Apply and Start
+
+```bash
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+```
+
+## NFS Client Setup
+
+```bash
+# Install client
+sudo apt install nfs-common
+
+# Create mount point
+sudo mkdir -p /mnt/media
+
+# Mount
+sudo mount -t nfs server-ip:/srv/nfs/media /mnt/media
+
+# Verify
+df -h /mnt/media
+```
+
+### Persistent Mount (fstab)
+
+```bash title="/etc/fstab"
+server-ip:/srv/nfs/media  /mnt/media  nfs  defaults,_netdev  0  0
+```
+
+### Docker Usage
+
+```yaml title="docker-compose.yml"
+services:
+  jellyfin:
+    volumes:
+      - nfs_media:/media
+
+volumes:
+  nfs_media:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.100,rw,nfsvers=4
+      device: ":/srv/nfs/media"
+```
+
+## SMB Setup (Server)
+
+### Install Samba
+
+```bash
+sudo apt install samba
+```
+
+### Create Share Directory
+
+```bash
+sudo mkdir -p /srv/samba/media
+sudo chown nobody:nogroup /srv/samba/media
+sudo chmod 2775 /srv/samba/media
+```
+
+### Configure Samba
+
+```ini title="/etc/samba/smb.conf"
+[media]
+   path = /srv/samba/media
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = @sambashare
+   create mask = 0664
+   directory mask = 0775
+```
+
+### Create Samba User
+
+```bash
+# Add system user to samba group
+sudo usermod -aG sambashare your-username
+
+# Set Samba password
+sudo smbpasswd -a your-username
+```
+
+### Restart Samba
+
+```bash
+sudo systemctl restart smbd
+sudo systemctl restart nmbd
+```
+
+## SMB Client Setup
+
+### Linux
+
+```bash
+# Install client
+sudo apt install cifs-utils
+
+# Mount
+sudo mount -t cifs //server-ip/media /mnt/media -o username=your-username
+
+# Persistent with credentials file
+echo "username=your-username" > ~/.smbcredentials
+echo "password=your-password" >> ~/.smbcredentials
+chmod 600 ~/.smbcredentials
+```
+
+```bash title="/etc/fstab"
+//server-ip/media  /mnt/media  cifs  credentials=/home/user/.smbcredentials,_netdev  0  0
+```
+
+### Windows
+
+```powershell
+# Map network drive
+net use M: \\server-ip\media /user:your-username
+```
+
+Or via File Explorer: `\\server-ip\media`
+
+### macOS
+
+Finder → Go → Connect to Server → `smb://server-ip/media`
+
+## Performance Tips
+
+### NFS Tuning
+
+```bash title="/etc/fstab"
+# Optimized NFS mount
+server:/share  /mnt/share  nfs  rsize=1048576,wsize=1048576,hard,intr,_netdev  0  0
+```
+
+- `rsize/wsize` - Larger buffer sizes
+- `hard` - Retry indefinitely on failure
+- `intr` - Allow interrupt
+
+### SMB Tuning
+
+```ini title="/etc/samba/smb.conf"
+[global]
+   socket options = TCP_NODELAY IPTOS_LOWDELAY
+   read raw = yes
+   write raw = yes
+   max xmit = 65535
+```
+
+## SSHFS Alternative
+
+For quick, secure mounts:
+
+```bash
+# Install
+sudo apt install sshfs
+
+# Mount
+sshfs user@server:/path /mnt/sshfs
+
+# Unmount
+fusermount -u /mnt/sshfs
+```
+
+Pros: Encrypted, works through firewalls
+Cons: Slower, requires SSH access
+
+## My Setup
+
+Current storage shares:
+- **NFS** - Proxmox VM disks, Docker volumes
+- **SMB** - Media library for TVs/clients
+- **SSHFS** - Quick access during development
+
+## Learn More
+
+- [NFS Configuration](/Networking/Docs/Storage/NFS)
+- [CIFS/SMB Configuration](/Networking/Docs/Storage/CIFS-SMB)
+- [SSHFS Setup](/Networking/Docs/Storage/SSHFS)
+- [MergerFS Pool](/Networking/Docs/Storage/mergerfs)
+
+---
+
+*What's your storage protocol of choice? Share on [Discord](https://discord.gg/6THYdvayjg)!*

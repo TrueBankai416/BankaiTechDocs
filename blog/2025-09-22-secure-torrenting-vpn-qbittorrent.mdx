@@ -1,0 +1,195 @@
+---
+slug: secure-torrenting-vpn-qbittorrent
+title: "Secure Torrenting: qBittorrent with VPN Kill Switch"
+authors: [bankai]
+tags: [torrents, vpn, security, tutorials]
+---
+
+If you're using torrents, protecting your privacy is essential. Here's how to set up qBittorrent with a built-in VPN and kill switch using Docker.
+
+<!--truncate-->
+
+## Why VPN for Torrents?
+
+When torrenting:
+- Your IP is visible to everyone in the swarm
+- Your ISP can see your traffic
+- Copyright trolls actively monitor popular torrents
+
+A VPN:
+- Hides your real IP
+- Encrypts traffic from ISP
+- Provides deniability
+
+## The Kill Switch Problem
+
+A regular VPN connection can drop without warning. If that happens, qBittorrent continues downloading with your real IP exposed.
+
+**Solution**: Use a container that won't allow any traffic without VPN.
+
+## qBittorrent + VPN Docker Setup
+
+We use binhex's image which integrates OpenVPN/WireGuard:
+
+```yaml title="docker-compose.yml"
+services:
+  qbittorrent:
+    image: binhex/arch-qbittorrentvpn
+    container_name: qbittorrent
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_PROV=custom
+      - VPN_CLIENT=openvpn
+      - ENABLE_PRIVOXY=no
+      - LAN_NETWORK=192.168.1.0/24
+      - NAME_SERVERS=1.1.1.1,8.8.8.8
+      - PUID=1000
+      - PGID=1000
+      - WEBUI_PORT=8080
+      - UMASK=022
+      - TZ=America/New_York
+    volumes:
+      - qbit_config:/config
+      - /path/to/downloads:/data/downloads
+      - /path/to/vpn:/config/openvpn  # VPN config files
+    ports:
+      - "8080:8080"    # Web UI
+      - "6881:6881"    # Torrent port (optional)
+      - "6881:6881/udp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+
+volumes:
+  qbit_config:
+```
+
+## VPN Provider Setup
+
+### NordVPN
+
+1. Download OpenVPN config from NordVPN
+2. Place `.ovpn` file in `/config/openvpn/`
+3. Create credentials file:
+
+```bash title="credentials.conf"
+your_username
+your_password
+```
+
+4. Update the `.ovpn` file to reference credentials:
+```
+auth-user-pass /config/openvpn/credentials.conf
+```
+
+### Mullvad
+
+1. Generate config at mullvad.net
+2. Download `.conf` file
+3. Place in `/config/openvpn/`
+4. No separate credentials needed (built into config)
+
+### ProtonVPN
+
+1. Download OpenVPN config from account dashboard
+2. Note: Use OpenVPN credentials, not account password
+3. Same process as NordVPN
+
+## Verifying the Kill Switch
+
+Test that the kill switch works:
+
+```bash
+# Get container's external IP
+docker exec qbittorrent curl -s https://ipinfo.io/ip
+
+# Stop VPN inside container (simulating failure)
+docker exec qbittorrent pkill openvpn
+
+# Try to get IP again - should fail
+docker exec qbittorrent curl -s --max-time 5 https://ipinfo.io/ip
+# No response = kill switch working!
+```
+
+## DNS Leak Testing
+
+Even with VPN, DNS requests can leak. Test with:
+
+1. Go to `https://dnsleaktest.com` from the container:
+```bash
+docker exec qbittorrent curl -s https://dnsleaktest.com/
+```
+
+2. Or check in qBittorrent's web UI if it shows your location
+
+3. Use our [DNS Leak Testing guide](/Examples/VPN/Docs/Testing/DNS%20Leak%20Test)
+
+## Port Forwarding
+
+Some VPN providers support port forwarding for better speeds:
+
+- **Mullvad** - Dynamically assigned ports
+- **AirVPN** - Manual port selection
+- **Private Internet Access** - Port in app settings
+
+Configure in qBittorrent:
+1. Settings → Connection
+2. Set "Listening Port" to your forwarded port
+3. Disable "Use UPnP / NAT-PMP"
+
+## Arr Stack Integration
+
+Connect qBittorrent to Radarr/Sonarr:
+
+1. In Radarr: Settings → Download Clients → Add
+2. Select qBittorrent
+3. Host: `qbittorrent` (container name) or `192.168.1.x`
+4. Port: `8080`
+5. Username/Password from qBittorrent settings
+
+### Category Setup
+
+Create categories in qBittorrent:
+- `movies` for Radarr
+- `tv` for Sonarr
+- `music` for Lidarr
+
+Set save paths:
+- `/data/downloads/torrents/movies`
+- `/data/downloads/torrents/tv`
+
+## Troubleshooting
+
+### VPN won't connect
+```bash
+docker logs qbittorrent 2>&1 | grep -i vpn
+```
+Check credentials and config file paths.
+
+### Web UI not accessible
+Verify `LAN_NETWORK` matches your actual network.
+
+### Slow speeds
+- Try different VPN servers
+- Enable port forwarding if available
+- Check if ISP throttles VPN traffic
+
+## My Setup
+
+Currently using:
+- Mullvad VPN (no logs, accepts crypto)
+- WireGuard protocol (faster than OpenVPN)
+- Port forwarding enabled
+- Connected to Radarr, Sonarr, Lidarr
+
+## Learn More
+
+- [qBittorrent VPN Deep Dive](/Torrent%20Clients/qBittorrent/Docs/docker-vpn)
+- [VPN Firewall Rules](/Examples/VPN/Docs/Firewall/Firewall)
+- [Arr Stack Setup](/Examples/Arr%20Suite/Introduction)
+
+---
+
+*What VPN do you use for torrenting? Share on [Discord](https://discord.gg/6THYdvayjg)!*

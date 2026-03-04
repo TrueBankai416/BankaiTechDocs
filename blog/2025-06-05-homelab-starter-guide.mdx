@@ -1,0 +1,203 @@
+---
+slug: homelab-starter-guide-2026
+title: "Homelab Starter Guide: Building Your First Setup in 2026"
+authors: [bankai]
+tags: [homelab, beginners, hardware, tutorials]
+---
+
+Ready to start your homelab journey but not sure where to begin? This guide covers hardware choices, software essentials, and the mindset that will help you succeed.
+
+<!--truncate-->
+
+## What is a Homelab?
+
+A homelab is your personal IT playground at home. It can be:
+
+- A single Raspberry Pi running Pi-hole
+- An old laptop as a Docker host
+- A rack full of enterprise servers
+- Anything in between!
+
+The goal isn't having the biggest setup—it's learning, experimenting, and running services you control.
+
+## Choosing Your Hardware
+
+### Option 1: Repurposed Hardware (Budget)
+
+**Old PC/Laptop:**
+- Cost: $0-200
+- Quiet, low power
+- Great for starting out
+
+**Mini PC (Dell Micro, Lenovo Tiny):**
+- Cost: $100-300 used
+- Very efficient
+- Small footprint
+
+### Option 2: Used Enterprise (Performance)
+
+**Dell PowerEdge R720/R730:**
+- Cost: $200-500
+- Tons of RAM/CPU
+- Loud, power-hungry
+
+**HP ProLiant DL380:**
+- Similar to Dell
+- Great community support
+
+### Option 3: Purpose-Built (Balanced)
+
+**Intel NUC:**
+- Cost: $300-800
+- Silent operation
+- Low power (15-30W)
+
+**Custom build:**
+- Full control
+- Can be optimized for use case
+
+## My Recommendation for Beginners
+
+**Start with what you have**, then:
+
+1. **Month 1-3**: Old PC/laptop or Raspberry Pi
+2. **Month 4-6**: Mini PC or used server
+3. **Year 2+**: Purpose-built based on needs
+
+Don't buy servers before you know what you need!
+
+## Essential Software Stack
+
+### Foundation
+
+| Layer | Options |
+|-------|---------|
+| OS | Ubuntu Server, Proxmox, TrueNAS |
+| Containers | Docker, Portainer |
+| Reverse Proxy | Nginx, Traefik |
+| SSL | Let's Encrypt, Certbot |
+| Backup | rsync, Borg, Duplicati |
+
+### Must-Have Services
+
+1. **Pi-hole or AdGuard** - Network-wide ad blocking
+2. **Portainer** - Docker management UI
+3. **Uptime Kuma** - Service monitoring
+4. **Homepage/Homarr** - Dashboard for all services
+
+### When You're Ready
+
+- **Nextcloud** - File storage
+- **Jellyfin** - Media server
+- **Arr stack** - Media automation
+- **Tailscale** - Remote access
+- **Grafana** - Monitoring
+
+## Networking Basics
+
+### Start Simple
+
+```
+[Internet] → [Router] → [Switch] → [Server]
+                     ↓
+              [WiFi AP] → [Clients]
+```
+
+### Level Up With VLANs
+
+```
+VLAN 10: Management
+VLAN 20: Servers
+VLAN 30: IoT devices
+VLAN 40: Guest network
+```
+
+Requires managed switch + VLAN-aware router.
+
+## First Day Checklist
+
+1. [ ] Install OS (Ubuntu Server or Proxmox)
+2. [ ] Set static IP
+3. [ ] Enable SSH
+4. [ ] Install Docker
+5. [ ] Deploy Portainer
+6. [ ] Set up Pi-hole
+7. [ ] Configure backups
+
+## Budget Breakdown
+
+### Ultra Budget ($0-100)
+
+- Raspberry Pi 4 4GB: ~$60
+- SD Card: ~$15
+- Power supply: ~$10
+- Case: ~$15
+
+Running: Pi-hole, Home Assistant, small services
+
+### Starter ($200-400)
+
+- Used Mini PC: ~$200-300
+- 16GB RAM upgrade: ~$50
+- 500GB SSD: ~$50
+
+Running: Docker host with 10-20 containers
+
+### Intermediate ($500-1000)
+
+- Used Dell R720: ~$300
+- RAM upgrade (64-128GB): ~$100-200
+- SSDs for VMs: ~$200
+- UPS: ~$150
+
+Running: Proxmox with multiple VMs, serious storage
+
+## Common Mistakes to Avoid
+
+### 1. Buying Too Much Hardware
+
+"I'll need 128GB RAM" - You probably won't. Start small.
+
+### 2. No Backup Strategy
+
+If it's not backed up, it doesn't exist. Set up backups on day one.
+
+### 3. Over-Engineering
+
+Don't build Kubernetes for 5 containers. Docker Compose is fine.
+
+### 4. Ignoring Power Costs
+
+That $200 server could cost $50/month in electricity. Calculate TCO.
+
+### 5. No Documentation
+
+Document as you go. Future you will thank present you.
+
+## Mindset Tips
+
+1. **Break things** - It's how you learn
+2. **Start simple** - Complexity comes later
+3. **Join communities** - Reddit r/homelab, Discord servers
+4. **Set goals** - Know why you're building
+5. **Have fun** - It's a hobby, not a job
+
+## Resources
+
+- Our documentation: [Bankai-Tech Docs](/)
+- Reddit: [r/homelab](https://reddit.com/r/homelab)
+- Discord: [Our community](https://discord.gg/6THYdvayjg)
+- YouTube: ServeTheHome, TechnoTim, Craft Computing
+
+## What's Next?
+
+Once you've got the basics:
+
+1. [Install Docker](/Docker/Introduction)
+2. [Set up Proxmox](/Proxmox/Introduction)
+3. [Configure Networking](/Networking/Introduction)
+4. [Deploy a media server](/Jellyfin/Introduction)
+
+---
+
+*Just getting started? Introduce yourself on [Discord](https://discord.gg/6THYdvayjg)!*

@@ -1,0 +1,193 @@
+---
+slug: windows-activation-local-kms-server
+title: "Windows & Office Activation: Setting Up a Local KMS Server"
+authors: [bankai]
+tags: [windows, kms, activation, tutorials]
+---
+
+Running Windows VMs in your homelab? Here's how to set up a local KMS (Key Management Service) server for activation. This is completely legal for testing and development purposes with volume license keys.
+
+<!--truncate-->
+
+## What is KMS?
+
+Key Management Service (KMS) is Microsoft's volume activation technology used by enterprises. Instead of each machine calling Microsoft, they call a local KMS server.
+
+### Important Legal Notes
+
+- KMS is intended for volume licensing customers
+- Using this for personal/testing in your homelab is a gray area
+- Never use this for production systems you don't have licenses for
+- Consider Microsoft 365 Developer Program for legitimate free licenses
+
+## Setting Up a KMS Server
+
+We'll use vlmcsd, an open-source KMS emulator:
+
+```yaml title="docker-compose.yml"
+services:
+  kms:
+    image: mikolatero/vlmcsd
+    container_name: kms-server
+    ports:
+      - "1688:1688"
+    restart: unless-stopped
+```
+
+Start it:
+
+```bash
+docker compose up -d
+```
+
+Your KMS server is now running on port 1688.
+
+## Activating Windows
+
+### Step 1: Set KMS Server
+
+Open Command Prompt as Administrator:
+
+```cmd
+slmgr /skms YOUR-KMS-SERVER-IP
+```
+
+### Step 2: Install Generic Volume License Key
+
+Use Microsoft's official GVLK keys:
+
+**Windows 11/10 Pro:**
+```cmd
+slmgr /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX
+```
+
+**Windows 11/10 Enterprise:**
+```cmd
+slmgr /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43
+```
+
+**Windows Server 2022 Standard:**
+```cmd
+slmgr /ipk VDYBN-27WPP-V4HQT-9VMD4-VMK7H
+```
+
+### Step 3: Activate
+
+```cmd
+slmgr /ato
+```
+
+### Verify Activation
+
+```cmd
+slmgr /xpr
+```
+
+Should show "The machine is permanently activated" (or 180 days for volume).
+
+## Activating Microsoft Office
+
+### Step 1: Navigate to Office Directory
+
+For Office 2021/2019:
+```cmd
+cd "C:\Program Files\Microsoft Office\Office16"
+```
+
+Or for 32-bit on 64-bit Windows:
+```cmd
+cd "C:\Program Files (x86)\Microsoft Office\Office16"
+```
+
+### Step 2: Set KMS Server
+
+```cmd
+cscript ospp.vbs /sethst:YOUR-KMS-SERVER-IP
+cscript ospp.vbs /setprt:1688
+```
+
+### Step 3: Activate
+
+```cmd
+cscript ospp.vbs /act
+```
+
+### Verify Status
+
+```cmd
+cscript ospp.vbs /dstatus
+```
+
+## Office GVLK Keys
+
+**Office 2021 Pro Plus:**
+```
+FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH
+```
+
+**Office 2019 Pro Plus:**
+```
+NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP
+```
+
+## Upgrading Windows Editions
+
+Did you know you can upgrade Windows editions with just a key?
+
+### From Home to Pro
+
+```cmd
+# Check current edition
+DISM /Online /Get-CurrentEdition
+
+# Change product key to upgrade
+changepk.exe /productkey W269N-WFGWX-YVC9B-4J6C9-T83GX
+
+# Then activate via KMS
+slmgr /ato
+```
+
+No reinstall needed!
+
+## Troubleshooting
+
+### Error 0xC004F074
+
+"The Software Licensing Service reported that the computer could not be activated."
+
+- Verify KMS server is reachable: `telnet KMS-IP 1688`
+- Check firewall allows port 1688
+- Verify correct GVLK is installed
+
+### Error 0x8007232B
+
+"DNS name does not exist."
+
+- Ensure you set KMS server IP, not hostname
+- Use `/skms` to set server address manually
+
+### Office Won't Activate
+
+- Verify you're using Volume License version, not Retail
+- Check ospp.vbs path is correct
+- Run Command Prompt as Administrator
+
+## Alternative: Microsoft 365 Developer Program
+
+For legitimate free access:
+
+1. Sign up at [developer.microsoft.com](https://developer.microsoft.com/microsoft-365/dev-program)
+2. Get 90-day renewable subscription
+3. Includes Windows, Office, and more
+4. Perfect for development/testing
+
+## Learn More
+
+- [KMS Server Setup](/MS%20Windows/Local%20KMS/Docs/KMS%20Server)
+- [Activating Windows](/MS%20Windows/Local%20KMS/Docs/Activating%20Windows)
+- [Activating Office](/MS%20Windows/Local%20KMS/Docs/Activating%20Office)
+- [Upgrading Windows Edition](/MS%20Windows/Local%20KMS/Docs/Upgrading%20Windows%20Edition)
+
+---
+
+*Running Windows in your homelab? Share your setup on [Discord](https://discord.gg/6THYdvayjg)!*

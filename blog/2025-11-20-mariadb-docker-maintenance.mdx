@@ -1,0 +1,269 @@
+---
+slug: mariadb-docker-maintenance-guide
+title: "MariaDB in Docker: Maintenance and Updates"
+authors: [bankai]
+tags: [mariadb, docker, database, tutorials]
+---
+
+Running MariaDB in Docker is easy, but maintaining it properly requires some knowledge. Here's how to update, backup, and troubleshoot your MariaDB containers.
+
+<!--truncate-->
+
+## Why MariaDB?
+
+MariaDB is the community-developed fork of MySQL, offering:
+
+- **Open source** - Truly free, no licensing concerns
+- **MySQL compatible** - Drop-in replacement
+- **Active development** - Regular security updates
+- **Performance** - Often faster than MySQL
+- **Docker ready** - Official images available
+
+## Basic Docker Setup
+
+```yaml title="docker-compose.yml"
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=myapp
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  mariadb_data:
+```
+
+## Backup Strategies
+
+### Method 1: mysqldump
+
+Best for small/medium databases:
+
+```bash
+# Backup
+docker exec mariadb mysqldump -u root -p${DB_ROOT_PASSWORD} --all-databases > backup.sql
+
+# Single database
+docker exec mariadb mysqldump -u root -p${DB_ROOT_PASSWORD} mydatabase > mydatabase.sql
+```
+
+### Method 2: Volume Backup
+
+Best for large databases:
+
+```bash
+# Stop container first!
+docker stop mariadb
+
+# Backup volume
+docker run --rm \
+  -v mariadb_data:/data:ro \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/mariadb-data.tar.gz /data
+
+# Restart
+docker start mariadb
+```
+
+### Method 3: Automated Backups
+
+```yaml title="docker-compose.yml"
+services:
+  mariadb-backup:
+    image: databack/mysql-backup
+    container_name: mariadb-backup
+    environment:
+      - DB_SERVER=mariadb
+      - DB_USER=root
+      - DB_PASS=${DB_ROOT_PASSWORD}
+      - DB_DUMP_TARGET=/backup
+      - DB_DUMP_FREQ=1440  # Daily
+      - DB_DUMP_BEGIN=0300 # 3 AM
+    volumes:
+      - ./backups:/backup
+    depends_on:
+      - mariadb
+```
+
+## Updating MariaDB
+
+### Minor Updates (10.11.x)
+
+Safe and usually painless:
+
+```bash
+# Update image
+docker compose pull mariadb
+
+# Recreate container
+docker compose up -d mariadb
+```
+
+### Major Updates (10.x → 11.x)
+
+**Always backup first!**
+
+```bash
+# 1. Backup everything
+docker exec mariadb mysqldump -u root -p --all-databases > pre-upgrade.sql
+
+# 2. Stop container
+docker compose stop mariadb
+
+# 3. Update compose file version
+# image: mariadb:10.11  →  image: mariadb:11.2
+
+# 4. Start new version
+docker compose up -d mariadb
+
+# 5. Run upgrade script
+docker exec mariadb mysql_upgrade -u root -p
+```
+
+### mysql_upgrade Explained
+
+After major version upgrades, run:
+
+```bash
+docker exec -it mariadb mysql_upgrade -u root -p
+```
+
+This:
+- Upgrades system tables
+- Checks all tables
+- Fixes compatibility issues
+
+## Restoring from Backup
+
+### From mysqldump
+
+```bash
+# Restore all databases
+docker exec -i mariadb mysql -u root -p${DB_ROOT_PASSWORD} < backup.sql
+
+# Restore single database
+docker exec -i mariadb mysql -u root -p${DB_ROOT_PASSWORD} mydatabase < mydatabase.sql
+```
+
+### From Volume Backup
+
+```bash
+# Stop container
+docker stop mariadb
+
+# Remove old volume
+docker volume rm mariadb_data
+
+# Restore volume
+docker run --rm \
+  -v mariadb_data:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/mariadb-data.tar.gz -C /
+
+# Start container
+docker start mariadb
+```
+
+## Performance Tuning
+
+### Basic Tuning
+
+```ini title="custom.cnf"
+[mysqld]
+innodb_buffer_pool_size = 1G
+innodb_log_file_size = 256M
+innodb_flush_log_at_trx_commit = 2
+max_connections = 200
+query_cache_size = 0
+query_cache_type = 0
+```
+
+Mount config file:
+```yaml
+volumes:
+  - ./custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
+```
+
+### Monitoring
+
+```bash
+# Check status
+docker exec mariadb mysqladmin -u root -p status
+
+# Show processes
+docker exec mariadb mysqladmin -u root -p processlist
+
+# Interactive monitor
+docker exec -it mariadb mysql -u root -p -e "SHOW FULL PROCESSLIST;"
+```
+
+## Common Issues
+
+### Container Won't Start
+
+```bash
+# Check logs
+docker logs mariadb
+
+# Common: permissions issue
+docker run --rm -v mariadb_data:/data alpine chown -R 999:999 /data
+```
+
+### Can't Connect
+
+```bash
+# Check if running
+docker ps | grep mariadb
+
+# Test connection
+docker exec mariadb mysqladmin -u root -p ping
+```
+
+### Forgot Root Password
+
+```bash
+# Stop container
+docker stop mariadb
+
+# Start with skip-grant-tables
+docker run -it --rm \
+  -v mariadb_data:/var/lib/mysql \
+  mariadb:10.11 \
+  --skip-grant-tables --user=mysql
+
+# In another terminal, reset password
+docker exec -it container_id mysql
+# mysql> FLUSH PRIVILEGES;
+# mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'newpassword';
+```
+
+## Health Checks
+
+Add to compose:
+
+```yaml
+services:
+  mariadb:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+## Learn More
+
+- [MariaDB Update Guide](/MariaDB/Docs/Updating)
+- [Nextcloud Database Setup](/Nextcloud/Docs/Installation/Complete)
+
+---
+
+*Database tips to share? Post them on [Discord](https://discord.gg/6THYdvayjg)!*

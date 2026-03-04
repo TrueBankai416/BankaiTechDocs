@@ -1,0 +1,241 @@
+---
+slug: discord-bot-gpt-ai-tutorial
+title: "Build Your Own AI Discord Bot with GPT"
+authors: [bankai]
+tags: [discord, ai, bots, tutorials]
+---
+
+Want your own AI assistant in Discord? Here's how to build a bot powered by OpenAI's GPT that can answer questions, have conversations, and help your server members.
+
+<!--truncate-->
+
+## What We're Building
+
+A Discord bot that:
+- Responds to mentions and messages
+- Uses GPT-3.5 Turbo for responses
+- Maintains conversation context
+- Can be customized with personality prompts
+
+## Prerequisites
+
+- Discord account and server
+- OpenAI API key (pay-as-you-go)
+- Node.js 18+ or Python 3.9+
+- Basic coding knowledge
+
+## Setting Up Discord Application
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Click "New Application"
+3. Name your bot and create
+4. Go to "Bot" section
+5. Click "Add Bot"
+6. Copy the token (keep secret!)
+7. Enable required intents:
+   - Message Content Intent
+   - Server Members Intent
+
+## Getting OpenAI API Key
+
+1. Go to [OpenAI Platform](https://platform.openai.com)
+2. Create account or sign in
+3. Navigate to API Keys
+4. Create new secret key
+5. Add credits to your account
+
+## The Bot Code
+
+Here's a Node.js implementation:
+
+```javascript title="index.js"
+const { Client, GatewayIntentBits } = require('discord.js');
+const OpenAI = require('openai');
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Conversation history per channel
+const conversations = new Map();
+
+const SYSTEM_PROMPT = `You are a helpful assistant in a Discord server. 
+You're friendly, knowledgeable about technology, and can help with coding questions.
+Keep responses concise but informative. Use Discord markdown formatting.`;
+
+client.on('messageCreate', async (message) => {
+  // Ignore bots and messages without mention
+  if (message.author.bot) return;
+  if (!message.mentions.has(client.user)) return;
+
+  // Remove the mention from the message
+  const userMessage = message.content
+    .replace(`<@${client.user.id}>`, '')
+    .trim();
+
+  if (!userMessage) {
+    return message.reply('How can I help you?');
+  }
+
+  // Get or create conversation history
+  let history = conversations.get(message.channel.id) || [];
+  
+  // Add user message to history
+  history.push({ role: 'user', content: userMessage });
+  
+  // Keep last 10 messages for context
+  if (history.length > 10) {
+    history = history.slice(-10);
+  }
+
+  try {
+    await message.channel.sendTyping();
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...history,
+      ],
+      max_tokens: 500,
+    });
+
+    const reply = completion.choices[0].message.content;
+    
+    // Add assistant response to history
+    history.push({ role: 'assistant', content: reply });
+    conversations.set(message.channel.id, history);
+
+    // Handle long responses
+    if (reply.length > 2000) {
+      const chunks = reply.match(/.{1,2000}/g);
+      for (const chunk of chunks) {
+        await message.reply(chunk);
+      }
+    } else {
+      await message.reply(reply);
+    }
+
+  } catch (error) {
+    console.error('OpenAI Error:', error);
+    await message.reply('Sorry, I encountered an error. Please try again.');
+  }
+});
+
+client.once('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`);
+});
+
+client.login(process.env.DISCORD_TOKEN);
+```
+
+## Package Configuration
+
+```json title="package.json"
+{
+  "name": "discord-gpt-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "openai": "^4.24.1"
+  }
+}
+```
+
+## Environment Variables
+
+```bash title=".env"
+DISCORD_TOKEN=your_discord_bot_token
+OPENAI_API_KEY=your_openai_api_key
+```
+
+## Docker Deployment
+
+```yaml title="docker-compose.yml"
+services:
+  discord-bot:
+    build: .
+    container_name: discord-gpt-bot
+    restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+```
+
+```dockerfile title="Dockerfile"
+FROM node:20-alpine
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+
+CMD ["node", "index.js"]
+```
+
+## Customization Ideas
+
+### Personality Prompts
+
+Make your bot unique:
+
+```javascript
+const SYSTEM_PROMPT = `You are a pirate captain named Captain Byte. 
+You speak like a pirate and relate everything to sailing the digital seas.
+You help with tech questions but always stay in character.`;
+```
+
+### Channel-Specific Behavior
+
+```javascript
+const channelPrompts = {
+  'helpdesk': 'You are a helpful support agent...',
+  'coding': 'You are a senior developer...',
+  'gaming': 'You are a gaming buddy...',
+};
+```
+
+### Rate Limiting
+
+Prevent API cost overruns:
+
+```javascript
+const cooldowns = new Map();
+
+client.on('messageCreate', async (message) => {
+  const cooldown = cooldowns.get(message.author.id);
+  if (cooldown && Date.now() - cooldown < 5000) {
+    return message.reply('Please wait a few seconds...');
+  }
+  cooldowns.set(message.author.id, Date.now());
+  // ... rest of handler
+});
+```
+
+## Cost Management
+
+GPT-3.5 Turbo costs approximately:
+- Input: $0.0005 per 1K tokens
+- Output: $0.0015 per 1K tokens
+
+For a 500-word conversation: ~$0.001
+
+Set usage limits in OpenAI dashboard to avoid surprises.
+
+## Learn More
+
+- [Discord Bot Documentation](/Discord/Docs/Bots/AI%20Bot)
+- [Discord Comments Integration](/Discord/Docs/Comments%20Integration)
+
+---
+
+*Built a cool Discord bot? Share it on [Discord](https://discord.gg/6THYdvayjg)!*
