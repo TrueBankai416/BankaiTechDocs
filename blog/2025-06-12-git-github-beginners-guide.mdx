@@ -102,28 +102,28 @@ gh repo create homelab-configs --private --source=. --push
 Recommended structure:
 
 <Trees title="homelab/">
-  <Folder label="README.md" badge="Project documentation" />
-  <Folder label=".gitignore" badge="Files to exclude from Git" />
+  <File label="README.md" badge="Project documentation" />
+  <File label=".gitignore" badge="Files to exclude from Git" />
   <Folder label="docker" badge="Docker Compose stacks" expanded>
     <Folder label="media" expanded>
-      <Folder label="docker-compose.yml" badge="Jellyfin, *arr, etc." />
+      <File label="docker-compose.yml" badge="Jellyfin, *arr, etc." />
     </Folder>
     <Folder label="monitoring" expanded>
-      <Folder label="docker-compose.yml" badge="Grafana, Prometheus, etc." />
+      <File label="docker-compose.yml" badge="Grafana, Prometheus, etc." />
     </Folder>
     <Folder label="infrastructure" expanded>
-      <Folder label="docker-compose.yml" badge="Traefik, databases, etc." />
+      <File label="docker-compose.yml" badge="Traefik, databases, etc." />
     </Folder>
   </Folder>
   <Folder label="nginx" expanded>
     <Folder label="sites-available" badge="Reverse proxy configs" />
   </Folder>
   <Folder label="scripts" expanded>
-    <Folder label="backup.sh" badge="Backup automation" />
-    <Folder label="deploy.sh" badge="Deployment scripts" />
+    <File label="backup.sh" badge="Backup automation" />
+    <File label="deploy.sh" badge="Deployment scripts" />
   </Folder>
   <Folder label="docs" expanded>
-    <Folder label="network-diagram.md" badge="Infrastructure docs" />
+    <File label="network-diagram.md" badge="Infrastructure docs" />
   </Folder>
 </Trees>
 
