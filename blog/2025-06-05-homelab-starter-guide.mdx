@@ -74,7 +74,7 @@ Don't buy servers before you know what you need!
 |-------|---------|
 | OS | Ubuntu Server, Proxmox, TrueNAS |
 | Containers | Docker, Portainer |
-| Reverse Proxy | Nginx, Traefik |
+| Reverse Proxy | Nginx, Caddy |
 | SSL | Let's Encrypt, Certbot |
 | Backup | rsync, Borg, Duplicati |
 
@@ -91,16 +91,16 @@ Don't buy servers before you know what you need!
 - **Jellyfin** - Media server
 - **Arr stack** - Media automation
 - **Tailscale** - Remote access
-- **Grafana** - Monitoring
 
 ## Networking Basics
 
 ### Start Simple
 
-```
-[Internet] → [Router] → [Switch] → [Server]
-                     ↓
-              [WiFi AP] → [Clients]
+```mermaid
+flowchart LR
+    Internet --> Router
+    Router --> Switch --> Server
+    Router --> WiFi[WiFi AP] --> Clients
 ```
 
 ### Level Up With VLANs
@@ -185,6 +185,7 @@ Document as you go. Future you will thank present you.
 ## Resources
 
 - Our documentation: [Bankai-Tech Docs](/)
+- Partner sites: [DemonWarrior Tech](https://docs.demonwarriortech.com/) | [NetworkWilbi](https://docs.networkwilbi.com)
 - Reddit: [r/homelab](https://reddit.com/r/homelab)
 - Discord: [Our community](https://discord.gg/6THYdvayjg)
 - YouTube: ServeTheHome, TechnoTim, Craft Computing

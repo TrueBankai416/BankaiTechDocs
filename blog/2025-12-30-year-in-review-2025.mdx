@@ -15,7 +15,7 @@ Let's start with some stats from this year:
 
 - **40+** containers running daily
 - **99.7%** uptime (excluding planned maintenance)
-- **12TB** of data managed
+- **150TB** of data managed
 - **3** major outages (all self-inflicted 😅)
 - **0** security incidents
 
@@ -38,23 +38,18 @@ Rebuilt my entire Arr stack from scratch using the [full stack guide](/Examples/
 
 - Moved to hardlinks for storage efficiency
 - Implemented proper folder structure
-- Added Recyclarr for automated quality profiles
 - Set up cross-seed for ratio maintenance
 
 ### Network Upgrade
 
 Upgraded my network infrastructure:
 
-- Replaced my aging USG with a UDM Pro
-- Added 10GbE between NAS and Proxmox host
+- Replaced my aging Netgear Router with a UDM Pro paired with some Unifi APs
+- Added 10GbE between Gateway | NVR | Switch
 - Implemented proper VLANs (finally!)
-- Set up Pi-hole in HA configuration
+- Upgraded Internet plan to 2GB/1GB Fiber Optic
 
 ## What Didn't Work
-
-### Kubernetes at Home
-
-Tried running k3s for a few months. The overhead wasn't worth it for my scale. Docker Compose remains king for homelabs under 50 containers in my opinion.
 
 ### Automated Everything
 
@@ -62,7 +57,7 @@ Tried to automate too much, too fast. Spent more time fixing automation than it 
 
 ## Lessons Learned
 
-1. **Backups are mandatory** - Lost a week of work when a drive failed. Now running 3-2-1 backup strategy religiously.
+1. **Backups are mandatory** - Lost the majority of our family pictures when a drive failed. Now running syncthing backup strategy to all owned PCs/Laptops for multiple backups.
 
 2. **Document as you go** - Future you will thank present you.
 
@@ -77,7 +72,6 @@ Here's what's on the roadmap:
 - [ ] Set up proper monitoring with Grafana/Prometheus
 - [ ] Implement GitOps for configuration management
 - [ ] Build a dedicated backup server
-- [ ] Explore Immich as a Google Photos replacement
 - [ ] Write more documentation and blog posts!
 
 ## Thank You

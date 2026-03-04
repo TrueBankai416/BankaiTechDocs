@@ -1,21 +1,53 @@
 ---
-slug: proxmox-vs-esxi-homelab-2026
-title: "Proxmox vs ESXi in 2026: A Homelab Perspective"
+slug: why-i-chose-proxmox-homelab-2026
+title: "Why I Chose Proxmox: From Single Host to Proper Virtualization"
 authors: [bankai]
-tags: [proxmox, virtualization, homelab, comparison]
+tags: [proxmox, virtualization, homelab, tutorials]
 ---
 
-With VMware's acquisition by Broadcom and subsequent licensing changes, many homelabbers have been reconsidering their virtualization platform. Here's my take on Proxmox vs ESXi in 2026.
+Before Proxmox, all my services ran on a single host with no isolation. One bad update could take down everything. Here's why I chose Proxmox and how virtualization transformed my homelab.
 
 <!--truncate-->
 
-## The Landscape Has Changed
+## The Problem: Everything on One Host
 
-In late 2023, Broadcom acquired VMware and subsequently made significant changes to licensing, including discontinuing the free ESXi hypervisor. This sent shockwaves through the homelab community.
+My original setup was simple but fragile:
 
-## Why I Switched to Proxmox
+- Docker containers running directly on the host OS
+- No isolation between services
+- One kernel panic = entire homelab down
+- Updates were terrifying
+- No easy way to snapshot or rollback
 
-After running ESXi for years, I made the switch to Proxmox. Here's why:
+It worked, but it wasn't sustainable.
+
+## Why Virtualization?
+
+Moving to a hypervisor provides:
+
+- **Isolation** - Problems in one VM don't affect others
+- **Snapshots** - Test changes safely, rollback instantly
+- **Resource management** - Allocate CPU/RAM per workload
+- **Flexibility** - Run different OSes side by side
+- **Better backups** - Backup entire VMs easily
+
+## Options I Considered
+
+### VMware ESXi
+
+The enterprise standard, but in 2023 Broadcom acquired VMware and discontinued the free ESXi hypervisor. Even before that, the free tier had limitations that made it less appealing for homelabs.
+
+### Proxmox VE
+
+Open source, free, and actively developed. Supports both VMs and LXC containers. This is what I went with.
+
+### Other Options
+
+- **Hyper-V** - Windows-only, still need a Windows license
+- **XCP-ng** - Solid option, but smaller community
+- **Unraid** - Great for storage-focused builds
+
+## Why Proxmox Won
 
 ### 1. It's Truly Free (and Open Source)
 
@@ -36,7 +68,7 @@ pct create 100 local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
 
 ### 3. Web-Based Management
 
-The Proxmox web UI is modern and capable. No need for a Windows machine to run vSphere Client.
+The Proxmox web UI is modern and capable. No need for special client software—just a browser.
 
 ### 4. Excellent ZFS Integration
 
@@ -46,35 +78,22 @@ Native ZFS support means I can create pools, snapshots, and replications directl
 
 Want to cluster multiple nodes? It's included. No additional licensing required.
 
-## What I Miss from ESXi
+## My Setup Now
 
-Let's be fair - there are things VMware did well:
+After migrating to Proxmox:
 
-- **vMotion** - Live migration in ESXi was incredibly smooth
-- **Ecosystem** - Third-party tool support was extensive  
-- **Enterprise features** - VMware's enterprise tooling is mature
+- **Separate VMs** for different workloads (media, networking, development)
+- **LXC containers** for lightweight services
+- **Snapshots before updates** - no more fear
+- **Easy backups** to NAS storage
+- **GPU passthrough** to a dedicated VM
 
-## Performance Comparison
-
-In my testing with identical hardware (Dell R720, dual Xeon E5-2670, 128GB RAM):
-
-| Metric | ESXi 7.0 | Proxmox 8.1 |
-|--------|----------|-------------|
-| Boot time | 45s | 30s |
-| Memory overhead | ~1.2GB | ~800MB |
-| VM startup | Similar | Similar |
-| Storage throughput | Similar | Similar |
-
-Real-world performance is virtually identical for homelab workloads.
-
-## My Recommendation
-
-For homelabs in 2026, **Proxmox is the clear winner**. The combination of zero licensing costs, LXC container support, and an active community makes it hard to justify ESXi unless you have specific enterprise requirements.
+The difference is night and day. I can experiment freely knowing I can roll back in seconds.
 
 ## Getting Started
 
-If you're ready to make the switch, check out my [Proxmox installation guide](/Proxmox/Introduction) for a step-by-step walkthrough.
+If you're still running everything on bare metal, consider making the switch. Check out my [Proxmox installation guide](/Proxmox/Introduction) for a step-by-step walkthrough.
 
 ---
 
-*What's your virtualization platform of choice? Share your experiences in the comments or on [Discord](https://discord.gg/6THYdvayjg)!*
+*Still running everything on a single host? Made the switch to virtualization? Share your experience on [Discord](https://discord.gg/6THYdvayjg)!*

@@ -18,9 +18,9 @@ The "Arr" applications handle different media types:
 | **Radarr** | Movies |
 | **Sonarr** | TV Shows |
 | **Lidarr** | Music |
-| **Readarr** | Books/Audiobooks |
+| **Bookshelf** | Books/Audiobooks |
 | **Prowlarr** | Indexer management |
-| **Jellyseerr** | Request management |
+| **Seerr** | Request management |
 | **qBittorrent** | Download client |
 | **JFA-Go** | Jellyfin account management |
 
@@ -30,7 +30,7 @@ Here's how everything connects:
 
 ```mermaid
 graph LR
-    A[User Request] --> B[Jellyseerr]
+    A[User Request] --> B[Seerr]
     B --> C[Radarr/Sonarr]
     C --> D[Prowlarr]
     D --> E[Indexers]
@@ -41,7 +41,7 @@ graph LR
     H --> I[Jellyfin]
 ```
 
-1. User requests media through Jellyseerr
+1. User requests media through Seerr
 2. Request goes to Radarr/Sonarr
 3. Arr app queries indexers via Prowlarr
 4. Best release is sent to qBittorrent
@@ -95,15 +95,22 @@ services:
       - "9696:9696"
     restart: unless-stopped
 
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  Seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: Seerr
+    init: true
     environment:
       - TZ=America/New_York
     volumes:
-      - jellyseerr_config:/app/config
+      - seerr_data:/app/config
     ports:
       - "5055:5055"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
     restart: unless-stopped
 
   qbittorrent:
@@ -125,7 +132,7 @@ volumes:
   radarr_config:
   sonarr_config:
   prowlarr_config:
-  jellyseerr_config:
+  seerr_data:
   qbit_config:
 ```
 

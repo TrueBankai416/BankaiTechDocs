@@ -80,26 +80,37 @@ sudo usermod -aG render $USER
 
 Organize your media properly:
 
-```
-media/
-├── movies/
-│   ├── Movie Name (2024)/
-│   │   ├── Movie Name (2024).mkv
-│   │   └── Movie Name (2024).srt
-│   └── Another Movie (2023)/
-│       └── Another Movie (2023).mp4
-├── tv/
-│   └── Show Name (2020)/
-│       ├── Season 01/
-│       │   ├── Show Name - S01E01 - Episode Title.mkv
-│       │   └── Show Name - S01E02 - Episode Title.mkv
-│       └── Season 02/
-│           └── ...
-└── music/
-    └── Artist/
-        └── Album (Year)/
-            └── 01 - Track Name.flac
-```
+<Trees title="media/">
+  <Folder label="movies" expanded>
+    <Folder label="Movie Name (2024)" expanded>
+      <Folder label="Movie Name (2024).mkv" />
+      <Folder label="Movie Name (2024).srt" />
+    </Folder>
+    <Folder label="Another Movie (2023)" expanded>
+      <Folder label="Another Movie (2023).mp4" />
+    </Folder>
+  </Folder>
+  <Folder label="tv" expanded>
+    <Folder label="Show Name (2020)" expanded>
+      <Folder label="Season 01" expanded>
+        <Folder label="Show Name - S01E01 - Episode Title.mkv" />
+        <Folder label="Show Name - S01E02 - Episode Title.mkv" />
+      </Folder>
+      <Folder label="Season 02" expanded>
+        <Folder label="Show Name - S02E01 - Episode Title.mkv" />
+      </Folder>
+    </Folder>
+  </Folder>
+  <Folder label="music" expanded>
+    <Folder label="Artist" expanded>
+      <Folder label="Album (Year)" expanded>
+        <Folder label="01 - Track Name.flac" />
+        <Folder label="02 - Track Name.flac" />
+        <Folder label="cover.jpg" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Trees>
 
 ## TinyMediaManager Integration
 
@@ -155,8 +166,8 @@ The hardest part is updating all your devices, but it's worth it.
 
 Currently running:
 - Jellyfin in Docker behind Nginx reverse proxy
-- Intel QuickSync for transcoding
-- 100TB library with movies, TV, and music
+- NVIDIA NVENC for transcoding
+- 100TB+ library with movies, TV, and music
 - Arr stack for automated acquisition
 - TinyMediaManager for metadata
 

@@ -157,29 +157,6 @@ sudo umount /mnt/storage
 sudo mergerfs /mnt/disk*:/mnt/storage -o ...options...
 ```
 
-## SnapRAID for Parity
-
-MergerFS + SnapRAID = Best of both worlds:
-
-```bash
-sudo apt install snapraid
-```
-
-```conf title="/etc/snapraid.conf"
-parity /mnt/parity1/snapraid.parity
-data d1 /mnt/disk1
-data d2 /mnt/disk2
-data d3 /mnt/disk3
-content /mnt/disk1/.snapraid.content
-content /mnt/disk2/.snapraid.content
-```
-
-Run regularly:
-```bash
-snapraid sync  # Calculate parity
-snapraid scrub # Verify data integrity
-```
-
 ## Tips from Experience
 
 1. **Label your drives** - Use `/dev/disk/by-id/` in fstab
@@ -191,11 +168,12 @@ snapraid scrub # Verify data integrity
 ## My Storage Setup
 
 Current configuration:
-- 4 x 8TB drives in MergerFS pool (32TB usable)
-- 1 x 8TB SnapRAID parity drive
-- Policy: `epmfs` (keeps series together)
-- minfreespace: 100GB
-- Used for Jellyfin media library
+- 3 x 26TB drives in MergerFS pool
+- 1 x 24TB drive in MergerFS pool
+- 1 x 22TB drive in MergerFS pool
+- 1 x 18TB drive in MergerFS pool
+- minfreespace: 500GB (per drive)
+- Used for Jellyfin media library (Without Parity)
 
 ## Learn More
 
