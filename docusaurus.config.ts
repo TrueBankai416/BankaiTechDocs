@@ -86,13 +86,15 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/TrueBankai416/BankaiTechDocs/tree/main/',
         },
-        blog: false, //{
-        //    showReadingTime: true,
-        // Please change this to your repo.
-        // Remove this to remove the "edit this page" links.
-        //  editUrl:
-        //    'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        // },
+        blog: {
+          showReadingTime: true,
+          blogTitle: 'Bankai-Tech Blog',
+          blogDescription: 'News, tutorials, tips, and insights about self-hosting, Docker, homelabs, and tech infrastructure.',
+          blogSidebarTitle: 'Recent Posts',
+          blogSidebarCount: 'ALL',
+          postsPerPage: 10,
+          editUrl: 'https://github.com/TrueBankai416/BankaiTechDocs/tree/main/',
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -217,7 +219,7 @@ const config: Config = {
     //      position: 'right',
     //    },
         { to: 'https://buymeacoffee.com/BankaiTech', label: 'Buy Me a Beer', position: 'left' },
-        //    {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
       ],
     },
     footer: {

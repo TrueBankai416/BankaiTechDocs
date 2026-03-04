@@ -1,0 +1,223 @@
+---
+slug: node-red-homelab-automation
+title: "Node-RED: Visual Automation for Your Homelab"
+authors: [bankai]
+tags: [node-red, automation, homelab, tutorials]
+---
+
+Node-RED is a flow-based programming tool that lets you wire together APIs, services, and devices with a visual interface. Perfect for homelab automation without writing code. Here's how to get started.
+
+<!--truncate-->
+
+## What is Node-RED?
+
+Node-RED is:
+
+- **Visual programming** - Drag, drop, and connect nodes
+- **Event-driven** - React to events in real-time
+- **Highly extensible** - Thousands of community nodes
+- **Lightweight** - Runs on a Raspberry Pi
+
+Common homelab uses:
+- Home automation triggers
+- API integrations
+- Data transformations
+- Alert notifications
+- Scheduled tasks
+
+## Docker Installation
+
+```yaml title="docker-compose.yml"
+services:
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
+    environment:
+      - TZ=America/New_York
+    ports:
+      - "1880:1880"
+    volumes:
+      - node_red_data:/data
+    restart: unless-stopped
+
+volumes:
+  node_red_data:
+```
+
+Access at `http://your-server:1880`
+
+## Your First Flow
+
+Let's create a simple HTTP endpoint that returns system info:
+
+1. **Drag an `http in` node** - Set method to GET, URL to `/status`
+2. **Drag an `exec` node** - Command: `uptime`
+3. **Drag a `template` node** - Format the response
+4. **Drag an `http response` node** - Send the response
+
+Connect them: http in → exec → template → http response
+
+Deploy and visit `http://your-server:1880/status`
+
+## Essential Nodes
+
+### Built-in
+
+| Node | Purpose |
+|------|---------|
+| inject | Trigger flows manually or on schedule |
+| debug | View message data |
+| function | JavaScript code |
+| change | Modify message properties |
+| switch | Conditional routing |
+| http request | Make HTTP calls |
+| exec | Run shell commands |
+
+### Community Must-Haves
+
+Install via Menu → Manage Palette:
+
+- **node-red-contrib-home-assistant** - Home Assistant integration
+- **node-red-node-discord** - Discord messaging
+- **node-red-contrib-influxdb** - Metrics storage
+- **node-red-contrib-telegrambot** - Telegram notifications
+- **node-red-dashboard** - Create web dashboards
+
+## Practical Examples
+
+### Example 1: Discord Notifications for Container Health
+
+```json
+[
+  {
+    "id": "exec-docker",
+    "type": "exec",
+    "command": "docker ps --filter health=unhealthy --format '{{.Names}}'",
+    "addpay": false
+  },
+  {
+    "id": "check-output",
+    "type": "switch",
+    "property": "payload",
+    "rules": [
+      { "t": "nempty" }
+    ]
+  },
+  {
+    "id": "discord-notify",
+    "type": "discord-send",
+    "channel": "YOUR_CHANNEL_ID"
+  }
+]
+```
+
+Schedule with inject node → Every 5 minutes.
+
+### Example 2: Daily Backup Reminder
+
+```javascript
+// Function node - Check if backup ran today
+const fs = global.get('fs');
+const lastBackup = fs.statSync('/backups/latest').mtime;
+const today = new Date();
+const hoursSince = (today - lastBackup) / 1000 / 60 / 60;
+
+if (hoursSince > 24) {
+    msg.payload = `⚠️ Backup is ${Math.round(hoursSince)} hours old!`;
+    return msg;
+}
+return null;
+```
+
+### Example 3: API Data Transformation
+
+Pull data from one API, transform, send to another:
+
+```
+[inject (cron)] → [http request (source)] → [function (transform)] → [http request (destination)]
+```
+
+## Dashboard Creation
+
+Install `node-red-dashboard` for instant web UIs:
+
+```bash
+# Within Node-RED
+Menu → Manage Palette → Install → node-red-dashboard
+```
+
+Add dashboard nodes:
+- `ui_gauge` - Display metrics
+- `ui_chart` - Line/bar charts
+- `ui_button` - Trigger actions
+- `ui_text` - Display text
+- `ui_switch` - Toggle controls
+
+Access dashboard at `http://your-server:1880/ui`
+
+## Environment Variables
+
+Secure credentials with environment variables:
+
+```yaml title="docker-compose.yml"
+environment:
+  - DISCORD_WEBHOOK=https://discord.com/api/webhooks/...
+  - API_KEY=your-secret-key
+```
+
+Access in function nodes:
+```javascript
+const webhook = env.get("DISCORD_WEBHOOK");
+```
+
+## Flow Import/Export
+
+### Export
+1. Select nodes
+2. Ctrl+E (or Menu → Export)
+3. Copy JSON or download file
+
+### Import
+1. Ctrl+I (or Menu → Import)
+2. Paste JSON or upload file
+3. Click Import
+
+## Tips from Experience
+
+1. **Name your nodes** - Future you will thank you
+2. **Use link nodes** - Clean up complex flows
+3. **Comment everything** - Add comment nodes explaining logic
+4. **Separate concerns** - One flow per function
+5. **Backup flows** - Export regularly to Git
+6. **Use context** - Store data between messages
+
+## Security
+
+⚠️ Node-RED has no authentication by default!
+
+Add to `settings.js`:
+
+```javascript
+adminAuth: {
+    type: "credentials",
+    users: [{
+        username: "admin",
+        password: "$2b$08$...", // bcrypt hash
+        permissions: "*"
+    }]
+}
+```
+
+Generate hash:
+```bash
+node -e "console.log(require('bcryptjs').hashSync('your-password', 8));"
+```
+
+## Learn More
+
+- [Node-RED Introduction](/Examples/Node-RED/Introduction)
+- [Example Flows](/Examples/Node-RED/Docs/Flows/)
+
+---
+
+*What automations have you built with Node-RED? Share on [Discord](https://discord.gg/6THYdvayjg)!*

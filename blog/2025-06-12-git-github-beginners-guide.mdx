@@ -1,0 +1,264 @@
+---
+slug: git-github-beginners-guide
+title: "Git and GitHub: A Beginner's Guide for Homelabbers"
+authors: [bankai]
+tags: [git, github, beginners, tutorials]
+---
+
+Version control might seem like overkill for a homelab, but once you start tracking your configurations in Git, you'll wonder how you ever lived without it. Here's a practical guide to Git and GitHub for homelabbers.
+
+<!--truncate-->
+
+## Why Version Control for Homelabs?
+
+- **Track changes** - Know exactly what you changed and when
+- **Rollback mistakes** - Broke something? Go back in time
+- **Documentation** - Commit messages explain your thinking
+- **Backup** - GitHub is a free off-site backup
+- **Collaboration** - Share configs with the community
+- **Automation** - CI/CD for your infrastructure
+
+## Git Basics
+
+### Initial Setup
+
+```bash
+# Configure your identity
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+
+# Useful defaults
+git config --global init.defaultBranch main
+git config --global pull.rebase false
+```
+
+### Creating a Repository
+
+```bash
+# Start tracking an existing folder
+cd my-homelab-configs
+git init
+
+# Create .gitignore for secrets
+echo ".env" >> .gitignore
+echo "*.secret" >> .gitignore
+
+# First commit
+git add .
+git commit -m "Initial commit: homelab configurations"
+```
+
+### Common Workflow
+
+```bash
+# Check status
+git status
+
+# Stage changes
+git add docker-compose.yml
+
+# Commit with message
+git commit -m "Add Jellyfin service to media stack"
+
+# Push to GitHub
+git push origin main
+```
+
+## Connecting to GitHub
+
+### SSH Authentication (Recommended)
+
+```bash
+# Generate SSH key
+ssh-keygen -t ed25519 -C "your@email.com"
+
+# Start SSH agent
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# Copy public key
+cat ~/.ssh/id_ed25519.pub
+```
+
+Add the key at GitHub → Settings → SSH Keys
+
+### GitHub CLI
+
+Easier authentication and workflows:
+
+```bash
+# Install
+sudo apt install gh
+
+# Authenticate
+gh auth login
+
+# Create repo from current directory
+gh repo create homelab-configs --private --source=. --push
+```
+
+## Organizing Your Homelab Repo
+
+Recommended structure:
+
+<Trees title="homelab/">
+  <Folder label="README.md" badge="Project documentation" />
+  <Folder label=".gitignore" badge="Files to exclude from Git" />
+  <Folder label="docker" badge="Docker Compose stacks" expanded>
+    <Folder label="media" expanded>
+      <Folder label="docker-compose.yml" badge="Jellyfin, *arr, etc." />
+    </Folder>
+    <Folder label="monitoring" expanded>
+      <Folder label="docker-compose.yml" badge="Grafana, Prometheus, etc." />
+    </Folder>
+    <Folder label="infrastructure" expanded>
+      <Folder label="docker-compose.yml" badge="Traefik, databases, etc." />
+    </Folder>
+  </Folder>
+  <Folder label="nginx" expanded>
+    <Folder label="sites-available" badge="Reverse proxy configs" />
+  </Folder>
+  <Folder label="scripts" expanded>
+    <Folder label="backup.sh" badge="Backup automation" />
+    <Folder label="deploy.sh" badge="Deployment scripts" />
+  </Folder>
+  <Folder label="docs" expanded>
+    <Folder label="network-diagram.md" badge="Infrastructure docs" />
+  </Folder>
+</Trees>
+
+## Essential .gitignore
+
+```gitignore title=".gitignore"
+# Secrets
+.env
+*.secret
+*.key
+*.pem
+secrets/
+
+# Database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+```
+
+## Handling Secrets
+
+Never commit secrets! Options:
+
+### 1. Environment Files
+
+```yaml title="docker-compose.yml"
+services:
+  app:
+    env_file:
+      - .env  # Not committed
+```
+
+```gitignore
+.env
+```
+
+### 2. Example Files
+
+```bash
+# Commit example, not real
+cp .env .env.example
+# Edit .env.example to remove real values
+git add .env.example
+```
+
+### 3. git-crypt
+
+Encrypt sensitive files in-repo:
+
+```bash
+git-crypt init
+echo "secrets/** filter=git-crypt diff=git-crypt" >> .gitattributes
+```
+
+## Common Issues and Solutions
+
+### Divergent Branches
+
+```bash
+# When pull fails due to local changes
+git pull --rebase origin main
+
+# Or if you want to merge
+git pull --no-rebase origin main
+```
+
+### Accidentally Committed Secrets
+
+```bash
+# Remove from history (destructive!)
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch .env" \
+  --prune-empty --tag-name-filter cat -- --all
+
+git push --force
+```
+
+Then rotate your compromised credentials!
+
+### Undo Last Commit
+
+```bash
+# Keep changes, undo commit
+git reset --soft HEAD~1
+
+# Discard changes too
+git reset --hard HEAD~1
+```
+
+## GitHub Features for Homelabs
+
+### Issues as Todo List
+
+Track improvements and bugs for your homelab.
+
+### Wiki for Documentation
+
+Extended docs right in your repo.
+
+### Actions for Automation
+
+Run linting, backups, or deployments on push.
+
+```yaml title=".github/workflows/validate.yml"
+name: Validate
+on: push
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate YAML
+        run: |
+          pip install yamllint
+          yamllint docker/
+```
+
+## Learn More
+
+- [Git Troubleshooting Guide](/GitHub/Docs/Git%20Troubleshooting)
+- [GitHub with Visual Studio](/GitHub/Docs/GitHub%20with%20Visual%20Studio)
+- [GitHub CLI](/GitHub/Docs/GitHub%20CLI)
+
+---
+
+*How do you organize your homelab configs? Share on [Discord](https://discord.gg/6THYdvayjg)!*

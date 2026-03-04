@@ -1,0 +1,160 @@
+---
+slug: building-proxmox-homelab-virtualization
+title: "Building Your Homelab: Getting Started with Proxmox Virtualization"
+authors: [bankai]
+tags: [proxmox, virtualization, homelab, tutorials]
+---
+
+Proxmox VE is the secret weapon of serious homelabbers. This enterprise-grade virtualization platform lets you run multiple operating systems, containers, and services on a single machine. Here's how to get started.
+
+<!--truncate-->
+
+## Why Proxmox?
+
+Proxmox Virtual Environment (VE) offers:
+
+- **Free and Open Source** - No licensing fees for homelab use
+- **KVM Virtualization** - Full VMs with hardware passthrough
+- **LXC Containers** - Lightweight Linux containers
+- **Web-Based Management** - No Windows client required
+- **Built-in Clustering** - Scale across multiple nodes
+- **ZFS Support** - Enterprise-grade storage built in
+
+## VM vs Container: When to Use What
+
+Understanding the difference is crucial:
+
+### Virtual Machines (KVM)
+✅ Use for:
+- Windows operating systems
+- Non-Linux workloads
+- Applications requiring kernel isolation
+- GPU passthrough scenarios
+
+❌ Overhead:
+- Full OS per VM
+- More resource intensive
+- Slower boot times
+
+### Containers (LXC)
+✅ Use for:
+- Linux services
+- Docker hosts
+- Development environments
+- High-density deployments
+
+❌ Limitations:
+- Linux guests only
+- Shared kernel with host
+- Some Docker features may need tweaking
+
+## Creating Your First LXC Container
+
+LXC containers are perfect for running services efficiently:
+
+```bash
+# Via Proxmox CLI (on the host)
+pct create 100 local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
+  --hostname docker-host \
+  --memory 4096 \
+  --cores 2 \
+  --rootfs local-lvm:32 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --features nesting=1
+```
+
+Or use the web UI:
+1. Click "Create CT"
+2. Select template
+3. Configure resources
+4. Set networking
+5. **Enable "Nesting"** for Docker support
+
+## VLAN Configuration
+
+Proper network segmentation is essential for security:
+
+```bash
+# On Proxmox host
+auto vmbr0.10
+iface vmbr0.10 inet manual
+    vlan-raw-device vmbr0
+```
+
+Then assign VLAN tags to VMs/containers in their network configuration.
+
+Common VLAN layout:
+- VLAN 10: Management
+- VLAN 20: Servers/Services
+- VLAN 30: IoT devices
+- VLAN 40: Guest network
+
+## Storage Options
+
+Proxmox supports multiple storage backends:
+
+| Storage Type | Best For | Performance |
+|--------------|----------|-------------|
+| Local LVM | VM disks | High |
+| ZFS | Everything | High + features |
+| NFS | Shared storage | Medium |
+| Ceph | Clustered storage | High + HA |
+| Local Directory | ISOs, backups | Low |
+
+For a single-node homelab, **ZFS** is ideal:
+
+```bash
+zpool create -f tank mirror /dev/sdb /dev/sdc
+```
+
+## Backup Configuration
+
+Never skip backups! Configure in Datacenter → Backup:
+
+```bash
+# Manual backup via CLI
+vzdump 100 --storage local --compress zstd --mode snapshot
+```
+
+Automate with a schedule:
+- Daily snapshots for active VMs
+- Weekly full backups
+- Monthly offsite copies
+
+## Pro Tips
+
+### 1. PCIe Passthrough for GPU
+Enable IOMMU in BIOS and add to `/etc/default/grub`:
+```bash
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on"
+```
+
+### 2. Disable Enterprise Repo Warning
+```bash
+sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
+```
+
+### 3. Enable Dark Mode
+Available in Options → Theme → Dark
+
+### 4. Monitor Resources
+Use the built-in Summary page or integrate with Grafana for advanced monitoring.
+
+## What I Run on Proxmox
+
+My current setup:
+- **Docker LXC** - All my containerized services
+- **Windows 11 VM** - For testing/gaming
+- **Ubuntu Server VM** - Development environment
+
+## Learn More
+
+For detailed guides on specific topics:
+
+- [LXC Container Deep Dive](/Proxmox/Docs/LXC%20Containers/)
+- [VLAN Configuration Guide](/Proxmox/Docs/Networking/VLAN%20Configuration)
+- [Firewall Setup](/Proxmox/Docs/Networking/Firewall%20Configuration)
+
+---
+
+*What's running on your Proxmox server? Share your setup on [Discord](https://discord.gg/6THYdvayjg)!*

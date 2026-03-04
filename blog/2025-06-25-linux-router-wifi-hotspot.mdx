@@ -1,0 +1,203 @@
+---
+slug: linux-router-wifi-hotspot-lnxrouter
+title: "Turn Any Linux Machine into a WiFi Hotspot with lnxrouter"
+authors: [bankai]
+tags: [networking, linux, wifi, tutorials]
+---
+
+Need a quick WiFi hotspot? Want to share your wired connection wirelessly? lnxrouter turns any Linux machine with a WiFi adapter into a full-featured router. Here's how.
+
+<!--truncate-->
+
+## What is lnxrouter?
+
+lnxrouter is a single script that creates a NATed WiFi hotspot on Linux. It handles:
+
+- **AP creation** - Uses hostapd
+- **DHCP server** - dnsmasq for IP assignment
+- **NAT routing** - iptables rules
+- **DNS** - Local DNS server
+- **Bandwidth limiting** - Optional QoS
+
+All in one command!
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/garywill/linux-router.git
+cd linux-router
+
+# Or direct download
+wget https://raw.githubusercontent.com/garywill/linux-router/master/lnxrouter
+chmod +x lnxrouter
+```
+
+## Basic Usage
+
+Create a hotspot sharing your internet:
+
+```bash
+# Basic hotspot
+sudo ./lnxrouter -i wlan0 --ap MyHotspot --password mysecretpass
+
+# Share ethernet connection
+sudo ./lnxrouter -i wlan0 -o eth0 --ap HomeShare --password strongpassword
+```
+
+Options:
+- `-i` - WiFi interface to use as AP
+- `-o` - Interface with internet (optional, auto-detected)
+- `--ap` - SSID name
+- `--password` - WPA2 password
+
+## Finding Your WiFi Adapter
+
+```bash
+# List wireless interfaces
+iwconfig
+
+# More detailed info
+iw dev
+
+# Check adapter capabilities
+iw list | grep -A 10 "Supported interface modes"
+```
+
+Look for "AP" in supported modes - not all adapters support AP mode!
+
+## Advanced Configuration
+
+### Change WiFi Channel and Band
+
+```bash
+# Use channel 6 (2.4GHz)
+sudo ./lnxrouter -i wlan0 --ap MyHotspot --password pass123 -c 6
+
+# Use 5GHz (channel 36)
+sudo ./lnxrouter -i wlan0 --ap MyHotspot --password pass123 -c 36
+```
+
+### Custom DHCP Range
+
+```bash
+sudo ./lnxrouter -i wlan0 --ap MyHotspot --password pass123 \
+  --dhcp-dns 1.1.1.1 \
+  --dhcp-range 192.168.12.10,192.168.12.100
+```
+
+### Run as Background Service
+
+```bash
+# Create systemd service
+cat << EOF | sudo tee /etc/systemd/system/lnxrouter.service
+[Unit]
+Description=Linux Router Hotspot
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/path/to/lnxrouter -i wlan0 --ap MyHotspot --password pass123
+ExecStop=/bin/kill -s QUIT \$MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start
+sudo systemctl enable lnxrouter
+sudo systemctl start lnxrouter
+```
+
+## Troubleshooting
+
+### "rf-kill" Error
+
+Your WiFi might be software blocked:
+
+```bash
+# Check rfkill status
+rfkill list
+
+# Unblock WiFi
+sudo rfkill unblock wifi
+```
+
+### Interface Busy
+
+NetworkManager might be controlling the interface:
+
+```bash
+# Stop NetworkManager's control
+sudo nmcli device set wlan0 managed no
+
+# Or add to NetworkManager conf
+cat << EOF | sudo tee /etc/NetworkManager/conf.d/unmanaged.conf
+[keyfile]
+unmanaged-devices=interface-name:wlan0
+EOF
+sudo systemctl restart NetworkManager
+```
+
+### Driver Issues
+
+Some USB adapters need specific drivers:
+
+```bash
+# Realtek adapters
+sudo apt install realtek-rtl88xxau-dkms
+
+# Update kernel modules
+sudo modprobe 88XXau
+```
+
+## Use Cases
+
+### 1. Travel Router
+Bring a Raspberry Pi, connect to hotel ethernet, share via WiFi.
+
+### 2. Captive Portal Bypass
+Connect to captive portal once, share to all devices.
+
+### 3. Network Testing
+Create isolated networks for testing.
+
+### 4. IoT Network
+Dedicated network for smart devices.
+
+### 5. Guest Network
+Isolated WiFi for visitors.
+
+## Security Considerations
+
+- **Always use WPA2** - Never create open networks
+- **Strong passwords** - 12+ characters
+- **Isolate networks** - Don't bridge to sensitive LANs
+- **Monitor connections** - Check connected clients
+
+```bash
+# View connected clients
+arp -a
+
+# Or with detailed info
+iw dev wlan0 station dump
+```
+
+## Alternatives
+
+If lnxrouter doesn't work for your use case:
+
+- **hostapd** - Manual AP configuration
+- **create_ap** - Similar tool, different approach
+- **RaspAP** - Web interface for Raspberry Pi
+
+## Learn More
+
+- [Complete lnxrouter Guide](/Networking/Docs/Linux%20Router)
+- [Changing WiFi Adapters](/Networking/Docs/Changing%20Wifi%20Adapter)
+- [Networking Fundamentals](/Networking/Introduction)
+
+---
+
+*Using Linux as a router? Share your setup on [Discord](https://discord.gg/6THYdvayjg)!*

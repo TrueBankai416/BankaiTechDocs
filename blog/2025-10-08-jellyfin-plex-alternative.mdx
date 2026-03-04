@@ -1,0 +1,184 @@
+---
+slug: jellyfin-plex-alternative-media-server
+title: "Jellyfin: The Free Plex Alternative You've Been Looking For"
+authors: [bankai]
+tags: [jellyfin, media-server, self-hosting, tutorials]
+---
+
+If you're tired of Plex's subscription model, account requirements, and feature removals, Jellyfin might be your perfect media server. Here's why I made the switch and how you can too.
+
+<!--truncate-->
+
+## Why Jellyfin?
+
+After years of Plex, several changes pushed me to explore alternatives:
+
+- **No account required** - Works entirely locally
+- **Free hardware transcoding** - No Plex Pass needed
+- **Truly open source** - GPL licensed, community driven
+- **No phone-home** - Your server, your rules
+- **Active development** - Regular updates and improvements
+
+## Jellyfin vs Plex vs Emby
+
+| Feature | Jellyfin | Plex | Emby |
+|---------|----------|------|------|
+| Price | Free | Freemium | Freemium |
+| Account Required | No | Yes | Yes |
+| Hardware Transcoding | Free | Plex Pass | Premiere |
+| Local-only Option | Yes | Limited | Limited |
+| Skip Intro | Plugin | Plex Pass | Premiere |
+| Open Source | Yes | No | No |
+| Mobile Apps | Free | Free/Paid | Free/Paid |
+
+## Docker Installation
+
+Here's a production-ready compose file:
+
+```yaml title="docker-compose.yml"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      - /path/to/media/movies:/data/movies:ro
+      - /path/to/media/tv:/data/tv:ro
+      - /path/to/media/music:/data/music:ro
+    ports:
+      - "8096:8096"
+    devices:
+      - /dev/dri:/dev/dri # For Intel QuickSync
+
+volumes:
+  jellyfin_config:
+  jellyfin_cache:
+```
+
+### Hardware Transcoding
+
+For Intel QuickSync (most common):
+
+1. Ensure your user has access to render group:
+```bash
+sudo usermod -aG render $USER
+```
+
+2. The `/dev/dri` device mapping in compose handles the rest
+
+3. In Jellyfin Dashboard → Playback → Transcoding:
+   - Select "Intel QuickSync (QSV)"
+   - Enable hardware decoding for supported codecs
+
+## Folder Structure
+
+Organize your media properly:
+
+<Trees title="media/">
+  <Folder label="movies" expanded>
+    <Folder label="Movie Name (2024)" expanded>
+      <Folder label="Movie Name (2024).mkv" />
+      <Folder label="Movie Name (2024).srt" />
+    </Folder>
+    <Folder label="Another Movie (2023)" expanded>
+      <Folder label="Another Movie (2023).mp4" />
+    </Folder>
+  </Folder>
+  <Folder label="tv" expanded>
+    <Folder label="Show Name (2020)" expanded>
+      <Folder label="Season 01" expanded>
+        <Folder label="Show Name - S01E01 - Episode Title.mkv" />
+        <Folder label="Show Name - S01E02 - Episode Title.mkv" />
+      </Folder>
+      <Folder label="Season 02" expanded>
+        <Folder label="Show Name - S02E01 - Episode Title.mkv" />
+      </Folder>
+    </Folder>
+  </Folder>
+  <Folder label="music" expanded>
+    <Folder label="Artist" expanded>
+      <Folder label="Album (Year)" expanded>
+        <Folder label="01 - Track Name.flac" />
+        <Folder label="02 - Track Name.flac" />
+        <Folder label="cover.jpg" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Trees>
+
+## TinyMediaManager Integration
+
+For the best metadata management, use **TinyMediaManager**:
+
+1. Point TMM at your media folders
+2. Scrape metadata from TMDB/TVDB
+3. Download artwork and NFO files
+4. **Then** add to Jellyfin
+
+The workflow is: **TMM First, Then Jellyfin**
+
+This gives you:
+- Better metadata accuracy
+- More artwork options
+- Bulk editing capabilities
+- NFO files for backup/portability
+
+## Plugins Worth Installing
+
+From the official repository:
+
+- **Intro Skipper** - Auto-skip intros (like Plex Pass)
+- **Open Subtitles** - Auto-download subtitles
+- **Playback Reporting** - Track your watch history
+- **TMDb Box Sets** - Better collection handling
+- **ConfusedPolarBear.Plugin.Intro** - Chapter generation
+
+## Client Apps
+
+Jellyfin has clients for everything:
+
+- **Web** - Built-in, works great
+- **Android/iOS** - Official apps
+- **Android TV** - Native app
+- **Roku** - Native app
+- **Kodi** - Jellyfin for Kodi plugin
+- **Desktop** - Jellyfin Media Player
+
+## Migration from Plex
+
+If you're coming from Plex:
+
+1. Export your watch history (there are community scripts)
+2. Set up Jellyfin with the same library structure
+3. Import watch history to Jellyfin
+4. Update your DNS/reverse proxy
+5. Install clients on your devices
+
+The hardest part is updating all your devices, but it's worth it.
+
+## My Setup
+
+Currently running:
+- Jellyfin in Docker behind Nginx reverse proxy
+- NVIDIA NVENC for transcoding
+- 100TB+ library with movies, TV, and music
+- Arr stack for automated acquisition
+- TinyMediaManager for metadata
+
+## Learn More
+
+For complete setup guides:
+
+- [Jellyfin Docker Installation](/Jellyfin/Docs/Installation/Docker%20Install)
+- [TinyMediaManager Integration](/Jellyfin/Docs/TinyMediaManager%20Integration)
+- [Arr Stack Setup](/Examples/Arr%20Suite/Introduction)
+
+---
+
+*Made the switch to Jellyfin? Share your experience on [Discord](https://discord.gg/6THYdvayjg)!*

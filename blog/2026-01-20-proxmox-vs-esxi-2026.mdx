@@ -1,0 +1,99 @@
+---
+slug: why-i-chose-proxmox-homelab-2026
+title: "Why I Chose Proxmox: From Single Host to Proper Virtualization"
+authors: [bankai]
+tags: [proxmox, virtualization, homelab, tutorials]
+---
+
+Before Proxmox, all my services ran on a single host with no isolation. One bad update could take down everything. Here's why I chose Proxmox and how virtualization transformed my homelab.
+
+<!--truncate-->
+
+## The Problem: Everything on One Host
+
+My original setup was simple but fragile:
+
+- Docker containers running directly on the host OS
+- No isolation between services
+- One kernel panic = entire homelab down
+- Updates were terrifying
+- No easy way to snapshot or rollback
+
+It worked, but it wasn't sustainable.
+
+## Why Virtualization?
+
+Moving to a hypervisor provides:
+
+- **Isolation** - Problems in one VM don't affect others
+- **Snapshots** - Test changes safely, rollback instantly
+- **Resource management** - Allocate CPU/RAM per workload
+- **Flexibility** - Run different OSes side by side
+- **Better backups** - Backup entire VMs easily
+
+## Options I Considered
+
+### VMware ESXi
+
+The enterprise standard, but in 2023 Broadcom acquired VMware and discontinued the free ESXi hypervisor. Even before that, the free tier had limitations that made it less appealing for homelabs.
+
+### Proxmox VE
+
+Open source, free, and actively developed. Supports both VMs and LXC containers. This is what I went with.
+
+### Other Options
+
+- **Hyper-V** - Windows-only, still need a Windows license
+- **XCP-ng** - Solid option, but smaller community
+- **Unraid** - Great for storage-focused builds
+
+## Why Proxmox Won
+
+### 1. It's Truly Free (and Open Source)
+
+Proxmox VE is free to use without artificial limitations. The paid subscription gets you enterprise support and access to the stable repository, but the free tier is fully functional.
+
+### 2. Built-in Container Support
+
+Proxmox supports both VMs and LXC containers out of the box. Running lightweight services in containers instead of full VMs saves significant resources.
+
+```bash
+# Create a container from template
+pct create 100 local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
+  -hostname mycontainer \
+  -memory 2048 \
+  -cores 2 \
+  -rootfs local-lvm:8
+```
+
+### 3. Web-Based Management
+
+The Proxmox web UI is modern and capable. No need for special client software—just a browser.
+
+### 4. Excellent ZFS Integration
+
+Native ZFS support means I can create pools, snapshots, and replications directly from the UI.
+
+### 5. Clustering is Free
+
+Want to cluster multiple nodes? It's included. No additional licensing required.
+
+## My Setup Now
+
+After migrating to Proxmox:
+
+- **Separate VMs** for different workloads (media, networking, development)
+- **LXC containers** for lightweight services
+- **Snapshots before updates** - no more fear
+- **Easy backups** to NAS storage
+- **GPU passthrough** to a dedicated VM
+
+The difference is night and day. I can experiment freely knowing I can roll back in seconds.
+
+## Getting Started
+
+If you're still running everything on bare metal, consider making the switch. Check out my [Proxmox installation guide](/Proxmox/Introduction) for a step-by-step walkthrough.
+
+---
+
+*Still running everything on a single host? Made the switch to virtualization? Share your experience on [Discord](https://discord.gg/6THYdvayjg)!*

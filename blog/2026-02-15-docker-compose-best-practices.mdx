@@ -1,0 +1,148 @@
+---
+slug: docker-compose-best-practices-2026
+title: Docker Compose Best Practices for 2026
+authors: [bankai]
+tags: [docker, best-practices, tutorials]
+---
+
+After running dozens of Docker containers across multiple servers, I've compiled my top best practices for writing maintainable, secure, and efficient Docker Compose files.
+
+<!--truncate-->
+
+## 1. Always Pin Your Image Versions
+
+```yaml
+# ❌ Don't do this
+services:
+  postgres:
+    image: postgres:latest
+
+# ✅ Do this instead
+services:
+  postgres:
+    image: postgres:16.2-alpine
+```
+
+Using `latest` might seem convenient, but it can lead to unexpected breaking changes when images update. Always pin to specific versions and update intentionally.
+
+## 2. Use Environment Files
+
+Keep your secrets and configuration out of your compose files:
+
+```yaml
+services:
+  app:
+    image: myapp:1.0.0
+    env_file:
+      - .env
+      - .env.local
+```
+
+Create a `.env.example` file to document required variables:
+
+```bash
+# .env.example
+DATABASE_URL=
+REDIS_URL=
+SECRET_KEY=
+```
+
+## 3. Implement Health Checks
+
+Don't assume your container is healthy just because it started:
+
+```yaml
+services:
+  web:
+    image: nginx:1.25-alpine
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+## 4. Set Resource Limits
+
+Prevent runaway containers from consuming all available resources:
+
+```yaml
+services:
+  app:
+    image: myapp:1.0.0
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+```
+
+## 5. Use Named Volumes for Persistent Data
+
+```yaml
+services:
+  database:
+    image: postgres:16.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    name: myapp_postgres_data
+```
+
+Named volumes are easier to manage, backup, and migrate than bind mounts for database storage.
+
+## 6. Organize with Networks
+
+Separate your services into logical networks:
+
+```yaml
+services:
+  frontend:
+    networks:
+      - frontend
+
+  api:
+    networks:
+      - frontend
+      - backend
+
+  database:
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+```
+
+This limits which services can communicate with each other, improving security.
+
+## 7. Use Depends On with Conditions
+
+```yaml
+services:
+  api:
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+```
+
+This ensures your services start in the correct order and wait for dependencies to be ready.
+
+## Wrapping Up
+
+These practices have saved me countless hours of debugging and made my homelab much more reliable. Start implementing them one at a time, and you'll notice the difference.
+
+Have your own best practices? Share them in our [Discord](https://discord.gg/6THYdvayjg)!
+
+---
+
+*Next up: A deep dive into Docker networking and troubleshooting common issues.*

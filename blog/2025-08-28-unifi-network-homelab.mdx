@@ -1,0 +1,182 @@
+---
+slug: unifi-network-homelab-setup
+title: "UniFi Network: Professional Networking for Your Homelab"
+authors: [bankai]
+tags: [ubiquiti, unifi, networking, tutorials]
+---
+
+Ubiquiti's UniFi line brings enterprise networking features to homelab budgets. Here's why I switched to UniFi and how to get started with the UniFi Controller.
+
+<!--truncate-->
+
+## Why UniFi?
+
+After years of consumer routers, I switched to UniFi for:
+
+- **Unified management** - Single interface for all devices
+- **VLAN support** - Proper network segmentation
+- **Enterprise features** - IDS/IPS, traffic analysis, captive portals
+- **Scalability** - Start small, grow without replacing hardware
+- **No subscription** - One-time hardware cost (mostly)
+
+## UniFi vs Consumer Routers
+
+| Feature | UniFi | Consumer Router |
+|---------|-------|-----------------|
+| VLANs | Yes | Rarely |
+| Management | Centralized | Per-device |
+| Firmware Updates | Controlled | Forced |
+| Expandability | Modular | Replace all |
+| Traffic Analytics | Detailed | Basic |
+| Price | Higher upfront | Lower upfront |
+
+## UniFi Product Lines
+
+### Network/Security
+- **Dream Machine** - All-in-one router + controller
+- **Security Gateway** - Dedicated router/firewall
+- **Switches** - Managed switches with PoE options
+
+### Wireless
+- **Access Points** - Various models for different needs
+- **In-Wall APs** - Combine AP + switch ports
+
+### My Recommendations
+
+**Starter setup:**
+- UDM SE (Dream Machine Special Edition)
+- 1-2 U6 Pro access points
+- USW-24-PoE switch
+
+**Budget conscious:**
+- USG (Security Gateway)
+- USW-Lite-8-PoE
+- U6 Lite access point
+- Self-hosted controller
+
+## Installing UniFi Controller
+
+:::note
+If you have a UDM gateway (Dream Machine, UDM SE, UDM Pro, etc.), the controller is built-in—no self-hosted installation needed. The steps below are for setups using standalone devices like the USG, switches, and access points without a Dream Machine.
+:::
+
+You don't need Ubiquiti hardware to run the controller. Self-host it for free!
+
+### Using GlennR's Scripts (Recommended)
+
+The easiest installation method:
+
+```bash
+# One-liner installation
+rm unifi-latest.sh &> /dev/null; \
+wget https://get.glennr.nl/unifi/install/install_latest/unifi-latest.sh && \
+bash unifi-latest.sh
+```
+
+The script handles:
+- MongoDB installation
+- Java version management
+- Dependencies
+- Firewall rules
+- Systemd service
+
+### Docker Alternative
+
+```yaml title="docker-compose.yml"
+services:
+  unifi-controller:
+    image: lscr.io/linuxserver/unifi-controller:latest
+    container_name: unifi-controller
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - unifi_config:/config
+    ports:
+      - "3478:3478/udp"   # STUN
+      - "10001:10001/udp" # Device discovery
+      - "8080:8080"       # Device communication
+      - "8443:8443"       # Web UI
+      - "6789:6789"       # Mobile speedtest
+    restart: unless-stopped
+
+volumes:
+  unifi_config:
+```
+
+## Initial Setup
+
+1. Access controller at `https://YOUR-IP:8443`
+2. Create admin account
+3. Set up site name and country
+4. Adopt devices (they find the controller automatically)
+
+### Adopting Devices
+
+Devices on the same L2 network find the controller automatically. For remote adoption:
+
+```bash
+# SSH into UniFi device
+ssh ubnt@device-ip
+
+# Set inform URL
+set-inform http://controller-ip:8080/inform
+```
+
+## VLAN Configuration
+
+UniFi makes VLANs easy:
+
+1. **Settings → Networks → Create New**
+2. Set VLAN ID
+3. Configure DHCP range
+4. Apply to switch ports
+5. Create corresponding SSID with VLAN tag
+
+Example VLANs:
+- VLAN 1: Management (default)
+- VLAN 10: Trusted devices
+- VLAN 20: IoT devices
+- VLAN 30: Guest network
+
+## Firewall Rules
+
+Isolate your IoT devices:
+
+**Settings → Firewall & Security → Create Rule**
+
+```
+Name: Block IoT to LAN
+Type: LAN In
+Source: IoT Network
+Destination: All Networks except IoT
+Action: Drop
+```
+
+## Traffic Analytics
+
+UniFi provides detailed traffic analysis:
+- Application identification
+- Bandwidth usage per device
+- Historical data
+- Top clients/applications
+
+Enable Deep Packet Inspection for full details (has performance impact).
+
+## Tips from Experience
+
+1. **Backup your controller** - Export site backups regularly
+2. **Stable releases only** - Avoid beta firmware for critical infrastructure
+3. **Plan your VLANs** - Changing later is painful
+4. **PoE budget** - Calculate total PoE needs before buying switch
+5. **Hardwired backhaul** - Wi-Fi mesh is good, Ethernet is better
+
+## Learn More
+
+- [UniFi Controller Installation](/Ubiquiti/Docs/Access%20Points/Unifi%20Controller%20Server)
+- [Network Configuration Basics](/Networking/Introduction)
+
+---
+
+*What networking gear are you running? Share your setup on [Discord](https://discord.gg/6THYdvayjg)!*

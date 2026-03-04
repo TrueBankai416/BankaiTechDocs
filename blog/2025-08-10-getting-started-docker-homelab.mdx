@@ -1,0 +1,122 @@
+---
+slug: getting-started-with-docker-homelab
+title: "Getting Started with Docker: A Homelab Beginner's Guide"
+authors: [bankai]
+tags: [docker, beginners, homelab, tutorials]
+---
+
+Docker has become the backbone of modern homelabs. If you're new to containerization or looking to level up your homelab game, this guide will help you understand why Docker matters and how to get started.
+
+<!--truncate-->
+
+## Why Docker for Your Homelab?
+
+Traditional software installation involves dependencies, configuration files scattered across your system, and the dreaded "it works on my machine" problem. Docker solves all of this by packaging applications with everything they need.
+
+### Benefits for Homelabbers
+
+- **Isolation**: Each container runs independently
+- **Portability**: Move your entire stack between machines easily
+- **Version Control**: Roll back to previous versions instantly
+- **Resource Efficiency**: Containers share the host OS kernel
+- **Reproducibility**: Define your entire infrastructure as code
+
+## Installing Docker on Ubuntu
+
+First, let's get Docker Engine installed. Run these commands:
+
+```bash
+# Update package index
+sudo apt update
+
+# Install prerequisites
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Set up the repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Verify the installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+## Your First Docker Compose Stack
+
+Here's a simple stack to get you started - a documentation site similar to what you're reading now:
+
+```yaml title="docker-compose.yml"
+services:
+  docs:
+    image: squidfunk/mkdocs-material
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docs:/docs
+    command: serve --dev-addr=0.0.0.0:8000
+```
+
+Run it with:
+
+```bash
+docker compose up -d
+```
+
+Visit `http://localhost:8000` and you've got a running documentation site!
+
+## Essential Docker Commands
+
+Here are the commands you'll use daily:
+
+```bash
+# View running containers
+docker ps
+
+# View all containers (including stopped)
+docker ps -a
+
+# View container logs
+docker logs -f container_name
+
+# Stop a container
+docker stop container_name
+
+# Remove a container
+docker rm container_name
+
+# Clean up unused resources
+docker system prune -a
+```
+
+## Common Mistakes to Avoid
+
+1. **Using `latest` tag in production** - Always pin specific versions
+2. **Storing data in containers** - Use volumes for persistence
+3. **Running as root** - Use non-root users when possible
+4. **Ignoring resource limits** - Set memory and CPU constraints
+5. **Not backing up volumes** - Your data lives in volumes, back them up!
+
+## What's Next?
+
+Once you're comfortable with the basics, check out our complete guides:
+
+- [Docker Installation Guide](/Docker/Introduction) - Comprehensive setup
+- [Docker Profiles](/Docker/Docs/Helpful%20Commands) - Advanced deployment patterns
+- [Full Arr Stack](/Examples/Arr%20Suite/Introduction) - Complete media automation
+
+---
+
+*Questions? Join our [Discord](https://discord.gg/6THYdvayjg) community!*

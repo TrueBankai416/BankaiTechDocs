@@ -1,0 +1,201 @@
+---
+slug: scrutiny-hard-drive-monitoring-homelab
+title: "Scrutiny: Monitor Your Hard Drives Before They Fail"
+authors: [bankai]
+tags: [storage, monitoring, homelab, tutorials]
+---
+
+Hard drives fail. It's not a matter of if, but when. Scrutiny helps you predict failures before they happen by monitoring SMART data across all your drives. Here's how to set it up.
+
+<!--truncate-->
+
+## What is SMART?
+
+Self-Monitoring, Analysis, and Reporting Technology (SMART) is built into most storage devices. It tracks:
+
+- **Reallocated Sectors** - Bad blocks moved to spare area
+- **Spin Retry Count** - Failed spin-up attempts
+- **Current Pending Sectors** - Unstable sectors waiting to be remapped
+- **Temperature** - Operating temperature
+- **Power On Hours** - Total running time
+- And many more...
+
+When these metrics go bad, your drive is telling you it's dying.
+
+## Why Scrutiny?
+
+Scrutiny provides:
+- **Web dashboard** - Visual overview of all drives
+- **Historical data** - Track trends over time (via InfluxDB)
+- **Alerting** - Get notified before failures
+- **Multi-server** - Monitor drives across multiple machines
+
+## Docker Setup
+
+Here's a complete stack with InfluxDB for history:
+
+```yaml title="docker-compose.yml"
+services:
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    container_name: scrutiny
+    cap_add:
+      - SYS_RAWIO
+    ports:
+      - "8080:8080"
+      - "8086:8086"  # InfluxDB
+    volumes:
+      - scrutiny_config:/opt/scrutiny/config
+      - scrutiny_influxdb:/opt/scrutiny/influxdb
+      - /run/udev:/run/udev:ro
+    devices:
+      - /dev/sda
+      - /dev/sdb
+      - /dev/sdc
+      # Add all your drives
+    restart: unless-stopped
+
+volumes:
+  scrutiny_config:
+  scrutiny_influxdb:
+```
+
+### Finding Your Drives
+
+```bash
+# List all block devices
+lsblk
+
+# Get detailed drive info
+sudo fdisk -l
+```
+
+Add each drive to the `devices` section.
+
+## Distributed Setup (Multiple Servers)
+
+For monitoring drives across multiple machines:
+
+### Hub (Central Server)
+
+```yaml title="docker-compose.yml (hub)"
+services:
+  scrutiny-web:
+    image: ghcr.io/analogj/scrutiny:master-web
+    container_name: scrutiny-web
+    ports:
+      - "8080:8080"
+    volumes:
+      - scrutiny_config:/opt/scrutiny/config
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:2.1
+    container_name: scrutiny-influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    restart: unless-stopped
+
+volumes:
+  scrutiny_config:
+  influxdb_data:
+```
+
+### Collector (Each Server with Drives)
+
+```yaml title="docker-compose.yml (collector)"
+services:
+  scrutiny-collector:
+    image: ghcr.io/analogj/scrutiny:master-collector
+    container_name: scrutiny-collector
+    cap_add:
+      - SYS_RAWIO
+    environment:
+      - COLLECTOR_API_ENDPOINT=http://hub-ip:8080
+    volumes:
+      - /run/udev:/run/udev:ro
+    devices:
+      - /dev/sda
+      - /dev/sdb
+    restart: unless-stopped
+```
+
+## Understanding the Dashboard
+
+### Drive Health Status
+
+- 🟢 **Passed** - All metrics healthy
+- 🟡 **Warning** - Some metrics outside normal range
+- 🔴 **Failed** - Critical issues detected
+
+### Key Metrics to Watch
+
+| Metric | Warning Signs |
+|--------|---------------|
+| Reallocated Sectors | Any non-zero value |
+| Pending Sectors | Any non-zero value |
+| Uncorrectable Errors | Any increase |
+| Spin Retry Count | Values > 0 |
+| Temperature | Above 50°C sustained |
+| Power On Hours | Reference for age |
+
+### Attribute Thresholds
+
+Scrutiny uses thresholds from various sources:
+- Backblaze failure data
+- Manufacturer specifications
+- Community research
+
+## Alerting Setup
+
+Configure notifications in `/opt/scrutiny/config/scrutiny.yaml`:
+
+```yaml
+notify:
+  urls:
+    - discord://webhook_id/token
+    - smtp://user:pass@smtp.gmail.com:587/?fromAddress=alerts@example.com&toAddresses=you@example.com
+    - pushover://user_key:api_token
+```
+
+Supported services:
+- Discord, Slack, Teams
+- Email (SMTP)
+- Pushover, Gotify, Ntfy
+- Webhook (generic)
+
+## Backup Strategy Based on SMART
+
+Use SMART data to prioritize backups:
+
+1. **Green drives** - Normal backup schedule
+2. **Yellow drives** - Increase backup frequency
+3. **Red drives** - Immediate backup, plan replacement
+
+## Real World Example
+
+Last year, Scrutiny warned me about rising reallocated sectors on a 4-year-old drive. Over 2 weeks:
+- Week 1: 2 reallocated sectors (warning)
+- Week 2: 47 reallocated sectors (critical)
+
+I replaced the drive before any data loss. Without monitoring, I would have lost data.
+
+## Drives That Fail Silently
+
+Some failure modes aren't caught by SMART:
+- Firmware bugs
+- Controller failures
+- Cable/connection issues
+
+Always maintain backups regardless of SMART status!
+
+## Learn More
+
+- [Scrutiny Full Setup Guide](/HDD%20Tools/Docs/scrutiny)
+- [Storage Documentation](/Networking/Storage/Introduction)
+
+---
+
+*What storage monitoring tools do you use? Share on [Discord](https://discord.gg/6THYdvayjg)!*

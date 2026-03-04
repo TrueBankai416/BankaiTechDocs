@@ -1,0 +1,171 @@
+---
+slug: self-hosted-cloud-nextcloud-complete-guide
+title: "Self-Hosted Cloud Storage: Complete Nextcloud Setup Guide"
+authors: [bankai]
+tags: [nextcloud, self-hosting, cloud-storage, tutorials]
+---
+
+Tired of paying for Google Drive or Dropbox? Want full control over your data? Nextcloud is the answer. This post covers everything you need to know about deploying your own cloud storage platform.
+
+<!--truncate-->
+
+## What is Nextcloud?
+
+Nextcloud is a self-hosted productivity platform that provides:
+
+- **File storage and sync** - Like Dropbox, but yours
+- **Calendar and contacts** - Replace Google Calendar
+- **Collaborative editing** - With Collabora or OnlyOffice
+- **Photo management** - With the Memories app
+- **Video calls** - Built-in Talk functionality
+- **And much more** - Through a vast app ecosystem
+
+## Choosing Your Installation Method
+
+We support multiple installation approaches:
+
+| Method | Best For | Complexity |
+|--------|----------|------------|
+| Docker (Complete) | Full features, easy updates | Medium |
+| Docker (Minimum) | Quick start, basic features | Low |
+| Snap | Raspberry Pi, simplicity | Low |
+| Manual | Maximum control | High |
+
+For most homelabbers, **Docker (Complete)** is the sweet spot.
+
+## The Complete Docker Stack
+
+Our recommended setup includes:
+
+- **Nextcloud** - The main application
+- **MariaDB** - Database backend
+- **Redis** - Caching for performance
+- **Collabora** - Document editing
+- **Cron** - Background job processing
+
+Here's a simplified version of the compose file:
+
+```yaml title="docker-compose.yml"
+services:
+  nextcloud:
+    image: nextcloud:production
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - "8080:80"
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+    volumes:
+      - nextcloud_data:/var/www/html
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: nextcloud-redis
+    restart: unless-stopped
+
+volumes:
+  nextcloud_data:
+  mariadb_data:
+```
+
+## Performance Optimization
+
+### Enable Redis Caching
+
+Add to your Nextcloud config.php:
+
+```php
+'memcache.local' => '\OC\Memcache\APCu',
+'memcache.distributed' => '\OC\Memcache\Redis',
+'memcache.locking' => '\OC\Memcache\Redis',
+'redis' => [
+    'host' => 'redis',
+    'port' => 6379,
+],
+```
+
+### Background Jobs
+
+Ensure cron is running properly:
+
+```bash
+docker exec -u www-data nextcloud php cron.php
+```
+
+Or use our dedicated cron container in the full stack.
+
+## Photo Management with Memories
+
+The Memories app transforms Nextcloud into a Google Photos alternative:
+
+1. Install Memories from the app store
+2. Install go-vod for video transcoding
+3. Configure the preview generator
+4. Run initial indexing
+
+```bash
+docker exec -u www-data nextcloud php occ memories:index
+```
+
+## Backup Strategy
+
+**Critical**: Always back up both your files AND your database!
+
+```bash
+# Database backup
+docker exec nextcloud-db mysqldump -u root -p${DB_ROOT_PASSWORD} nextcloud > backup.sql
+
+# Volume backup
+docker run --rm -v nextcloud_data:/data -v $(pwd):/backup alpine \
+  tar czf /backup/nextcloud-files.tar.gz /data
+```
+
+Check out our [comprehensive backup guide](/Nextcloud/Docs/Backup) for automated solutions.
+
+## Common Issues and Solutions
+
+### "Maintenance mode" loops
+```bash
+docker exec -u www-data nextcloud php occ maintenance:mode --off
+```
+
+### Slow initial page loads
+Enable APCu and Redis caching, run cron consistently.
+
+### Upload size limits
+Configure PHP limits in your environment:
+```yaml
+environment:
+  - PHP_UPLOAD_LIMIT=16G
+```
+
+## Learn More
+
+For complete, production-ready configurations:
+
+- [Complete Installation Guide](/Nextcloud/Docs/Installation/Complete)
+- [Collabora Office Setup](/Nextcloud/Docs/Installation/Collabora)
+- [Troubleshooting Guide](/Nextcloud/Docs/Troubleshooting/Nextcloud)
+
+---
+
+*Self-hosting your data is a journey. Join us on [Discord](https://discord.gg/6THYdvayjg) to share your experiences!*

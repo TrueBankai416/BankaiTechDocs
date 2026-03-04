@@ -1,0 +1,186 @@
+---
+slug: mergerfs-jbod-storage-homelab
+title: "MergerFS: Combine Multiple Drives into One Pool"
+authors: [bankai]
+tags: [storage, mergerfs, homelab, tutorials]
+---
+
+Have a bunch of different-sized drives? Want to use them as one big storage pool without RAID complexity? MergerFS is the answer. Here's how to pool your drives while maintaining flexibility.
+
+<!--truncate-->
+
+## What is MergerFS?
+
+MergerFS is a union filesystem that:
+
+- **Combines multiple drives** into a single mount point
+- **No reformatting required** - Use existing filesystems
+- **No redundancy overhead** - Full capacity available
+- **Drive independence** - Each drive remains accessible individually
+- **Flexible policies** - Choose how files are distributed
+
+## MergerFS vs RAID vs ZFS
+
+| Feature | MergerFS | RAID | ZFS |
+|---------|----------|------|-----|
+| Mixed drive sizes | ✅ | ❌ | ⚠️ |
+| No parity overhead | ✅ | ❌ | ❌ |
+| Drive independence | ✅ | ❌ | ❌ |
+| Redundancy | ❌* | ✅ | ✅ |
+| Performance | Good | Great | Great |
+| Complexity | Low | Medium | High |
+
+*Use SnapRAID alongside MergerFS for parity protection!
+
+## Installation
+
+```bash
+# Ubuntu/Debian
+sudo apt install mergerfs
+
+# Or latest from GitHub
+wget https://github.com/trapexit/mergerfs/releases/download/2.38.0/mergerfs_2.38.0.ubuntu-focal_amd64.deb
+sudo dpkg -i mergerfs_2.38.0.ubuntu-focal_amd64.deb
+```
+
+## Basic Setup
+
+### Prepare Your Drives
+
+Assuming drives at `/mnt/disk1`, `/mnt/disk2`, `/mnt/disk3`:
+
+```bash
+# Create mount point for pool
+sudo mkdir -p /mnt/storage
+
+# Mount drives (add to fstab for persistence)
+sudo mount /dev/sdb1 /mnt/disk1
+sudo mount /dev/sdc1 /mnt/disk2
+sudo mount /dev/sdd1 /mnt/disk3
+```
+
+### Create MergerFS Pool
+
+```bash
+# Basic merge
+sudo mergerfs /mnt/disk1:/mnt/disk2:/mnt/disk3 /mnt/storage
+
+# With recommended options
+sudo mergerfs -o defaults,allow_other,use_ino,cache.files=off,moveonenospc=true,category.create=mfs,dropcacheonclose=true,minfreespace=50G,fsname=mergerfs /mnt/disk*:/mnt/storage
+```
+
+### Persistent Mount (fstab)
+
+```bash title="/etc/fstab"
+# Individual drives
+/dev/sdb1 /mnt/disk1 ext4 defaults 0 2
+/dev/sdc1 /mnt/disk2 ext4 defaults 0 2
+/dev/sdd1 /mnt/disk3 ext4 defaults 0 2
+
+# MergerFS pool
+/mnt/disk* /mnt/storage fuse.mergerfs defaults,allow_other,use_ino,cache.files=off,moveonenospc=true,category.create=mfs,dropcacheonclose=true,minfreespace=50G,fsname=mergerfs 0 0
+```
+
+## Key Options Explained
+
+### category.create (File Placement Policy)
+
+| Policy | Description |
+|--------|-------------|
+| `mfs` | Most free space - New files go to drive with most room |
+| `lfs` | Least free space - Fill drives evenly |
+| `epmfs` | Existing path, most free space - Keep files together |
+| `rand` | Random placement |
+| `ff` | First found - Fill drives sequentially |
+
+For media libraries: `mfs` or `epmfs`
+For general use: `mfs`
+
+### minfreespace
+
+Stop writing to a drive when it has less than specified free space:
+
+```
+minfreespace=50G  # Leave 50GB free on each drive
+```
+
+### moveonenospc
+
+If a drive fills up during a write, move the file to another drive:
+
+```
+moveonenospc=true
+```
+
+## Use with Docker
+
+Perfect for media stacks!
+
+```yaml title="docker-compose.yml"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    volumes:
+      - /mnt/storage/media:/media:ro
+      
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    volumes:
+      - /mnt/storage/media/movies:/movies
+      - /mnt/storage/downloads:/downloads
+```
+
+All containers see one unified `/mnt/storage` path.
+
+## Monitoring Pool Status
+
+```bash
+# Check pool status
+df -h /mnt/storage
+
+# See individual drive usage
+df -h /mnt/disk*
+
+# Find which drive a file is on
+getfattr -n user.mergerfs.fullpath /mnt/storage/somefile
+```
+
+## Adding New Drives
+
+1. Format and mount new drive
+2. Add to mergerfs mount options
+3. Remount or restart
+
+```bash
+# Add /mnt/disk4
+sudo umount /mnt/storage
+sudo mergerfs /mnt/disk*:/mnt/storage -o ...options...
+```
+
+## Tips from Experience
+
+1. **Label your drives** - Use `/dev/disk/by-id/` in fstab
+2. **Test failover** - Unplug a drive, verify others work
+3. **Monitor health** - Use Scrutiny or smartd
+4. **Regular SnapRAID sync** - Cron job daily
+5. **Backup critical data** - SnapRAID isn't instant recovery
+
+## My Storage Setup
+
+Current configuration:
+- 3 x 26TB drives in MergerFS pool
+- 1 x 24TB drive in MergerFS pool
+- 1 x 22TB drive in MergerFS pool
+- 1 x 18TB drive in MergerFS pool
+- minfreespace: 500GB (per drive)
+- Used for Jellyfin media library (Without Parity)
+
+## Learn More
+
+- [MergerFS Documentation](/Networking/Storage/mergerfs)
+- [Storage Options Comparison](/Networking/Storage/Introduction)
+- [NFS Shares](/Networking/Storage/NFS)
+
+---
+
+*How do you organize your storage? Share your setup on [Discord](https://discord.gg/6THYdvayjg)!*

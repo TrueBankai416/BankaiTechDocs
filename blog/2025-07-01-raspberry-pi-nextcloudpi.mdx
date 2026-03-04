@@ -1,0 +1,226 @@
+---
+slug: raspberry-pi-nextcloudpi-cloud
+title: "NextcloudPI: Self-Hosted Cloud on a Raspberry Pi"
+authors: [bankai]
+tags: [raspberry-pi, nextcloud, self-hosting, tutorials]
+---
+
+Want your own cloud storage but don't have a full server? NextcloudPI runs a complete Nextcloud instance on a Raspberry Pi. Perfect for low-power, always-on personal cloud storage.
+
+<!--truncate-->
+
+## What is NextcloudPI?
+
+NextcloudPI (NCP) is:
+
+- **Pre-configured Nextcloud** - Works out of the box
+- **Optimized for Pi** - Tuned for ARM and limited resources
+- **Easy management** - Web UI and CLI tools
+- **Automated backups** - Built-in backup solutions
+- **Security hardened** - SSL, firewall, fail2ban included
+
+## Hardware Requirements
+
+**Minimum:**
+- Raspberry Pi 3B+ or Pi 4
+- 2GB+ RAM (4GB recommended)
+- microSD card (32GB+)
+- Ethernet or WiFi
+
+**Recommended:**
+- Raspberry Pi 4 4GB or 8GB
+- USB 3.0 SSD (boot from SSD)
+- Ethernet connection
+- Case with cooling
+
+## Installation Methods
+
+### Method 1: Flash Image (Easiest)
+
+1. Download NextcloudPI image from [nextcloudpi.com](https://nextcloudpi.com)
+2. Flash to SD card with Raspberry Pi Imager
+3. Insert and boot
+4. Access web interface
+
+### Method 2: Install Script
+
+On a fresh Raspberry Pi OS:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/nextcloud/nextcloudpi/master/install.sh | sudo bash
+```
+
+This takes 30-60 minutes on a Pi 4.
+
+## First-Time Setup
+
+1. Find your Pi's IP address (check router or use `nmap`)
+2. Access `https://YOUR-PI-IP:4443` (ncp-web interface)
+3. Note the generated passwords
+4. Complete the setup wizard
+
+### Activate Nextcloud
+
+In ncp-web:
+1. Navigate to Nextcloud → nc-admin
+2. Set admin password
+3. Enable additional features
+
+## ncp-config vs ncp-web
+
+| Tool | Access | Best For |
+|------|--------|----------|
+| ncp-web | Browser :4443 | General configuration |
+| ncp-config | SSH/Terminal | Advanced settings |
+
+```bash
+# Terminal interface
+sudo ncp-config
+```
+
+## Essential Configuration
+
+### Enable External Storage
+
+For USB drives:
+
+1. ncp-web → USB Configuration → nc-automount
+2. Plug in USB drive
+3. It auto-mounts at `/media/USBdrive`
+
+### Expand Data Directory
+
+Move data to external storage:
+
+1. ncp-web → CONFIG → nc-datadir
+2. Set new path (e.g., `/media/USBdrive/ncdata`)
+3. Wait for migration
+
+### Enable SSL
+
+Already included! Access via HTTPS on port 443 or 4443.
+
+For Let's Encrypt:
+1. ncp-web → CONFIG → letsencrypt
+2. Enter your domain
+3. Enable
+
+## Backup Configuration
+
+### Local Backup
+
+```bash
+# ncp-web → BACKUPS → nc-backup
+```
+
+Backs up:
+- Nextcloud database
+- Data files
+- Configuration
+
+### Automatic Backups
+
+Schedule in ncp-web → BACKUPS → nc-backup-auto:
+- Daily at 2 AM
+- Keep 7 days
+- Store on external drive
+
+## Performance Tuning
+
+### Enable Memory Caching
+
+Already configured! But verify Redis is running:
+
+```bash
+sudo systemctl status redis-server
+```
+
+### Use SSD Boot
+
+1. Flash NCP to SSD
+2. Update bootloader for USB boot
+3. Connect SSD to USB 3.0 port
+
+10x speed improvement over SD card!
+
+### Disable Features You Don't Use
+
+In Nextcloud → Apps, disable:
+- Activity (if not needed)
+- First Run Wizard
+- Weather Status
+
+## Accessing Remotely
+
+### Option 1: Port Forwarding
+
+Forward ports 80 and 443 to your Pi. Requires static IP or DDNS.
+
+### Option 2: Tailscale (Recommended)
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+Access from anywhere without port forwarding!
+
+### Option 3: Cloudflare Tunnel
+
+Free tunneling without exposing ports:
+
+```bash
+cloudflared tunnel create nextcloud
+```
+
+## Mobile Apps
+
+Install Nextcloud app:
+- iOS: App Store
+- Android: Play Store or F-Droid
+
+Enable auto-upload for photos to replace Google Photos!
+
+## Troubleshooting
+
+### Slow Performance
+
+- Check SD card speed (Class 10 minimum)
+- Use SSD instead
+- Reduce concurrent users
+- Enable caching
+
+### Can't Access Web Interface
+
+```bash
+# Check services
+sudo systemctl status apache2
+sudo systemctl status mariadb
+
+# Restart if needed
+sudo systemctl restart apache2
+```
+
+### Database Errors
+
+```bash
+# Repair database
+sudo -u www-data php /var/www/nextcloud/occ maintenance:repair
+```
+
+## Alternatives
+
+If NextcloudPI doesn't fit your needs:
+
+- **Docker on Pi** - More flexibility, more setup
+- **DietPi with Nextcloud** - Ultra-minimal base
+- **Synology/QNAP** - Off-the-shelf NAS
+
+## Learn More
+
+- [NextcloudPI Installation](/NextcloudPI/Docs/Installation)
+- [Full Nextcloud Setup](/Nextcloud/Introduction)
+
+---
+
+*Running Nextcloud on a Pi? Share your experience on [Discord](https://discord.gg/6THYdvayjg)!*

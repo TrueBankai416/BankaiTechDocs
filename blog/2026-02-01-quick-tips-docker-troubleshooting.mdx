@@ -1,0 +1,105 @@
+---
+slug: quick-tips-docker-troubleshooting
+title: "5 Quick Docker Troubleshooting Commands You Should Know"
+authors: [bankai]
+tags: [docker, quick-tips, troubleshooting]
+---
+
+Here are five Docker commands that have saved me hours of debugging time. Bookmark this one!
+
+<!--truncate-->
+
+## 1. Follow Container Logs with Timestamps
+
+```bash
+docker logs -f --timestamps container_name
+```
+
+The `-f` flag follows the log output (like `tail -f`), and `--timestamps` adds timestamps to each line. Essential for correlating events across multiple containers.
+
+**Pro tip:** Limit output with `--tail`:
+```bash
+docker logs -f --tail 100 container_name
+```
+
+## 2. Get a Shell in a Running Container
+
+```bash
+docker exec -it container_name /bin/sh
+```
+
+If `/bin/sh` doesn't work (minimal containers), try `/bin/bash` or `ash`. This lets you poke around inside the container to debug issues.
+
+For containers that don't have a shell at all:
+```bash
+docker run -it --rm --pid=container:container_name --net=container:container_name alpine sh
+```
+
+## 3. Inspect Container Details
+
+```bash
+docker inspect container_name | jq '.[0].NetworkSettings.Networks'
+```
+
+Combined with `jq`, you can extract exactly what you need. Common queries:
+
+```bash
+# Get IP address
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name
+
+# Get mounted volumes
+docker inspect -f '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}' container_name
+
+# Get environment variables
+docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' container_name
+```
+
+## 4. Check Resource Usage
+
+```bash
+docker stats --no-stream
+```
+
+Shows CPU, memory, network, and disk I/O for all running containers. The `--no-stream` flag gives you a snapshot instead of real-time updates.
+
+For a specific container with more details:
+```bash
+docker stats container_name
+```
+
+## 5. Clean Up Docker System
+
+```bash
+# Remove unused containers, networks, images, and optionally volumes
+docker system prune -a
+
+# See what's using disk space
+docker system df
+
+# Nuclear option - reclaim ALL space (careful!)
+docker system prune -a --volumes
+```
+
+:::warning
+The `--volumes` flag will remove named volumes not used by any container. Make sure you have backups!
+:::
+
+## Bonus: Docker Compose Specific
+
+```bash
+# Rebuild a single service without cache
+docker compose build --no-cache service_name
+
+# View logs for all services
+docker compose logs -f
+
+# Restart a single service
+docker compose restart service_name
+
+# See running containers in a compose project
+docker compose ps
+```
+
+---
+
+What are your go-to Docker troubleshooting commands? Share them in [Discord](https://discord.gg/6THYdvayjg)!
