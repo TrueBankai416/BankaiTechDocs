@@ -221,13 +221,13 @@ $CONFIG = array (
 ### _Nextcloud_
 
 ```bash
-sudo docker exec -it <container_name> trunecate data/nextcloud.log -s 0 && sudo docker restart <container_name>
+sudo docker exec -it <container_name> truncate data/nextcloud.log -s 0 && sudo docker restart <container_name>
 ```
 
 ### _Nextcloud AIO_
 
 ```bash
-sudo docker exec -it nextcloud-aio-nextcloud trunecate data/nextcloud.log -s 0 && sudo docker restart nextcloud-aio-nextcloud
+sudo docker exec -it nextcloud-aio-nextcloud truncate data/nextcloud.log -s 0 && sudo docker restart nextcloud-aio-nextcloud
 ```
 
 ## **Resources**
