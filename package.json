@@ -47,7 +47,7 @@
     "@docusaurus/module-type-aliases": "^3.9.2",
     "@docusaurus/tsconfig": "^3.9.2",
     "@docusaurus/types": "^3.9.2",
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@giscus/react": "^3.1.0",
     "@rspack/cli": "^1.7.9",
     "@rspack/core": "^1.7.9",
