@@ -60,7 +60,7 @@ Replace `your-secure-master-key-here` with a strong, unique master key. This key
 
 ## Updating Meilisearch
 
-:::danger Do Not Upgrade Without Backing Up
+:::danger[Do Not Upgrade Without Backing Up]
 **NEVER** upgrade Meilisearch without dumping the database first. Meilisearch updates can sometimes break compatibility with existing indexes, and you risk losing all your search data.
 
 If you upgrade without backing up and encounter a version incompatibility, you will see an error like this:
@@ -133,7 +133,7 @@ The dump will be created in the `/dumps` directory inside the container. To retr
 sudo docker cp meilisearch:/meili_data/dumps/. ./meilisearch-backup/
 ```
 
-:::info Named Volume Location
+:::info[Named Volume Location]
 If you need to access the volume directly, you can find it using:
 
 ```bash
@@ -176,7 +176,7 @@ sudo docker compose up -d
 
 ### Step 4: Check Logs for New API Key
 
-:::warning API Key Regeneration
+:::warning[API Key Regeneration]
 After updating, Meilisearch may generate a new API key. Always check the logs after an update to ensure you have the correct credentials.
 :::
 

@@ -14,7 +14,7 @@ const config: Config = {
 
   // Adopt Docusaurus Faster and v4
   future: {
-    experimental_faster: true,
+    faster: true,
     v4: true,
   },
   customFields: {
