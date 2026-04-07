@@ -102,6 +102,22 @@ const config: Config = {
     ],
   ],
   plugins: [
+    // Suppress harmless UMD dynamic require warnings from mermaid's langium dependency
+    function suppressMermaidWarning() {
+      return {
+        name: 'suppress-mermaid-warning',
+        configureWebpack(config, isServer, utils) {
+          return {
+            ignoreWarnings: [
+              {
+                module: /vscode-languageserver-types/,
+                message: /Critical dependency/,
+              },
+            ],
+          };
+        },
+      };
+    },
     //      [
     //        'docusaurus-plugin-dotenv',
     //        {
