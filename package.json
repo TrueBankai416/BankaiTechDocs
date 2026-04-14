@@ -39,7 +39,7 @@
     "dotenv": "^17.3.1",
     "posthog-docusaurus": "^2.0.5",
     "prism-react-renderer": "^2.4.1",
-    "react": "19.2.4",
+    "react": "19.2.5",
     "react-dom": "19.2.4",
     "swizzle": "^1.1.0"
   },
