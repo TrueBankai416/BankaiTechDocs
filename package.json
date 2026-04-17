@@ -34,7 +34,7 @@
     "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
     "discord-webhook-node": "^1.1.8",
-    "discord.js": "^14.25.1",
+    "discord.js": "^14.26.3",
     "disqus-react": "^1.1.7",
     "dotenv": "^17.3.1",
     "posthog-docusaurus": "^2.0.5",
