@@ -209,7 +209,7 @@ The fstab entry for mergerfs accepts a number of options that control how the fi
 
 ---
 
-#### cache.files {#cachefiles}
+#### cache.files
 
 :::info[Not everyone needs `cache.files=partial`]
 `cache.files` controls how aggressively the kernel caches file data from mergerfs:
@@ -224,7 +224,7 @@ The fstab entry for mergerfs accepts a number of options that control how the fi
 
 ---
 
-#### umask=002 {#umask002}
+#### umask=002
 
 :::info[Not everyone needs `umask=002`]
 By default, files created through mergerfs inherit the umask of the process that created them — typically `022`, which makes files `644` (owner read/write, everyone else read-only).
