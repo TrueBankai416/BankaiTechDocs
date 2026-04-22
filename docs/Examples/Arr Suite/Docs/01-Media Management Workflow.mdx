@@ -5,6 +5,10 @@ keywords: [Arr Suite, Workflow, Media Management, Jellyseerr, Radarr, Sonarr, Pr
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-04-22
+    note: "Add mount option reference table and cache.files/umask callouts"
+  - date: 2026-04-22
+    note: "Update mergerfs fstab: cache.files=partial, umask=002 to fix torrent 'no such device' errors"
   - date: 2026-02-13
     note: "Add bind-mount consistency warning above folder structure"
   - date: 2026-02-13
@@ -177,7 +181,7 @@ UUID=your-disk2-uuid /mnt/disk2 ext4 defaults,noatime 0 2
 UUID=your-disk3-uuid /mnt/disk3 ext4 defaults,noatime 0 2
 
 # Mount mergerfs pool (add to /etc/fstab for persistence)
-/mnt/disk1:/mnt/disk2:/mnt/disk3 /media/merged mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=50G,fsname=mergerfs-pool,category.create=mfs 0 0
+/mnt/disk1:/mnt/disk2:/mnt/disk3 /media/merged mergerfs defaults,nonempty,allow_other,use_ino,cache.files=partial,moveonenospc=true,dropcacheonclose=true,minfreespace=50G,fsname=mergerfs-pool,category.create=mfs,umask=002 0 0
 
 # Use bind mounts for these directories so media doesnt get added on this drive
 # Bind mount downloads from Processing drive
@@ -188,6 +192,56 @@ sudo mount --bind /media/server/Processing/downloads /media/merged/downloads
 sudo mkdir -p /media/merged/cache
 sudo mount --bind /media/server/Processing/Tdarr /media/merged/cache
 ```
+
+### Mount Option Reference
+
+The fstab entry for mergerfs accepts a number of options that control how the filesystem behaves. Below is a breakdown of each option used in the example above:
+
+| Option | Description |
+|--------|-------------|
+| `defaults` | Applies the standard mount defaults: `rw`, `suid`, `dev`, `exec`, `auto`, `nouser`, `async`. Safe baseline for most setups. |
+| `nonempty` | Allows mounting over a directory that already contains files. Required when the mount point has subdirectories created beforehand (e.g. for bind mounts). |
+| `allow_other` | Permits users other than the one who performed the mount (typically root) to access the filesystem. Required for Docker containers and non-root services to read/write files. |
+| `use_ino` | Makes mergerfs use the underlying filesystem's inode numbers instead of generating its own. Improves compatibility with applications that rely on stable inodes (e.g. Plex, Jellyfin, and \*Arr apps). |
+| `cache.files=partial` | Controls how file data is cached in the kernel page cache. See the [cache.files note](#cachefiles) below. |
+| `moveonenospc=true` | If a write fails because a branch (disk) is full, mergerfs will automatically move the file to another branch with enough space and retry the write. Prevents "no space left on device" errors mid-write. |
+| `dropcacheonclose=true` | Drops the kernel page cache for a file when it is closed. Helps prevent memory bloat on systems that stream large media files, since the cached data is unlikely to be re-read soon. |
+| `minfreespace=50G` | mergerfs will not write new files to a branch that has less than 50 GB free. Prevents drives from being filled completely, which can cause filesystem errors. Adjust to suit your drive sizes. |
+| `fsname=mergerfs-pool` | Sets a human-readable name for the filesystem as it appears in tools like `df`, `mount`, and `htop`. Purely cosmetic — change it to whatever makes sense for your setup. |
+| `category.create=mfs` | Determines which branch new files are created on. `mfs` (Most Free Space) writes new files to whichever drive currently has the most available space, distributing data across drives over time. |
+| `umask=002` | Sets the default permission mask for new files and directories created through the mergerfs mount. `002` means files are created as `664` (rw-rw-r--) and directories as `775` (rwxrwxr-x), giving group write access. See the [umask note](#umask002) below. |
+
+---
+
+#### cache.files {#cachefiles}
+
+:::info[Not everyone needs `cache.files=partial`]
+`cache.files` controls how aggressively the kernel caches file data from mergerfs:
+
+- **`off`** — Disables the page cache entirely for mergerfs files. Every read goes directly to the underlying filesystem. This is the safest option and avoids stale-cache issues, but it means the kernel cannot use mmap-based I/O, which some applications require.
+- **`partial`** — Enables the page cache for reads but not writes. This is compatible with applications that use `mmap()` (memory-mapped files), such as qBittorrent. Without this, torrent clients that use mmap for piece verification can fail with errors like **"no such device"** or silent I/O failures.
+- **`full`** — Enables the page cache for both reads and writes. Improves performance but can cause stale data if files are modified outside of mergerfs (e.g. directly on a branch mount).
+- **`auto-full`** — Automatically enables full caching only when a file is opened with `mmap`.
+
+**Use `cache.files=partial` if** you run qBittorrent or any application that uses memory-mapped file I/O against the mergerfs mount. If you use only Usenet clients (SABnzbd, NZBGet) or never write downloads directly to the mergerfs pool, `cache.files=off` is the safer default.
+:::
+
+---
+
+#### umask=002 {#umask002}
+
+:::info[Not everyone needs `umask=002`]
+By default, files created through mergerfs inherit the umask of the process that created them — typically `022`, which makes files `644` (owner read/write, everyone else read-only).
+
+`umask=002` relaxes this to allow **group write access** (`664` for files, `775` for directories). This is useful when:
+
+- Multiple services (e.g. Sonarr, Radarr, qBittorrent) run under different users but share the same group (commonly `media` with GID `1000` or similar).
+- You want to avoid "permission denied" errors when one service tries to move or delete a file created by another.
+
+**You do not need `umask=002` if** all your containers run as the same user, or if you manage permissions through Docker's `PUID`/`PGID` environment variables and they are all set to the same values. Adding it unnecessarily has no negative effect, but it does grant broader write access to any process in the group.
+:::
+
+---
 
 ### Docker Integration
 
