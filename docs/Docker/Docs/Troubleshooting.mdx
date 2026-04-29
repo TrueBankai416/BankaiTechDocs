@@ -5,6 +5,45 @@ keywords: [Docker, Troubleshooting]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-04-29
+    note: "Add iptables DOCKER chain missing error and resolution"
 ---
 
-TODO
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Docker Troubleshooting**
+
+## **Failed to create network: iptables No chain/target/match by that name**
+
+### **Error**
+
+```
+failed to create network <network_name>: Error response from daemon: Failed to Setup IP tables: Unable to enable SKIP DNAT rule:  (iptables failed: iptables --wait -t nat -I DOCKER -i <bridge> -j RETURN: iptables: No chain/target/match by that name.
+ (exit status 1))
+```
+
+### **Cause**
+
+Docker sets up its own chains in iptables (such as the `DOCKER` chain in the `nat` table) when it starts. If a firewall service (UFW, firewalld) is restarted, or iptables is flushed after Docker has already started, those chains are removed. When Docker then tries to create a new network, it attempts to insert a rule into a chain that no longer exists, resulting in this error.
+
+### **Resolution**
+
+1. Stop your containers:
+
+```bash
+docker compose down
+```
+
+2. Restart Docker. This causes Docker to rebuild all of its iptables chains:
+
+```bash
+sudo systemctl restart docker
+```
+
+3. Bring your containers back up:
+
+```bash
+docker compose up -d
+```
+
+<BuyMeACoffeeButton />
