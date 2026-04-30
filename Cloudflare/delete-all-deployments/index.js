@@ -127,7 +127,7 @@ async function deleteBatch(deploymentIds) {
     )
   }
 
-  for (id of deploymentIds) {
+  for (const id of deploymentIds) {
     if (productionDeploymentId !== null && id === productionDeploymentId) {
       console.log(`Skipping production deployment: ${id}`)
     } else {

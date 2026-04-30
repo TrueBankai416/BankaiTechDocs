@@ -2,12 +2,24 @@
 /**
  * AI Translation Script for Docusaurus i18n
  * Translates English source files to multiple languages using free translation API
- * Install: npm install translate-google
+ *
+ * DEPRECATED: translate-google was removed due to a critical safe-eval vulnerability
+ * (https://www.npmjs.com/advisories/1104). This script requires a safe replacement
+ * library before it can be used. Do not re-add translate-google.
  */
 
 const fs = require('fs');
 const path = require('path');
-const translate = require('translate-google');
+
+// translate-google was removed due to a critical safe-eval vulnerability.
+// Replace this stub with a safe translation library before using this script.
+// See: https://www.npmjs.com/advisories/1104
+function translate() {
+  throw new Error(
+    'translate-google was removed due to a critical security vulnerability. ' +
+    'Replace with a safe translation library before using this script.'
+  );
+}
 
 // Language codes
 const LANGUAGES = {

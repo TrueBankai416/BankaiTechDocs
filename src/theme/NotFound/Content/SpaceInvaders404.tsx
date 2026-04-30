@@ -22,7 +22,9 @@ function playSound(url: string) {
     const audio = new window.Audio(url);
     audio.volume = 0.3;
     audio.play().catch(() => {});
-  } catch {}
+  } catch {
+    // ignore audio errors
+  }
 }
 
 function drawInvader(ctx, x, y) {
@@ -87,10 +89,10 @@ const SpaceInvaders404: React.FC = () => {
 
     // Game objects
     let playerX = canvas.width / 2;
-    let playerY = canvas.height - 120; // Move ship up so it's always visible
+    const playerY = canvas.height - 120; // Move ship up so it's always visible
     let bullets: { x: number; y: number }[] = [];
     let invaderBullets: { x: number; y: number }[] = [];
-    let invaders: { x: number; y: number; alive: boolean }[] = [];
+    const invaders: { x: number; y: number; alive: boolean }[] = [];
     let invaderDir = 1;
     let frames = 0;
     let scoreVal = 0;
@@ -141,7 +143,7 @@ const SpaceInvaders404: React.FC = () => {
       invaderBullets.forEach(b => (b.y += INVADER_BULLET_SPEED));
       invaderBullets = invaderBullets.filter(b => b.y < canvas.height);
       // Move invaders
-      let aliveInvaders = invaders.filter(i => i.alive);
+      const aliveInvaders = invaders.filter(i => i.alive);
       if (aliveInvaders.length === 0) {
         // Next level logic
         setLevel(l => l + 1);
@@ -149,8 +151,8 @@ const SpaceInvaders404: React.FC = () => {
         setTimeout(() => setGameActive(true), 10);
         return;
       }
-      let minX = Math.min(...aliveInvaders.map(i => i.x));
-      let maxX = Math.max(...aliveInvaders.map(i => i.x));
+      const minX = Math.min(...aliveInvaders.map(i => i.x));
+      const maxX = Math.max(...aliveInvaders.map(i => i.x));
       if (minX + invaderDir * INVADER_SPEED < 0 || maxX + INVADER_SIZE + invaderDir * INVADER_SPEED > canvas.width) {
         invaderDir *= -1;
         invaders.forEach(i => (i.y += 32));
