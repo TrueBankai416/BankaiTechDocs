@@ -1,6 +1,6 @@
 {
   "name": "home-lab-docs",
-  "version": "3.10.0",
+  "version": "3.10.1",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -23,20 +23,20 @@
     "links": "markdown-link-check --config .markdownlinkcheck.json **/*.md"
   },
   "dependencies": {
-    "@docsearch/js": "^4.6.0",
-    "@docusaurus/core": "^3.10.0",
-    "@docusaurus/faster": "^3.10.0",
-    "@docusaurus/preset-classic": "^3.10.0",
-    "@docusaurus/theme-live-codeblock": "^3.10.0",
-    "@docusaurus/theme-mermaid": "^3.10.0",
-    "@easyops-cn/docusaurus-search-local": "^0.55.0",
+    "@docsearch/js": "^4.6.3",
+    "@docusaurus/core": "^3.10.1",
+    "@docusaurus/faster": "^3.10.1",
+    "@docusaurus/preset-classic": "^3.10.1",
+    "@docusaurus/theme-live-codeblock": "^3.10.1",
+    "@docusaurus/theme-mermaid": "^3.10.1",
+    "@easyops-cn/docusaurus-search-local": "^0.55.1",
     "@iconify/react": "^6.0.2",
     "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
     "discord-webhook-node": "^1.1.8",
     "discord.js": "^14.26.3",
     "disqus-react": "^1.1.7",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "posthog-docusaurus": "^2.0.5",
     "prism-react-renderer": "^2.4.1",
     "react": "19.2.5",
@@ -44,10 +44,10 @@
     "swizzle": "^1.1.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.10.0",
-    "@docusaurus/tsconfig": "^3.10.0",
-    "@docusaurus/types": "^3.10.0",
-    "@eslint/js": "^9.39.2",
+    "@docusaurus/module-type-aliases": "^3.10.1",
+    "@docusaurus/tsconfig": "^3.10.1",
+    "@docusaurus/types": "^3.10.1",
+    "@eslint/js": "^10.0.1",
     "@giscus/react": "^3.1.0",
     "@rspack/cli": "^1.7.7",
     "@rspack/core": "^1.7.6",
@@ -55,11 +55,11 @@
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "markdown-link-check": "^3.14.2",
-    "prettier": "^3.8.2",
+    "prettier": "^3.8.3",
     "process": "^0.11.10",
     "translate-google": "^1.5.0",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.58.2"
+    "typescript-eslint": "^8.59.1"
   },
   "browserslist": {
     "production": [
