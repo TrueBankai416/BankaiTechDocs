@@ -11,15 +11,18 @@ export default tseslint.config(
     ignores: ['build/**', 'node_modules/**', '.docusaurus/**', 'static/**', 'server/**'],
   },
   {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-    },
     rules: {
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-empty': ['error', { allowEmptyCatch: true }],
+    },
+  },
+  {
+    files: ['src/**/*'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
     },
   },
   {
