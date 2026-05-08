@@ -49,7 +49,7 @@
     "@docusaurus/types": "^3.10.1",
     "@eslint/js": "^10.0.1",
     "@giscus/react": "^3.1.0",
-    "@rspack/cli": "^1.7.7",
+    "@rspack/cli": "^2.0.2",
     "@rspack/core": "^1.7.6",
     "cspell": "^10.0.0",
     "eslint": "^10.3.0",
