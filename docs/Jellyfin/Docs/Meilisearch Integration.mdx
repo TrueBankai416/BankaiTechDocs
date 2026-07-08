@@ -134,10 +134,18 @@ sudo docker cp meilisearch:/meili_data/dumps/. ./meilisearch-backup/
 ```
 
 :::info[Named Volume Location]
-If you need to access the volume directly, you can find it using:
+If you need to access the volume directly, first confirm the exact volume mounted to `/meili_data`:
 
 ```bash
-sudo docker volume inspect meilisearch_data
+sudo docker inspect meilisearch --format '{{range .Mounts}}{{if eq .Destination "/meili_data"}}{{.Name}}{{end}}{{end}}'
+```
+
+If your Compose file uses a project name (for example `name: media-management`), Docker may prefix the volume name (for example `media-management_meilisearch_data`). Use the exact mounted volume name from the inspect command in all `docker run -v ...` and `docker volume inspect ...` commands.
+
+Then inspect that volume using:
+
+```bash
+sudo docker volume inspect <mounted-volume-name>
 ```
 
 The dump files are stored in the volume at `/meili_data/dumps/`.
@@ -155,20 +163,22 @@ sudo docker rm meilisearch
 
 ### Step 3: Pull New Image and Start
 
-Update your `docker-compose.yaml` to use the latest tag:
+Update your `docker-compose.yaml` to use a pinned version tag (do not use `latest`):
 
 ```yaml
 services:
   meilisearch:
     //highlight-next-line
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.49.0
 ```
 
-Then pull and start the new image:
+Replace `v1.49.0` with the exact version you validated for your data and migration path.
+
+Then pull and start that specific version:
 
 ```bash
-# Pull the latest image
-sudo docker pull getmeili/meilisearch:latest
+# Pull the pinned image version
+sudo docker pull getmeili/meilisearch:v1.49.0
 
 # Start the container again
 sudo docker compose up -d
@@ -201,7 +211,7 @@ environment:
   - MEILI_MASTER_KEY=your-secure-master-key-here
   - MEILI_ENV=production
   //highlight-next-line
-  - MEILI_IMPORT_DUMP: "/meili_data/dumps/20260105-220227298.dump"
+  - MEILI_IMPORT_DUMP=/meili_data/dumps/20260105-220227298.dump
 ```
 
 Replace `20260105-220227298.dump` with your actual dump filename.
@@ -211,11 +221,14 @@ Replace `20260105-220227298.dump` with your actual dump filename.
 ```bash
 sudo docker compose down
 # Option 1: Delete data from within the volume (Recommended)
-sudo docker run --rm -v meilisearch_data:/meili_data alpine rm -rf /meili_data/data.ms
+VOL=$(sudo docker inspect meilisearch --format '{{range .Mounts}}{{if eq .Destination "/meili_data"}}{{.Name}}{{end}}{{end}}')
+sudo docker run --rm -v ${VOL}:/meili_data alpine rm -rf /meili_data/data.ms
+# Verify deletion (prints "data.ms removed" when successful)
+sudo docker run --rm -v ${VOL}:/meili_data alpine sh -c '[ ! -e /meili_data/data.ms ] && echo "data.ms removed" || (echo "data.ms still exists" && ls -la /meili_data/data.ms)'
 
 # Option 2: Remove and recreate the volume (if you want a completely fresh start)
-# sudo docker volume rm meilisearch_data
-# sudo docker volume create meilisearch_data
+# sudo docker volume rm ${VOL}
+# sudo docker volume create ${VOL}
 ```
 
 3. **Recreate the container**:
