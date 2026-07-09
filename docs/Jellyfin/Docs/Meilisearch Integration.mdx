@@ -113,6 +113,16 @@ sudo docker logs meilisearch
 
 Before updating, create a dump of your Meilisearch database:
 
+:::tip[Finding the master key on TrueNAS]
+If you are running this on TrueNAS and cannot find your Meilisearch master key, run:
+
+```bash
+sudo docker inspect meilisearch | grep MEILI_MASTER_KEY
+```
+
+Use the value shown for the `Authorization: Bearer ...` header below.
+:::
+
 ```bash
 curl -X POST 'http://localhost:7700/dumps' \
   -H 'Authorization: Bearer your-master-key-here'
