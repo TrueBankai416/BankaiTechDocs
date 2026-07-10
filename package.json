@@ -1,6 +1,6 @@
 {
   "name": "home-lab-docs",
-  "version": "3.10.1",
+  "version": "3.10.2",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -24,10 +24,10 @@
   },
   "dependencies": {
     "@docsearch/js": "^4.6.3",
-    "@docusaurus/core": "^3.10.1",
-    "@docusaurus/faster": "^3.10.1",
-    "@docusaurus/preset-classic": "^3.10.1",
-    "@docusaurus/theme-live-codeblock": "^3.10.1",
+    "@docusaurus/core": "^3.10.2",
+    "@docusaurus/faster": "^3.10.2",
+    "@docusaurus/preset-classic": "^3.10.2",
+    "@docusaurus/theme-live-codeblock": "^3.10.2",
     "@docusaurus/theme-mermaid": "^3.10.2",
     "@easyops-cn/docusaurus-search-local": "^0.55.2",
     "@iconify/react": "^6.0.2",
@@ -44,9 +44,9 @@
     "swizzle": "^1.1.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.10.1",
-    "@docusaurus/tsconfig": "^3.10.1",
-    "@docusaurus/types": "^3.10.1",
+    "@docusaurus/module-type-aliases": "^3.10.2",
+    "@docusaurus/tsconfig": "^3.10.2",
+    "@docusaurus/types": "^3.10.2",
     "@eslint/js": "^10.0.1",
     "@giscus/react": "^3.1.0",
     "@rspack/cli": "^1.7.11",
