@@ -79,8 +79,8 @@ def main():
     with open(DOCS_FILE, "r", encoding="utf-8") as f:
         content = f.read()
 
-    pattern = r"<!-- DOCKER_TAGS_START -->.*?<!-- DOCKER_TAGS_END -->"
-    replacement = f"<!-- DOCKER_TAGS_START -->\n{table}\n<!-- DOCKER_TAGS_END -->"
+    pattern = r"\{/\* DOCKER_TAGS_START \*/\}.*?\{/\* DOCKER_TAGS_END \*/\}"
+    replacement = f"{{/* DOCKER_TAGS_START */}}\n{table}\n{{/* DOCKER_TAGS_END */}}"
     new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 
     if new_content == content:
