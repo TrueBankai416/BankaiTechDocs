@@ -1,0 +1,59 @@
+name: Update Nextcloud Docker Tags
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Daily at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-tags:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub App token (optional)
+        id: app-token
+        if: vars.DOCS_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token || github.token }}
+
+      - name: Update tags table from Docker Hub
+        run: python3 scripts/update-nextcloud-tags.py
+
+      - name: Commit and push changes
+        run: |
+          if [ -n "${{ steps.app-token.outputs.token }}" ]; then
+            git config user.name "docs-changelog-bot[bot]"
+            git config user.email "docs-changelog-bot[bot]@users.noreply.github.com"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fi
+
+          if git diff --quiet -- "docs/Nextcloud/Docs/Pre-built Images.mdx"; then
+            echo "No tag updates detected."
+            exit 0
+          fi
+
+          git add "docs/Nextcloud/Docs/Pre-built Images.mdx"
+          git commit -m "docs: update Nextcloud Docker Hub tags [skip ci]"
+          git push
+
+      - name: Trigger Cloudflare Pages deploy hook
+        env:
+          CLOUDFLARE_PAGES_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$CLOUDFLARE_PAGES_DEPLOY_HOOK_URL" ]; then
+            echo "CLOUDFLARE_PAGES_DEPLOY_HOOK_URL is not set. Skipping deploy hook."
+            exit 0
+          fi
+          curl -fsS -X POST "$CLOUDFLARE_PAGES_DEPLOY_HOOK_URL"

@@ -7,6 +7,8 @@ keywords: [Docker, Docker Engine, Tutorial, Nextcloud]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-07-25
+    note: "docs: reflect GitHub Actions build automation and add auto-updating tags workflow"
   - date: 2026-03-03
     note: "docs: update Pre-built Images documentation with new features and tags"
 ---
@@ -15,7 +17,7 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **My Docker Hub Repo**
 
-<h2>I will push my images to [my Docker Repo](https://hub.docker.com/r/bankaitech/nextcloud)</h2>
+<h2>Images are automatically built and published to [my Docker Repo](https://hub.docker.com/r/bankaitech/nextcloud) via GitHub Actions.</h2>
 
 :::tip[tag]
 The `latest` tag will be the most up to date image
@@ -23,6 +25,7 @@ The `latest` tag will be the most up to date image
 
 ## **Available Tags**
 
+<!-- DOCKER_TAGS_START -->
 | Tag | Description |
 |-----|-------------|
 | `latest` | Most up to date image (currently 32.0.6) |
@@ -35,6 +38,11 @@ The `latest` tag will be the most up to date image
 | `31.0.14` | Nextcloud 31.0.14 |
 | `31.0.13` | Nextcloud 31.0.13 |
 | `31.0.8` | Nextcloud 31.0.8 |
+<!-- DOCKER_TAGS_END -->
+
+:::note[Auto-updated]
+This table is automatically refreshed daily from [Docker Hub](https://hub.docker.com/r/bankaitech/nextcloud/tags) by a GitHub Actions workflow.
+:::
 
 ---
 
@@ -97,6 +105,19 @@ gosu
 | 2:45 AM | Recognize processing |
 | 3:00 AM | Preview generation |
 | 3:30 AM | Preview pre-generator |
+
+---
+
+## **Build & Publish Automation**
+
+Images are built and published automatically via a dedicated GitHub Actions pipeline. On each release:
+
+1. The Docker image is built from a custom `Dockerfile` based on `nextcloud:production`
+2. All packages, PHP extensions, and configurations are applied at build time
+3. The image is tagged with both the version number and `latest`
+4. The final image is pushed to [Docker Hub](https://hub.docker.com/r/bankaitech/nextcloud)
+
+No manual build or push steps are required.
 
 ---
 
