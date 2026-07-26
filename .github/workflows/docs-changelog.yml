@@ -57,7 +57,7 @@ jobs:
           fi
 
           git add docs
-          git commit -m "docs: update automatic changelog [skip ci]"
+          git commit -m "docs: update automatic changelog"
           git push
 
       - name: Trigger Cloudflare Pages deploy hook
