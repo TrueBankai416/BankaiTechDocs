@@ -128,7 +128,7 @@ name: nextcloud
 
 services:
   mariadb:
-    image: mariadb:10.11
+    image: mariadb:11.8
     container_name: mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
