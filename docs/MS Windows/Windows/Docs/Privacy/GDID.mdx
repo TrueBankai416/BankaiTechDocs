@@ -152,6 +152,23 @@ These tools are third-party and not affiliated with Microsoft. Review what each 
 - PowerShell 5.1 or later
 - Administrator privileges (the script self-elevates via UAC if needed)
 
+#### Download
+
+From an elevated PowerShell session, run the following to download the script to your Desktop and launch it:
+
+```powershell
+$dest = "$env:USERPROFILE\Desktop\Disable-GDID-Tracking.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TrueBankai416/BankaiTechDocs/main/scripts/Windows/Disable-GDID-Tracking.ps1" -OutFile $dest
+& $dest
+```
+
+You can also view or download the script directly on GitHub:
+[Disable-GDID-Tracking.ps1](https://github.com/TrueBankai416/BankaiTechDocs/blob/main/scripts/Windows/Disable-GDID-Tracking.ps1)
+
+:::note
+The script must be run **from a saved file**, not piped via `irm | iex`. It copies itself to `C:\ProgramData\GDIDBlock\` to support the persistence scheduled tasks, and this requires `$PSCommandPath` to be set — which only happens when running from a file.
+:::
+
 #### Usage
 
 **Right-click the `.ps1` file → Run with PowerShell**
