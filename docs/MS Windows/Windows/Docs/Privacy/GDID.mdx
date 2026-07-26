@@ -200,7 +200,7 @@ Alternatively, from an existing elevated PowerShell session:
 
 | Option | Description |
 |--------|-------------|
-| **1. Disable GDID / Telemetry** | Runs the full remediation: stops and disables CDP services, applies Activity Feed group policies, removes residual registry identity entries, blocks network endpoints in the hosts file and Windows Firewall, and installs persistence scheduled tasks. |
+| **1. Disable GDID / Telemetry** | Runs the full remediation: prompts to create a local administrator account (recommended), then stops and disables CDP services, applies Activity Feed group policies, removes residual registry identity entries, blocks network endpoints in the hosts file and Windows Firewall, and installs persistence scheduled tasks. |
 | **2. Full Rollback** | Fully reverses all changes: restores services to their default startup types, removes hosts file entries and the firewall rule, clears Activity Feed policy restrictions, and uninstalls the scheduled tasks. |
 | **3. Unblock network endpoints only** | Removes only the hosts file entries and firewall rule without touching services or policies. |
 | **4. Check status** | Displays the current state of all managed components without making any changes. |
@@ -219,7 +219,9 @@ Alternatively, from an existing elevated PowerShell session:
 :::danger[Before Disabling `wlidsvc`]
 Disabling `wlidsvc` (Microsoft Account Sign-in Assistant) stops the service that refreshes Microsoft Account (MSA) authentication tokens. If your Windows user account is linked to a Microsoft account, your cached login token will eventually expire and **you may be unable to sign in to your computer**. It is strongly recommended to **create a local user account with administrator privileges** before applying these changes, so you have a fallback login that is not affected by this service being disabled.
 
-To create a local account via Settings: **Settings → Accounts → Other users → Add account → "I don't have this person's sign-in information" → "Add a user without a Microsoft account"**
+When you select **Option 1**, the script will prompt you to create a local administrator account before proceeding. It is strongly recommended to accept this prompt if your Windows account is linked to a Microsoft account.
+
+You can also create a local account manually via Settings: **Settings → Accounts → Other users → Add account → "I don't have this person's sign-in information" → "Add a user without a Microsoft account"**
 
 Alternatively, see [Creating a Local Admin Account via CMD](../Local%20Admin%20Account) for a faster command-line method.
 :::

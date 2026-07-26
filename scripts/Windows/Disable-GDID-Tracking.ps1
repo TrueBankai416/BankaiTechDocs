@@ -219,9 +219,55 @@ function Remove-PersistenceTask {
     Write-Host "[INFO] Persistence tasks and scripts removed"
 }
 
+function New-LocalAccountPrompt {
+    Write-Host ""
+    Write-Host "[RECOMMENDED] Blocking Microsoft identity services may disrupt Microsoft" -ForegroundColor Cyan
+    Write-Host "              account logins. A local administrator account ensures you" -ForegroundColor Cyan
+    Write-Host "              can always log in regardless of network or service state." -ForegroundColor Cyan
+    Write-Host ""
+    $response = Read-Host "Create a local administrator account now? (Y/N)"
+    if ($response -notmatch '^[Yy]') {
+        Write-Host "[INFO] Skipping local account creation."
+        return
+    }
+
+    $username = Read-Host "Username"
+    if ([string]::IsNullOrWhiteSpace($username)) {
+        Write-Host "[WARN] No username entered. Skipping local account creation." -ForegroundColor Yellow
+        return
+    }
+
+    $password = Read-Host "Password" -AsSecureString
+    $confirm  = Read-Host "Confirm password" -AsSecureString
+
+    $b1 = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password)
+    $b2 = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($confirm)
+    $match = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($b1) -eq `
+             [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($b2)
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b1)
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b2)
+
+    if (-not $match) {
+        Write-Host "[WARN] Passwords do not match. Skipping local account creation." -ForegroundColor Yellow
+        return
+    }
+
+    try {
+        New-LocalUser -Name $username -Password $password -FullName $username `
+            -Description "Local admin - created by GDID remediation tool" -ErrorAction Stop
+        Add-LocalGroupMember -Group "Administrators" -Member $username -ErrorAction Stop
+        Write-Host "[INFO] Local administrator account '$username' created successfully." -ForegroundColor Green
+    } catch {
+        Write-Host "[WARN] Could not create local account: $_" -ForegroundColor Yellow
+    }
+}
+
 function Invoke-Remediation {
     Write-Host ""
     Write-Host "[INFO] Starting GDID remediation" -ForegroundColor Cyan
+
+    New-LocalAccountPrompt
+    Write-Host ""
 
     $gdid = Get-CurrentGDID
     if ($gdid) {
