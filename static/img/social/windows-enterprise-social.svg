@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0078d4" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Edition staircase visual — left side -->
+  <!-- Home box (bottom) -->
+  <g transform="translate(80, 370)">
+    <rect x="0" y="0" width="180" height="70" rx="8" fill="#1e2840" stroke="#8ab4d4" stroke-width="1.5" opacity="0.7"/>
+    <text x="90" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle" opacity="0.7">WINDOWS 11</text>
+    <text x="90" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="#c9d1d9" text-anchor="middle" font-weight="600">Home</text>
+  </g>
+
+  <!-- Pro box (middle) -->
+  <g transform="translate(130, 280)">
+    <rect x="0" y="0" width="180" height="70" rx="8" fill="#1e2840" stroke="#0078d4" stroke-width="1.5" opacity="0.85"/>
+    <text x="90" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">WINDOWS 11</text>
+    <text x="90" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="600">Pro</text>
+  </g>
+
+  <!-- Enterprise box (top — highlighted) -->
+  <g transform="translate(180, 155)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="220" height="88" rx="10" fill="#0078d4" opacity="0.92"/>
+    <text x="110" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.75)" text-anchor="middle">WINDOWS 11</text>
+    <text x="110" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="30" fill="white" text-anchor="middle" font-weight="700">Enterprise</text>
+  </g>
+
+  <!-- Upward arrows -->
+  <g stroke="#0078d4" stroke-width="3" fill="none" opacity="0.7">
+    <!-- Arrow from Home to Pro -->
+    <line x1="200" y1="370" x2="220" y2="355"/>
+    <polyline points="214,352 220,355 218,362"/>
+    <!-- Arrow from Pro to Enterprise -->
+    <line x1="240" y1="280" x2="265" y2="258"/>
+    <polyline points="258,253 265,258 261,265"/>
+  </g>
+
+  <!-- Star/premium badge top right of Enterprise -->
+  <g transform="translate(365, 145)">
+    <circle cx="22" cy="22" r="22" fill="#ffb900" opacity="0.9"/>
+    <text x="22" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="900" fill="#0d1117" text-anchor="middle">★</text>
+  </g>
+
+  <!-- Main text area -->
+  <text x="660" y="210" font-family="'Segoe UI', Arial, sans-serif" font-size="64" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Enterprise</text>
+  <text x="660" y="265" font-family="'Segoe UI', Arial, sans-serif" font-size="30" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Windows 11 Edition Upgrade</text>
+
+  <rect x="410" y="285" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="660" y="335" font-family="'Segoe UI', Arial, sans-serif" font-size="23" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">Upgrade from any edition — completely free</text>
+
+  <!-- Feature chips -->
+  <g transform="translate(430, 380)">
+    <rect x="0" y="0" width="170" height="44" rx="8" fill="#1e2840" stroke="#0078d4" stroke-width="1" opacity="0.85"/>
+    <text x="85" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#8ab4d4" text-anchor="middle">Group Policy</text>
+    <rect x="185" y="0" width="175" height="44" rx="8" fill="#1e2840" stroke="#0078d4" stroke-width="1" opacity="0.85"/>
+    <text x="272" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#8ab4d4" text-anchor="middle">BitLocker</text>
+  </g>
+
+  <!-- Tag pills -->
+  <g transform="translate(430, 455)">
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="60" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows 11</text>
+    <rect x="135" y="0" width="150" height="38" rx="19" fill="#ffb900" opacity="0.18"/>
+    <rect x="135" y="0" width="150" height="38" rx="19" fill="none" stroke="#ffb900" stroke-width="1.5" opacity="0.5"/>
+    <text x="210" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ffb900" text-anchor="middle">Enterprise</text>
+    <rect x="300" y="0" width="110" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="300" y="0" width="110" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="355" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Upgrade</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

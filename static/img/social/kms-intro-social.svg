@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#0078d4" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- KMS Server node — center -->
+  <g transform="translate(430, 130)" filter="url(#dropShadow)">
+    <!-- Server rack body -->
+    <rect x="0" y="0" width="340" height="260" rx="14" fill="#1e2840" stroke="#0078d4" stroke-width="2.5" opacity="0.95"/>
+    <!-- Server units -->
+    <rect x="20" y="22" width="300" height="38" rx="6" fill="#0f1929" stroke="#0078d4" stroke-width="1" opacity="0.9"/>
+    <circle cx="42" cy="41" r="7" fill="#28c840" opacity="0.9"/>
+    <text x="62" y="47" font-family="'Consolas', monospace" font-size="13" fill="#8ab4d4">KMS Server</text>
+    <rect x="270" y="30" width="35" height="22" rx="4" fill="#0078d4" opacity="0.7"/>
+    <text x="287" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="white" text-anchor="middle">ON</text>
+
+    <rect x="20" y="72" width="300" height="38" rx="6" fill="#0f1929" stroke="#0078d4" stroke-width="1" opacity="0.9"/>
+    <circle cx="42" cy="91" r="7" fill="#28c840" opacity="0.9"/>
+    <text x="62" y="97" font-family="'Consolas', monospace" font-size="13" fill="#8ab4d4">py-kms  [Docker]</text>
+
+    <rect x="20" y="122" width="300" height="38" rx="6" fill="#0f1929" stroke="#0078d4" stroke-width="1" opacity="0.9"/>
+    <circle cx="42" cy="141" r="7" fill="#28c840" opacity="0.9"/>
+    <text x="62" y="147" font-family="'Consolas', monospace" font-size="13" fill="#8ab4d4">Port: 1688  Active</text>
+
+    <rect x="20" y="172" width="300" height="38" rx="6" fill="#0f1929" stroke="#0078d4" stroke-width="1" opacity="0.7"/>
+    <circle cx="42" cy="191" r="7" fill="#ffb900" opacity="0.8"/>
+    <text x="62" y="197" font-family="'Consolas', monospace" font-size="13" fill="#8ab4d4">Clients: 12 / 25</text>
+
+    <!-- KMS label on server -->
+    <text x="170" y="238" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="700" fill="#0078d4" text-anchor="middle" opacity="0.8">KEY MANAGEMENT SERVICE</text>
+  </g>
+
+  <!-- Client nodes — left and right -->
+  <!-- Left client -->
+  <g transform="translate(80, 210)">
+    <rect x="0" y="0" width="130" height="80" rx="8" fill="#1e2840" stroke="#8ab4d4" stroke-width="1" opacity="0.7"/>
+    <text x="65" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8ab4d4" text-anchor="middle">CLIENT</text>
+    <text x="65" y="56" font-family="'Segoe UI', Arial, sans-serif" font-size="20" fill="white" text-anchor="middle" font-weight="700">Win</text>
+    <circle cx="100" cy="65" r="10" fill="#28c840" opacity="0.8"/>
+  </g>
+  <!-- Connection line -->
+  <line x1="210" y1="250" x2="430" y2="270" stroke="#0078d4" stroke-width="2" stroke-dasharray="8 5" opacity="0.6"/>
+  <polygon points="424,261 430,270 421,272" fill="#0078d4" opacity="0.6"/>
+
+  <!-- Right client -->
+  <g transform="translate(990, 210)">
+    <rect x="0" y="0" width="130" height="80" rx="8" fill="#1e2840" stroke="#8ab4d4" stroke-width="1" opacity="0.7"/>
+    <text x="65" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8ab4d4" text-anchor="middle">CLIENT</text>
+    <text x="65" y="56" font-family="'Segoe UI', Arial, sans-serif" font-size="20" fill="white" text-anchor="middle" font-weight="700">Office</text>
+    <circle cx="100" cy="65" r="10" fill="#28c840" opacity="0.8"/>
+  </g>
+  <!-- Connection line -->
+  <line x1="770" y1="270" x2="990" y2="250" stroke="#0078d4" stroke-width="2" stroke-dasharray="8 5" opacity="0.6"/>
+  <polygon points="996,254 990,245 984,253" fill="#0078d4" opacity="0.6"/>
+
+  <!-- Main text -->
+  <text x="600" y="455" font-family="'Segoe UI', Arial, sans-serif" font-size="62" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">KMS Server</text>
+  <text x="600" y="505" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Key Management Service — Introduction</text>
+
+  <rect x="300" y="520" width="600" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <!-- Tag pills -->
+  <g transform="translate(350, 545)">
+    <rect x="0" y="0" width="100" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="100" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="50" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">KMS</text>
+    <rect x="115" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="115" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="175" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows</text>
+    <rect x="250" y="0" width="100" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="250" y="0" width="100" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="300" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Office</text>
+    <rect x="365" y="0" width="110" height="38" rx="19" fill="#2496ed" opacity="0.18"/>
+    <rect x="365" y="0" width="110" height="38" rx="19" fill="none" stroke="#2496ed" stroke-width="1.5" opacity="0.5"/>
+    <text x="420" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#2496ed" text-anchor="middle">Docker</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

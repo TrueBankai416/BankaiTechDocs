@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#d83b01" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Office app icons grid — left side -->
+  <g transform="translate(80, 100)" filter="url(#dropShadow)">
+    <!-- Word -->
+    <rect x="0" y="0" width="120" height="120" rx="14" fill="#d83b01" opacity="0.95"/>
+    <text x="60" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">W</text>
+
+    <!-- Excel -->
+    <rect x="135" y="0" width="120" height="120" rx="14" fill="#217346" opacity="0.95"/>
+    <text x="195" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">X</text>
+
+    <!-- PowerPoint -->
+    <rect x="0" y="135" width="120" height="120" rx="14" fill="#b7472a" opacity="0.95"/>
+    <text x="60" y="223" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">P</text>
+
+    <!-- Outlook -->
+    <rect x="135" y="135" width="120" height="120" rx="14" fill="#0078d4" opacity="0.95"/>
+    <text x="195" y="223" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">O</text>
+
+    <!-- Teams - smaller -->
+    <rect x="270" y="0" width="120" height="120" rx="14" fill="#6264a7" opacity="0.95"/>
+    <text x="330" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">T</text>
+
+    <!-- OneNote -->
+    <rect x="270" y="135" width="120" height="120" rx="14" fill="#7719aa" opacity="0.95"/>
+    <text x="330" y="223" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle" opacity="0.95">N</text>
+  </g>
+
+  <!-- App labels -->
+  <g transform="translate(80, 285)">
+    <text x="60" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">Word</text>
+    <text x="195" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">Excel</text>
+    <text x="330" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">Teams</text>
+  </g>
+  <g transform="translate(80, 420)">
+    <text x="60" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">PowerPoint</text>
+    <text x="195" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">Outlook</text>
+    <text x="330" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">OneNote</text>
+  </g>
+
+  <!-- Main text -->
+  <text x="790" y="210" font-family="'Segoe UI', Arial, sans-serif" font-size="68" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Microsoft</text>
+  <text x="790" y="275" font-family="'Segoe UI', Arial, sans-serif" font-size="68" font-weight="700"
+        fill="#d83b01" text-anchor="middle" filter="url(#softGlow)">Office</text>
+
+  <rect x="540" y="295" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="790" y="345" font-family="'Segoe UI', Arial, sans-serif" font-size="24" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">Productivity Suite — Introduction</text>
+
+  <!-- Feature pills row -->
+  <g transform="translate(540, 385)">
+    <rect x="0" y="0" width="100" height="38" rx="8" fill="#d83b01" opacity="0.2"/>
+    <rect x="0" y="0" width="100" height="38" rx="8" fill="none" stroke="#d83b01" stroke-width="1" opacity="0.5"/>
+    <text x="50" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#ff7043" text-anchor="middle">Word</text>
+
+    <rect x="112" y="0" width="100" height="38" rx="8" fill="#217346" opacity="0.2"/>
+    <rect x="112" y="0" width="100" height="38" rx="8" fill="none" stroke="#217346" stroke-width="1" opacity="0.5"/>
+    <text x="162" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#4caf50" text-anchor="middle">Excel</text>
+
+    <rect x="224" y="0" width="130" height="38" rx="8" fill="#b7472a" opacity="0.2"/>
+    <rect x="224" y="0" width="130" height="38" rx="8" fill="none" stroke="#b7472a" stroke-width="1" opacity="0.5"/>
+    <text x="289" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#ef5350" text-anchor="middle">PowerPoint</text>
+
+    <rect x="366" y="0" width="120" height="38" rx="8" fill="#0078d4" opacity="0.2"/>
+    <rect x="366" y="0" width="120" height="38" rx="8" fill="none" stroke="#0078d4" stroke-width="1" opacity="0.5"/>
+    <text x="426" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8ab4d4" text-anchor="middle">Outlook</text>
+  </g>
+
+  <!-- Tag pills -->
+  <g transform="translate(540, 460)">
+    <rect x="0" y="0" width="180" height="38" rx="19" fill="#d83b01" opacity="0.2"/>
+    <rect x="0" y="0" width="180" height="38" rx="19" fill="none" stroke="#d83b01" stroke-width="1.5" opacity="0.6"/>
+    <text x="90" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ff7043" text-anchor="middle">Microsoft Office</text>
+    <rect x="195" y="0" width="150" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="195" y="0" width="150" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="270" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Productivity</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

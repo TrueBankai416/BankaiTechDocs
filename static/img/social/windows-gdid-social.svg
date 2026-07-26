@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f2e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005a9e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0" />
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#0078d4" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="150" y1="0" x2="150" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="450" y1="0" x2="450" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="750" y1="0" x2="750" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="900" y1="0" x2="900" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1050" y1="0" x2="1050" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <!-- Left blue accent bar -->
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Windows logo (4 colored squares) — right side decorative -->
+  <g opacity="0.12" transform="translate(870, 100)">
+    <rect x="0"   y="0"   width="110" height="110" fill="#f25022"/>
+    <rect x="120" y="0"   width="110" height="110" fill="#7fba00"/>
+    <rect x="0"   y="120" width="110" height="110" fill="#00a4ef"/>
+    <rect x="120" y="120" width="110" height="110" fill="#ffb900"/>
+  </g>
+
+  <!-- Shield shape (main focal point) — centered left/middle -->
+  <g transform="translate(160, 120)" filter="url(#dropShadow)">
+    <!-- Shield body -->
+    <path d="M160 0 L300 55 L300 185 Q300 290 160 350 Q20 290 20 185 L20 55 Z"
+          fill="url(#shieldGrad)" opacity="0.95"/>
+    <!-- Shield inner highlight -->
+    <path d="M160 25 L278 72 L278 185 Q278 272 160 325 Q42 272 42 185 L42 72 Z"
+          fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+
+    <!-- Lock icon inside shield -->
+    <!-- Lock body -->
+    <rect x="125" y="190" width="70" height="58" rx="6" fill="white" opacity="0.92"/>
+    <!-- Lock shackle -->
+    <path d="M143 190 L143 162 Q160 135 177 162 L177 190"
+          fill="none" stroke="white" stroke-width="12" stroke-linecap="round" opacity="0.92"/>
+    <!-- Lock keyhole -->
+    <circle cx="160" cy="218" r="10" fill="#0078d4"/>
+    <rect x="155" y="218" width="10" height="14" rx="2" fill="#0078d4"/>
+  </g>
+
+  <!-- Blocked signal / network lines (right of shield) -->
+  <g opacity="0.18" filter="url(#softGlow)">
+    <!-- Radiating arcs representing telemetry signals being blocked -->
+    <path d="M 540 315 Q 620 240 700 315" fill="none" stroke="#0078d4" stroke-width="3" stroke-dasharray="8 6"/>
+    <path d="M 540 315 Q 640 210 740 315" fill="none" stroke="#0078d4" stroke-width="2.5" stroke-dasharray="8 6"/>
+    <path d="M 540 315 Q 660 180 780 315" fill="none" stroke="#0078d4" stroke-width="2" stroke-dasharray="8 6"/>
+
+    <!-- Dashed data flow lines -->
+    <line x1="560" y1="320" x2="780" y2="320" stroke="#e53935" stroke-width="2" stroke-dasharray="10 7" opacity="0.6"/>
+    <line x1="560" y1="340" x2="760" y2="340" stroke="#e53935" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.5"/>
+    <line x1="560" y1="360" x2="740" y2="360" stroke="#e53935" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4"/>
+
+    <!-- X / block symbol at endpoint -->
+    <circle cx="800" cy="320" r="24" fill="none" stroke="#e53935" stroke-width="3" opacity="0.7"/>
+    <line x1="784" y1="304" x2="816" y2="336" stroke="#e53935" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    <line x1="816" y1="304" x2="784" y2="336" stroke="#e53935" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <!-- Main heading -->
+  <text x="520" y="220" font-family="'Segoe UI', Arial, sans-serif" font-size="82" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">GDID</text>
+
+  <!-- Subtitle -->
+  <text x="520" y="285" font-family="'Segoe UI', Arial, sans-serif" font-size="32" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Global Device Identifier</text>
+
+  <!-- Horizontal rule under heading -->
+  <rect x="270" y="305" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <!-- Description line -->
+  <text x="520" y="360" font-family="'Segoe UI', Arial, sans-serif" font-size="26" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">What it is — and how to disable it</text>
+
+  <!-- Tag pills at the bottom -->
+  <g transform="translate(270, 415)">
+    <!-- Privacy pill -->
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="60" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500"
+          fill="#8ab4d4" text-anchor="middle">Privacy</text>
+
+    <!-- Windows pill -->
+    <rect x="135" y="0" width="130" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="135" y="0" width="130" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="200" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500"
+          fill="#8ab4d4" text-anchor="middle">Windows</text>
+
+    <!-- Telemetry pill -->
+    <rect x="280" y="0" width="148" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="280" y="0" width="148" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="354" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500"
+          fill="#8ab4d4" text-anchor="middle">Telemetry</text>
+
+    <!-- Security pill -->
+    <rect x="443" y="0" width="130" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="443" y="0" width="130" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="508" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500"
+          fill="#8ab4d4" text-anchor="middle">Security</text>
+  </g>
+
+  <!-- Site branding bottom-right -->
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#0078d4" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Edition upgrade ladder — center visual -->
+  <!-- Step 1: Home -->
+  <g transform="translate(140, 380)">
+    <rect x="0" y="0" width="180" height="65" rx="8" fill="#1e2840" stroke="#8ab4d4" stroke-width="1.5" opacity="0.65"/>
+    <text x="90" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">STEP 1</text>
+    <text x="90" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="22" fill="#c9d1d9" text-anchor="middle" font-weight="600">Home</text>
+  </g>
+  <!-- Arrow up -->
+  <g opacity="0.75" stroke="#0078d4" stroke-width="2.5" fill="none">
+    <line x1="230" y1="380" x2="230" y2="326"/>
+    <polygon points="222,330 230,318 238,330" fill="#0078d4" stroke="none"/>
+  </g>
+
+  <!-- Step 2: Pro -->
+  <g transform="translate(140, 258)">
+    <rect x="0" y="0" width="180" height="65" rx="8" fill="#1e2840" stroke="#0078d4" stroke-width="1.5" opacity="0.8"/>
+    <text x="90" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#8ab4d4" text-anchor="middle">STEP 2</text>
+    <text x="90" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="22" fill="white" text-anchor="middle" font-weight="600">Pro</text>
+  </g>
+  <!-- Arrow up -->
+  <g opacity="0.75" stroke="#0078d4" stroke-width="2.5" fill="none">
+    <line x1="230" y1="258" x2="230" y2="204"/>
+    <polygon points="222,208 230,196 238,208" fill="#0078d4" stroke="none"/>
+  </g>
+
+  <!-- Step 3: Enterprise (highlighted) -->
+  <g transform="translate(116, 110)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="228" height="88" rx="12" fill="#0078d4" opacity="0.92"/>
+    <text x="114" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.75)" text-anchor="middle">STEP 3 — TARGET</text>
+    <text x="114" y="68" font-family="'Segoe UI', Arial, sans-serif" font-size="32" fill="white" text-anchor="middle" font-weight="700">Enterprise</text>
+  </g>
+
+  <!-- KMS key below ladder -->
+  <g transform="translate(168, 475)">
+    <text x="70" y="28" font-family="'Consolas', monospace" font-size="13" fill="#ffb900" text-anchor="middle">changepk /ProductKey</text>
+    <text x="70" y="50" font-family="'Consolas', monospace" font-size="13" fill="#8ab4d4" text-anchor="middle">NPPR9-FWDCX-D2C8J...</text>
+  </g>
+
+  <!-- Main text area -->
+  <text x="720" y="200" font-family="'Segoe UI', Arial, sans-serif" font-size="60" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Upgrade</text>
+  <text x="720" y="258" font-family="'Segoe UI', Arial, sans-serif" font-size="32" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Windows Edition</text>
+
+  <rect x="470" y="278" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="720" y="325" font-family="'Segoe UI', Arial, sans-serif" font-size="23" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">Home → Pro → Enterprise via KMS</text>
+
+  <!-- Feature comparison -->
+  <g transform="translate(440, 365)">
+    <rect x="0" y="0" width="560" height="130" rx="12" fill="#1e2840" stroke="#0078d4" stroke-width="1.5" opacity="0.85"/>
+    <text x="280" y="28" font-family="'Segoe UI', Arial, sans-serif" font-size="16" fill="#0078d4" text-anchor="middle" font-weight="600">EDITION COMPARISON</text>
+    <line x1="20" y1="38" x2="540" y2="38" stroke="#0078d4" stroke-width="1" opacity="0.4"/>
+    <!-- Row 1 -->
+    <text x="30" y="62" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8ab4d4">Group Policy</text>
+    <text x="220" y="62" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#e53935" text-anchor="middle">✗ Home</text>
+    <text x="360" y="62" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#28c840" text-anchor="middle">✓ Pro</text>
+    <text x="490" y="62" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#28c840" text-anchor="middle">✓ Ent</text>
+    <!-- Row 2 -->
+    <text x="30" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8ab4d4">BitLocker</text>
+    <text x="220" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#e53935" text-anchor="middle">✗ Home</text>
+    <text x="360" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#28c840" text-anchor="middle">✓ Pro</text>
+    <text x="490" y="90" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#28c840" text-anchor="middle">✓ Ent</text>
+    <!-- Row 3 -->
+    <text x="30" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#8ab4d4">LTSC Updates</text>
+    <text x="220" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#e53935" text-anchor="middle">✗ Home</text>
+    <text x="360" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#e53935" text-anchor="middle">✗ Pro</text>
+    <text x="490" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#28c840" text-anchor="middle">✓ Ent</text>
+  </g>
+
+  <!-- Tag pills -->
+  <g transform="translate(460, 530)">
+    <rect x="0" y="0" width="100" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="100" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="50" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">KMS</text>
+    <rect x="115" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="115" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="175" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows</text>
+    <rect x="250" y="0" width="110" height="38" rx="19" fill="#ffb900" opacity="0.18"/>
+    <rect x="250" y="0" width="110" height="38" rx="19" fill="none" stroke="#ffb900" stroke-width="1.5" opacity="0.5"/>
+    <text x="305" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ffb900" text-anchor="middle">Upgrade</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="keyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffb900"/>
+      <stop offset="100%" style="stop-color:#e08c00"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="goldGlow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#ffb900" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Large key icon — left side -->
+  <g transform="translate(80, 130)" filter="url(#dropShadow)">
+    <!-- Key ring -->
+    <circle cx="155" cy="155" r="110" fill="none" stroke="url(#keyGrad)" stroke-width="28" opacity="0.95"/>
+    <circle cx="155" cy="155" r="75" fill="none" stroke="url(#keyGrad)" stroke-width="18" opacity="0.5"/>
+    <!-- Key shaft -->
+    <rect x="240" y="143" width="220" height="24" rx="12" fill="url(#keyGrad)" opacity="0.95"/>
+    <!-- Key teeth -->
+    <rect x="310" y="167" width="20" height="34" rx="4" fill="url(#keyGrad)" opacity="0.95"/>
+    <rect x="350" y="167" width="20" height="46" rx="4" fill="url(#keyGrad)" opacity="0.95"/>
+    <rect x="390" y="167" width="20" height="26" rx="4" fill="url(#keyGrad)" opacity="0.95"/>
+    <rect x="430" y="167" width="20" height="40" rx="4" fill="url(#keyGrad)" opacity="0.95"/>
+    <!-- Keyhole inside ring -->
+    <circle cx="155" cy="155" r="28" fill="#0d1117"/>
+    <rect x="143" y="155" width="24" height="36" rx="4" fill="#0d1117"/>
+  </g>
+
+  <!-- Checkmark / activated badge -->
+  <g transform="translate(810, 130)">
+    <circle cx="110" cy="110" r="105" fill="#1e2840" stroke="#28c840" stroke-width="3" opacity="0.9"/>
+    <!-- Checkmark -->
+    <polyline points="55,110 95,155 170,65" fill="none" stroke="#28c840" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- Activated text badge -->
+  <g transform="translate(810, 355)">
+    <rect x="0" y="0" width="220" height="52" rx="26" fill="#28c840" opacity="0.18"/>
+    <rect x="0" y="0" width="220" height="52" rx="26" fill="none" stroke="#28c840" stroke-width="2" opacity="0.6"/>
+    <text x="110" y="34" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="700" fill="#28c840" text-anchor="middle">ACTIVATED</text>
+  </g>
+
+  <!-- Text -->
+  <text x="540" y="220" font-family="'Segoe UI', Arial, sans-serif" font-size="72" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Activate</text>
+  <text x="540" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="32" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Windows</text>
+
+  <rect x="290" y="300" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="540" y="350" font-family="'Segoe UI', Arial, sans-serif" font-size="24" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">PowerShell activation in one command</text>
+
+  <!-- Tag pills -->
+  <g transform="translate(300, 410)">
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="60" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows</text>
+    <rect x="135" y="0" width="150" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="135" y="0" width="150" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="210" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Activation</text>
+    <rect x="300" y="0" width="150" height="38" rx="19" fill="#ffb900" opacity="0.18"/>
+    <rect x="300" y="0" width="150" height="38" rx="19" fill="none" stroke="#ffb900" stroke-width="1.5" opacity="0.5"/>
+    <text x="375" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ffb900" text-anchor="middle">PowerShell</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

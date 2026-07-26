@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="terminalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e2840"/>
+      <stop offset="100%" style="stop-color:#141b2d"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0078d4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- CMD Terminal window — left side -->
+  <g transform="translate(90, 100)" filter="url(#dropShadow)">
+    <!-- Window frame -->
+    <rect x="0" y="0" width="460" height="340" rx="10" fill="url(#terminalGrad)" stroke="#0078d4" stroke-width="1.5" opacity="0.95"/>
+    <!-- Title bar -->
+    <rect x="0" y="0" width="460" height="38" rx="10" fill="#0f1929"/>
+    <rect x="0" y="28" width="460" height="10" fill="#0f1929"/>
+    <!-- Traffic lights -->
+    <circle cx="22" cy="19" r="7" fill="#ff5f57" opacity="0.9"/>
+    <circle cx="44" cy="19" r="7" fill="#febc2e" opacity="0.9"/>
+    <circle cx="66" cy="19" r="7" fill="#28c840" opacity="0.9"/>
+    <!-- Title -->
+    <text x="230" y="25" font-family="'Consolas', monospace" font-size="14" fill="#8ab4d4" text-anchor="middle">Administrator: Command Prompt</text>
+
+    <!-- CMD content -->
+    <text x="18" y="72" font-family="'Consolas', monospace" font-size="14" fill="#7fba00">C:\Windows\system32&gt;</text>
+    <text x="18" y="100" font-family="'Consolas', monospace" font-size="14" fill="white">net user LocalAdmin Password123 /add</text>
+    <text x="18" y="128" font-family="'Consolas', monospace" font-size="14" fill="#8ab4d4">The command completed successfully.</text>
+    <text x="18" y="156" font-family="'Consolas', monospace" font-size="14" fill="#7fba00">C:\Windows\system32&gt;</text>
+    <text x="18" y="184" font-family="'Consolas', monospace" font-size="14" fill="white">net localgroup Administrators LocalAdmin /add</text>
+    <text x="18" y="212" font-family="'Consolas', monospace" font-size="14" fill="#8ab4d4">The command completed successfully.</text>
+    <text x="18" y="240" font-family="'Consolas', monospace" font-size="14" fill="#7fba00">C:\Windows\system32&gt;</text>
+    <!-- Blinking cursor -->
+    <rect x="200" y="252" width="10" height="18" fill="#0078d4" opacity="0.9"/>
+  </g>
+
+  <!-- User icon — top right of terminal area -->
+  <g transform="translate(820, 130)">
+    <!-- User circle -->
+    <circle cx="120" cy="100" r="90" fill="#1e2840" stroke="#0078d4" stroke-width="2" opacity="0.85"/>
+    <!-- Head -->
+    <circle cx="120" cy="80" r="36" fill="#0078d4" opacity="0.9"/>
+    <!-- Body/shoulders -->
+    <path d="M40 185 Q55 130 120 130 Q185 130 200 185" fill="#0078d4" opacity="0.9"/>
+    <!-- Admin badge -->
+    <circle cx="178" cy="155" r="26" fill="#ffb900"/>
+    <text x="178" y="163" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="900" fill="#0d1117" text-anchor="middle">A</text>
+  </g>
+
+  <!-- Text content -->
+  <text x="680" y="370" font-family="'Segoe UI', Arial, sans-serif" font-size="56" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Local Admin</text>
+  <text x="680" y="420" font-family="'Segoe UI', Arial, sans-serif" font-size="28" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Account via CMD</text>
+
+  <rect x="480" y="438" width="400" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="680" y="478" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">Create a fallback administrator account</text>
+
+  <!-- Tag pills -->
+  <g transform="translate(495, 515)">
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="60" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows</text>
+    <rect x="135" y="0" width="90" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="135" y="0" width="90" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="180" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">CMD</text>
+    <rect x="240" y="0" width="130" height="38" rx="19" fill="#ffb900" opacity="0.2"/>
+    <rect x="240" y="0" width="130" height="38" rx="19" fill="none" stroke="#ffb900" stroke-width="1.5" opacity="0.5"/>
+    <text x="305" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#ffb900" text-anchor="middle">Admin</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>

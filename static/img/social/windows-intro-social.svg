@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a1f2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078d4;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#0078d4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0078d4;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0078d4" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Grid -->
+  <g opacity="0.04">
+    <line x1="0" y1="90" x2="1200" y2="90" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="180" x2="1200" y2="180" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="270" x2="1200" y2="270" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="360" x2="1200" y2="360" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#0078d4" stroke-width="1"/>
+    <line x1="0" y1="540" x2="1200" y2="540" stroke="#0078d4" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="#0078d4" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="#0078d4" stroke-width="1"/>
+  </g>
+
+  <rect x="0" y="0" width="6" height="630" fill="#0078d4" opacity="0.9"/>
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+  <rect x="0" y="627" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Large Windows logo — left side -->
+  <g transform="translate(110, 140)" filter="url(#dropShadow)">
+    <!-- Red quadrant (top-left) -->
+    <rect x="0" y="0" width="145" height="145" rx="8" fill="#f25022"/>
+    <!-- Green quadrant (top-right) -->
+    <rect x="155" y="0" width="145" height="145" rx="8" fill="#7fba00"/>
+    <!-- Blue quadrant (bottom-left) -->
+    <rect x="0" y="155" width="145" height="145" rx="8" fill="#00a4ef"/>
+    <!-- Yellow quadrant (bottom-right) -->
+    <rect x="155" y="155" width="145" height="145" rx="8" fill="#ffb900"/>
+  </g>
+
+  <!-- Edition badges — right section -->
+  <!-- Home -->
+  <g transform="translate(680, 130)">
+    <rect x="0" y="0" width="200" height="72" rx="10" fill="#1e2840" stroke="#0078d4" stroke-width="1.5" opacity="0.85"/>
+    <text x="100" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#8ab4d4" text-anchor="middle" font-weight="500">EDITION</text>
+    <text x="100" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="700">Home</text>
+  </g>
+  <!-- Pro -->
+  <g transform="translate(680, 222)">
+    <rect x="0" y="0" width="200" height="72" rx="10" fill="#1e2840" stroke="#0078d4" stroke-width="1.5" opacity="0.85"/>
+    <text x="100" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="#8ab4d4" text-anchor="middle" font-weight="500">EDITION</text>
+    <text x="100" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="700">Pro</text>
+  </g>
+  <!-- Enterprise -->
+  <g transform="translate(680, 314)">
+    <rect x="0" y="0" width="200" height="72" rx="10" fill="#0078d4" opacity="0.9"/>
+    <text x="100" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="13" fill="rgba(255,255,255,0.75)" text-anchor="middle" font-weight="500">EDITION</text>
+    <text x="100" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="700">Enterprise</text>
+  </g>
+
+  <!-- Arrow between badges and text area -->
+  <line x1="620" y1="315" x2="680" y2="315" stroke="#0078d4" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
+
+  <!-- Main text -->
+  <text x="460" y="215" font-family="'Segoe UI', Arial, sans-serif" font-size="70" font-weight="700"
+        fill="white" text-anchor="middle" filter="url(#softGlow)">Windows</text>
+  <text x="460" y="275" font-family="'Segoe UI', Arial, sans-serif" font-size="30" font-weight="400"
+        fill="#8ab4d4" text-anchor="middle">Operating System</text>
+
+  <rect x="210" y="295" width="500" height="2" rx="1" fill="#0078d4" opacity="0.6"/>
+
+  <text x="460" y="345" font-family="'Segoe UI', Arial, sans-serif" font-size="24" font-weight="300"
+        fill="#c9d1d9" text-anchor="middle">Editions, Features &amp; Getting Started</text>
+
+  <!-- Tag pills -->
+  <g transform="translate(260, 405)">
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="0" y="0" width="120" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="60" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows</text>
+    <rect x="135" y="0" width="130" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="135" y="0" width="130" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="200" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Windows 11</text>
+    <rect x="280" y="0" width="110" height="38" rx="19" fill="#0078d4" opacity="0.25"/>
+    <rect x="280" y="0" width="110" height="38" rx="19" fill="none" stroke="#0078d4" stroke-width="1.5" opacity="0.6"/>
+    <text x="335" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="500" fill="#8ab4d4" text-anchor="middle">Guide</text>
+  </g>
+
+  <text x="1160" y="600" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600"
+        fill="#0078d4" text-anchor="end" opacity="0.8">BankaiTech Docs</text>
+</svg>
