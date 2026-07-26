@@ -1,0 +1,96 @@
+---
+title: Creating a Local Admin Account via CMD
+tags: [Windows, CMD, Local Account, Administrator]
+keywords: [Windows, local account, administrator, CMD, net user, net localgroup]
+last_update:
+  author: BankaiTech
+updates:
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Creating a local administrator account gives you a fallback login that is independent of your Microsoft Account and any Microsoft services. This is especially useful before making changes that could affect Microsoft Account authentication (such as disabling `wlidsvc` or blocking `login.live.com`).
+
+:::warning
+You must run Command Prompt **as Administrator** for these commands to work. Right-click the Start menu → **Terminal (Admin)** or search for `cmd`, right-click → **Run as administrator**.
+:::
+
+## Step 1 — Create the User Account
+
+```cmd
+net user /add [username] [password]
+```
+
+Replace `[username]` with your chosen account name and `[password]` with a strong password.
+
+**Example:**
+
+```cmd
+net user /add LocalAdmin MyStr0ngP@ss!
+```
+
+:::tip
+Avoid spaces in the username. If you need spaces, wrap the username in quotes: `net user /add "My Admin" password`.
+:::
+
+## Step 2 — Add the Account to the Administrators Group
+
+```cmd
+net localgroup administrators [username] /add
+```
+
+**Example:**
+
+```cmd
+net localgroup administrators LocalAdmin /add
+```
+
+This grants the new account full administrative privileges on the local machine.
+
+## Step 3 — Verify the Account
+
+Confirm the account was created and is in the Administrators group:
+
+```cmd
+net user [username]
+```
+
+Look for `Local Group Memberships` in the output — it should include `*Administrators`.
+
+You can also list all members of the Administrators group:
+
+```cmd
+net localgroup administrators
+```
+
+## Signing In with the New Account
+
+Once created, the account will appear on the Windows login screen. You can switch to it without restarting:
+
+1. Press `Win + L` to lock the screen
+2. Click on the new username in the bottom-left corner of the login screen
+3. Enter the password you set in Step 1
+
+## Setting a Password (Optional — If You Want No Password)
+
+:::caution
+Passwordless local accounts are a security risk, especially on shared or portable machines.
+:::
+
+To create an account with no password, omit the password argument:
+
+```cmd
+net user /add [username]
+```
+
+## Removing the Account (Cleanup)
+
+If you no longer need the local account, you can remove it:
+
+```cmd
+net user /delete [username]
+```
+
+---
+
+<BuyMeACoffeeButton />

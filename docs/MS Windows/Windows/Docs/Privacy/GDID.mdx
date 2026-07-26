@@ -1,0 +1,376 @@
+---
+title: What is GDID and How to Disable It
+tags: [Windows, Privacy, GDID, Telemetry, Diagnostics]
+keywords: [Windows, GDID, Global Device ID, telemetry, privacy, diagnostics, tracking, disable]
+last_update:
+  author: BankaiTech
+updates:
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## What is GDID?
+
+**GDID** stands for **Global Device Identifier** (also referred to as the **Global Device ID**). It is a unique identifier assigned to a Windows device that Microsoft uses as part of its telemetry and diagnostics data collection infrastructure. The GDID is tied to the hardware of your device and persists across Windows reinstallations, making it more persistent than typical software-based identifiers.
+
+Windows silently registers this identifier through the **Connected Devices Platform (CDP)** and **Microsoft identity services**. It is then transmitted to Microsoft telemetry endpoints and used to correlate activity across devices and accounts.
+
+The GDID is used by Microsoft to:
+
+- Link diagnostic and usage data across sessions and reinstallations
+- Associate crash reports, performance logs, and feature usage statistics with a specific device
+- Improve Windows Update targeting and reliability metrics
+- Feed data into Microsoft's advertising and analytics pipelines
+
+:::warning
+The GDID is **not** the same as your Microsoft account ID or your hardware serial number, but it can be combined with those to build a persistent device profile that survives OS reinstalls.
+:::
+
+---
+
+## Why Should You Care?
+
+Unlike most telemetry identifiers, the GDID is designed to survive OS reinstalls. This means even if you perform a clean installation of Windows, Microsoft can still associate your new installation with your previous diagnostic history — as long as the hardware remains the same.
+
+This raises privacy concerns for users who:
+
+- Prefer to limit the data they share with Microsoft
+- Want a clean slate after reinstalling Windows
+- Are concerned about long-term device profiling by a third party
+- Operate in environments with strict data governance or compliance requirements
+
+---
+
+## What Data Does It Collect?
+
+Through the GDID, Microsoft may associate the following types of data with your device:
+
+| Data Type | Description |
+|-----------|-------------|
+| **Diagnostic Data** | Crash reports, error logs, driver issues |
+| **Usage Telemetry** | App launch frequency, feature usage, session durations |
+| **Performance Metrics** | Boot times, memory usage, CPU load patterns |
+| **Update Behavior** | Which updates were applied, failed, or rolled back |
+| **Connected Experiences** | Data from Cortana, Search, Widgets, and Microsoft services |
+| **Activity Feed / Timeline** | Window activity and user actions via `activity.windows.com` |
+
+The amount of data collected depends on your **Diagnostics & Feedback** setting in Windows:
+
+- **Required** – Minimal data; device info, basic crash data
+- **Optional** – Full telemetry; browsing behavior in Edge, app usage, inking data, etc.
+
+---
+
+## How to Disable or Limit GDID Tracking
+
+Microsoft does not provide a direct toggle to delete the GDID, but there are several steps you can take to limit or prevent its use.
+
+### Method 1 — Adjust Diagnostic Data Settings (Built-in)
+
+1. Open **Settings** → **Privacy & security** → **Diagnostics & feedback**
+2. Set **Diagnostic data** to **Required diagnostic data only**
+3. Turn off **Tailored experiences**
+4. Turn off **View diagnostic data** collection (this stops optional analytics)
+5. Click **Delete diagnostic data** to clear previously collected data
+
+This reduces the scope of what is sent but does not eliminate the GDID from being used.
+
+---
+
+### Method 2 — Group Policy (Windows 11 Pro / Enterprise)
+
+For Pro and Enterprise users, Group Policy gives more granular control:
+
+1. Press `Win + R`, type `gpedit.msc`, and press Enter
+2. Navigate to:
+   ```
+   Computer Configuration → Administrative Templates → Windows Components → Data Collection and Preview Builds
+   ```
+3. Set **Allow Diagnostic Data** to **Disabled** or **Send Required Diagnostic Data**
+4. Enable **Disable OneSettings Downloads** to prevent Microsoft from remotely changing these settings
+5. Apply and restart
+
+---
+
+### Method 3 — Registry Edits
+
+:::caution
+Editing the registry incorrectly can cause system instability. Create a backup before proceeding.
+:::
+
+You can disable telemetry and CDP services via the registry:
+
+```powershell
+# Set diagnostics level to Security (0) — most restrictive
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord
+
+# Disable Connected User Experiences and Telemetry service
+Set-Service -Name "DiagTrack" -StartupType Disabled
+Stop-Service -Name "DiagTrack" -Force
+
+# Disable WAP Push Message Routing Service (feeds telemetry)
+Set-Service -Name "dmwappushservice" -StartupType Disabled
+Stop-Service -Name "dmwappushservice" -Force
+
+# Disable Activity Feed group policies (controls CDP/GDID activity upload)
+$policyPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"
+Set-ItemProperty -Path $policyPath -Name "EnableActivityFeed"    -Value 0 -Type DWord
+Set-ItemProperty -Path $policyPath -Name "PublishUserActivities" -Value 0 -Type DWord
+Set-ItemProperty -Path $policyPath -Name "UploadUserActivities"  -Value 0 -Type DWord
+
+# Remove the stored GDID value
+Remove-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\IdentityCRL\ExtendedProperties" -Name "LID" -ErrorAction SilentlyContinue
+```
+
+Run the above commands in an elevated PowerShell session.
+
+---
+
+### Method 4 — Third-Party Tools
+
+Several community tools can help automate privacy hardening on Windows:
+
+- **[O&O ShutUp10++](https://www.oo-software.com/en/shutup10)** — Free tool with toggles for hundreds of privacy settings including telemetry
+- **[WPD (Windows Privacy Dashboard)](https://wpd.app/)** — Blocks telemetry endpoints and manages privacy settings
+- **[Privacy.Sexy](https://privacy.sexy/)** — Open-source, script-based privacy hardening tool for Windows
+
+:::note
+These tools are third-party and not affiliated with Microsoft. Review what each setting does before applying it, as some changes may affect Windows Update or other features.
+:::
+
+---
+
+### Method 5 — Disable-GDID-Tracking.ps1 (Recommended)
+
+`Disable-GDID-Tracking.ps1` is a comprehensive PowerShell tool purpose-built for disabling Microsoft's GDID telemetry, identity registration services, and associated network endpoints on Windows 10/11. All changes are persistent across reboots and Windows Updates via scheduled task enforcement.
+
+#### Requirements
+
+- Windows 10 or Windows 11
+- PowerShell 5.1 or later
+- Administrator privileges (the script self-elevates via UAC if needed)
+
+#### Usage
+
+**Right-click the `.ps1` file → Run with PowerShell**
+
+The script detects if it is not running as Administrator and automatically triggers a UAC elevation prompt. No need to open an elevated console manually.
+
+Alternatively, from an existing elevated PowerShell session:
+
+```powershell
+.\Disable-GDID-Tracking.ps1
+```
+
+#### Menu Options
+
+```
+=======================================
+  GDID / Device PUID Remediation Tool
+=======================================
+  1. Disable GDID / Telemetry
+  2. Full Rollback (Restore defaults)
+  3. Unblock network endpoints only
+  4. Check status
+  5. Exit
+```
+
+| Option | Description |
+|--------|-------------|
+| **1. Disable GDID / Telemetry** | Runs the full remediation: stops and disables CDP services, applies Activity Feed group policies, removes residual registry identity entries, blocks network endpoints in the hosts file and Windows Firewall, and installs persistence scheduled tasks. |
+| **2. Full Rollback** | Fully reverses all changes: restores services to their default startup types, removes hosts file entries and the firewall rule, clears Activity Feed policy restrictions, and uninstalls the scheduled tasks. |
+| **3. Unblock network endpoints only** | Removes only the hosts file entries and firewall rule without touching services or policies. |
+| **4. Check status** | Displays the current state of all managed components without making any changes. |
+| **5. Exit** | Exits the script. |
+
+#### What Option 1 Does
+
+**Services Disabled**
+
+| Service | Description |
+|---------|-------------|
+| `CDPSvc` | Connected Devices Platform Service |
+| `CDPUserSvc` | Per-user CDP instance template — disabling prevents new instances from spawning |
+| `wlidsvc` | Microsoft Account Sign-in Assistant |
+
+:::danger[Before Disabling `wlidsvc`]
+Disabling `wlidsvc` (Microsoft Account Sign-in Assistant) stops the service that refreshes Microsoft Account (MSA) authentication tokens. If your Windows user account is linked to a Microsoft account, your cached login token will eventually expire and **you may be unable to sign in to your computer**. It is strongly recommended to **create a local user account with administrator privileges** before applying these changes, so you have a fallback login that is not affected by this service being disabled.
+
+To create a local account via Settings: **Settings → Accounts → Other users → Add account → "I don't have this person's sign-in information" → "Add a user without a Microsoft account"**
+
+Alternatively, see [Creating a Local Admin Account via CMD](../Local%20Admin%20Account) for a faster command-line method.
+:::
+
+**Group Policies Applied**
+
+Sets the following registry values under `HKLM:\SOFTWARE\Policies\Microsoft\Windows\System`:
+
+| Value | Set To |
+|-------|--------|
+| `EnableActivityFeed` | `0` |
+| `PublishUserActivities` | `0` |
+| `UploadUserActivities` | `0` |
+
+**Registry Entries Removed**
+
+- `HKCU:\SOFTWARE\Microsoft\IdentityCRL\ExtendedProperties\LID` — the GDID value itself
+- `DeviceId` entries under `HKCU:\SOFTWARE\Microsoft\IdentityCRL\Immersive\production\Token\*`
+- `HKLM:\SOFTWARE\Microsoft\IdentityCRL\NegativeCache`
+
+**Local Cache Cleared**
+
+- `%LOCALAPPDATA%\ConnectedDevicesPlatform\` — local CDP cache folder
+
+**Network Blocking**
+
+The script blocks GDID registration endpoints at two levels:
+
+- **Hosts file** — adds IPv4 and IPv6 null-route entries for each blocked domain
+- **Windows Firewall** — creates an outbound block rule resolving both A (IPv4) and AAAA (IPv6) records for all blocked domains at time of run
+
+| Domain | Purpose |
+|--------|---------|
+| `dds.microsoft.com` | Device Directory Service (GDID registration) |
+| `fd.dds.microsoft.com` | DDS frontend |
+| `aad.cs.dds.microsoft.com` | Azure AD device sync |
+| `cdpcs.access.microsoft.com` | Connected Devices Platform cloud sync |
+| `activity.windows.com` | Windows Activity Feed / Timeline telemetry |
+
+#### Persistence
+
+Running option 1 installs two scheduled tasks that run as **SYSTEM** (no UAC, no UI):
+
+| Task Name | Trigger | Purpose |
+|-----------|---------|---------|
+| `GDID-Telemetry-Enforcement` | Every system startup | Re-disables services and re-applies group policies in case Windows Update resets them |
+| `GDID-Firewall-Refresh` | Every Sunday at 03:00 | Re-resolves Microsoft CDN IPs and rebuilds the firewall block rule to keep it current as IPs rotate. Runs on next boot if the PC was off at trigger time. |
+
+The script copies itself to `C:\ProgramData\GDIDBlock\` so the tasks always have a stable file path to reference, regardless of where the original `.ps1` is stored.
+
+#### Status Check (Option 4)
+
+```
+=== GDID / Identity Registration Status ===
+Current GDID:              not present
+CDPSvc:                    Stopped / StartType=Disabled
+CDPUserSvc (template):     Stopped / StartType=Disabled
+wlidsvc:                   Stopped / StartType=Disabled
+Activity Feed policy:      EnableActivityFeed=0
+HKLM IdentityStore:        present
+HKLM NegativeCache:        absent
+Local CDP cache folder:    absent
+Hosts file blocking:       5 / 5 endpoints blocked
+Firewall rule:             present (Block, Enabled=True)
+Persistence task:          installed (State=Ready)
+```
+
+:::note
+`HKLM IdentityStore` will always show `present`. This key is owned by TrustedInstaller and cannot be removed by any admin process. Its presence does not affect telemetry blocking.
+:::
+
+#### Silent Execution Modes (Advanced)
+
+The script accepts two switches used internally by the scheduled tasks:
+
+| Switch | Behavior |
+|--------|----------|
+| `-Enforce` | Re-enforces services and policies silently, then exits. No UI. |
+| `-RefreshFW` | Re-resolves domain IPs and rebuilds the firewall rule silently, then exits. No UI. |
+
+```powershell
+.\Disable-GDID-Tracking.ps1 -Enforce
+.\Disable-GDID-Tracking.ps1 -RefreshFW
+```
+
+#### Rollback (Option 2)
+
+All changes made by option 1 are fully reversible:
+
+- Services restored to their default startup types (`CDPSvc` → Automatic, `wlidsvc` → Manual)
+- Hosts file entries removed
+- Firewall rule deleted
+- Activity Feed group policy values removed
+- Scheduled tasks unregistered and `C:\ProgramData\GDIDBlock\` deleted
+
+:::note
+Deleted registry entries and cleared cache folders are not restored on rollback — Windows recreates them automatically on next login.
+:::
+
+:::caution
+The hosts file write uses a temp-file + copy approach to work around Windows Defender Tamper Protection, which blocks direct writes to the hosts file even from admin processes. If Tamper Protection is enabled and the copy fails, the script will display a warning with instructions to temporarily disable it in Windows Security settings.
+:::
+
+---
+
+## Blocking GDID Endpoints Manually (Advanced)
+
+You can block the GDID-specific registration endpoints at the network level without the script. Add these entries to your hosts file at `C:\Windows\System32\drivers\etc\hosts`:
+
+```
+0.0.0.0 dds.microsoft.com
+::0     dds.microsoft.com
+0.0.0.0 fd.dds.microsoft.com
+::0     fd.dds.microsoft.com
+0.0.0.0 aad.cs.dds.microsoft.com
+::0     aad.cs.dds.microsoft.com
+0.0.0.0 cdpcs.access.microsoft.com
+::0     cdpcs.access.microsoft.com
+0.0.0.0 activity.windows.com
+::0     activity.windows.com
+```
+
+These same domains can also be blocked network-wide using a Pi-hole or other DNS sinkhole.
+
+:::note[`login.live.com` — Optional, Advanced]
+`login.live.com` is the Microsoft Account authentication endpoint that `wlidsvc` uses to register and refresh the device GDID. Blocking it at the network level will prevent GDID re-registration, but it also blocks all Microsoft consumer service authentication from that machine (Microsoft Store, OneDrive, Xbox, Outlook.com). **Do not block this domain unless you have already switched to a local Windows user account.** See the impact chart below for a full breakdown.
+:::
+
+:::warning
+The firewall rule blocks IPs resolved at runtime. Because Microsoft uses rotating CDN IPs, a periodic refresh (as the script's `GDID-Firewall-Refresh` task does) is needed to keep it current. Hosts file blocking is domain-based and does not have this limitation.
+:::
+
+---
+
+## Impact Reference Chart
+
+This table shows exactly what is affected by each action the script takes, or that you may take manually.
+
+| Action | Windows Login (MSA) | Microsoft Store | OneDrive Sync | Xbox / Gaming | Outlook.com | GDID Registration Blocked |
+|--------|:-------------------:|:---------------:|:-------------:|:-------------:|:-----------:|:-------------------------:|
+| Block `dds.microsoft.com` | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ Yes |
+| Block `fd.dds.microsoft.com` | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ Yes |
+| Block `aad.cs.dds.microsoft.com` | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ Yes |
+| Block `cdpcs.access.microsoft.com` | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ Yes |
+| Block `activity.windows.com` | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ No impact | ✅ Yes (Activity Feed) |
+| Disable `wlidsvc` | ⚠️ Cached only — may expire | ⚠️ May fail | ⚠️ Stops syncing | ⚠️ May fail | ⚠️ May fail | ✅ Yes |
+| Block `login.live.com` *(optional)* | ❌ MSA login breaks | ❌ Fails | ❌ Stops syncing | ❌ Fails | ❌ Fails | ✅ Yes |
+
+**Key:**
+- ✅ **No impact** — feature works normally
+- ⚠️ **Degraded** — works on cached tokens; will fail once the cached token expires (days to weeks)
+- ❌ **Broken** — feature stops working immediately
+
+:::warning
+Blocking `login.live.com` or disabling `wlidsvc` without first creating a **local administrator account** risks being locked out of Windows entirely once your Microsoft Account cached token expires. Always create a local account as a fallback first.
+:::
+
+---
+
+## Summary
+
+| Method | Ease | Effectiveness | Reversible |
+|--------|------|---------------|------------|
+| Settings UI | Easy | Low–Medium | Yes |
+| Group Policy | Medium | Medium–High | Yes |
+| Registry Edit | Medium | High | Yes |
+| Third-Party Tools | Easy | High | Mostly |
+| Disable-GDID-Tracking.ps1 | Easy | Very High | Yes (Option 2) |
+| Manual Network Blocking | Hard | High | Yes |
+
+For the most complete protection, use **`Disable-GDID-Tracking.ps1`** — it handles services, group policies, registry cleanup, network blocking, and persistence in a single automated tool with a full rollback option.
+
+---
+
+<BuyMeACoffeeButton />
