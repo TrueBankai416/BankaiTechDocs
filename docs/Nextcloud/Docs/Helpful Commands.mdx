@@ -106,6 +106,14 @@ sudo docker exec -it -u 33 nextcloud php occ upgrade
 sudo docker exec -it -u 33 nextcloud php occ maintenance:mode --off
 ```
 
+### **_Hide Simple Signup Link_**
+
+This OCC command hides the public simple signup link prompt in Nextcloud by setting the `simpleSignUpLink.shown` system value to `false`.
+
+```bash
+sudo docker compose exec -u www-data nextcloud php occ config:system:set simpleSignUpLink.shown --type=boolean --value=false
+```
+
 ### **_Scan all Files_**
 
 This OCC command tells Nextcloud to scan for file changes. This is useful for making sure that files added, removed, or modified directly on the filesystem (outside of Nextcloud's web or desktop clients) are correctly reflected in Nextcloud's database.
