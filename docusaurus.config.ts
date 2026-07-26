@@ -181,8 +181,8 @@ const config: Config = {
       minHeadingLevel: 2,
       maxHeadingLevel: 5,
     },
-    // Replace with your project's social card
-    image: 'img/social-card.jpg',
+    // Site-wide default social card (OG image)
+    image: 'img/bankai-tech-social-card.svg',
     // algolia: {
     //   appId: process.env.ALGOLIA_APP_ID,
     //   apiKey: process.env.ALGOLIA_API_KEY,
