@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  style="stop-color:#060606"/>
+      <stop offset="100%" style="stop-color:#140303"/>
+    </linearGradient>
+    <linearGradient id="hexStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  style="stop-color:#cc1a00"/>
+      <stop offset="100%" style="stop-color:#d4a017"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"  style="stop-color:#ff2a00"/>
+      <stop offset="100%" style="stop-color:#d4a017"/>
+    </linearGradient>
+    <filter id="hexGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="textGlow">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#cc1a00" flood-opacity="0.7"/>
+    </filter>
+    <filter id="goldGlow">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#d4a017" flood-opacity="0.6"/>
+    </filter>
+    <filter id="bigGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+  </defs>
+
+  <!-- Background square -->
+  <rect width="200" height="200" fill="url(#bgGrad)" rx="18"/>
+
+  <!-- Atmospheric red glow behind hex -->
+  <circle cx="100" cy="100" r="80" fill="#cc1a00" opacity="0.08" filter="url(#bigGlow)"/>
+
+  <!-- Outer halo rings -->
+  <polygon points="100,14 170,54 170,134 100,174 30,134 30,54"
+           fill="none" stroke="#cc1a00" stroke-width="1" opacity="0.15"/>
+  <polygon points="100,8  176,50 176,138 100,180 24,138 24,50"
+           fill="none" stroke="#d4a017" stroke-width="0.8" opacity="0.08"/>
+
+  <!-- Hexagon red ambient glow layer -->
+  <polygon points="100,20 164,57 164,131 100,168 36,131 36,57"
+           fill="#cc1a00" opacity="0.06" filter="url(#hexGlow)"/>
+
+  <!-- Main hexagon — black fill, red/gold border -->
+  <polygon points="100,20 164,57 164,131 100,168 36,131 36,57"
+           fill="#090101" stroke="url(#hexStroke)" stroke-width="4"
+           filter="url(#hexGlow)" opacity="0.97"/>
+
+  <!-- Inner ring highlight -->
+  <polygon points="100,34 152,63 152,121 100,150 48,121 48,63"
+           fill="none" stroke="#cc1a00" stroke-width="1" opacity="0.18"/>
+
+  <!-- BT letters -->
+  <text x="80" y="120" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="900"
+        fill="white" text-anchor="middle" filter="url(#textGlow)" opacity="0.97">B</text>
+  <text x="126" y="120" font-family="'Segoe UI', Arial, sans-serif" font-size="80" font-weight="900"
+        fill="url(#titleGrad)" text-anchor="middle" filter="url(#goldGlow)" opacity="0.97">T</text>
+
+  <!-- Corner node dots -->
+  <circle cx="100" cy="20"  r="3.5" fill="#cc1a00" opacity="0.85" filter="url(#softGlow)"/>
+  <circle cx="164" cy="57"  r="2.8" fill="#cc1a00" opacity="0.55"/>
+  <circle cx="164" cy="131" r="2.8" fill="#d4a017" opacity="0.55"/>
+  <circle cx="100" cy="168" r="3.5" fill="#d4a017" opacity="0.85" filter="url(#softGlow)"/>
+  <circle cx="36"  cy="131" r="2.8" fill="#d4a017" opacity="0.55"/>
+  <circle cx="36"  cy="57"  r="2.8" fill="#cc1a00" opacity="0.55"/>
+
+  <!-- Reiatsu tendrils -->
+  <line x1="100" y1="20"  x2="100" y2="6"  stroke="#cc1a00" stroke-width="1.2" opacity="0.3" stroke-dasharray="3 3"/>
+  <line x1="164" y1="57"  x2="176" y2="50" stroke="#cc1a00" stroke-width="1.2" opacity="0.22" stroke-dasharray="3 3"/>
+  <line x1="36"  cy="57"  x2="24"  y2="50" stroke="#cc1a00" stroke-width="1.2" opacity="0.22" stroke-dasharray="3 3"/>
+  <line x1="100" y1="168" x2="100" y2="183" stroke="#d4a017" stroke-width="1.2" opacity="0.3" stroke-dasharray="3 3"/>
+
+  <!-- Satellite tip dots -->
+  <circle cx="100" cy="4"   r="2" fill="#cc1a00" opacity="0.4"/>
+  <circle cx="100" cy="185" r="2" fill="#d4a017" opacity="0.4"/>
+</svg>

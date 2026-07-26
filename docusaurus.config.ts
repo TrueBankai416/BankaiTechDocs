@@ -10,7 +10,7 @@ dotenv.config({ path: './.env' });
 const config: Config = {
   title: 'Bankai-Tech Docs',
   tagline: 'Debugging is when you are a detective in a crime where you are also the murderer',
-  favicon: 'img/favcon.ico',
+  favicon: 'img/favicon.svg',
 
   // Adopt Docusaurus Faster and v4
   future: {
@@ -203,8 +203,8 @@ const config: Config = {
     navbar: {
       title: 'Bankai-Tech Docs',
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/icon.jpg',
+        alt: 'Bankai-Tech Docs',
+        src: 'img/icon.svg',
       },
       items: [
         {
