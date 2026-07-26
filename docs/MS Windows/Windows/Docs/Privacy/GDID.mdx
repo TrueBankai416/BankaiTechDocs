@@ -154,6 +154,8 @@ These tools are third-party and not affiliated with Microsoft. Review what each 
 
 `Disable-GDID-Tracking.ps1` is a comprehensive PowerShell tool purpose-built for disabling Microsoft's GDID telemetry, identity registration services, and associated network endpoints on Windows 10/11. All changes are persistent across reboots and Windows Updates via scheduled task enforcement.
 
+Credit to **[Jank8](https://github.com/Jank8)** for creating and sharing the original script this version is based on.
+
 #### Requirements
 
 - Windows 10 or Windows 11
@@ -382,6 +384,12 @@ This table shows exactly what is affected by each action the script takes, or th
 :::warning
 Blocking `login.live.com` or disabling `wlidsvc` without first creating a **local administrator account** risks being locked out of Windows entirely once your Microsoft Account cached token expires. Always create a local account as a fallback first.
 :::
+
+---
+
+## References
+
+- [gdid-reversal](https://github.com/SmtimesIWndr/gdid-reversal)
 
 ---
 
