@@ -1,0 +1,266 @@
+---
+title: Talk High Performance Backend
+description: Set up Nextcloud Talk High Performance Backend (HPB) using nextcloud/aio-talk, including the signaling server, TURN server, and Nextcloud Talk configuration.
+image: /img/social/nextcloud-social.webp
+sidebar_position: 5
+tags: [Docker, Docker Compose, Tutorial, Nextcloud, Nextcloud Talk, TURN, HPB]
+keywords: [Docker, Nextcloud Talk, HPB, High Performance Backend, TURN, Signaling, aio-talk]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-08-05
+    note: "Add Nextcloud Talk HPB documentation using nextcloud/aio-talk"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+## **Nextcloud Talk High Performance Backend**
+
+The `nextcloud/aio-talk` image bundles everything needed for a full Talk HPB:
+- **eturnal** — TURN/STUN server for NAT traversal
+- **nextcloud-spreed-signaling** — WebRTC signaling server
+- **Janus** — WebRTC media server (MCU/SFU)
+- **NATS** — internal message broker
+
+Without the HPB, Nextcloud Talk is peer-to-peer and degrades significantly with more than 4–5 participants. The HPB routes all media through the server, enabling reliable calls at scale.
+
+:::note[Prerequisites]
+- A working Nextcloud Docker install (any install method)
+- Ports **`TALK_PORT`** (default `3478`) open on your firewall **and port-forwarded on your router** for **UDP and TCP**
+- A DNS `A` record pointing `talk.<YourDomain>.com` at your server
+- A reverse proxy entry for the signaling server (port `8081`)
+:::
+
+:::warning[Cloudflare Users]
+Set `talk.<YourDomain>.com` to **DNS only (grey cloud)** in Cloudflare.
+
+| Port | Cloudflare proxy | Reason |
+|---|---|---|
+| `443` (signaling) | ✅ Would work | Standard HTTPS/WSS |
+| `3478` UDP+TCP (TURN) | ❌ Will not work | Cloudflare doesn't proxy UDP or port 3478 |
+
+Because both services share the same subdomain, the entire record must be grey-clouded.
+:::
+
+---
+
+## **Updating the .env File**
+
+Open your existing `.env` file:
+
+```bash
+nano /opt/docker/nextcloud/.env
+```
+
+Add the following block:
+
+:::warning[warning]
+When editing the configuration below, remove all instances of `<>` from the values
+:::
+
+```editorconfig title="Highlighted items will need to be modified" showLineNumbers
+# Talk HPB (aio-talk)
+// highlight-start
+NC_DOMAIN=cloud.<YourDomain>.com
+TALK_DOMAIN=talk.<YourDomain>.com
+TURN_SECRET=CHANGEME_RANDOM_SECRET
+SIGNALING_SECRET=CHANGEME_RANDOM_SECRET
+INTERNAL_SECRET=CHANGEME_RANDOM_SECRET
+// highlight-end
+TALK_PORT=3478
+SKIP_CERT_VERIFY=false
+AIO_LOG_LEVEL=warn
+TALK_MAX_STREAM_BITRATE=1048576
+TALK_MAX_SCREEN_BITRATE=2097152
+```
+
+:::tip
+Generate strong secrets with:
+```bash
+openssl rand -hex 32
+```
+Run it three times — once each for `TURN_SECRET`, `SIGNALING_SECRET`, and `INTERNAL_SECRET`.
+:::
+
+:::info[NC_DOMAIN]
+`NC_DOMAIN` must be the bare domain **without** a protocol prefix (e.g. `cloud.yourdomain.com`, not `https://cloud.yourdomain.com`).
+:::
+
+---
+
+## **Adding the talk Service to docker-compose.yaml**
+
+Open your existing compose file:
+
+```bash
+nano /opt/docker/nextcloud/docker-compose.yaml
+```
+
+Add the `talk` service and update the `nextcloud` service `links`:
+
+```yaml title="Add the talk service alongside your existing services"
+services:
+
+  # --- add to the links list of the nextcloud service ---
+  nextcloud:
+    links:
+      - talk          # add this line
+
+  # --- new service ---
+  talk:
+    image: nextcloud/aio-talk:latest
+    container_name: talk
+    restart: always
+    ports:
+      - ${TALK_PORT:-3478}:${TALK_PORT:-3478}/udp
+      - ${TALK_PORT:-3478}:${TALK_PORT:-3478}/tcp
+      - 8081:8081
+    env_file:
+      - .env
+    networks:
+      - nextcloud
+```
+
+:::warning[Port Exposure]
+`TALK_PORT` (UDP **and** TCP) must be reachable from the public internet — clients use it for TURN relay. Port `8081` only needs to be reachable by your reverse proxy.
+:::
+
+---
+
+## **Reverse Proxy — Signaling Server**
+
+The signaling server listens on port `8081` and requires a **WebSocket-capable** reverse proxy entry at `https://talk.<YourDomain>.com`.
+
+### Nginx example
+
+:::note
+A ready-to-use example is available in the [Nginx Examples](/Examples/Reverse%20Proxies/Docs/Nginx/#nextcloud-talk-hpb). Your **Nextcloud** vhost also needs a `/spreed` location block — see the [Nextcloud nginx example](/Examples/Reverse%20Proxies/Docs/Nginx/#nextcloud).
+:::
+
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+server {
+    listen 80;
+// highlight-next-line
+    server_name talk.<YourDomain>.com;
+    return 301 https://$host$request_uri;
+}
+server {
+    listen 443 ssl http2;
+// highlight-next-line
+    server_name talk.<YourDomain>.com;
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/<YourDomain>.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/<YourDomain>.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/<YourDomain>.com/chain.pem;
+// highlight-end
+    location / {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;
+    }
+}
+```
+
+---
+
+## **Starting the talk Container**
+
+```bash
+cd /opt/docker/nextcloud
+sudo docker compose up -d talk
+```
+
+Verify it started cleanly:
+
+```bash
+sudo docker logs talk
+```
+
+You should see `eturnal`, `nats-server`, `nextcloud-spreed-signaling`, and `janus` all report as started.
+
+### Fix CSP for the signaling server
+
+Nextcloud's Content Security Policy will block connections to the HPB unless the talk domain is added to trusted proxies:
+
+```bash
+docker exec -it -u 33 nextcloud php occ config:system:set trusted_proxies 2 --value="talk.<YourDomain>.com"
+```
+
+:::note
+Adjust the index (`2`) if you already have other entries — it must be a unique number. Check existing entries with:
+```bash
+docker exec -it -u 33 nextcloud php occ config:system:get trusted_proxies
+```
+:::
+
+---
+
+## **Configuring Nextcloud Talk**
+
+In Nextcloud, go to **Administration Settings → Talk**.
+
+### STUN Servers
+
+Remove the default `stun.nextcloud.com` entry and add:
+
+```
+talk.<YourDomain>.com:3478
+```
+
+### TURN Servers
+
+Click **Add a new TURN server** and fill in:
+
+| Field | Value |
+|---|---|
+| Server | `talk.<YourDomain>.com:3478` |
+| Secret | your `TURN_SECRET` value |
+| Protocol | `UDP and TCP` |
+
+### High-Performance Backend (Signaling)
+
+Click **Add High-performance backend server** and fill in:
+
+| Field | Value |
+|---|---|
+| High-performance backend URL | `https://talk.<YourDomain>.com` |
+| Shared secret | your `SIGNALING_SECRET` value |
+
+Leave **Validate SSL certificate** checked for production.
+
+Click **Save** after each section.
+
+---
+
+## **Testing**
+
+Open a Talk call with another user. In your browser's developer console (Network tab), you should see WebSocket connections to `wss://talk.<YourDomain>.com` and ICE candidates using your server's IP rather than direct peer-to-peer paths.
+
+You can also verify TURN is working by checking the talk container logs during a call:
+
+```bash
+sudo docker logs -f talk
+```
+
+---
+
+## **Troubleshooting**
+
+| Symptom | Likely Cause |
+|---|---|
+| Calls drop with 3+ participants | Signaling server not reachable — check Nginx WebSocket config |
+| "TURN server is not accessible" warning | `TALK_PORT` blocked on firewall — open UDP **and** TCP |
+| Signaling config shows red in admin | Wrong `SIGNALING_SECRET` or reverse proxy not forwarding WebSocket `Upgrade` header |
+| `SKIP_CERT_VERIFY=false` errors in logs | Nextcloud's cert isn't trusted — set `SKIP_CERT_VERIFY=true` for self-signed setups |
+| "Error: Cannot connect to server" in admin | CSP blocking the HPB domain — run the `trusted_proxies` occ command above |
+| Warning: missing features `chat-relay`, `changed-users` | Minor version mismatch between `aio-talk` and your Talk app — non-critical, calls work normally. Resolves when the image updates |
+
+<BuyMeACoffeeButton />

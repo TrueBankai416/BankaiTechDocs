@@ -131,6 +131,21 @@ server {
         proxy_cache_valid 200;
         proxy_cache_background_update on;
     }
+    # Nextcloud Talk built-in WebSocket – required for Talk to function
+    location /spreed {
+// highlight-next-line
+        proxy_pass http://192.168.8.181:8080/spreed;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        proxy_buffering off;
+    }
 }
 ```
 
@@ -1041,6 +1056,46 @@ server {
         proxy_buffering on;
         proxy_cache_valid 200;
         proxy_cache_background_update on;
+    }
+}
+```
+
+## Nextcloud Talk HPB
+
+:::note
+This is the signaling server vhost for `nextcloud/aio-talk`. The TURN port (`TALK_PORT`/3478) is exposed directly — it does **not** go through nginx.
+:::
+
+```nginx title="Highlighted items will need to be modified" showLineNumbers
+server {
+    listen 80;
+// highlight-next-line
+    server_name talk.bankai-tech.com;
+    return 301 https://$host$request_uri;
+}
+server {
+    listen 443 ssl http2;
+// highlight-next-line
+    server_name talk.bankai-tech.com;
+    #                         Load TLS Certs
+// highlight-start
+    ssl_certificate /etc/letsencrypt/live/bankai-tech.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bankai-tech.com/privkey.pem;
+    proxy_ssl_trusted_certificate /etc/letsencrypt/live/bankai-tech.com/chain.pem;
+// highlight-end
+    location / {
+// highlight-next-line
+        proxy_pass http://127.0.0.1:8081;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+        proxy_buffering off;
     }
 }
 ```
