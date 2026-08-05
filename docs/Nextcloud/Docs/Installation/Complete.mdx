@@ -22,6 +22,10 @@ updates:
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+:::caution[Facial Recognition]
+Facial recognition is currently non-functional until further notice.
+:::
+
 ## **Nextcloud Installation using Docker Build and Docker Compose**
 
 **_This method includes Redis, MariaDB, Nextcloud Memories, and Office_**
@@ -110,6 +114,8 @@ MARIADB_AUTO_UPGRADE=true
 NEXTCLOUD_HOST=https://cloud.example.com
 NEXTCLOUD_ALLOW_INSECURE=1 # (self-signed certs or no HTTPS)
 NVIDIA_VISIBLE_DEVICES=all
+# Notify Push
+NEXTCLOUD_URL=http://localhost:80
 # Collabora
 // highlight-start
 username=admin
@@ -417,6 +423,16 @@ Make sure to set `Groups` to `admin`
 :::
 
 ![Nextcloud Add Users1](/img/nextcloud/Adduser1.jpg)
+
+## **Setting up Notify Push**
+
+`notify_push` is included in the `bankaitech/nextcloud` image and provides instant client push notifications for real-time file sync.
+
+After starting the containers, run the following command to add `127.0.0.1` to your trusted proxies to avoid CSP issues:
+
+```bash
+docker exec -it -u 33 nextcloud php occ config:system:set trusted_proxies 1 --value="127.0.0.1"
+```
 
 ## **Setting up Nextcloud Office (Collabora Code)**
 
