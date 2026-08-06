@@ -542,6 +542,20 @@ You should see allocation and permission lines as clients connect through the re
 
 ---
 
+## **Federated Calls**
+
+Nextcloud Talk supports calling users on other Nextcloud instances. The **host server** (the one that owns the conversation room) provides the signaling and Janus infrastructure — federated participants connect to the host's HPB, not their own.
+
+| Component | Host server | Participant's server |
+|---|---|---|
+| Signaling server | ✅ Required | ❌ Not needed — joins host's |
+| Janus (MCU) | ✅ Required | ❌ Not needed — connects to host's |
+| TURN/STUN | ✅ Required | ✅ Recommended for their own NAT traversal |
+
+The federated participant's Nextcloud instance only needs the **Talk** app installed. They will use their own TURN configuration (if set) to get relay candidates on their side, then connect through to the host's Janus using those candidates.
+
+---
+
 ## **Troubleshooting**
 
 | Symptom | Likely Cause |
