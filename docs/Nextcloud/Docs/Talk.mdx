@@ -543,17 +543,24 @@ You should see allocation and permission lines as clients connect through the re
 
 ---
 
-## **Federated Calls**
+## **Talk Federation (Beta)**
 
-Nextcloud Talk supports calling users on other Nextcloud instances. The **host server** (the one that owns the conversation room) provides the signaling and Janus infrastructure — federated participants connect to the host's HPB, not their own.
+:::warning Beta Feature
+Talk federation is currently in **beta**. Expect rough edges and check the [Nextcloud Talk release notes](https://nextcloud.com/changelog/#latest29) for updates on what is supported in your version.
+:::
 
-| Component | Host server | Participant's server |
-|---|---|---|
-| Signaling server | ✅ Required | ❌ Not needed — joins host's |
-| Janus (MCU) | ✅ Required | ❌ Not needed — connects to host's |
-| TURN/STUN | ✅ Required | ✅ Recommended for their own NAT traversal |
+Nextcloud Talk supports **federated text chat** between users on different Nextcloud instances using the [Open Cloud Mesh (OCM)](https://nextcloud.com/blog/how-federated-chat-works-in-nextcloud-talk/) standard. Federated users are added via their Federated Cloud ID (`user@cloud.example.com`) and receive an invite notification before they can join.
 
-The federated participant's Nextcloud instance only needs the **Talk** app installed. They will use their own TURN configuration (if set) to get relay candidates on their side, then connect through to the host's Janus using those candidates.
+**What works in federated chat:**
+- Group text chat across instances
+- User mentions (`@user`)
+- Markdown formatting
+- Chat polls
+
+**Known limitations:**
+- ❌ **Video calls are not supported** — federation is chat-only
+- ❌ Federated users cannot be appointed as moderators
+- ❌ File/attachment sharing is not available for federated users
 
 ---
 
@@ -573,7 +580,6 @@ The federated participant's Nextcloud instance only needs the **Talk** app insta
 | Janus container exits immediately | Check `docker logs janus` — may need the `SHM_SIZE` environment variable on low-memory hosts |
 | ICE candidates use wrong public IP | Hardcode `external-ip=<WAN_IP>/<LAN_IP>` and `relay-ip=<LAN_IP>` in `turnserver.conf` — env-var auto-detection does not work behind NAT |
 | `ERROR -X : Wrong address format` on coturn startup | The default Docker CMD includes `--external-ip=$(detect-external-ip)` which runs `dig` and returns EDNS text — override it with `command: ["--log-file=stdout"]` in the compose service. `external-ip` in `turnserver.conf` takes effect without the CLI flag |
-| Federated call is one-way — remote can see/hear you but you cannot see/hear them | Their TURN server is advertising a Docker bridge IP (e.g. `172.19.0.x`) as the relay address. This happens when coturn runs on a host that also has Docker installed and `relay-ip` is not set — coturn creates relay sockets on all interfaces including Docker bridges. Your coturn logs will show `A peer IP x.x.x.x denied in the range: 172.16.0.0-172.31.255.255`. Fix: ensure their `turnserver.conf` has both `external-ip=<WAN>/<LAN>` and `relay-ip=<LAN>` so relay sockets are bound only to the real interface |
 | `no_such_room: The user is not invited to this room.` in signaling logs | Federated user attempted to join without a Talk federation invite — the host must send a federation invite through the Talk app and the remote user must accept before connecting |
 
 <BuyMeACoffeeButton />
