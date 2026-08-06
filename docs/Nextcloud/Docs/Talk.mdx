@@ -80,6 +80,7 @@ nano /opt/docker/nextcloud/coturn/turnserver.conf
 
 ```ini title="/opt/docker/nextcloud/coturn/turnserver.conf — highlighted items will need to be modified" showLineNumbers
 listening-port=3478
+no-cli
 fingerprint
 use-auth-secret
 // highlight-next-line
@@ -116,6 +117,14 @@ denied-peer-ip=198.51.100.0-198.51.100.255
 denied-peer-ip=203.0.113.0-203.0.113.255
 denied-peer-ip=240.0.0.0-255.255.255.255
 ```
+
+:::tip[`allowed-peer-ip`]
+If you run a VPN or have Docker bridge networks (e.g. `172.17.0.0/16`) that need to reach each other via TURN, add `allowed-peer-ip` entries to punch holes in the denied ranges:
+```ini
+allowed-peer-ip=172.17.0.1
+allowed-peer-ip=10.200.0.0-10.200.0.8
+```
+:::
 
 :::tip[Logging]
 Add `verbose` on its own line to enable detailed coturn logs during initial testing. Remove it once everything is working.
@@ -205,6 +214,8 @@ nat: {
 media: {
     # Constrain Janus media ports so they can be port-forwarded on the router
     rtp_port_range = "10000-20000"
+    ipv6 = false
+    ipv6_linklocal = false
 }
 
 events: {
@@ -221,7 +232,7 @@ nano /opt/docker/nextcloud/janus/janus.eventhandler.wsevh.jcfg
 ```hcl title="/opt/docker/nextcloud/janus/janus.eventhandler.wsevh.jcfg" showLineNumbers
 general: {
     enabled = true
-    json = "indented"
+    json = "compact"
     grouping = true
     # at minimum: handles, media, webrtc
     events = "handles,media,webrtc"
@@ -230,6 +241,21 @@ general: {
     # points to the signaling server WebSocket endpoint on the host
     backend = "ws://localhost:8081/spreed"
     subprotocol = "janus-events"
+}
+```
+
+```bash
+nano /opt/docker/nextcloud/janus/janus.transport.websockets.jcfg
+```
+
+```hcl title="/opt/docker/nextcloud/janus/janus.transport.websockets.jcfg"
+general: {
+    json = "compact"
+    ws = true
+    ws_port = 8188
+    # bind to loopback only — only the signaling server needs this port
+    ws_interface = "lo"
+    wss = false
 }
 ```
 
@@ -358,6 +384,7 @@ services:
     volumes:
       - ./janus/janus.jcfg:/usr/local/etc/janus/janus.jcfg:ro
       - ./janus/janus.eventhandler.wsevh.jcfg:/usr/local/etc/janus/janus.eventhandler.wsevh.jcfg:ro
+      - ./janus/janus.transport.websockets.jcfg:/usr/local/etc/janus/janus.transport.websockets.jcfg:ro
     network_mode: host
 
   signaling:
