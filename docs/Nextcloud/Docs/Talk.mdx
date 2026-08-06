@@ -32,7 +32,8 @@ This guide sets up each component as its own Docker container, giving you full c
 :::note[Prerequisites]
 - A working Nextcloud Docker install (any install method)
 - Port **`3478`** open on your firewall **and port-forwarded on your router** for **UDP and TCP**
-- Ports **`10000–20000` UDP** open on your firewall for Janus WebRTC media relay
+- Ports **`10000–20000` UDP** open on your firewall **and port-forwarded** for Janus WebRTC media
+- Ports **`49152–65535` UDP** open on your firewall **and port-forwarded** for coturn TURN relay
 - A DNS `A` record pointing `talk.<YourDomain>.com` at your server
 - A reverse proxy entry for the signaling server (port `8081`)
 - If behind NAT: your public WAN IP (run `curl -4 https://icanhazip.com` on the server)
@@ -172,12 +173,27 @@ general: {
     plugins_folder = "/usr/local/lib/janus/plugins"
     transports_folder = "/usr/local/lib/janus/transports"
     events_folder = "/usr/local/lib/janus/events"
+    loggers_folder = "/usr/local/lib/janus/loggers"
     log_to_stdout = true
     debug_level = 4
 }
 
+nat: {
+    # 1:1 NAT mapping — public WAN IP so Janus advertises the correct ICE candidates
+    # Get your WAN IP with: curl -s -4 https://ifconfig.me
+    nat_1_1_mapping = "<WAN_IP>"
+    ice_ignore_list = "vmnet"
+}
+
+media: {
+    # Constrain Janus media ports so they can be port-forwarded on the router
+    rtp_port_range = "10000-20000"
+}
+
 events: {
     broadcast = true
+    # disable unused event handlers to suppress FATAL log spam at startup
+    disable = "libjanus_sampleevh.so,libjanus_gelfevh.so"
 }
 ```
 
@@ -338,9 +354,10 @@ services:
 ```
 
 :::warning[Port Exposure]
-With `network_mode: host` the containers bind directly to the host network — no Docker port mapping is needed. You still need the following open on the host firewall:
-- Port `3478` UDP **and** TCP — must be reachable from the public internet for TURN relay
-- Ports `10000–20000` UDP — must be open for Janus WebRTC media relay
+With `network_mode: host` the containers bind directly to the host network — no Docker port mapping is needed. You still need the following open on the host firewall **and port-forwarded on your router**:
+- Port `3478` UDP **and** TCP — coturn STUN/TURN
+- Ports `10000–20000` UDP — Janus WebRTC media
+- Ports `49152–65535` UDP — coturn TURN relay (used when direct WebRTC to Janus fails)
 - Port `8081` TCP — only needs to be reachable by your reverse proxy
 :::
 
