@@ -102,11 +102,19 @@ no-multicast-peers
 no-tls
 
 # Block relay to private/loopback/multicast ranges (prevents SSRF via TURN)
-denied-peer-ip=127.0.0.0-127.255.255.255
+denied-peer-ip=0.0.0.0-0.255.255.255
 denied-peer-ip=10.0.0.0-10.255.255.255
-denied-peer-ip=192.168.0.0-192.168.255.255
-denied-peer-ip=172.16.0.0-172.31.255.255
+denied-peer-ip=100.64.0.0-100.127.255.255
+denied-peer-ip=127.0.0.0-127.255.255.255
 denied-peer-ip=169.254.0.0-169.254.255.255
+denied-peer-ip=172.16.0.0-172.31.255.255
+denied-peer-ip=192.0.0.0-192.0.0.255
+denied-peer-ip=192.0.2.0-192.0.2.255
+denied-peer-ip=192.168.0.0-192.168.255.255
+denied-peer-ip=198.18.0.0-198.19.255.255
+denied-peer-ip=198.51.100.0-198.51.100.255
+denied-peer-ip=203.0.113.0-203.0.113.255
+denied-peer-ip=240.0.0.0-255.255.255.255
 ```
 
 :::tip[Logging]
@@ -188,6 +196,9 @@ nat: {
     # 1:1 NAT mapping — public WAN IP so Janus advertises the correct ICE candidates
     # Get your WAN IP with: curl -s -4 https://ifconfig.me
     nat_1_1_mapping = "<WAN_IP>"
+    # keep private IP in candidates too so LAN clients can connect directly
+    keep_private_host = true
+    full_trickle = true
     ice_ignore_list = "vmnet"
 }
 
@@ -213,7 +224,9 @@ general: {
     json = "indented"
     grouping = true
     # at minimum: handles, media, webrtc
-    events = "plugins,handles,media,webrtc"
+    events = "handles,media,webrtc"
+    # prevents memory runaway if signaling goes down and reconnects
+    events_cap_on_reconnect = 1000
     # points to the signaling server WebSocket endpoint on the host
     backend = "ws://localhost:8081/spreed"
     subprotocol = "janus-events"
