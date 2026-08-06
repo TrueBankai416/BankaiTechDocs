@@ -186,19 +186,16 @@ sudo docker logs talk
 
 You should see `eturnal`, `nats-server`, `nextcloud-spreed-signaling`, and `janus` all report as started.
 
-### Fix CSP for the signaling server
+### Allow Nextcloud to reach the signaling server
 
-Nextcloud's Content Security Policy will block connections to the HPB unless the talk domain is added to trusted proxies:
+If the signaling server is on the same host or a local network address, Nextcloud will refuse the outbound connection by default. Allow it with:
 
 ```bash
-docker exec -it -u 33 nextcloud php occ config:system:set trusted_proxies 2 --value="talk.<YourDomain>.com"
+docker exec -it -u 33 nextcloud php occ config:system:set allow_local_remote_servers --value=true --type=boolean
 ```
 
-:::note
-Adjust the index (`2`) if you already have other entries — it must be a unique number. Check existing entries with:
-```bash
-docker exec -it -u 33 nextcloud php occ config:system:get trusted_proxies
-```
+:::warning[`trusted_proxies`]
+Do **not** add the talk domain to `trusted_proxies`. That setting expects IP addresses (optionally in CIDR notation) and adding a hostname there will cause a "Forwarded for headers" error in your Nextcloud admin overview.
 :::
 
 ---
@@ -260,7 +257,7 @@ sudo docker logs -f talk
 | "TURN server is not accessible" warning | `TALK_PORT` blocked on firewall — open UDP **and** TCP |
 | Signaling config shows red in admin | Wrong `SIGNALING_SECRET` or reverse proxy not forwarding WebSocket `Upgrade` header |
 | `SKIP_CERT_VERIFY=false` errors in logs | Nextcloud's cert isn't trusted — set `SKIP_CERT_VERIFY=true` for self-signed setups |
-| "Error: Cannot connect to server" in admin | CSP blocking the HPB domain — run the `trusted_proxies` occ command above |
+| "Error: Cannot connect to server" in admin | Nextcloud blocking local outbound connection — run the `allow_local_remote_servers` occ command above |
 | Warning: missing features `chat-relay`, `changed-users` | Minor version mismatch between `aio-talk` and your Talk app — non-critical, calls work normally. Resolves when the image updates |
 
 <BuyMeACoffeeButton />
