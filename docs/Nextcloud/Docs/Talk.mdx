@@ -210,7 +210,8 @@ nat: {
     # keep private IP in candidates too so LAN clients can connect directly
     keep_private_host = true
     full_trickle = true
-    ice_ignore_list = "vmnet"
+    # docker0 and br-* are Docker bridge interfaces — exclude them from ICE candidates
+    ice_ignore_list = "vmnet;docker;br-"
 }
 
 media: {
