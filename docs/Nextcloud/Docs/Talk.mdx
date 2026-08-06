@@ -137,7 +137,7 @@ RUN cd /tmp && \
 # libsrtp
 ARG LIBSRTP_VERSION=2.6.0
 RUN cd /tmp && \
-    wget https://github.com/cisco/libsrtp/archive/v$LIBSRTP_VERSION.tar.gz && \
+    curl -L -o v$LIBSRTP_VERSION.tar.gz https://github.com/cisco/libsrtp/archive/v$LIBSRTP_VERSION.tar.gz && \
     tar xfv v$LIBSRTP_VERSION.tar.gz && \
     cd libsrtp-$LIBSRTP_VERSION && \
     ./configure --prefix=/usr --enable-openssl && \
@@ -310,7 +310,7 @@ Open your existing compose file:
 nano /opt/docker/nextcloud/docker-compose.yaml
 ```
 
-Add the four new services and update the `nextcloud` service network entry so it can reach the signaling server:
+Add the four new services:
 
 ```yaml title="Add to your existing docker-compose.yaml"
 services:
