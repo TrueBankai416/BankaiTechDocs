@@ -24,10 +24,10 @@ This guide sets up each component as its own Docker container, giving you full c
 
 | Container | Image | Role |
 |---|---|---|
-| `coturn` | `coturn/coturn:latest` | TURN/STUN server for NAT traversal |
-| `nats` | `nats:latest` | Internal message broker |
-| `janus` | `nextcloud/aio-janus:latest` | WebRTC media server (SFU/MCU) |
-| `signaling` | `ghcr.io/strukturag/nextcloud-spreed-signaling:latest` | WebRTC signaling server |
+| `coturn` | `coturn/coturn:4.17` | TURN/STUN server for NAT traversal |
+| `nats` | `nats:2.10` | Internal message broker |
+| `janus` | built from strukturag Dockerfile | WebRTC media server (SFU/MCU) |
+| `signaling` | `strukturag/nextcloud-spreed-signaling:latest` | WebRTC signaling server |
 
 :::note[Prerequisites]
 - A working Nextcloud Docker install (any install method)
