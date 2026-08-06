@@ -572,5 +572,7 @@ The federated participant's Nextcloud instance only needs the **Talk** app insta
 | Janus container exits immediately | Check `docker logs janus` — may need the `SHM_SIZE` environment variable on low-memory hosts |
 | ICE candidates use wrong public IP | Hardcode `external-ip=<WAN_IP>/<LAN_IP>` and `relay-ip=<LAN_IP>` in `turnserver.conf` — env-var auto-detection does not work behind NAT |
 | `ERROR -X : Wrong address format` on coturn startup | The default Docker CMD includes `--external-ip=$(detect-external-ip)` which runs `dig` and returns EDNS text — override it with `command: ["--log-file=stdout"]` in the compose service. `external-ip` in `turnserver.conf` takes effect without the CLI flag |
+| Federated call is one-way — remote can see/hear you but you cannot see/hear them | The remote participant's Nextcloud instance has no TURN server configured. Their phone only sends host/srflx candidates which fail across NAT, so their publish stream never reaches your Janus. Ask them to configure TURN in their Nextcloud Talk admin settings |
+| `no_such_room: The user is not invited to this room.` in signaling logs | Federated user attempted to join without a Talk federation invite — the host must send a federation invite through the Talk app and the remote user must accept before connecting |
 
 <BuyMeACoffeeButton />
