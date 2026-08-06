@@ -111,10 +111,12 @@ denied-peer-ip=169.254.0.0-169.254.255.255
 denied-peer-ip=172.16.0.0-172.31.255.255
 denied-peer-ip=192.0.0.0-192.0.0.255
 denied-peer-ip=192.0.2.0-192.0.2.255
+denied-peer-ip=192.88.99.0-192.88.99.255
 denied-peer-ip=192.168.0.0-192.168.255.255
 denied-peer-ip=198.18.0.0-198.19.255.255
 denied-peer-ip=198.51.100.0-198.51.100.255
 denied-peer-ip=203.0.113.0-203.0.113.255
+denied-peer-ip=224.0.0.0-239.255.255.255
 denied-peer-ip=240.0.0.0-255.255.255.255
 ```
 
@@ -184,7 +186,7 @@ WORKDIR /usr/src/janus/janus-gateway-$JANUS_VERSION
 CMD [ "janus", "--full-trickle" ]
 ```
 
-The signaling server requires Janus to broadcast events over WebSocket. Create the two required config overrides:
+The signaling server requires Janus to broadcast events over WebSocket. Create the three required config overrides:
 
 ```bash
 nano /opt/docker/nextcloud/janus/janus.jcfg
