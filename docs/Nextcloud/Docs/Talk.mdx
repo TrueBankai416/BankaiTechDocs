@@ -1,13 +1,15 @@
 ---
 title: Talk High Performance Backend
-description: Set up Nextcloud Talk High Performance Backend (HPB) using nextcloud/aio-talk, including the signaling server, TURN server, and Nextcloud Talk configuration.
+description: Set up Nextcloud Talk High Performance Backend (HPB) using individual Docker services — coturn, NATS, Janus, and nextcloud-spreed-signaling.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 5
-tags: [Docker, Docker Compose, Tutorial, Nextcloud, Nextcloud Talk, TURN, HPB]
-keywords: [Docker, Nextcloud Talk, HPB, High Performance Backend, TURN, Signaling, aio-talk]
+tags: [Docker, Docker Compose, Tutorial, Nextcloud, Nextcloud Talk, TURN, HPB, coturn, NATS, Janus]
+keywords: [Docker, Nextcloud Talk, HPB, High Performance Backend, TURN, coturn, NATS, Janus, nextcloud-spreed-signaling]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-06
+    note: "refactor(docs): migrate from aio-talk to manual component setup"
   - date: 2026-08-05
     note: "feat(docs): add Nextcloud Talk HPB documentation"
 ---
@@ -16,19 +18,24 @@ import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
 ## **Nextcloud Talk High Performance Backend**
 
-The `nextcloud/aio-talk` image bundles everything needed for a full Talk HPB:
-- **eturnal** — TURN/STUN server for NAT traversal
-- **nextcloud-spreed-signaling** — WebRTC signaling server
-- **Janus** — WebRTC media server (MCU/SFU)
-- **NATS** — internal message broker
-
 Without the HPB, Nextcloud Talk is peer-to-peer and degrades significantly with more than 4–5 participants. The HPB routes all media through the server, enabling reliable calls at scale.
+
+This guide sets up each component as its own Docker container, giving you full control over versions, configuration, and logging:
+
+| Container | Image | Role |
+|---|---|---|
+| `coturn` | `coturn/coturn:latest` | TURN/STUN server for NAT traversal |
+| `nats` | `nats:latest` | Internal message broker |
+| `janus` | `nextcloud/aio-janus:latest` | WebRTC media server (SFU/MCU) |
+| `signaling` | `ghcr.io/strukturag/nextcloud-spreed-signaling:latest` | WebRTC signaling server |
 
 :::note[Prerequisites]
 - A working Nextcloud Docker install (any install method)
-- Ports **`TALK_PORT`** (default `3478`) open on your firewall **and port-forwarded on your router** for **UDP and TCP**
+- Port **`3478`** open on your firewall **and port-forwarded on your router** for **UDP and TCP**
+- Ports **`10000–20000` UDP** open on your firewall for Janus WebRTC media relay
 - A DNS `A` record pointing `talk.<YourDomain>.com` at your server
 - A reverse proxy entry for the signaling server (port `8081`)
+- If behind NAT: your public WAN IP (run `curl -4 https://icanhazip.com` on the server)
 :::
 
 :::warning[Cloudflare Users]
@@ -44,51 +51,242 @@ Because both services share the same subdomain, the entire record must be grey-c
 
 ---
 
-## **Updating the .env File**
+## **Directory Structure**
 
-Open your existing `.env` file:
+Create the config directories alongside your existing Nextcloud compose directory:
 
 ```bash
-nano /opt/docker/nextcloud/.env
+mkdir -p /opt/docker/nextcloud/coturn
+mkdir -p /opt/docker/nextcloud/janus
+mkdir -p /opt/docker/nextcloud/signaling
 ```
 
-Add the following block:
+---
 
-:::warning[warning]
-When editing the configuration below, remove all instances of `<>` from the values
-:::
+## **coturn Configuration**
 
-```editorconfig title="Highlighted items will need to be modified" showLineNumbers
-# Talk HPB (aio-talk)
-// highlight-start
-NC_DOMAIN=cloud.<YourDomain>.com
-TALK_DOMAIN=talk.<YourDomain>.com
-TURN_SECRET=CHANGEME_RANDOM_SECRET
-SIGNALING_SECRET=CHANGEME_RANDOM_SECRET
-INTERNAL_SECRET=CHANGEME_RANDOM_SECRET
-// highlight-end
-TALK_PORT=3478
-SKIP_CERT_VERIFY=false
-AIO_LOG_LEVEL=warn
-TALK_MAX_STREAM_BITRATE=1048576
-TALK_MAX_SCREEN_BITRATE=2097152
-```
+Create the coturn config file:
 
-:::tip
-Generate strong secrets with:
 ```bash
-openssl rand -hex 32
+nano /opt/docker/nextcloud/coturn/turnserver.conf
 ```
-Run it three times — once each for `TURN_SECRET`, `SIGNALING_SECRET`, and `INTERNAL_SECRET`.
-:::
 
-:::info[NC_DOMAIN]
-`NC_DOMAIN` must be the bare domain **without** a protocol prefix (e.g. `cloud.yourdomain.com`, not `https://cloud.yourdomain.com`).
+```ini title="/opt/docker/nextcloud/coturn/turnserver.conf — highlighted items will need to be modified" showLineNumbers
+listening-port=3478
+fingerprint
+use-auth-secret
+// highlight-next-line
+static-auth-secret=CHANGEME_TURN_SECRET
+// highlight-next-line
+realm=talk.<YourDomain>.com
+# Required for NAT — maps public WAN IP to the server's LAN IP
+# Get your WAN IP with: curl -s -4 https://ifconfig.me
+# WARNING: paste ONLY the bare IP — some DNS resolvers append "edns0-client-subnet ..." text
+// highlight-next-line
+external-ip=<WAN_IP>/<LAN_IP>
+// highlight-next-line
+relay-ip=<LAN_IP>
+min-port=49152
+max-port=65535
+total-quota=100
+stale-nonce=600
+no-multicast-peers
+# Disable TLS; DTLS is already off by default in coturn 4.17+
+no-tls
+
+# Block relay to private/loopback/multicast ranges (prevents SSRF via TURN)
+denied-peer-ip=127.0.0.0-127.255.255.255
+denied-peer-ip=10.0.0.0-10.255.255.255
+denied-peer-ip=192.168.0.0-192.168.255.255
+denied-peer-ip=172.16.0.0-172.31.255.255
+denied-peer-ip=169.254.0.0-169.254.255.255
+```
+
+:::tip[Logging]
+Add `verbose` on its own line to enable detailed coturn logs during initial testing. Remove it once everything is working.
 :::
 
 ---
 
-## **Adding the talk Service to docker-compose.yaml**
+## **Janus Configuration**
+
+No maintained pre-built Janus image is available for Nextcloud Talk — Janus must be built from source. Create a `Dockerfile` that compiles it with the required plugins:
+
+```bash
+nano /opt/docker/nextcloud/janus/Dockerfile
+```
+
+```dockerfile title="/opt/docker/nextcloud/janus/Dockerfile"
+FROM alpine:3
+
+RUN apk add --no-cache curl autoconf automake libtool pkgconf build-base \
+  glib-dev libconfig-dev libnice-dev jansson-dev openssl-dev zlib libsrtp-dev \
+  gengetopt libwebsockets-dev git curl-dev libogg-dev
+
+# usrsctp
+ARG USRSCTP_VERSION=b28f0b55b00bde67f6be80d6623e2775b88026b8
+RUN cd /tmp && \
+    git clone https://github.com/sctplab/usrsctp && \
+    cd usrsctp && \
+    git checkout $USRSCTP_VERSION && \
+    ./bootstrap && \
+    ./configure --prefix=/usr && \
+    make -j$(nproc) && make install
+
+# libsrtp
+ARG LIBSRTP_VERSION=2.6.0
+RUN cd /tmp && \
+    wget https://github.com/cisco/libsrtp/archive/v$LIBSRTP_VERSION.tar.gz && \
+    tar xfv v$LIBSRTP_VERSION.tar.gz && \
+    cd libsrtp-$LIBSRTP_VERSION && \
+    ./configure --prefix=/usr --enable-openssl && \
+    make shared_library -j$(nproc) && \
+    make install
+
+# Janus
+ARG JANUS_VERSION=1.3.0
+RUN mkdir -p /usr/src/janus && \
+    cd /usr/src/janus && \
+    curl -L https://github.com/meetecho/janus-gateway/archive/v$JANUS_VERSION.tar.gz | tar -xz && \
+    cd /usr/src/janus/janus-gateway-$JANUS_VERSION && \
+    ./autogen.sh && \
+    ./configure --disable-rabbitmq --disable-mqtt --disable-boringssl && \
+    make -j$(nproc) && \
+    make install && \
+    make configs
+
+WORKDIR /usr/src/janus/janus-gateway-$JANUS_VERSION
+
+CMD [ "janus", "--full-trickle" ]
+```
+
+The signaling server requires Janus to broadcast events over WebSocket. Create the two required config overrides:
+
+```bash
+nano /opt/docker/nextcloud/janus/janus.jcfg
+```
+
+```hcl title="/opt/docker/nextcloud/janus/janus.jcfg"
+general: {
+    configs_folder = "/usr/local/etc/janus"
+    plugins_folder = "/usr/local/lib/janus/plugins"
+    transports_folder = "/usr/local/lib/janus/transports"
+    events_folder = "/usr/local/lib/janus/events"
+    log_to_stdout = true
+    debug_level = 4
+}
+
+events: {
+    broadcast = true
+}
+```
+
+```bash
+nano /opt/docker/nextcloud/janus/janus.eventhandler.wsevh.jcfg
+```
+
+```hcl title="/opt/docker/nextcloud/janus/janus.eventhandler.wsevh.jcfg" showLineNumbers
+general: {
+    enabled = true
+    json = "indented"
+    grouping = true
+    # at minimum: handles, media, webrtc
+    events = "plugins,handles,media,webrtc"
+    # points to the signaling server WebSocket endpoint on the host
+    backend = "ws://localhost:8081/spreed"
+    subprotocol = "janus-events"
+}
+```
+
+---
+
+## **Signaling Server Configuration**
+
+Create the signaling server config file:
+
+```bash
+nano /opt/docker/nextcloud/signaling/server.conf
+```
+
+```ini title="/opt/docker/nextcloud/signaling/server.conf — highlighted items will need to be modified" showLineNumbers
+[http]
+listen = 0.0.0.0:8081
+
+[app]
+debug = false
+
+[sessions]
+// highlight-start
+hashkey = CHANGEME_HASH_KEY
+blockkey = CHANGEME_BLOCK_KEY
+// highlight-end
+
+[clients]
+// highlight-next-line
+internalsecret = CHANGEME_INTERNAL_SECRET
+
+[backend]
+backends = nextcloud
+// highlight-next-line
+secret = CHANGEME_SIGNALING_SECRET
+timeout = 10
+connectionsperhost = 8
+
+[nextcloud]
+// highlight-next-line
+urls = https://cloud.<YourDomain>.com
+// highlight-next-line
+secret = CHANGEME_SIGNALING_SECRET
+skipverify = false
+
+[nats]
+# all services run on host network — use localhost for all internal connections
+url = nats://localhost:4222
+
+[mcu]
+type = janus
+url = ws://localhost:8188
+# 1 Mbps / 2 Mbps — matches upstream defaults
+maxstreambitrate = 1048576
+maxscreenbitrate = 2097152
+
+[turn]
+// highlight-start
+apikey = CHANGEME_TURN_API_KEY
+secret = CHANGEME_TURN_SECRET
+// highlight-end
+// highlight-next-line
+servers = turn:localhost:3478?transport=udp,turn:localhost:3478?transport=tcp
+```
+
+:::tip[Generating secrets]
+Run `openssl rand -hex 32` once per placeholder — each call produces a unique 64-character hex string (32 bytes):
+```bash
+openssl rand -hex 32    # → secret (global + backend)
+openssl rand -hex 32    # → internalsecret
+openssl rand -hex 32    # → TURN_API_KEY
+openssl rand -hex 32    # → hashkey  (32 or 64 bytes both valid)
+openssl rand -base64 24 # → blockkey (must be 16/24/32 bytes — base64-24 = exactly 32 chars)
+```
+- `TURN_SECRET` — must match `static-auth-secret` in `turnserver.conf`
+- `TURN_API_KEY` — arbitrary key clients use to request temporary TURN credentials from the signaling server
+- `SIGNALING_SECRET` — set the same value in both `[backend]` → `secret` and `[nextcloud]` → `secret`; must match the shared secret in the Nextcloud Talk admin UI
+- `blockkey` — AES session encryption key; strictly limited to 16, 24, or 32 bytes
+:::
+
+:::info[`skipverify`]
+Set `skipverify = true` only if your Nextcloud instance uses a self-signed certificate.
+:::
+
+---
+
+## **Updating the .env File**
+
+No extra environment variables are required for these containers — all configuration is handled via the mounted config files above. You only need to ensure your existing `.env` is present for the `nextcloud` service.
+
+---
+
+## **Adding Services to docker-compose.yaml**
 
 Open your existing compose file:
 
@@ -96,33 +294,54 @@ Open your existing compose file:
 nano /opt/docker/nextcloud/docker-compose.yaml
 ```
 
-Add the `talk` service and update the `nextcloud` service `links`:
+Add the four new services and update the `nextcloud` service network entry so it can reach the signaling server:
 
-```yaml title="Add the talk service alongside your existing services"
+```yaml title="Add to your existing docker-compose.yaml"
 services:
 
-  # --- add to the links list of the nextcloud service ---
-  nextcloud:
-    links:
-      - talk          # add this line
+  # all HPB services use host networking — no port mappings needed
+  coturn:
+    image: coturn/coturn:4.17
+    container_name: coturn
+    restart: unless-stopped
+    # Override CMD to drop the built-in detect-external-ip call; external-ip is hardcoded in turnserver.conf
+    command: ["--log-file=stdout"]
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    network_mode: host
 
-  # --- new service ---
-  talk:
-    image: nextcloud/aio-talk:latest
-    container_name: talk
-    restart: always
-    ports:
-      - ${TALK_PORT:-3478}:${TALK_PORT:-3478}/udp
-      - ${TALK_PORT:-3478}:${TALK_PORT:-3478}/tcp
-      - 8081:8081
-    env_file:
-      - .env
-    networks:
-      - nextcloud
+  nats:
+    image: nats:2.10
+    container_name: nats
+    restart: unless-stopped
+    network_mode: host
+
+  janus:
+    build: ./janus
+    container_name: janus
+    restart: unless-stopped
+    volumes:
+      - ./janus/janus.jcfg:/usr/local/etc/janus/janus.jcfg:ro
+      - ./janus/janus.eventhandler.wsevh.jcfg:/usr/local/etc/janus/janus.eventhandler.wsevh.jcfg:ro
+    network_mode: host
+
+  signaling:
+    image: strukturag/nextcloud-spreed-signaling:latest
+    container_name: signaling
+    restart: unless-stopped
+    volumes:
+      - ./signaling/server.conf:/config/server.conf:ro
+    depends_on:
+      - nats
+      - janus
+    network_mode: host
 ```
 
 :::warning[Port Exposure]
-`TALK_PORT` (UDP **and** TCP) must be reachable from the public internet — clients use it for TURN relay. Port `8081` only needs to be reachable by your reverse proxy.
+With `network_mode: host` the containers bind directly to the host network — no Docker port mapping is needed. You still need the following open on the host firewall:
+- Port `3478` UDP **and** TCP — must be reachable from the public internet for TURN relay
+- Ports `10000–20000` UDP — must be open for Janus WebRTC media relay
+- Port `8081` TCP — only needs to be reachable by your reverse proxy
 :::
 
 ---
@@ -171,31 +390,38 @@ server {
 
 ---
 
-## **Starting the talk Container**
+## **Starting the Containers**
 
 ```bash
 cd /opt/docker/nextcloud
-sudo docker compose up -d talk
+sudo docker compose up -d coturn nats janus signaling
 ```
 
-Verify it started cleanly:
+:::note
+The first run will take several minutes — Docker builds Janus from source before starting it.
+:::
+
+Verify each container started cleanly:
 
 ```bash
-sudo docker logs talk
+sudo docker logs coturn
+sudo docker logs nats
+sudo docker logs janus
+sudo docker logs signaling
 ```
 
-You should see `eturnal`, `nats-server`, `nextcloud-spreed-signaling`, and `janus` all report as started.
+The signaling server log should contain a line like `Started serving on 0.0.0.0:8081`.
 
 ### Allow Nextcloud to reach the signaling server
 
-If the signaling server is on the same host or a local network address, Nextcloud will refuse the outbound connection by default. Allow it with:
+If your signaling server is on the same host or a private network address, Nextcloud will refuse the outbound connection by default. Allow it with:
 
 ```bash
 docker exec -it -u 33 nextcloud php occ config:system:set allow_local_remote_servers --value=true --type=boolean
 ```
 
 :::warning[`trusted_proxies`]
-Do **not** add the talk domain to `trusted_proxies`. That setting expects IP addresses (optionally in CIDR notation) and adding a hostname there will cause a "Forwarded for headers" error in your Nextcloud admin overview.
+Do **not** add the talk domain to `trusted_proxies`. That setting expects IP addresses (optionally in CIDR notation) — adding a hostname causes a "Forwarded for headers" error in your Nextcloud admin overview.
 :::
 
 ---
@@ -219,7 +445,7 @@ Click **Add a new TURN server** and fill in:
 | Field | Value |
 |---|---|
 | Server | `talk.<YourDomain>.com:3478` |
-| Secret | your `TURN_SECRET` value |
+| Secret | your `TURN_SECRET` value (matches `static-auth-secret` in `turnserver.conf`) |
 | Protocol | `UDP and TCP` |
 
 ### High-Performance Backend (Signaling)
@@ -229,7 +455,7 @@ Click **Add High-performance backend server** and fill in:
 | Field | Value |
 |---|---|
 | High-performance backend URL | `https://talk.<YourDomain>.com` |
-| Shared secret | your `SIGNALING_SECRET` value |
+| Shared secret | your `SIGNALING_SECRET` value (matches `secret` in `server.conf`) |
 
 Leave **Validate SSL certificate** checked for production.
 
@@ -239,13 +465,15 @@ Click **Save** after each section.
 
 ## **Testing**
 
-Open a Talk call with another user. In your browser's developer console (Network tab), you should see WebSocket connections to `wss://talk.<YourDomain>.com` and ICE candidates using your server's IP rather than direct peer-to-peer paths.
+Open a Talk call with another user. In your browser's developer console (Network tab), you should see WebSocket connections to `wss://talk.<YourDomain>.com` and ICE candidates using your server's public IP rather than direct peer-to-peer paths.
 
-You can also verify TURN is working by checking the talk container logs during a call:
+Verify TURN is working by watching the coturn log during a call:
 
 ```bash
-sudo docker logs -f talk
+sudo docker logs -f coturn
 ```
+
+You should see allocation and permission lines as clients connect through the relay.
 
 ---
 
@@ -254,10 +482,16 @@ sudo docker logs -f talk
 | Symptom | Likely Cause |
 |---|---|
 | Calls drop with 3+ participants | Signaling server not reachable — check Nginx WebSocket config |
-| "TURN server is not accessible" warning | `TALK_PORT` blocked on firewall — open UDP **and** TCP |
+| "TURN server is not accessible" warning | Port `3478` blocked on firewall — open UDP **and** TCP |
 | Signaling config shows red in admin | Wrong `SIGNALING_SECRET` or reverse proxy not forwarding WebSocket `Upgrade` header |
-| `SKIP_CERT_VERIFY=false` errors in logs | Nextcloud's cert isn't trusted — set `SKIP_CERT_VERIFY=true` for self-signed setups |
 | "Error: Cannot connect to server" in admin | Nextcloud blocking local outbound connection — run the `allow_local_remote_servers` occ command above |
-| Warning: missing features `chat-relay`, `changed-users` | Minor version mismatch between `aio-talk` and your Talk app — non-critical, calls work normally. Resolves when the image updates |
+| coturn logs show `ERROR: cannot bind to IP` | coturn trying to bind to a public IP not present on the interface — remove `listening-ip` if set |
+| Signaling container exits immediately | Malformed `server.conf` — check indentation and that all `CHANGEME_` values are replaced |
+| `lookup nats on ...: no such host` in signaling logs | `server.conf` still uses `nats://nats:4222` — change to `nats://localhost:4222` (host network has no Docker DNS) |
+| `sessions block key must be 16, 24 or 32 bytes but is 64 bytes` | `hashkey`/`blockkey` were set with `openssl rand -hex 32` (64 chars) — regenerate with `openssl rand -base64 24` (32 chars) |
+| `invalid_backend` / "The backend URL is not supported" in Nextcloud Talk admin | Backend section is named `[backend "nextcloud"]` instead of `[nextcloud]`, or `url =` is used instead of `urls =` — fix both in `server.conf` and restart |
+| Janus container exits immediately | Check `docker logs janus` — may need the `SHM_SIZE` environment variable on low-memory hosts |
+| ICE candidates use wrong public IP | Hardcode `external-ip=<WAN_IP>/<LAN_IP>` and `relay-ip=<LAN_IP>` in `turnserver.conf` — env-var auto-detection does not work behind NAT |
+| `ERROR -X : Wrong address format` on coturn startup | The default Docker CMD includes `--external-ip=$(detect-external-ip)` which runs `dig` and returns EDNS text — override it with `command: ["--log-file=stdout"]` in the compose service. `external-ip` in `turnserver.conf` takes effect without the CLI flag |
 
 <BuyMeACoffeeButton />
