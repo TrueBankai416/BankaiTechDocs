@@ -106,6 +106,26 @@ services:
           memory: 4G
 ```
 
+You can also set `memswap_limit` and `mem_swappiness` at the **top level of the service** (not under `deploy`) to cap swap usage per container and reduce how aggressively it swaps:
+
+```yaml title="docker-compose.yaml"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    # ... other config ...
+    # top-level service options (not under deploy)
+    memswap_limit: 6G   # Total RAM + SWAP the container may use; set equal to mem_limit to disable swap entirely
+    mem_swappiness: 0   # 0 = never swap; 100 = swap aggressively
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+```
+
+:::note
+`memswap_limit` and `mem_swappiness` require the `--compatibility` flag or Docker Swarm mode to be respected in some older Compose versions. In modern Compose V2 they are applied directly.
+:::
+
 Apply the changes:
 
 ```bash
