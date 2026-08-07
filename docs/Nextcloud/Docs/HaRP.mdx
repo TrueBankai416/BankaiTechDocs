@@ -90,6 +90,8 @@ Add the `appapi-harp` service to the existing `services:` block:
     ports:
       - "8780:8780"   # ExApps HTTP frontend (reverse proxy → HaRP)
       - "8782:8782"   # FRP TCP frontend (ExApp containers → HaRP)
+    networks:
+      - nextcloud
     restart: unless-stopped
 ```
 
