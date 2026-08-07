@@ -9,7 +9,11 @@ last_update:
   author: BankaiTech
 updates:
   - date: 2026-08-07
-    note: "Rewrite backup script: auto-load config from .env, add descriptive per-step error messages with diagnostic hints, validate containers before starting"
+    note: "fix(nextcloud-backup): address Copilot review - strip .env quotes, grep -E portability, cleanup staging on container failure, check maintenance mode --off"
+  - date: 2026-08-07
+    note: "fix(nextcloud-backup): use fuzzy container lookup to handle Docker Compose project-name prefixes"
+  - date: 2026-08-07
+    note: "docs(nextcloud): rewrite backup script with .env auto-detection and descriptive error messages"
   - date: 2025-07-23
     note: "Add comprehensive Nextcloud backup documentation"
 ---
