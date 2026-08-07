@@ -1,6 +1,6 @@
 ---
 title: HaRP (AppAPI Reverse Proxy)
-description: Set up Nextcloud HaRP (HAProxy Reversed Proxy) to enable direct ExApp communication and replace DockerSocketProxy for Nextcloud 32+ AppAPI.
+description: Set up Nextcloud HaRP (HAProxy Reverse Proxy) to enable direct ExApp communication and replace DockerSocketProxy for Nextcloud 32+ AppAPI.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 7
 tags: [Docker, Docker Compose, Tutorial, Nextcloud, AppAPI, HaRP, ExApps]
@@ -14,7 +14,7 @@ updates:
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-## **Nextcloud AppAPI HaProxy Reversed Proxy (HaRP)**
+## **Nextcloud AppAPI HAProxy Reverse Proxy (HaRP)**
 
 HaRP is a reverse proxy container for Nextcloud 32's **AppAPI**. It routes client requests directly to ExApps (AI assistants, Memories, Office extensions, etc.), bypassing the Nextcloud PHP process. This improves performance, simplifies the deployment compared to the old `DockerSocketProxy` setup, and adds built-in brute-force protection.
 
@@ -22,7 +22,8 @@ HaRP is a reverse proxy container for Nextcloud 32's **AppAPI**. It routes clien
 - A working Nextcloud install following the [Complete Install](./Installation/Complete.mdx) or [Memories Install](./Installation/Memories.mdx) guide
 - **Nextcloud 32 or later**
 - The **AppAPI** app installed and enabled in Nextcloud (`Apps` → search *AppAPI* → Enable)
-- Port **`8780`** and **`8782`** open on your firewall and reachable by your reverse proxy
+- Port **`8780`** open on your firewall and reachable by your reverse proxy
+- Port **`8782`** open on your firewall and reachable by ExApp containers (FRP TCP)
 :::
 
 ---
@@ -153,29 +154,38 @@ sudo nginx -t && sudo nginx -s reload
 | Daemon name | `appapi-harp` |
 | Display name | `appapi-harp` |
 | Deployment method | `docker-install` |
-| HaRP host | `127.0.0.1:8780` |
+| HaRP host | `appapi-harp:8780` |
 | HaRP shared key | *(your `HP_SHARED_KEY` value)* |
 | Nextcloud URL | `https://cloud.example.com` |
-| FRP server address | `127.0.0.1:8782` |
-| Docker network | `bridge` |
+| FRP server address | `appapi-harp:8782` |
+| Docker network | `nextcloud` |
 
 3. Click **Test Deploy** (three-dots menu on the daemon) to confirm the connection.
 
 :::tip
-If HaRP is running on a separate host from Nextcloud, replace `127.0.0.1` with the actual IP address of the HaRP host.
+Since HaRP is on the same `nextcloud` Docker network, use the service name `appapi-harp` rather than `127.0.0.1`. If HaRP is on a separate host, replace it with that host's IP.
 :::
 
 ---
 
 ## **Verifying the Setup**
 
-Run the following from the host to confirm NGINX → HaRP → Docker connectivity:
+**Direct HaRP check** (from the host, bypasses NGINX):
 
 ```bash
 curl -fsS \
   -H "harp-shared-key: YOUR_HP_SHARED_KEY" \
   -H "docker-engine-port: 24000" \
   http://127.0.0.1:8780/exapps/app_api/v1.44/_ping
+```
+
+**Full-stack check** (from any machine, tests NGINX → HaRP → Docker):
+
+```bash
+curl -fsS \
+  -H "harp-shared-key: YOUR_HP_SHARED_KEY" \
+  -H "docker-engine-port: 24000" \
+  https://cloud.example.com/exapps/app_api/v1.44/_ping
 ```
 
 Expected response: `OK`
