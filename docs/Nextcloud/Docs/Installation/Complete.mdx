@@ -119,7 +119,8 @@ NEXTCLOUD_HOST=https://cloud.example.com
 NEXTCLOUD_ALLOW_INSECURE=1 # (self-signed certs or no HTTPS)
 NVIDIA_VISIBLE_DEVICES=all
 # Notify Push
-NEXTCLOUD_URL=http://localhost:80
+// highlight-next-line
+NEXTCLOUD_URL=https://cloud.example.com
 # Collabora
 // highlight-start
 username=admin
@@ -432,11 +433,20 @@ Make sure to set `Groups` to `admin`
 
 `notify_push` is included in the `bankaitech/nextcloud` image and provides instant client push notifications for real-time file sync.
 
-After starting the containers, run the following command to add `127.0.0.1` to your trusted proxies to avoid CSP issues:
+After starting the containers, run the following commands:
 
+Add `127.0.0.1` to your trusted proxies to avoid CSP issues:
 ```bash
 docker exec -it -u 33 nextcloud php occ config:system:set trusted_proxies 1 --value="127.0.0.1"
 ```
+
+Then register your domain with the push server so clients connect to the correct endpoint:
+```bash
+sudo docker exec -u www-data nextcloud php occ notify_push:setup https://cloud.example.com/push
+```
+:::info
+Replace `cloud.example.com` with your actual Nextcloud domain. Without this step, clients will attempt to connect to `ws://localhost:7867/ws` and fail.
+:::
 
 ## **Setting up Nextcloud Office (Collabora Code)**
 

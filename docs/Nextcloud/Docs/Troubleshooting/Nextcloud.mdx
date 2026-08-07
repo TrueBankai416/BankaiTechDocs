@@ -1,6 +1,6 @@
 ---
 title: Nextcloud
-description: Common Nextcloud troubleshooting solutions including untrusted domain errors, missing database indexes, and configuration fixes.
+description: Common Nextcloud troubleshooting solutions including untrusted domain errors, missing database indexes, WebSocket notify_push errors, and configuration fixes.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 1
 tags: [Docker, Nextcloud, Tutorial, Troubleshooting]
@@ -8,6 +8,8 @@ keywords: [Docker, Docker Engine, Tutorial, Nextcloud, Troubleshooting]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "Add troubleshooting section for WebSocket connection error caused by misconfigured notify_push app"
   - date: 2026-01-02
     note: "Add troubleshooting section for upstream timeout errors during large file uploads/downloads in Nextcloud"
 ---
@@ -146,6 +148,24 @@ If you continue to experience issues, you may also need to increase timeout valu
 - `proxy_read_timeout`
 - `proxy_connect_timeout`
 - `proxy_send_timeout`
+:::
+
+### **_WebSocket Connection Error (notify_push)_**
+
+<p>
+<>If you see the following error in the browser console:</>
+</p>
+```
+Firefox can't establish a connection to the server at ws://localhost:7867/ws.
+```
+<p>
+<>This is caused by the `notify_push` setup command never being run, so clients default to connecting directly to `localhost:7867`. A secondary cause is having `NEXTCLOUD_URL=http://localhost:80` in your `.env` file — this should be your actual domain URL. Run the following command to register the correct push endpoint:</>
+</p>
+```bash
+sudo docker exec -u www-data nextcloud php occ notify_push:setup https://your-domain.com/push
+```
+:::info
+Replace `your-domain.com` with your actual Nextcloud domain (e.g. `cloud.bankai-tech.com`).
 :::
 
 ## **Example Files**
