@@ -8,6 +8,8 @@ keywords: [Docker, Backup, Recovery, MariaDB, Nextcloud, Data Protection]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "Rewrite backup script: auto-load config from .env, add descriptive per-step error messages with diagnostic hints, validate containers before starting"
   - date: 2025-07-23
     note: "Add comprehensive Nextcloud backup documentation"
 ---
@@ -73,122 +75,203 @@ Create a comprehensive backup script for Docker installations:
 #!/bin/bash
 
 # Nextcloud Docker Backup Script
-# Make sure to modify the variables below for your setup
 
-# Configuration
+# ── Static paths ───────────────────────────────────────────────────────────────
 BACKUP_DIR="/backup/nextcloud"
-NEXTCLOUD_DIR="/var/docker/nextcloud"
-CONTAINER_NAME="nextcloud"
-DB_CONTAINER_NAME="mariadb"
-DB_NAME="nextcloud"
-DB_USER="nextcloud"
-DB_PASSWORD="YOUR_PASSWORD_FROM_ENV"
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_NAME="nextcloud_backup_${DATE}"
+NEXTCLOUD_DIR="/opt/docker/nextcloud"   # folder containing docker-compose.yaml and .env
 RETENTION_DAYS=30
 
-# Colors for output
+# ── Colors ─────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# ── Load .env if present ───────────────────────────────────────────────────────
+ENV_FILE="${NEXTCLOUD_DIR}/.env"
+if [ -f "${ENV_FILE}" ]; then
+    echo -e "${CYAN}Loading configuration from ${ENV_FILE}${NC}"
+    # shellcheck source=/dev/null
+    set -a; source "${ENV_FILE}"; set +a
+else
+    echo -e "${YELLOW}No .env found at ${ENV_FILE} — using built-in defaults${NC}"
+fi
+
+# ── Resolve config (env file values take priority, then hardcoded fallbacks) ────
+CONTAINER_NAME="${CONTAINER_NAME:-nextcloud}"
+DB_CONTAINER_NAME="${DB_CONTAINER_NAME:-mariadb}"
+DB_NAME="${MYSQL_DATABASE:-${DB_NAME:-nextcloud}}"
+DB_USER="${MYSQL_USER:-${DB_USER:-nextcloud}}"
+DB_PASSWORD="${MYSQL_PASSWORD:-${DB_PASSWORD:-}}"
+
+echo -e "${CYAN}Using config:${NC}"
+echo "  Nextcloud dir    : ${NEXTCLOUD_DIR}"
+echo "  Nextcloud container: ${CONTAINER_NAME}"
+echo "  DB container     : ${DB_CONTAINER_NAME}"
+echo "  DB name          : ${DB_NAME}"
+echo "  DB user          : ${DB_USER}"
+echo "  Backup dir       : ${BACKUP_DIR}"
+echo ""
+
+# ── Validate required config ───────────────────────────────────────────────────
+if [ -z "${DB_PASSWORD}" ]; then
+    echo -e "${RED}ERROR: Database password is not set.${NC}"
+    echo "  → Expected: MYSQL_PASSWORD in ${ENV_FILE}"
+    echo "  → Or export DB_PASSWORD before running this script."
+    exit 1
+fi
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_NAME="nextcloud_backup_${DATE}"
 
 echo -e "${GREEN}Starting Nextcloud backup: ${BACKUP_NAME}${NC}"
 
-# Create backup directory
-mkdir -p "${BACKUP_DIR}/${BACKUP_NAME}"
+# ── Create backup staging directory ────────────────────────────────────────────
+if ! mkdir -p "${BACKUP_DIR}/${BACKUP_NAME}"; then
+    echo -e "${RED}ERROR: Could not create backup directory ${BACKUP_DIR}/${BACKUP_NAME}${NC}"
+    echo "  → Check that ${BACKUP_DIR} exists and is writable by $(whoami)."
+    echo "  → Run: sudo mkdir -p ${BACKUP_DIR} && sudo chown $(whoami) ${BACKUP_DIR}"
+    exit 1
+fi
 
-# Step 1: Enable maintenance mode
+# ── Step 1: Verify containers are running ─────────────────────────────────────
+echo -e "${YELLOW}Checking containers...${NC}"
+if ! docker inspect --format='{{.State.Running}}' "${CONTAINER_NAME}" 2>/dev/null | grep -q true; then
+    echo -e "${RED}ERROR: Nextcloud container '${CONTAINER_NAME}' is not running.${NC}"
+    echo "  → Run: docker ps -a | grep nextcloud"
+    echo "  → Start it with: cd ${NEXTCLOUD_DIR} && docker compose up -d"
+    exit 1
+fi
+if ! docker inspect --format='{{.State.Running}}' "${DB_CONTAINER_NAME}" 2>/dev/null | grep -q true; then
+    echo -e "${RED}ERROR: Database container '${DB_CONTAINER_NAME}' is not running.${NC}"
+    echo "  → Run: docker ps -a | grep mariadb"
+    echo "  → Start it with: cd ${NEXTCLOUD_DIR} && docker compose up -d"
+    exit 1
+fi
+
+# ── Step 2: Enable maintenance mode ────────────────────────────────────────────
 echo -e "${YELLOW}Enabling maintenance mode...${NC}"
-docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --on
-
-# Step 2: Backup database
-echo -e "${YELLOW}Backing up MariaDB database...${NC}"
-docker exec ${DB_CONTAINER_NAME} mysqldump -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} > "${BACKUP_DIR}/${BACKUP_NAME}/database.sql"
-
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Database backup completed successfully${NC}"
-else
-    echo -e "${RED}Database backup failed!${NC}"
-    docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+if ! docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --on; then
+    echo -e "${RED}ERROR: Could not enable maintenance mode.${NC}"
+    echo "  → The Nextcloud container '${CONTAINER_NAME}' is running but occ failed."
+    echo "  → Check PHP/container health: docker logs ${CONTAINER_NAME} --tail 30"
     exit 1
 fi
 
-# Step 3: Backup Nextcloud data directory
-echo -e "${YELLOW}Backing up Nextcloud data directory...${NC}"
-tar -czf "${BACKUP_DIR}/${BACKUP_NAME}/nextcloud_data.tar.gz" -C "${NEXTCLOUD_DIR}" .
-
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Data directory backup completed successfully${NC}"
-else
-    echo -e "${RED}Data directory backup failed!${NC}"
-    docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+# ── Step 3: Backup database ────────────────────────────────────────────────────
+echo -e "${YELLOW}Backing up MariaDB database '${DB_NAME}'...${NC}"
+DB_DUMP="${BACKUP_DIR}/${BACKUP_NAME}/database.sql"
+if ! docker exec "${DB_CONTAINER_NAME}" mysqldump -u "${DB_USER}" -p"${DB_PASSWORD}" "${DB_NAME}" > "${DB_DUMP}"; then
+    echo -e "${RED}ERROR: Database dump failed.${NC}"
+    echo "  → Container : ${DB_CONTAINER_NAME}"
+    echo "  → DB user   : ${DB_USER}"
+    echo "  → DB name   : ${DB_NAME}"
+    echo "  → Common causes:"
+    echo "      • Wrong password — check MYSQL_PASSWORD in ${ENV_FILE}"
+    echo "      • DB user lacks DUMP privileges — run SHOW GRANTS FOR '${DB_USER}'@'%';"
+    echo "      • Container not ready — check: docker logs ${DB_CONTAINER_NAME} --tail 30"
+    docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off
+    rm -rf "${BACKUP_DIR}/${BACKUP_NAME}"
     exit 1
 fi
+# Verify dump is non-empty
+if [ ! -s "${DB_DUMP}" ]; then
+    echo -e "${RED}ERROR: Database dump file is empty — mysqldump may have silently failed.${NC}"
+    echo "  → Check: docker logs ${DB_CONTAINER_NAME} --tail 30"
+    docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off
+    rm -rf "${BACKUP_DIR}/${BACKUP_NAME}"
+    exit 1
+fi
+echo -e "${GREEN}Database backup completed ($(du -h "${DB_DUMP}" | cut -f1))${NC}"
 
-# Step 4: Backup Docker Compose files
+# ── Step 4: Backup Nextcloud data directory ────────────────────────────────────
+echo -e "${YELLOW}Backing up Nextcloud data directory (${NEXTCLOUD_DIR})...${NC}"
+DATA_ARCHIVE="${BACKUP_DIR}/${BACKUP_NAME}/nextcloud_data.tar.gz"
+if ! tar -czf "${DATA_ARCHIVE}" -C "${NEXTCLOUD_DIR}" .; then
+    echo -e "${RED}ERROR: Data directory backup failed.${NC}"
+    echo "  → Source path : ${NEXTCLOUD_DIR}"
+    echo "  → Common causes:"
+    echo "      • Path does not exist — verify NEXTCLOUD_DIR is correct"
+    echo "      • Permission denied — run: ls -la ${NEXTCLOUD_DIR}"
+    echo "      • Not enough disk space — run: df -h ${BACKUP_DIR}"
+    docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off
+    rm -rf "${BACKUP_DIR}/${BACKUP_NAME}"
+    exit 1
+fi
+echo -e "${GREEN}Data backup completed ($(du -h "${DATA_ARCHIVE}" | cut -f1))${NC}"
+
+# ── Step 5: Backup Docker Compose config ──────────────────────────────────────
 echo -e "${YELLOW}Backing up Docker Compose configuration...${NC}"
-cp "${NEXTCLOUD_DIR}/docker-compose.yaml" "${BACKUP_DIR}/${BACKUP_NAME}/"
-cp "${NEXTCLOUD_DIR}/.env" "${BACKUP_DIR}/${BACKUP_NAME}/"
+for f in docker-compose.yaml docker-compose.yml .env; do
+    [ -f "${NEXTCLOUD_DIR}/${f}" ] && cp "${NEXTCLOUD_DIR}/${f}" "${BACKUP_DIR}/${BACKUP_NAME}/"
+done
 
-# Step 5: Create backup info file
-echo -e "${YELLOW}Creating backup info file...${NC}"
+# ── Step 6: Write backup manifest ─────────────────────────────────────────────
 cat > "${BACKUP_DIR}/${BACKUP_NAME}/backup_info.txt" << EOF
 Nextcloud Backup Information
 ============================
-Backup Date: $(date)
-Backup Name: ${BACKUP_NAME}
-Nextcloud Container: ${CONTAINER_NAME}
-Database Container: ${DB_CONTAINER_NAME}
-Database Name: ${DB_NAME}
-Nextcloud Directory: ${NEXTCLOUD_DIR}
+Backup Date       : $(date)
+Backup Name       : ${BACKUP_NAME}
+Nextcloud container: ${CONTAINER_NAME}
+DB container      : ${DB_CONTAINER_NAME}
+DB name           : ${DB_NAME}
+Nextcloud dir     : ${NEXTCLOUD_DIR}
 
-Files Included:
-- database.sql (MariaDB dump)
-- nextcloud_data.tar.gz (Nextcloud data directory)
-- docker-compose.yaml (Docker Compose configuration)
-- .env (Environment variables)
-- backup_info.txt (This file)
-
-To restore this backup, see the recovery section in the documentation.
+Files:
+  database.sql           — MariaDB dump
+  nextcloud_data.tar.gz  — Nextcloud data directory
+  docker-compose.yaml    — Compose file (if found)
+  .env                   — Environment variables (if found)
 EOF
 
-# Step 6: Disable maintenance mode
+# ── Step 7: Disable maintenance mode ──────────────────────────────────────────
 echo -e "${YELLOW}Disabling maintenance mode...${NC}"
-docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off
+docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off
 
-# Step 7: Create compressed archive of entire backup
-echo -e "${YELLOW}Creating compressed backup archive...${NC}"
-cd "${BACKUP_DIR}"
-tar -czf "${BACKUP_NAME}.tar.gz" "${BACKUP_NAME}/"
-rm -rf "${BACKUP_NAME}/"
+# ── Step 8: Create final archive ───────────────────────────────────────────────
+echo -e "${YELLOW}Creating compressed archive...${NC}"
+FINAL_ARCHIVE="${BACKUP_DIR}/${BACKUP_NAME}.tar.gz"
+if ! tar -czf "${FINAL_ARCHIVE}" -C "${BACKUP_DIR}" "${BACKUP_NAME}/"; then
+    echo -e "${RED}ERROR: Could not create final archive ${FINAL_ARCHIVE}${NC}"
+    echo "  → Staging files are still at ${BACKUP_DIR}/${BACKUP_NAME}/"
+    echo "  → Check disk space: df -h ${BACKUP_DIR}"
+    exit 1
+fi
+rm -rf "${BACKUP_DIR}/${BACKUP_NAME}"
 
-# Step 8: Cleanup old backups
-echo -e "${YELLOW}Cleaning up old backups (older than ${RETENTION_DAYS} days)...${NC}"
+# ── Step 9: Prune old backups ──────────────────────────────────────────────────
+echo -e "${YELLOW}Removing backups older than ${RETENTION_DAYS} days...${NC}"
 find "${BACKUP_DIR}" -name "nextcloud_backup_*.tar.gz" -mtime +${RETENTION_DAYS} -delete
 
-# Step 9: Calculate backup size
-BACKUP_SIZE=$(du -h "${BACKUP_DIR}/${BACKUP_NAME}.tar.gz" | cut -f1)
-echo -e "${GREEN}Backup completed successfully!${NC}"
-echo -e "${GREEN}Backup location: ${BACKUP_DIR}/${BACKUP_NAME}.tar.gz${NC}"
-echo -e "${GREEN}Backup size: ${BACKUP_SIZE}${NC}"
+BACKUP_SIZE=$(du -h "${FINAL_ARCHIVE}" | cut -f1)
+echo -e "${GREEN}Backup complete!${NC}"
+echo "  Location : ${FINAL_ARCHIVE}"
+echo "  Size     : ${BACKUP_SIZE}"
 
-# Optional: Send notification (uncomment and configure)
+# Optional: uncomment to send an email notification
 # echo "Nextcloud backup completed: ${BACKUP_NAME} (${BACKUP_SIZE})" | mail -s "Nextcloud Backup Success" admin@yourdomain.com
 ```
 
   </TabItem>
   <TabItem value="config">
 
-**Before using the script, modify these variables:**
+The script automatically reads your existing `/opt/docker/nextcloud/.env` and maps:
+
+| `.env` variable | Script variable | Fallback |
+|---|---|---|
+| `MYSQL_PASSWORD` | `DB_PASSWORD` | *(required — script exits if missing)* |
+| `MYSQL_DATABASE` | `DB_NAME` | `nextcloud` |
+| `MYSQL_USER` | `DB_USER` | `nextcloud` |
+| `CONTAINER_NAME` | `CONTAINER_NAME` | `nextcloud` |
+| `DB_CONTAINER_NAME` | `DB_CONTAINER_NAME` | `mariadb` |
+
+**Only two things need to be set directly in the script if your paths differ:**
 
 ```bash
-# Update these variables in the script
-BACKUP_DIR="/backup/nextcloud"           # Where to store backups
-NEXTCLOUD_DIR="/var/docker/nextcloud"    # Your Nextcloud Docker directory
-CONTAINER_NAME="nextcloud"               # Your Nextcloud container name
-DB_CONTAINER_NAME="mariadb"              # Your database container name
-DB_PASSWORD="YOUR_PASSWORD_FROM_ENV"     # Your database password from .env file
+# Edit these two lines at the top of the script
+BACKUP_DIR="/backup/nextcloud"       # Where backups are stored
+NEXTCLOUD_DIR="/opt/docker/nextcloud" # Folder containing docker-compose.yaml and .env
 ```
 
 **Make the script executable:**
