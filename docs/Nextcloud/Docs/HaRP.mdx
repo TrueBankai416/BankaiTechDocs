@@ -27,33 +27,34 @@ HaRP is a reverse proxy container for Nextcloud 32's **AppAPI**. It routes clien
 
 ---
 
-## **Setting up the Directories**
+## **Setting up the Certs Directory**
+
+Create the directory HaRP will use to store its FRP certificates:
 
 ```bash
-sudo mkdir -p /opt/docker/harp/certs
+sudo mkdir -p /opt/docker/nextcloud/harp/certs
 ```
 
 ---
 
-## **Creating the Environment File**
+## **Adding HaRP to your .env**
+
+Open your existing Nextcloud `.env` file:
 
 ```bash
-cd /opt/docker/harp
+cd /opt/docker/nextcloud
 nano .env
 ```
 
-```bash title=".env"
-# HaRP shared secret — change this to a strong random string
-# highlight-next-line
+Append the following to the bottom:
+
+```bash title=".env (additions)"
+# HaRP
+# highlight-start
 HP_SHARED_KEY=CHANGEME
-
-# Internal URL HaRP uses to reach your Nextcloud instance
-# highlight-next-line
 NC_INSTANCE_URL=https://cloud.example.com
-
-# CIDR range of your reverse proxy / Nextcloud host so HaRP trusts X-Forwarded-For
-# highlight-next-line
 HP_TRUSTED_PROXY_IPS=192.168.0.0/24
+# highlight-end
 ```
 
 :::tip[Info]
@@ -64,16 +65,17 @@ HP_TRUSTED_PROXY_IPS=192.168.0.0/24
 
 ---
 
-## **Creating the Compose File**
+## **Adding HaRP to your docker-compose.yaml**
+
+Open your existing Nextcloud compose file:
 
 ```bash
 nano docker-compose.yaml
 ```
 
-```yaml title="docker-compose.yaml"
-name: harp
+Add the `appapi-harp` service to the existing `services:` block:
 
-services:
+```yaml title="docker-compose.yaml (add to services:)"
   appapi-harp:
     image: ghcr.io/nextcloud/nextcloud-appapi-harp:release
     container_name: appapi-harp
@@ -84,7 +86,7 @@ services:
       - HP_TRUSTED_PROXY_IPS=${HP_TRUSTED_PROXY_IPS}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /opt/docker/harp/certs:/certs
+      - ./harp/certs:/certs
     ports:
       - "8780:8780"   # ExApps HTTP frontend (reverse proxy → HaRP)
       - "8782:8782"   # FRP TCP frontend (ExApp containers → HaRP)
@@ -98,7 +100,7 @@ Save the file by pressing `CTRL+X`
 ### **_Starting HaRP_**
 
 ```bash
-sudo docker compose up -d
+sudo docker compose up -d appapi-harp
 ```
 
 Verify it is running:
