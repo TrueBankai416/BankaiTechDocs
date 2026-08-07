@@ -92,9 +92,16 @@ NC='\033[0m'
 ENV_FILE="${NEXTCLOUD_DIR}/.env"
 if [ -f "${ENV_FILE}" ]; then
     echo -e "${CYAN}Loading configuration from ${ENV_FILE}${NC}"
-    while IFS= read -r line; do
+    while IFS= read -r line || [ -n "$line" ]; do
+        line="${line%$'\r'}"
         [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-        [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] && export "$line"
+        if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+            key="${BASH_REMATCH[1]}"; val="${BASH_REMATCH[2]}"
+            [[ "$val" =~ ^\"(.*)\"$ ]] && val="${BASH_REMATCH[1]}"
+            [[ "$val" =~ ^\'(.*)\'$ ]] && val="${BASH_REMATCH[1]}"
+            printf -v "$key" '%s' "$val"
+            export "$key"
+        fi
     done < "${ENV_FILE}"
 else
     echo -e "${YELLOW}No .env found at ${ENV_FILE} — using built-in defaults${NC}"
@@ -110,7 +117,7 @@ DB_PASSWORD="${MYSQL_PASSWORD:-${DB_PASSWORD:-}}"
 # ── Fuzzy container lookup — handles Docker Compose project-name prefixes ──────
 # --filter name= does substring matching, e.g. finds "nextcloud-nextcloud-1"
 CONTAINER_NAME=$(docker ps --filter "name=${NC_NAME_HINT}" --format '{{.Names}}' \
-    | grep -v 'cron\|installer\|nginx\|backup\|harp\|redis' | head -1)
+    | grep -E -v '(cron|installer|nginx|backup|harp|redis)' | head -1)
 DB_CONTAINER_NAME=$(docker ps --filter "name=${DB_NAME_HINT}" --format '{{.Names}}' | head -1)
 
 echo -e "${CYAN}Using config:${NC}"
@@ -149,12 +156,14 @@ if [ -z "${CONTAINER_NAME}" ]; then
     echo -e "${RED}ERROR: Could not find a running Nextcloud container matching '${NC_NAME_HINT}'.${NC}"
     echo "  → Running containers: $(docker ps --format '{{.Names}}' | tr '\n' ' ')"
     echo "  → Start it with: cd ${NEXTCLOUD_DIR} && docker compose up -d"
+    rm -rf "${BACKUP_DIR:?}/${BACKUP_NAME:?}"
     exit 1
 fi
 if [ -z "${DB_CONTAINER_NAME}" ]; then
     echo -e "${RED}ERROR: Could not find a running database container matching '${DB_NAME_HINT}'.${NC}"
     echo "  → Running containers: $(docker ps --format '{{.Names}}' | tr '\n' ' ')"
     echo "  → Start it with: cd ${NEXTCLOUD_DIR} && docker compose up -d"
+    rm -rf "${BACKUP_DIR:?}/${BACKUP_NAME:?}"
     exit 1
 fi
 
@@ -238,7 +247,11 @@ EOF
 
 # ── Step 7: Disable maintenance mode ──────────────────────────────────────────
 echo -e "${YELLOW}Disabling maintenance mode...${NC}"
-docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off
+if ! docker exec -u 33 "${CONTAINER_NAME}" php occ maintenance:mode --off; then
+    echo -e "${RED}WARNING: Could not disable maintenance mode — Nextcloud may still be offline.${NC}"
+    echo "  → Run manually: docker exec -u 33 ${CONTAINER_NAME} php occ maintenance:mode --off"
+    exit 1
+fi
 
 # ── Step 8: Create final archive ───────────────────────────────────────────────
 echo -e "${YELLOW}Creating compressed archive...${NC}"
@@ -267,7 +280,7 @@ echo "  Size     : ${BACKUP_SIZE}"
   </TabItem>
   <TabItem value="config">
 
-The script automatically reads your existing `/opt/docker/nextcloud/.env` and maps:
+The script automatically reads `${NEXTCLOUD_DIR}/.env` (default: `/opt/docker/nextcloud/.env`) and maps:
 
 | `.env` variable | Script variable | Fallback |
 |---|---|---|
