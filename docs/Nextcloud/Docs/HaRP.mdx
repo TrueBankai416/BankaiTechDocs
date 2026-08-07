@@ -1,0 +1,219 @@
+---
+title: HaRP (AppAPI Reverse Proxy)
+description: Set up Nextcloud HaRP (HAProxy Reverse Proxy) to enable direct ExApp communication and replace DockerSocketProxy for Nextcloud 32+ AppAPI.
+image: /img/social/nextcloud-social.webp
+sidebar_position: 7
+tags: [Docker, Docker Compose, Tutorial, Nextcloud, AppAPI, HaRP, ExApps]
+keywords: [Docker, Nextcloud, HaRP, AppAPI, ExApps, HAProxy, High Performance, Reverse Proxy]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-08-07
+    note: "docs(nextcloud): add HaRP installation and configuration guide"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+## **Nextcloud AppAPI HAProxy Reverse Proxy (HaRP)**
+
+HaRP is a reverse proxy container for Nextcloud 32's **AppAPI**. It routes client requests directly to ExApps (AI assistants, Memories, Office extensions, etc.), bypassing the Nextcloud PHP process. This improves performance, simplifies the deployment compared to the old `DockerSocketProxy` setup, and adds built-in brute-force protection.
+
+:::note[Prerequisites]
+- A working Nextcloud install following the [Complete Install](./Installation/Complete.mdx) or [Memories Install](./Installation/Memories.mdx) guide
+- **Nextcloud 32 or later**
+- The **AppAPI** app installed and enabled in Nextcloud (`Apps` → search *AppAPI* → Enable)
+- Port **`8780`** open on your firewall and reachable by your reverse proxy
+- Port **`8782`** open on your firewall and reachable by ExApp containers (FRP TCP)
+:::
+
+---
+
+## **Setting up the Certs Directory**
+
+Create the directory HaRP will use to store its FRP certificates:
+
+```bash
+sudo mkdir -p /opt/docker/nextcloud/harp/certs
+```
+
+---
+
+## **Adding HaRP to your .env**
+
+Open your existing Nextcloud `.env` file:
+
+```bash
+cd /opt/docker/nextcloud
+nano .env
+```
+
+Append the following to the bottom:
+
+```bash title=".env (additions)"
+# HaRP
+# highlight-start
+HP_SHARED_KEY=CHANGEME
+NC_INSTANCE_URL=https://cloud.example.com
+HP_TRUSTED_PROXY_IPS=192.168.0.0/24
+# highlight-end
+```
+
+:::tip[Info]
+`HP_SHARED_KEY` must contain only ASCII characters (`a-z A-Z 0-9` and common symbols).  
+`NC_INSTANCE_URL` must be reachable **from inside the HaRP container** — use your public domain or the Docker-internal hostname.  
+`HP_TRUSTED_PROXY_IPS` should match the subnet of the host running your NGINX reverse proxy.
+:::
+
+---
+
+## **Adding HaRP to your docker-compose.yaml**
+
+Open your existing Nextcloud compose file:
+
+```bash
+nano docker-compose.yaml
+```
+
+Add the `appapi-harp` service to the existing `services:` block:
+
+```yaml title="docker-compose.yaml (add to services:)"
+  appapi-harp:
+    image: ghcr.io/nextcloud/nextcloud-appapi-harp:release
+    container_name: appapi-harp
+    hostname: appapi-harp
+    environment:
+      - HP_SHARED_KEY=${HP_SHARED_KEY}
+      - NC_INSTANCE_URL=${NC_INSTANCE_URL}
+      - HP_TRUSTED_PROXY_IPS=${HP_TRUSTED_PROXY_IPS}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./harp/certs:/certs
+    ports:
+      - "8780:8780"   # ExApps HTTP frontend (reverse proxy → HaRP)
+      - "8782:8782"   # FRP TCP frontend (ExApp containers → HaRP)
+    networks:
+      - nextcloud
+    restart: unless-stopped
+```
+
+:::tip[Save the file]
+Save the file by pressing `CTRL+X`
+:::
+
+### **_Starting HaRP_**
+
+```bash
+sudo docker compose up -d appapi-harp
+```
+
+Verify it is running:
+
+```bash
+sudo docker logs appapi-harp
+```
+
+---
+
+## **Configuring the Reverse Proxy**
+
+HaRP needs your reverse proxy to forward requests from `https://cloud.example.com/exapps/` to port `8780` on the HaRP host.
+
+Add the following `location` block **inside** your existing Nextcloud `server {}` block in NGINX:
+
+```nginx
+location /exapps/ {
+    proxy_pass http://127.0.0.1:8780/exapps/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1800s;
+}
+```
+
+:::info
+The `1800s` timeout matches HaRP's default `HP_TIMEOUT_SERVER` value and is required for ExApps that handle long-running AI or indexing tasks.
+:::
+
+Reload NGINX after saving:
+
+```bash
+sudo nginx -t && sudo nginx -s reload
+```
+
+---
+
+## **Registering HaRP in Nextcloud AppAPI**
+
+1. In Nextcloud, go to **Administration Settings** → **AppAPI**
+2. Click **Register Daemon** and fill in:
+
+| Field | Value |
+|---|---|
+| Configuration template | **HaRP Proxy (HOST)** |
+| Daemon name | `appapi-harp` |
+| Display name | `appapi-harp` |
+| Deployment method | `docker-install` |
+| HaRP host | `appapi-harp:8780` |
+| HaRP shared key | *(your `HP_SHARED_KEY` value)* |
+| Nextcloud URL | `https://cloud.example.com` |
+| FRP server address | `appapi-harp:8782` |
+| Docker network | `nextcloud` |
+
+3. Click **Test Deploy** (three-dots menu on the daemon) to confirm the connection.
+
+:::tip
+Since HaRP is on the same `nextcloud` Docker network, use the service name `appapi-harp` rather than `127.0.0.1`. If HaRP is on a separate host, replace it with that host's IP.
+:::
+
+---
+
+## **Verifying the Setup**
+
+**Direct HaRP check** (from the host, bypasses NGINX):
+
+```bash
+curl -fsS \
+  -H "harp-shared-key: YOUR_HP_SHARED_KEY" \
+  -H "docker-engine-port: 24000" \
+  http://127.0.0.1:8780/exapps/app_api/v1.44/_ping
+```
+
+**Full-stack check** (from any machine, tests NGINX → HaRP → Docker):
+
+```bash
+curl -fsS \
+  -H "harp-shared-key: YOUR_HP_SHARED_KEY" \
+  -H "docker-engine-port: 24000" \
+  https://cloud.example.com/exapps/app_api/v1.44/_ping
+```
+
+Expected response: `OK`
+
+| Response | Meaning |
+|---|---|
+| `OK` | HaRP is working correctly |
+| `401 Unauthorized` | `harp-shared-key` does not match `HP_SHARED_KEY` |
+| `503 / 504` | Wrong `docker-engine-port`, FRP tunnel is down, or Docker unreachable |
+| Connection refused | Port `8780` is not reachable |
+
+---
+
+## **Migrating from DockerSocketProxy (DSP)**
+
+If you are on Nextcloud 32+ and were previously using DSP:
+
+1. Deploy HaRP using the steps above.
+2. In **AppAPI**, run **Test Deploy** on the new HaRP daemon.
+3. Set HaRP as the **default** deployment daemon.
+4. Remove each ExApp **without** deleting its data:
+   - Terminal: omit the `--rm-data` flag
+   - UI: uncheck *Delete data when removing*
+5. Re-install each ExApp — it will now deploy through HaRP.
+6. Remove the old DSP container once all ExApps are migrated.
+
+:::warning
+Do **not** delete ExApp data volumes during migration — they contain your AI models, indexes, and configuration.
+:::
+
+<BuyMeACoffeeButton />
