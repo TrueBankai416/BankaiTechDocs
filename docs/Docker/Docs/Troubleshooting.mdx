@@ -5,6 +5,8 @@ keywords: [Docker, Troubleshooting]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "docs(docker): Add OOM (Out of Memory) troubleshooting entry with memory limits and swap fix"
   - date: 2026-04-29
     note: "docs(docker): Add iptables DOCKER chain missing error troubleshooting entry"
 ---
@@ -45,5 +47,121 @@ sudo systemctl restart docker
 ```bash
 docker compose up -d
 ```
+
+---
+
+## **Out of Memory (OOM): Container Killed by Kernel**
+
+### **Error**
+
+```
+Out of memory: Killed process 2426654 (uvicorn) total-vm:8242728kB, anon-rss:2725272kB
+```
+
+Visible via `sudo dmesg` after the system exhausts both RAM and SWAP. Check current memory state with:
+
+```bash
+free -h
+```
+
+### **Cause**
+
+Docker containers have no memory limits by default — they can consume all available RAM and SWAP on the host. Resource-intensive tasks (such as Jellyfin generating trickplay images, Tdarr transcoding, etc.) can exhaust system memory, causing the Linux OOM killer to terminate processes.
+
+### **Resolution**
+
+#### **1. Add memory limits to containers in `docker-compose.yaml`**
+
+For each resource-heavy container, add a `mem_limit` under `deploy.resources.limits`:
+
+```yaml title="docker-compose.yaml"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    # ... other config ...
+    deploy:
+      resources:
+        limits:
+          memory: 12G    # Adjust to fit your available RAM
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    # ... other config ...
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  tdarr-node:
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    # ... other config ...
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+```
+
+Apply the changes:
+
+```bash
+sudo docker compose up -d
+```
+
+#### **2. Flush SWAP to reclaim memory immediately**
+
+```bash
+sudo swapoff -a && sudo swapon -a
+```
+
+#### **3. Reduce `vm.swappiness` to prevent aggressive SWAP usage**
+
+Check the current value (default is usually `60`):
+
+```bash
+cat /proc/sys/vm/swappiness
+```
+
+Set it to `10` so the kernel prefers RAM over SWAP:
+
+```bash
+sudo sysctl vm.swappiness=10 && echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+```
+
+#### **4. Verify memory is recovered**
+
+```bash
+free -h
+```
+
+**Before:**
+
+```
+               total        used        free      shared  buff/cache   available
+Mem:            31Gi        28Gi       555Mi       880Mi       3.3Gi       2.5Gi
+Swap:          8.0Gi       8.0Gi          0B
+```
+
+**After:**
+
+```
+               total        used        free      shared  buff/cache   available
+Mem:            31Gi        15Gi       388Mi       551Mi        16Gi        15Gi
+Swap:          8.0Gi          0B       8.0Gi
+```
+
+:::tip[Identify memory hogs]
+
+Use `docker stats` sorted by memory percentage to find which containers are consuming the most RAM:
+
+```bash
+sudo docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}" | sort -k3 -rh
+```
+
+:::
 
 <BuyMeACoffeeButton />

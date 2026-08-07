@@ -7,6 +7,8 @@ keywords: [Jellyfin, Media Server]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "Add memory limit to docker-compose example to prevent OOM crashes"
   - date: 2025-12-20
     note: "Remove sudo from command to create Docker Compose file in installation guide"
   - date: 2025-12-20
@@ -93,6 +95,12 @@ services:
     # Optional - may be necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - 'host.docker.internal:host-gateway'
+    # Recommended - prevents Jellyfin from exhausting RAM during trickplay generation or transcoding
+    deploy:
+      resources:
+        limits:
+          // highlight-next-line
+          memory: 12G
 ```
 
 Replace `./config`, `/path/to/cache`, and `/path/to/media` with your preferred directories on your host system.
@@ -125,6 +133,7 @@ Upon accessing Jellyfin for the first time, the setup wizard will guide you thro
 - **HTTPS:** For secure access, consider setting up a reverse proxy with HTTPS. Utilize Docker images like `nginx` or `traefik` for this purpose.
 - **Data Persistence:** The volume mappings in the `docker run` command ensure that your configuration and media remain persistent across container restarts.
 - **Updates:** To update Jellyfin, pull the latest Docker image and recreate the container.
+- **Memory Limits:** Jellyfin can consume large amounts of RAM during trickplay image generation and transcoding. Without a limit, it can exhaust all available RAM and SWAP, causing the kernel OOM killer to terminate other processes. Set `deploy.resources.limits.memory` to a value that leaves headroom for the rest of your system (e.g., `12G` on a 32 GB host).
 
 ## **_Conclusion_**
 

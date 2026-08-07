@@ -5,6 +5,8 @@ keywords: [Arr Suite]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "Add memory limits to jellyfin service to prevent OOM crashes"
   - date: 2026-02-06
     note: "fix: update docker-compose configuration for jellyfin service with additional settings and volume mappings"
   - date: 2025-08-23
@@ -51,6 +53,8 @@ services:
     runtime: nvidia
     deploy:
       resources:
+        limits:
+          memory: 12G
         reservations:
           devices:
             - driver: nvidia
