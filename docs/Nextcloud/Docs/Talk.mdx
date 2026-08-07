@@ -3,11 +3,13 @@ title: Talk High Performance Backend
 description: Set up Nextcloud Talk High Performance Backend (HPB) using individual Docker services — coturn, NATS, Janus, and nextcloud-spreed-signaling.
 image: /img/social/nextcloud-social.webp
 sidebar_position: 5
-tags: [Docker, Docker Compose, Tutorial, Nextcloud, Nextcloud Talk, TURN, HPB, coturn, NATS, Janus]
-keywords: [Docker, Nextcloud Talk, HPB, High Performance Backend, TURN, coturn, NATS, Janus, nextcloud-spreed-signaling]
+tags: [Docker, Docker Compose, Tutorial, Nextcloud, Nextcloud Talk, TURN, HPB, coturn, NATS, Janus, Recording]
+keywords: [Docker, Nextcloud Talk, HPB, High Performance Backend, TURN, coturn, NATS, Janus, nextcloud-spreed-signaling, Recording, recording backend]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-08-07
+    note: "docs(talk): add recording backend setup section"
   - date: 2026-08-07
     note: "docs(talk): update warning syntax for Talk federation beta feature"
   - date: 2026-08-06
@@ -581,5 +583,156 @@ Nextcloud Talk supports **federated text chat** between users on different Nextc
 | ICE candidates use wrong public IP | Hardcode `external-ip=<WAN_IP>/<LAN_IP>` and `relay-ip=<LAN_IP>` in `turnserver.conf` — env-var auto-detection does not work behind NAT |
 | `ERROR -X : Wrong address format` on coturn startup | The default Docker CMD includes `--external-ip=$(detect-external-ip)` which runs `dig` and returns EDNS text — override it with `command: ["--log-file=stdout"]` in the compose service. `external-ip` in `turnserver.conf` takes effect without the CLI flag |
 | `no_such_room: The user is not invited to this room.` in signaling logs | Federated user attempted to join without a Talk federation invite — the host must send a federation invite through the Talk app and the remote user must accept before connecting |
+
+---
+
+## **Recording Backend**
+
+The recording backend captures Talk calls as video/audio files (`.webm`/`.ogg`) saved to the moderator's Nextcloud Files. It joins the call as a headless browser (Firefox + Selenium + ffmpeg) and uploads the result when recording stops.
+
+:::note[Prerequisites]
+- The Talk HPB from this guide is already running (the recording server connects to the signaling server as an internal client)
+- At least **2 GB shared memory** (`/dev/shm`) available on the host — the headless browser requires it
+- Port `8000` reachable from Nextcloud to the recording container (internal only — no public exposure needed)
+:::
+
+### **_Setting up the Directory_**
+
+```bash
+sudo mkdir -p /opt/docker/nextcloud/recording
+```
+
+### **_Configuration File_**
+
+```bash
+nano /opt/docker/nextcloud/recording/server.conf
+```
+
+```ini title="/opt/docker/nextcloud/recording/server.conf — highlighted items must be changed"
+[logs]
+level = 20
+
+[http]
+listen = 0.0.0.0:8000
+
+[backend]
+backends = nextcloud
+// highlight-next-line
+secret = CHANGEME_RECORDING_SECRET
+
+[nextcloud]
+// highlight-next-line
+url = https://cloud.<YourDomain>.com
+// highlight-next-line
+secret = CHANGEME_RECORDING_SECRET
+
+[signaling]
+signalings = signaling
+// highlight-next-line
+url = https://talk.<YourDomain>.com
+// highlight-next-line
+internalsecret = CHANGEME_INTERNAL_SECRET
+
+[recording]
+# firefox or chrome
+browser = firefox
+videowidth = 1920
+videoheight = 1080
+```
+
+:::info
+- `CHANGEME_RECORDING_SECRET` — a new secret you choose freely; you will enter the same value in the Nextcloud Talk admin UI
+- `CHANGEME_INTERNAL_SECRET` — must match `internalsecret` in your signaling server's `server.conf` (`[clients]` section)
+:::
+
+:::tip[Generating a secret]
+```bash
+openssl rand -hex 32    # → RECORDING_SECRET
+```
+:::
+
+### **_Adding the Recording Service to Docker Compose_**
+
+There is no pre-built image — the recording server must be built from source. Clone the repository into your recording directory first:
+
+```bash
+cd /opt/docker/nextcloud/recording
+git clone https://github.com/nextcloud/nextcloud-talk-recording.git src
+```
+
+Open your existing Nextcloud compose file and add the service:
+
+```bash
+nano /opt/docker/nextcloud/docker-compose.yaml
+```
+
+```yaml title="docker-compose.yaml (add to services:)"
+  recording:
+    build:
+      context: ./recording/src
+      dockerfile: docker-compose/Dockerfile
+    container_name: nextcloud-talk-recording
+    init: true
+    shm_size: '2gb'
+    volumes:
+      - ./recording/server.conf:/config/server.conf:ro
+    networks:
+      - nextcloud
+    restart: unless-stopped
+```
+
+:::tip[Save the file]
+Save the file by pressing `CTRL+X`
+:::
+
+Build and start the recording container:
+
+```bash
+cd /opt/docker/nextcloud && sudo docker compose up -d --build recording
+```
+
+Confirm it started cleanly:
+
+```bash
+sudo docker logs nextcloud-talk-recording
+```
+
+:::tip[Updating]
+To update to the latest version, pull the source and rebuild:
+```bash
+cd /opt/docker/nextcloud/recording/src && git pull
+cd /opt/docker/nextcloud && sudo docker compose up -d --build recording
+```
+:::
+
+### **_Nextcloud Talk Admin Configuration_**
+
+1. In Nextcloud, go to **Administration Settings** → **Talk**
+2. Scroll to **Recording servers**
+3. Click **Add a new recording server** and fill in:
+
+| Field | Value |
+|---|---|
+| Recording backend URL | `http://nextcloud-talk-recording:8000` |
+| Shared secret | your `CHANGEME_RECORDING_SECRET` value |
+
+4. Click the **checkmark** to save, then click **Test connection** — you should see a green tick
+
+:::info
+The URL uses the Docker service name because the recording container is on the same `nextcloud` network. If the recording server is on a separate host, use its IP/hostname instead.
+:::
+
+### **_Enabling Recording in a Conversation_**
+
+Once the backend is configured, moderators can start a recording from inside a call:
+
+1. Open the call in Nextcloud Talk
+2. Click the **⋮ More options** button in the call toolbar
+3. Select **Start recording**
+4. When finished, click **Stop recording** — the file is saved to `Talk Recordings/` in the moderator's Files
+
+:::tip
+The recording file appears as a notification in Talk once processing is complete. The moderator can share it directly to the conversation from there.
+:::
 
 <BuyMeACoffeeButton />
