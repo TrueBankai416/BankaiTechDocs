@@ -1,0 +1,810 @@
+---
+title: Helpful Commands for Ubuntu
+tags: [Ubuntu, Linux, Commands, Terminal]
+keywords: [Ubuntu, Linux, Commands, Terminal, CLI]
+last_update:
+  author: BankaiTech
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+### **Helpful Commands for Ubuntu**
+
+A reference for commonly used Ubuntu terminal commands, written for beginners. Each command includes an explanation of what it does and what any flags mean.
+
+:::tip[What is a flag?]
+Flags (also called options) are extra instructions you add to a command, always starting with `-` or `--`. For example, in `ls -l`, the `-l` flag tells `ls` to show a detailed (long) list instead of just filenames.
+:::
+
+---
+
+## **System Information**
+
+### View OS version
+```bash
+lsb_release -a
+```
+- `lsb_release` prints information about the Linux distribution.
+- `-a` means **all** — show every available detail (distributor, description, release number, codename).
+
+---
+
+### View kernel version
+```bash
+uname -r
+```
+- `uname` prints system information.
+- `-r` means **release** — show only the kernel version number (e.g. `6.8.0-45-generic`).
+
+---
+
+### View system uptime
+```bash
+uptime
+```
+Prints how long the system has been running, how many users are logged in, and the average CPU load over the last 1, 5, and 15 minutes. No flags needed.
+
+---
+
+### View CPU info
+```bash
+lscpu
+```
+Lists detailed information about your CPU: architecture, number of cores, threads, speed, and more. No flags needed.
+
+---
+
+### View memory (RAM) usage
+```bash
+free -h
+```
+- `free` shows how much RAM and swap space is used vs. available.
+- `-h` means **human-readable** — displays sizes in MB/GB instead of raw bytes (e.g. `3.8G` instead of `3981234`).
+
+---
+
+### View disk usage
+```bash
+df -h
+```
+- `df` stands for **disk free** — shows how much space is used and available on each mounted filesystem.
+- `-h` means **human-readable** — displays sizes in MB/GB instead of raw bytes.
+
+---
+
+## **Package Management (APT)**
+
+APT is Ubuntu's built-in package manager. Use it to install, update, and remove software.
+
+### Update package lists
+```bash
+sudo apt update
+```
+Downloads the latest list of available packages from Ubuntu's software repositories. This does **not** install or upgrade anything — it only refreshes the list so Ubuntu knows what's available.
+
+:::note[Before installing or upgrading]
+Always run `apt update` first so Ubuntu knows what's available.
+:::
+
+---
+
+### Upgrade installed packages
+```bash
+sudo apt upgrade -y
+```
+Installs the newest versions of all currently installed packages.
+- `-y` means **yes** — automatically answers "yes" to any confirmation prompts so you don't have to type it manually.
+
+---
+
+### Install a package
+```bash
+sudo apt install <package-name>
+```
+Downloads and installs the named package. Replace `<package-name>` with the actual name, e.g. `sudo apt install curl`.
+
+---
+
+### Remove a package
+```bash
+sudo apt remove <package-name>
+```
+Uninstalls the named package but keeps its configuration files on disk (useful if you want to reinstall later and keep your settings).
+
+---
+
+### Remove a package and its config files
+```bash
+sudo apt purge <package-name>
+```
+Uninstalls the named package **and** deletes its configuration files. Use this when you want a completely clean removal.
+
+---
+
+### Remove unused dependencies
+```bash
+sudo apt autoremove -y
+```
+Removes packages that were installed automatically to support other software but are no longer needed.
+- `-y` automatically confirms the removal.
+
+---
+
+### Search for a package
+```bash
+apt search <keyword>
+```
+Searches the package list for packages matching the keyword. No `sudo` needed since this only reads data.
+
+---
+
+### Show package details
+```bash
+apt show <package-name>
+```
+Displays information about a package: version, description, dependencies, and more. No `sudo` needed.
+
+---
+
+## **File & Directory**
+
+### List files
+```bash
+ls -lah
+```
+- `ls` lists the contents of a directory.
+- `-l` means **long format** — shows permissions, owner, size, and modification date for each file.
+- `-a` means **all** — includes hidden files (files whose names start with `.`).
+- `-h` means **human-readable** — shows file sizes in KB/MB/GB instead of bytes.
+
+You can combine these flags: `-lah` is the same as `-l -a -h`.
+
+---
+
+### Change directory
+```bash
+cd /path/to/directory
+```
+Moves your terminal session into the specified directory. Replace `/path/to/directory` with the actual path, e.g. `cd /home/john/Documents`.
+
+| Shortcut | Meaning |
+|---|---|
+| `cd ~` | Go to your home directory |
+| `cd ..` | Go up one level |
+| `cd -` | Go back to the previous directory |
+
+---
+
+### Create a directory
+```bash
+mkdir -p /path/to/directory
+```
+- `mkdir` creates a new directory.
+- `-p` means **parents** — also creates any missing parent directories in the path. Without `-p`, the command fails if the parent directory doesn't exist.
+
+Example: `mkdir -p /home/john/projects/myapp` creates all three folders at once if they don't exist.
+
+---
+
+### Copy files
+```bash
+cp -r /source /destination
+```
+- `cp` copies files or directories.
+- `-r` means **recursive** — required when copying a directory, so it copies the folder and everything inside it. Without `-r`, `cp` will refuse to copy a directory.
+
+---
+
+### Move or rename files
+```bash
+mv /source /destination
+```
+- `mv` moves a file or directory to a new location.
+- If the destination is in the same folder with a different name, it renames the file instead. No flags needed for basic usage.
+
+---
+
+### Delete a file
+```bash
+rm /path/to/file
+```
+- `rm` permanently deletes a file. There is no recycle bin — deleted files cannot be recovered easily.
+
+---
+
+### Delete a directory
+```bash
+rm -rf /path/to/directory
+```
+- `-r` means **recursive** — delete the directory and everything inside it.
+- `-f` means **force** — skip confirmation prompts and do not show errors for missing files.
+
+:::danger[Irreversible]
+`rm -rf` is permanent and irreversible. Double-check the path before running it.
+:::
+
+---
+
+### Find a file by name
+```bash
+find / -name "filename" 2>/dev/null
+```
+- `find` searches for files and directories.
+- `/` is the starting directory — here it starts from the root, searching the entire system.
+- `-name "filename"` filters results to only entries matching that name. You can use wildcards, e.g. `-name "*.log"` finds all `.log` files.
+- `2>/dev/null` redirects error messages (like "Permission denied") away from your screen so the output is clean. `2>` redirects stderr (error output) and `/dev/null` is a special file that discards anything written to it.
+
+---
+
+### Find large files and display their sizes
+```bash
+sudo find ./ -type f -size +30G -printf '%s %p\n' | sort -n | numfmt --field=1 --to=iec
+```
+Searches the current directory recursively for files larger than 30 GB, then sorts them by size and prints human-readable sizes (e.g. `14T`).
+
+- `./` — start searching from the current directory.
+- `-type f` — match only files (not directories).
+- `-size +30G` — only include files **larger than** 30 GB. Change `30G` to any size you need (e.g. `1G`, `500M`).
+- `-printf '%s %p\n'` — print the file size in bytes (`%s`) followed by the full path (`%p`) on each line. This format is required for the next two commands to work correctly.
+- `sort -n` — sort the lines **numerically** by the first column (the byte size), so the largest files appear last.
+- `numfmt --field=1 --to=iec` — convert the first field (raw bytes) to a human-readable IEC unit (`K`, `M`, `G`, `T`), so `15393162788864` becomes `14T`.
+
+:::tip[Adjusting the size threshold]
+Change `+30G` to a smaller threshold like `+1G` if you want to cast a wider net.
+:::
+
+---
+
+### Find files by extension
+```bash
+find . -type f \( -iname "*.EXT1" -o -iname "*.EXT2" -o -iname "*.EXT3" \)
+```
+Searches the current directory recursively for files matching any of the listed extensions. Add or remove `-o -iname "*.EXT"` blocks to match more or fewer extensions.
+
+- `.` — start from the current directory.
+- `-type f` — match only files.
+- `\( ... \)` — groups the extension conditions together as a unit.
+- `-iname "*.EXT"` — case-**insensitive** name match. `*.EXT` matches any filename ending in `.EXT` regardless of upper/lowercase.
+- `-o` — means **or** — the file only needs to match one of the extensions.
+
+Example — find files with suspicious or unknown extensions:
+```bash
+find . -type f \( -iname "*.KDRSXS" -o -iname "*.ECJLLX" -o -iname "*.YFUINC" \)
+```
+
+---
+
+### Find and delete files by extension
+```bash
+find . -type f \( -iname "*.EXT1" -o -iname "*.EXT2" -o -iname "*.EXT3" \) -delete
+```
+Same as the search above but adds `-delete` at the end to **permanently remove** every matched file.
+
+- `-delete` — deletes each file that matches all the preceding conditions. It must come **after** the match conditions or `find` will behave unexpectedly.
+
+:::danger[Do a dry run first]
+Run the command **without** `-delete` first to review what will be removed before committing to the deletion.
+:::
+
+Example — delete files with those extensions:
+```bash
+find . -type f \( -iname "*.KDRSXS" -o -iname "*.ECJLLX" -o -iname "*.YFUINC" \) -delete
+```
+
+---
+
+## **User Management**
+
+### Add a new user
+```bash
+sudo adduser <username>
+```
+Creates a new user account interactively — it will ask you to set a password and optional details. Replace `<username>` with the desired username.
+
+---
+
+### Add a user to a group
+```bash
+sudo usermod -aG <group> <username>
+```
+- `usermod` modifies an existing user account.
+- `-a` means **append** — add the user to the group without removing them from other groups.
+- `-G` specifies the **group** to add the user to.
+
+:::warning[Always use -aG together]
+Using `-G` alone without `-a` will remove the user from all other groups.
+:::
+
+Example: `sudo usermod -aG docker john` gives the user `john` permission to run Docker commands without `sudo`.
+
+---
+
+### Switch to another user
+```bash
+su - <username>
+```
+- `su` stands for **substitute user** — switches to the specified user's account.
+- `-` loads that user's full login environment (home directory, shell settings, etc.). Without `-`, you switch users but keep your current environment, which can cause unexpected behaviour.
+
+---
+
+### Show current user
+```bash
+whoami
+```
+Prints the username of the currently logged-in user. Useful when switching between users to confirm who you are.
+
+---
+
+### List groups for a user
+```bash
+groups <username>
+```
+Prints all groups the specified user belongs to. Leave out `<username>` to see groups for the current user.
+
+---
+
+## **Service Management (systemd)**
+
+Ubuntu uses **systemd** to manage background services (called units or daemons). Replace `<service>` with the service name, e.g. `nginx`, `ssh`, or `docker`.
+
+### Start a service
+```bash
+sudo systemctl start <service>
+```
+Starts the service immediately. This does not make it start automatically on reboot.
+
+---
+
+### Stop a service
+```bash
+sudo systemctl stop <service>
+```
+Stops the service immediately.
+
+---
+
+### Restart a service
+```bash
+sudo systemctl restart <service>
+```
+Stops and then starts the service. Use this to apply configuration changes.
+
+---
+
+### Enable a service at boot
+```bash
+sudo systemctl enable <service>
+```
+Configures the service to start automatically every time the system boots. Does not start it right now.
+
+---
+
+### Disable a service at boot
+```bash
+sudo systemctl disable <service>
+```
+Prevents the service from starting automatically on boot. Does not stop it right now.
+
+---
+
+### Check service status
+```bash
+sudo systemctl status <service>
+```
+Shows whether the service is running or stopped, and displays the most recent log lines. Press `q` to exit.
+
+---
+
+### View live service logs
+```bash
+journalctl -u <service> -f
+```
+- `journalctl` reads logs managed by systemd.
+- `-u <service>` means **unit** — filter logs to only show entries from the specified service.
+- `-f` means **follow** — keep the output open and print new log lines in real time (like `tail -f`). Press `Ctrl+C` to stop.
+
+---
+
+## **Networking**
+
+### Show IP addresses
+```bash
+ip a
+```
+- `ip` is the modern Linux networking tool.
+- `a` is short for **address** — lists all network interfaces and their assigned IP addresses (both IPv4 and IPv6).
+
+---
+
+### Show routing table
+```bash
+ip route
+```
+Displays the system's routing table — which network interface handles traffic to which destinations, and what the default gateway is.
+
+---
+
+### Test connectivity
+```bash
+ping -c 4 <host>
+```
+- `ping` sends ICMP echo requests to a host to test if it is reachable.
+- `-c 4` means **count 4** — send exactly 4 packets then stop. Without `-c`, ping runs forever until you press `Ctrl+C`.
+
+Example: `ping -c 4 google.com`
+
+---
+
+### DNS lookup
+```bash
+nslookup <domain>
+```
+Queries DNS to find the IP address associated with a domain name. Example: `nslookup google.com`.
+
+---
+
+### Show open ports
+```bash
+ss -tulnp
+```
+- `ss` stands for **socket statistics** — shows network connections and listening ports.
+- `-t` shows **TCP** connections.
+- `-u` shows **UDP** connections.
+- `-l` shows only **listening** sockets (ports waiting for connections).
+- `-n` shows **numeric** addresses and port numbers instead of resolving hostnames and service names.
+- `-p` shows the **process** (program name and PID) that owns each socket.
+
+---
+
+### Find what is using a specific port
+```bash
+ss -tulnp | grep :<port>
+```
+Filters the socket list to only show the process bound to a specific port. Replace `<port>` with the port number.
+
+Example — find what is using port 8080:
+```bash
+ss -tulnp | grep :8080
+```
+
+The output shows the process name and PID in the last column, e.g. `users:(("nginx",pid=1234,fd=6))`.
+
+You can also use `lsof` for a more detailed view:
+```bash
+sudo lsof -i :<port>
+```
+- `lsof` stands for **list open files** — on Linux, network sockets are treated as files.
+- `-i :<port>` filters to only show processes with a socket open on that port.
+- The output includes the **command**, **PID**, **user**, and connection state.
+
+Or use `fuser` to get just the PID instantly:
+```bash
+sudo fuser <port>/tcp
+```
+- `fuser` prints the PID(s) of processes using the specified port. Combine with `-v` for verbose output including the process name:
+```bash
+sudo fuser -v <port>/tcp
+```
+
+:::tip[Port conflict workflow]
+1. Run `sudo lsof -i :<port>` to identify the conflicting process and its PID.
+2. Either stop the service (`sudo systemctl stop <service>`) or kill the process (`sudo kill -9 <pid>`).
+3. Then start your own service on that port.
+:::
+
+---
+
+### Check firewall status (UFW)
+```bash
+sudo ufw status verbose
+```
+- `ufw` stands for **Uncomplicated Firewall** — Ubuntu's built-in firewall tool.
+- `status` shows whether the firewall is active and lists the current rules.
+- `verbose` shows extra detail, including the default policies for incoming and outgoing traffic.
+
+---
+
+### Allow a port through UFW
+```bash
+sudo ufw allow <port>/tcp
+```
+Creates a firewall rule that permits incoming TCP connections on the specified port. Replace `<port>` with the port number, e.g. `sudo ufw allow 80/tcp` opens port 80 for web traffic.
+
+---
+
+### Allow a port with a comment
+```bash
+sudo ufw allow <port>/tcp comment '<description>'
+```
+Same as above but attaches a human-readable label to the rule so you can remember why it was added. The comment appears when you run `ufw status`.
+
+Example:
+```bash
+sudo ufw allow 8096/tcp comment 'Jellyfin Web UI'
+```
+
+---
+
+### View firewall rules with rule numbers
+```bash
+sudo ufw status numbered
+```
+Lists all active firewall rules with a number next to each one. The numbers are useful for deleting a specific rule:
+```bash
+sudo ufw delete <number>
+```
+Example — to remove rule number 3:
+```bash
+sudo ufw delete 3
+```
+
+---
+
+## **Process Management**
+
+### List running processes
+```bash
+ps aux
+```
+- `ps` shows a snapshot of currently running processes.
+- `a` shows processes from **all users**, not just your own.
+- `u` shows output in a **user-oriented** format that includes the username, CPU%, and memory% columns.
+- `x` includes processes that are **not attached to a terminal** (background daemons).
+
+---
+
+### Interactive process viewer
+```bash
+top
+```
+Opens a live, updating view of all running processes sorted by CPU usage. Useful for spotting what is using the most resources. Press `q` to quit, `M` to sort by memory, `P` to sort by CPU.
+
+---
+
+### Kill a process by PID
+```bash
+kill -9 <pid>
+```
+- `kill` sends a signal to a process.
+- `-9` is the **signal number** to send — signal 9 is called **SIGKILL**, which forces the process to terminate immediately and cannot be ignored or caught by the program. You can also write it as `-SIGKILL` for the same effect. Use this only when a normal `kill <pid>` (which sends SIGTERM) has not worked.
+- `<pid>` is the **process ID** — the target of the signal. You can find it with `ps aux` or `pgrep`.
+
+So in the example below, `-9` is *what* to do and `8325` is *who* to do it to:
+```bash
+sudo kill -9 8325
+```
+
+---
+
+### Kill a process by name
+```bash
+pkill <process-name>
+```
+Sends a termination signal to all processes matching the given name. Easier than finding the PID first.
+
+---
+
+### Find a process by name
+```bash
+pgrep <process-name>
+```
+Prints the PID(s) of all processes matching the given name. Example: `pgrep nginx`.
+
+---
+
+## **Permissions**
+
+Linux file permissions control who can read, write, or execute a file. Every file has three sets of permissions: one for the **owner**, one for the **group**, and one for **everyone else** (others).
+
+### Understanding permission numbers
+
+Each set is represented by a single digit from 0–7, calculated by adding up the values of the permissions granted:
+
+| Value | Permission | Symbol |
+|---|---|---|
+| 4 | Read | `r` |
+| 2 | Write | `w` |
+| 1 | Execute | `x` |
+| 0 | No permission | `-` |
+
+You add these numbers together to get the digit for each set. For example, read + write = 4 + 2 = **6**.
+
+### Permission reference chart
+
+| Number | Permissions | Symbolic | Who can do what |
+|---|---|---|---|
+| `7` | Read + Write + Execute | `rwx` | Full access |
+| `6` | Read + Write | `rw-` | Read and modify, but not execute |
+| `5` | Read + Execute | `r-x` | Read and run, but not modify |
+| `4` | Read only | `r--` | View only |
+| `3` | Write + Execute | `-wx` | Modify and run, but not read |
+| `2` | Write only | `-w-` | Modify only |
+| `1` | Execute only | `--x` | Run only |
+| `0` | No permission | `---` | No access |
+
+### Common permission combinations
+
+| Mode | Owner | Group | Others | Typical use |
+|---|---|---|---|---|
+| `755` | `rwx` | `r-x` | `r-x` | Directories, executables — owner can edit; everyone else can read/run |
+| `644` | `rw-` | `r--` | `r--` | Regular files — owner can edit; everyone else can only read |
+| `600` | `rw-` | `---` | `---` | Private files (e.g. SSH keys) — only the owner can read/write |
+| `777` | `rwx` | `rwx` | `rwx` | Full access for everyone — avoid unless necessary |
+| `700` | `rwx` | `---` | `---` | Private executables — only the owner can read, write, or run |
+| `750` | `rwx` | `r-x` | `---` | Group-accessible executables — others have no access |
+
+### Change file permissions
+```bash
+chmod 755 /path/to/file
+```
+- `chmod` stands for **change mode** — sets the permissions of a file or directory.
+- The three digits represent permissions for **owner**, **group**, and **others** respectively.
+
+Example: `chmod 644 config.txt` makes `config.txt` readable by everyone but only writable by the owner.
+
+To apply permissions recursively to a directory and all its contents, add `-R`:
+```bash
+chmod -R 755 /path/to/directory
+```
+
+---
+
+### Change file owner
+```bash
+sudo chown -R <user>:<group> /path
+```
+- `chown` stands for **change owner** — changes who owns a file or directory.
+- `<user>:<group>` sets both the owning user and the owning group. You can omit `:<group>` to change only the user.
+- `-R` means **recursive** — apply the change to the directory and everything inside it.
+
+Example: `sudo chown -R john:john /home/john/projects` gives the user `john` ownership of all files in that directory.
+
+---
+
+## **SSH**
+
+SSH (Secure Shell) lets you securely connect to and control remote machines from your terminal.
+
+### Connect to a remote host
+```bash
+ssh <user>@<host>
+```
+Opens an encrypted terminal session on the remote machine. Replace `<user>` with the username on the remote machine and `<host>` with its IP address or hostname.
+
+Example: `ssh john@192.168.1.10`
+
+---
+
+### Copy files to a remote host
+```bash
+scp /local/file <user>@<host>:/remote/path
+```
+- `scp` stands for **secure copy** — copies files over SSH.
+- The first argument is the source file on your local machine.
+- The second argument is the destination in the format `user@host:/path`.
+
+To copy a directory, add `-r` (recursive):
+```bash
+scp -r /local/folder <user>@<host>:/remote/path
+```
+
+---
+
+### Generate an SSH key pair
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+Creates a pair of cryptographic keys for passwordless SSH authentication.
+- `-t ed25519` specifies the **key type** — Ed25519 is modern and secure.
+- `-C "your_email@example.com"` adds a **comment** to the key to help you identify it later.
+
+This creates two files: a private key (`~/.ssh/id_ed25519`) that you keep secret, and a public key (`~/.ssh/id_ed25519.pub`) that you share with remote servers.
+
+---
+
+### Copy your public key to a remote host
+```bash
+ssh-copy-id <user>@<host>
+```
+Appends your public key to the remote machine's `~/.ssh/authorized_keys` file, enabling passwordless login. You only need to do this once per remote machine.
+
+---
+
+## **Rsync**
+
+`rsync` is a fast, versatile file copying tool that only transfers the parts of files that have changed, making it far more efficient than `cp` or `scp` for large transfers or regular backups.
+
+### Common flags
+
+| Flag | Meaning |
+|---|---|
+| `-a` | **Archive** — preserves permissions, timestamps, symlinks, owner, and group. Equivalent to `-rlptgoD`. Almost always used. |
+| `-v` | **Verbose** — prints the name of each file as it is transferred. |
+| `-z` | **Compress** — compresses data during transfer to reduce bandwidth. Useful over slow networks, unnecessary on a LAN. |
+| `-h` | **Human-readable** — shows transfer sizes in KB/MB/GB. |
+| `-P` | **Progress + Partial** — shorthand for `--progress --partial`. Shows a per-file progress bar and keeps partially transferred files so the transfer can be resumed. |
+| `--progress` | **Progress** — shows a per-file progress bar without enabling partial file resuming. |
+| `--info=progress2` | **Overall progress** — shows a single progress bar for the entire transfer instead of one per file. Cleaner output for large jobs. |
+| `-n` | **Dry run** — simulates the transfer without actually copying anything. Use this first to verify what will be synced. |
+| `--delete` | Deletes files at the destination that no longer exist at the source, keeping the two locations in sync. |
+| `--exclude` | Skips files or directories matching a pattern. |
+
+---
+
+### Copy a local directory to another local location
+```bash
+rsync -avh /source/directory/ /destination/directory/
+```
+- `-a` preserves all file attributes.
+- `-v` prints each file name as it copies.
+- `-h` shows sizes in human-readable format.
+
+:::tip[Trailing slash matters]
+`/source/directory/` (with trailing slash) copies the **contents** of the directory into the destination.
+`/source/directory` (no trailing slash) copies the **directory itself** into the destination, creating `/destination/directory/directory/`.
+:::
+
+---
+
+### Preview what will be synced (dry run)
+```bash
+rsync -avhn /source/directory/ /destination/directory/
+```
+- `-n` performs a **dry run** — nothing is copied. Use this to verify the file list before committing.
+
+---
+
+### Copy files to a remote host over SSH
+```bash
+rsync -avhP /local/directory/ <user>@<host>:/remote/directory/
+```
+- `-P` shows a per-file progress bar and enables resuming interrupted transfers.
+- rsync uses SSH by default for remote transfers.
+
+Example:
+```bash
+rsync -avhP /home/john/videos/ john@192.168.1.10:/mnt/storage/videos/
+```
+
+---
+
+### Copy files from a remote host to local
+```bash
+rsync -avhP <user>@<host>:/remote/directory/ /local/directory/
+```
+Same as above but the source and destination are swapped — pulling files from the remote machine to your local machine.
+
+---
+
+### Sync and delete files removed from source
+```bash
+rsync -avh --delete /source/directory/ /destination/directory/
+```
+- `--delete` removes files from the destination that no longer exist in the source, keeping the destination an exact mirror.
+
+:::danger[Do a dry run first]
+`--delete` permanently removes files from the destination. Always do a dry run with `-n` first.
+:::
+
+---
+
+### Exclude files or directories
+```bash
+rsync -avh --exclude='*.tmp' --exclude='cache/' /source/ /destination/
+```
+- `--exclude='*.tmp'` skips all files ending in `.tmp`.
+- `--exclude='cache/'` skips the `cache` directory entirely.
+- You can stack multiple `--exclude` flags.
+
+---
+
+### Resume an interrupted transfer
+```bash
+rsync -avhP --append-verify /source/ /destination/
+```
+- `--append-verify` resumes partially transferred files and verifies the checksum of the appended data. Safer than `--append` alone.
+
+---
+
+<BuyMeACoffeeButton />
