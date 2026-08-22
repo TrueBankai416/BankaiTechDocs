@@ -105,6 +105,13 @@ code {
   border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 40%, transparent);
 }
 
+/* Prevent left sidebar items from being hidden behind the bottom bar */
+@media (min-width: 997px) {
+  .theme-doc-sidebar-menu {
+    padding-bottom: 80px !important;
+  }
+}
+
 /* Prevent TOC from overlapping with floating widgets at bottom right */
 .table-of-contents {
   max-height: calc(100vh - var(--floating-widget-clearance)) !important;
