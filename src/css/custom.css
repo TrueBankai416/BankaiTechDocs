@@ -24,6 +24,7 @@
   --ifm-toc-border-color: rgba(39, 74, 122, 0.3);
   --ifm-card-background-color: rgba(255, 255, 255, 0.9);
   --floating-widget-clearance: 225px; /* Greater the number = more clearance reserved for widgets (shorter TOC) */
+  --bottom-bar-height: 60px; /* Update this if the BottomBar height changes */
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -108,7 +109,7 @@ code {
 /* Prevent left sidebar items from being hidden behind the bottom bar */
 @media (min-width: 997px) {
   .theme-doc-sidebar-menu {
-    padding-bottom: 80px !important;
+    padding-bottom: calc(var(--bottom-bar-height) + 20px) !important;
   }
 }
 

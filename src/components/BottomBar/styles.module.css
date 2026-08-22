@@ -133,11 +133,11 @@
 }
 
 :global(body) {
-  padding-bottom: 60px;
+  padding-bottom: var(--bottom-bar-height);
 }
 
 @media (max-width: 768px) {
   :global(body) {
-    padding-bottom: 50px;
+    padding-bottom: calc(var(--bottom-bar-height) - 10px);
   }
 }
