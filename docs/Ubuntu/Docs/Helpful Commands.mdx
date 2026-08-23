@@ -191,6 +191,38 @@ Example: `mkdir -p /home/john/projects/myapp` creates all three folders at once 
 
 ---
 
+### Create an empty file
+```bash
+touch /path/to/file
+```
+- Creates the file if it does not exist.
+- If the file already exists, `touch` updates its access and modification timestamps without changing its contents.
+
+Useful for creating placeholder files or resetting timestamps for testing.
+
+---
+
+### Print text or write to a file
+```bash
+echo "hello world"
+```
+Prints the string to standard output (your terminal).
+
+Redirect to a file with `>` (overwrite) or `>>` (append):
+```bash
+# overwrite the file with new content
+echo "config=true" > /path/to/file.txt
+
+# append a line without erasing existing content
+echo "another line" >> /path/to/file.txt
+```
+
+:::danger[`>` overwrites without warning]
+`>` silently replaces the entire file. Use `>>` when you want to add to an existing file.
+:::
+
+---
+
 ### Copy files
 ```bash
 cp -r /source /destination
@@ -337,6 +369,105 @@ Useful when a file is growing unexpectedly, cannot be deleted, or you need to co
 2. Run `sudo lsof /path/to/file` to see what has it open and in what mode (`r` = read, `w` = write, `u` = read+write).
 3. Wait a few seconds, then `stat` again. If the size increased and `lsof` shows a write handle, a process is still appending to it.
 :::
+
+---
+
+### Watch a file's size in real time
+```bash
+watch -n 1 'stat -c "%s bytes %n" "/path/to/file"'
+```
+- `watch -n 1` re-runs the quoted command every **1 second** and refreshes the display in place.
+- `stat -c "%s bytes %n"` prints only the size in bytes (`%s`) and the filename (`%n`) — much less noise than a full `stat` output.
+
+Useful for confirming a file has stopped growing after a transcoding or remux job finishes. Press `Ctrl+C` to exit `watch`.
+
+---
+
+### Search file contents with grep
+```bash
+grep "pattern" /path/to/file
+```
+- Prints every line in the file that contains `pattern`. The pattern can be plain text or a regular expression.
+
+Common flags:
+
+| Flag | Effect |
+|---|---|
+| `-r` | Recurse into subdirectories |
+| `-i` | Case-insensitive match |
+| `-n` | Prefix each match with its line number |
+| `-l` | Print only the filenames that contain a match, not the lines |
+| `-v` | Invert — print lines that do **not** match |
+| `-c` | Print a count of matching lines per file |
+| `--include='*.log'` | Limit recursive search to files matching a glob |
+
+Recursive search with line numbers (the most common real-world form):
+```bash
+grep -rn "pattern" /path/to/directory
+```
+
+Filter command output — pipe any command into `grep` to show only relevant lines:
+```bash
+journalctl -u tdarr | grep -i "error\|warn"
+```
+
+---
+
+### Edit text in files with sed
+```bash
+sed 's/search/replacement/' /path/to/file
+```
+`sed` (stream editor) reads a file line by line and applies an expression to each line. The substitution expression format is `s/search/replacement/` — `search` is the text (or regex) to find, and `replacement` is what to put in its place.
+
+Concrete example — change every `http://` to `https://` in a config file:
+```bash
+sed 's/http:\/\//https:\/\//' /etc/myapp/config.conf
+```
+Because `sed` uses `/` as the delimiter between `s`, `search`, and `replacement`, any `/` that appears in the search or replacement text must be escaped as `\/` so `sed` doesn't mistake it for a delimiter.
+
+Common expressions:
+
+| Expression | Effect |
+|---|---|
+| `s/search/replacement/` | Replace **first** match per line |
+| `s/search/replacement/g` | Replace **all** matches per line (`g` = global) |
+| `s/search/replacement/i` | Case-insensitive replace |
+| `/pattern/d` | Delete lines that contain `pattern` |
+| `/pattern/p` | Print only lines that contain `pattern` (use with `-n`) |
+
+By default `sed` prints to stdout without modifying the file. Use `-i` to edit in place:
+```bash
+# replace all occurrences directly in the file
+sed -i 's/search/replacement/g' /path/to/file
+
+# save a backup as file.bak before editing
+sed -i.bak 's/search/replacement/g' /path/to/file
+```
+
+---
+
+### Browse disk usage interactively with ncdu
+```bash
+ncdu /path/to/directory
+```
+`ncdu` (NCurses Disk Usage) scans a directory tree and displays a sorted, interactive breakdown of what is consuming space.
+
+Install it first if not present:
+```bash
+sudo apt install ncdu
+```
+
+Key bindings once inside `ncdu`:
+
+| Key | Action |
+|---|---|
+| `↑` / `↓` | Move between entries |
+| `Enter` | Drill into a subdirectory |
+| `d` | Delete the selected file or directory (with confirmation) |
+| `i` | Show info about the selected item |
+| `q` | Quit |
+
+Useful for quickly finding which folder is eating your disk before reaching for `du -sh *`.
 
 ---
 
@@ -542,6 +673,31 @@ sudo fuser -v <port>/tcp
 
 ---
 
+### Test if a port is reachable
+```bash
+nc -zv <host> <port>
+```
+- `nc` (netcat) opens a TCP connection to `<host>` on `<port>` and immediately exits.
+- `-z` — zero-I/O mode: connect and exit without sending data (port probe only).
+- `-v` — verbose: print whether the connection succeeded or was refused.
+
+Example — check if Jellyfin on another machine is reachable:
+```bash
+nc -zv 192.168.1.50 8096
+```
+
+Output when **open**: `Connection to 192.168.1.50 8096 port [tcp/*] succeeded!`
+
+Output when **blocked or closed**: `nc: connect to 192.168.1.50 port 8096 (tcp) failed: Connection refused`
+
+:::tip[Port blocked vs. port closed]
+**Connection refused** means the host responded but nothing is listening on that port — the service is down or on a different port.
+
+**Connection timed out** (no output for several seconds) means the traffic is being dropped by a firewall before it reaches the host — check UFW rules on the server and any network-level firewall between the two machines.
+:::
+
+---
+
 ### Check firewall status (UFW)
 ```bash
 sudo ufw status verbose
@@ -609,6 +765,28 @@ Opens a live, updating view of all running processes sorted by CPU usage. Useful
 
 ---
 
+### Interactive process viewer (enhanced)
+```bash
+htop
+```
+`htop` is a more readable alternative to `top` with color-coded bars for CPU and memory, mouse support, and easier process management. Install it first if not present:
+```bash
+sudo apt install htop
+```
+
+Key bindings:
+
+| Key | Action |
+|---|---|
+| `F2` | Open settings |
+| `F3` / `/` | Search for a process by name |
+| `F5` | Toggle tree view (shows parent/child relationships) |
+| `F6` | Change sort column |
+| `F9` | Send a signal to the selected process (e.g. SIGKILL) |
+| `q` | Quit |
+
+---
+
 ### Kill a process by PID
 ```bash
 kill -9 <pid>
@@ -652,6 +830,42 @@ The pattern can be a regex, so you can match multiple programs at once using `|`
 sudo pgrep -a -f 'mkvpropedit|tdarr|ffmpeg'
 ```
 This returns all running processes whose command line contains `mkvpropedit`, `tdarr`, or `ffmpeg`. `sudo` is needed to see processes owned by other users (e.g. services running as `root` or a dedicated service account).
+
+---
+
+### Find a process with ps and grep
+```bash
+sudo ps auxww | grep '[m]kvpropedit'
+```
+- `ps auxww` lists all processes for all users (`a`), with user-oriented format (`u`), including processes without a controlling terminal (`x`), with no column truncation (`ww`).
+- The bracket trick `[m]kvpropedit` prevents the `grep` process itself from appearing in results (the pattern doesn't match its own command line).
+
+Alternative to `pgrep` when you want the full `ps` output columns (USER, PID, %CPU, %MEM, VSZ, RSS, START, TIME, COMMAND) without a separate lookup.
+
+---
+
+### Inspect a specific process by PID
+```bash
+sudo ps -p <PID> -o pid,etime,pcpu,pmem,cmd
+```
+- `-p <PID>` — target a single process by its PID.
+- `etime` — elapsed time since the process started (format: `[[DD-]HH:]MM:SS`).
+- `pcpu` / `pmem` — CPU and memory percentage.
+- `cmd` — full command line.
+
+Useful after finding a PID with `pgrep` or `ps auxww` to check how long a job has been running and how much CPU/memory it is consuming.
+
+---
+
+### Trace file-write syscalls on a running process
+```bash
+sudo strace -p <PID> -e trace=write,pwrite64,truncate,ftruncate -c
+```
+- `-p <PID>` — attach to an already-running process.
+- `-e trace=write,pwrite64,truncate,ftruncate` — record only file-write related syscalls; filters out the noise of unrelated syscalls.
+- `-c` — summary mode: instead of printing every call, accumulate counts and print a table of call frequency and time when you detach (`Ctrl+C`).
+
+Useful for confirming whether a process is actively writing to disk. If `write`/`pwrite64` counts climb while you watch, the process is still appending data. A near-zero count after a few seconds means it has stalled or finished.
 
 ---
 
@@ -885,8 +1099,22 @@ mkvinfo /path/to/file.mkv | head -100
 
 Useful for identifying the codec of each track (e.g. VC-1, H.264, AC-3) before remuxing or transcoding, and for diagnosing container-level issues such as a corrupt seek head.
 
-:::note[mkvpropedit + VC-1 + old mkvmerge]
-Files muxed with very old versions of mkvmerge (e.g. v5.8.0 from 2012) and containing VC-1 video can grow indefinitely when `mkvpropedit` tries to rewrite the seek head, because the seek head was written without reserving void space. Use `mkvinfo` to confirm the codec and mkvmerge version before running `mkvpropedit`.
+### Add track statistics tags to an MKV
+```bash
+mkvpropedit /path/to/file.mkv --add-track-statistics-tags
+```
+- Reads the actual stream data and writes `BPS` (bitrate), `DURATION`, `NUMBER_OF_FRAMES`, and `NUMBER_OF_BYTES` tags into the MKV container without re-encoding.
+- Tdarr and some media servers call this automatically after transcoding to populate statistics that the original mux may not have included.
+- The file is modified in-place; no re-mux is required.
+
+---
+
+:::note[Ever-growing files with mkvpropedit (affects mkvpropedit &lt; v71.0.0 only)]
+Files muxed with old versions of mkvmerge (e.g. v5.8.0 from 2012) often have a Seek Head with no void space reserved for future edits. When `mkvpropedit` needs to add or update Seek Head entries, if the existing Seek Head is too small to hold the new positions, versions **before v71.0.0** entered an endless loop writing data to the end of the file — causing the file to grow indefinitely.
+
+This was fixed in MKVToolNix v71.0.0 (issue #3338): the fix was to void the undersized Seek Head and write a new one with sufficient space instead. **If you are running mkvpropedit v71.0.0 or newer, this bug does not affect you.** Any codec muxed with that era of mkvmerge is susceptible, not just VC-1.
+
+If you are on an older version, use `mkvinfo` to check the writing application and mkvmerge version in the file's segment info before running `mkvpropedit`, and remux the file first with a current mkvmerge to rebuild the Seek Head with proper void space.
 :::
 
 ---
