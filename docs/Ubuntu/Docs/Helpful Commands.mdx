@@ -519,6 +519,24 @@ Exit code `0` means the files are identical; `1` means they differ.
 
 ---
 
+### Compare two files byte by byte
+```bash
+cmp file1 file2
+```
+`cmp` does a binary comparison and reports the byte offset and line number of the **first** difference it finds, then stops. Unlike `diff`, it works on any file type (binary, compressed, media).
+
+- With no flags, prints nothing if the files are identical and reports the first differing byte if not.
+- `-l` — list **all** differing bytes (offset and values in octal).
+- `-s` — silent mode: produce no output, only set the exit code. Useful in scripts.
+
+Exit code `0` = identical, `1` = differ, `2` = error.
+
+:::tip[cmp vs diff]
+Use `diff` when you want to see *what* text changed line by line. Use `cmp` when you only need to know *whether* two files are byte-for-byte identical (e.g. verifying a copy or download).
+:::
+
+---
+
 ### Browse disk usage interactively with ncdu
 ```bash
 ncdu /path/to/directory
