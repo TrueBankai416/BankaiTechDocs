@@ -494,6 +494,31 @@ sed -i.bak 's/search/replacement/g' /path/to/file
 
 ---
 
+### Compare two files line by line
+```bash
+diff file1 file2
+```
+Prints the lines that differ between two files. Lines prefixed with `<` are only in `file1`; lines prefixed with `>` are only in `file2`.
+
+Common flags:
+
+| Flag | Effect |
+|---|---|
+| `-u` | Unified format — shows a few lines of context around each change (the format used by `git diff`) |
+| `-i` | Ignore case differences |
+| `-w` | Ignore all whitespace differences |
+| `-r` | Recurse into directories and compare all files |
+| `-q` | Quiet — only report whether files differ, not what differs |
+
+Example — compare two JSON dumps side by side in unified format:
+```bash
+diff -u /tmp/before.json /tmp/after.json
+```
+
+Exit code `0` means the files are identical; `1` means they differ.
+
+---
+
 ### Browse disk usage interactively with ncdu
 ```bash
 ncdu /path/to/directory
@@ -1150,6 +1175,22 @@ Useful for identifying the codec of each track (e.g. VC-1, H.264, AC-3) before r
 To save the full output to a file for easier reading (e.g. in a text editor or with `grep`):
 ```bash
 mkvinfo /path/to/file.mkv > output.txt
+```
+
+---
+
+### Dump MKV metadata as JSON
+```bash
+mkvmerge -J /path/to/file.mkv > /tmp/output.json
+```
+- `-J` outputs the file's full track, attachment, chapter, and container metadata as structured JSON instead of human-readable text.
+- Redirecting to a file (e.g. `/tmp/output.json`) lets you open it in a JSON viewer, diff two files, or parse it with `jq`.
+
+Useful for comparing a file before and after a remux or transcode to confirm track order, codec, language tags, and flags are unchanged:
+```bash
+mkvmerge -J before.mkv > /tmp/before.json
+mkvmerge -J after.mkv  > /tmp/after.json
+diff /tmp/before.json /tmp/after.json
 ```
 
 ### Add track statistics tags to an MKV
