@@ -296,6 +296,48 @@ find . -type f \( -iname "*.KDRSXS" -o -iname "*.ECJLLX" -o -iname "*.YFUINC" \)
 
 ---
 
+### Get detailed file metadata
+```bash
+stat /path/to/file
+```
+Displays detailed metadata about a file: size in bytes, block allocation, inode number, permissions, owner, and all three timestamps (access time, modify time, change time).
+
+`stat` accepts multiple paths in a single call, which is useful for comparing several files at once:
+```bash
+sudo stat /path/to/file1 /path/to/file2 /path/to/file3
+```
+
+Useful for diagnosing files that are unexpectedly growing — run `stat` periodically and watch whether the **Size** and **Modify** time keep updating.
+
+---
+
+### Hex dump the last N bytes of a file
+```bash
+sudo tail -c 1024 /path/to/file | xxd
+```
+- `tail -c 1024` reads the last **1024 bytes** of the file. Change `1024` to any byte count.
+- `xxd` converts the binary data to a hex dump for visual inspection.
+
+Useful for checking whether a file has valid end-of-file data or is still being written. For example, a correctly finalised MKV will have recognisable EBML closing bytes; a file still in progress will show an incomplete block.
+
+---
+
+### Check which process has a file open
+```bash
+sudo lsof /path/to/file
+```
+- Passing a file path to `lsof` shows every process that currently has that file open, along with its PID, user, and access mode.
+
+Useful when a file is growing unexpectedly, cannot be deleted, or you need to confirm whether a tool has finished writing before moving the file.
+
+:::tip[File still growing?]
+1. Run `stat /path/to/file` to record the current size.
+2. Run `sudo lsof /path/to/file` to see what has it open and in what mode (`r` = read, `w` = write, `u` = read+write).
+3. Wait a few seconds, then `stat` again. If the size increased and `lsof` shows a write handle, a process is still appending to it.
+:::
+
+---
+
 ## **User Management**
 
 ### Add a new user
@@ -596,6 +638,21 @@ Prints the PID(s) of all processes matching the given name. Example: `pgrep ngin
 
 ---
 
+### Find processes by full command line
+```bash
+pgrep -a -f <pattern>
+```
+- `-a` — print the **full command line** alongside each PID, not just the PID.
+- `-f` — match against the **full command line** (including arguments and flags) instead of just the executable name. Useful when multiple processes share the same binary (e.g. several concurrent `ffmpeg` jobs with different input files).
+
+The pattern can be a regex, so you can match multiple programs at once using `|` alternation:
+```bash
+sudo pgrep -a -f 'mkvpropedit|tdarr|ffmpeg'
+```
+This returns all running processes whose command line contains `mkvpropedit`, `tdarr`, or `ffmpeg`. `sudo` is needed to see processes owned by other users (e.g. services running as `root` or a dedicated service account).
+
+---
+
 ## **Permissions**
 
 Linux file permissions control who can read, write, or execute a file. Every file has three sets of permissions: one for the **owner**, one for the **group**, and one for **everyone else** (others).
@@ -807,6 +864,55 @@ rsync -avh --exclude='*.tmp' --exclude='cache/' /source/ /destination/
 rsync -avhP --append-verify /source/ /destination/
 ```
 - `--append-verify` resumes partially transferred files and verifies the checksum of the appended data. Safer than `--append` alone.
+
+---
+
+## **Media File Inspection**
+
+These commands require `mkvtoolnix` and `ffmpeg`. Install them with:
+```bash
+sudo apt install mkvtoolnix ffmpeg
+```
+
+### Inspect MKV container structure
+```bash
+mkvinfo /path/to/file.mkv | head -100
+```
+- `mkvinfo` parses an MKV file and prints its full container structure: EBML headers, tracks, codecs, timestamps, and flags.
+- `| head -100` limits output to the first 100 lines — remove it to see everything (output can be thousands of lines for large files).
+
+Useful for identifying the codec of each track (e.g. VC-1, H.264, AC-3) before remuxing or transcoding, and for diagnosing container-level issues such as a corrupt seek head.
+
+:::note[mkvpropedit + VC-1 + old mkvmerge]
+Files muxed with very old versions of mkvmerge (e.g. v5.8.0 from 2012) and containing VC-1 video can grow indefinitely when `mkvpropedit` tries to rewrite the seek head, because the seek head was written without reserving void space. Use `mkvinfo` to confirm the codec and mkvmerge version before running `mkvpropedit`.
+:::
+
+---
+
+### Probe media file metadata
+```bash
+ffprobe -v error -show_entries format=filename,format_name,duration,size -of default=noprint_wrappers=1 /path/to/file
+```
+- `-v error` — suppress all output except errors.
+- `-show_entries format=...` — select which container-level fields to display. Common fields: `filename`, `format_name`, `duration`, `size`, `bit_rate`.
+- `-of default=noprint_wrappers=1` — output as plain `key=value` pairs without section headers.
+
+Example output:
+```
+filename=Supernatural - S02E15 - Tall Tales.mkv
+format_name=matroska,webm
+duration=2612.345678
+size=34359738368
+```
+
+To also include per-stream info (codec, resolution, audio channels), add `stream=codec_name,width,height,channels` to `-show_entries`:
+```bash
+ffprobe -v error -show_entries format=size,duration:stream=codec_name,width,height -of default=noprint_wrappers=1 /path/to/file
+```
+
+:::tip[Confirm a file is no longer growing]
+Run `ffprobe` (or `stat`) twice a few seconds apart. If the `size` value changes between runs, a process is still writing to the file.
+:::
 
 ---
 
