@@ -234,12 +234,54 @@ cp -r /source /destination
 
 ---
 
+### Copy files with copy-on-write (reflink)
+```bash
+cp --reflink=auto /source /destination
+```
+Instead of duplicating the file's data on disk immediately, `--reflink` creates a shallow clone that shares the same underlying data blocks as the original. New blocks are only written when one of the two copies is modified (copy-on-write), so the initial copy is nearly instant and uses no extra space until changes are made.
+
+- `--reflink=auto` — use a reflink if the filesystem supports it (Btrfs, XFS, APFS); silently fall back to a normal copy if not.
+- `--reflink=always` — fail with an error if a reflink is not possible, rather than falling back.
+
+:::note[Filesystem support required]
+Reflinks require a filesystem that supports copy-on-write extents. On Ubuntu, **Btrfs** and **XFS** (with `reflink=1` mount option) support this. The default **ext4** filesystem does not.
+:::
+
+---
+
 ### Move or rename files
 ```bash
 mv /source /destination
 ```
 - `mv` moves a file or directory to a new location.
 - If the destination is in the same folder with a different name, it renames the file instead. No flags needed for basic usage.
+
+---
+
+### Create links between files
+```bash
+# symbolic (soft) link — like a shortcut
+ln -s /path/to/original /path/to/link
+
+# hard link — a second name for the same file data
+ln /path/to/original /path/to/link
+```
+
+A **symbolic link** points to a path. If the original is moved or deleted, the symlink breaks. Works across filesystems and on directories.
+
+A **hard link** points directly to the same inode (the underlying data) as the original. The file's data is only deleted when all hard links to it are removed. Cannot span filesystems or link directories.
+
+| | Symlink | Hard link |
+|---|---|---|
+| Survives original deletion | No — becomes a dangling link | Yes — data stays until all links removed |
+| Works across filesystems | Yes | No |
+| Can link directories | Yes (with `-s`) | No |
+| Shows as separate file | Yes | Yes |
+
+Verify a symlink with `ls -la` — the `->` arrow shows what it points to:
+```bash
+ls -la /path/to/link
+```
 
 ---
 
