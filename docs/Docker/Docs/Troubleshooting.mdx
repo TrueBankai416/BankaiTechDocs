@@ -186,4 +186,64 @@ sudo docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPe
 
 :::
 
+---
+
+## **Tdarr (or any NVIDIA container) won't start after driver update**
+
+### **Error**
+
+```
+Error response from daemon: failed to create task for container: failed to create shim task:
+OCI runtime create failed: runc create failed: unable to start container process:
+error during container init: failed to fulfil mount request:
+open /usr/lib/x86_64-linux-gnu/libEGL_nvidia.so.580.159.04: no such file or directory
+```
+
+The library version in the error (`580.159.04`) is the **old** driver — not the one you just installed.
+
+### **Cause**
+
+Docker uses CDI (Container Device Interface) to mount NVIDIA libraries into containers. The CDI spec file (`/etc/cdi/nvidia.yaml`) is generated at install time and caches the exact library paths for the driver version present at that moment. When the driver is updated, the CDI spec is not automatically regenerated, so Docker still tries to mount libraries from the previous version that no longer exist on disk.
+
+### **Resolution**
+
+**1. Restart the CDI refresh service and check the current CDI device list:**
+
+```bash
+sudo systemctl restart nvidia-cdi-refresh.service
+sudo nvidia-ctk --debug cdi list
+```
+
+**2. Check whether the old driver version is still referenced in the CDI config:**
+
+```bash
+# Replace 580.159.04 with the OLD driver version shown in the error
+sudo grep -R "580.159.04" /etc/cdi /var/run/cdi 2>/dev/null
+```
+
+If this returns output, the CDI spec still contains stale paths and must be regenerated.
+
+**3. Regenerate the CDI spec:**
+
+```bash
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+```
+
+**4. Recreate the container:**
+
+```bash
+docker compose up -d --force-recreate tdarr
+```
+
+**5. If the container still fails, restart Docker to clear its cached device configuration:**
+
+```bash
+sudo systemctl restart docker
+docker compose up -d tdarr
+```
+
+:::tip[Avoid unnecessary capabilities]
+Remove `NVIDIA_DRIVER_CAPABILITIES=all` from the Compose file if you have it. Tdarr already defaults to the capabilities it needs (`compute,video,utility`). Requesting `all` unnecessarily includes graphics/EGL libraries — which are also what triggers this error when they go stale after a driver update.
+:::
+
 <BuyMeACoffeeButton />
