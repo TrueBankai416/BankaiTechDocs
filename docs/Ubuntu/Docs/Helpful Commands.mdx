@@ -6,9 +6,7 @@ last_update:
   author: BankaiTech
 updates:
   - date: 2026-08-23
-    note: "docs(ubuntu): update frontmatter update note"
-  - date: 2026-08-23
-    note: "docs(ubuntu): add cp --reflink, ln, touch, echo, grep, sed, ncdu, htop, nc, strace, ps, watch, mkvpropedit stats"
+    note: "docs(ubuntu): add cp --reflink, ln"
   - date: 2026-08-23
     note: "docs(ubuntu): add watch, grep, sed, ncdu, touch, echo, htop, nc port test, strace, ps, mkvpropedit stats"
   - date: 2026-08-23
@@ -1146,6 +1144,11 @@ mkvinfo /path/to/file.mkv | head -100
 - `| head -100` limits output to the first 100 lines — remove it to see everything (output can be thousands of lines for large files).
 
 Useful for identifying the codec of each track (e.g. VC-1, H.264, AC-3) before remuxing or transcoding, and for diagnosing container-level issues such as a corrupt seek head.
+
+To save the full output to a file for easier reading (e.g. in a text editor or with `grep`):
+```bash
+mkvinfo /path/to/file.mkv > output.txt
+```
 
 ### Add track statistics tags to an MKV
 ```bash
