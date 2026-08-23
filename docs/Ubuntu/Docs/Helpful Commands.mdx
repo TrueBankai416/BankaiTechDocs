@@ -528,11 +528,33 @@ cmp file1 file2
 - With no flags, prints nothing if the files are identical and reports the first differing byte if not.
 - `-l` — list **all** differing bytes (offset and values in octal).
 - `-s` — silent mode: produce no output, only set the exit code. Useful in scripts.
+- `-n <bytes>` — compare only the first `<bytes>` bytes. Use this when the files have different sizes and you only want to check the region that exists in both.
 
 Exit code `0` = identical, `1` = differ, `2` = error.
 
 :::tip[cmp vs diff]
 Use `diff` when you want to see *what* text changed line by line. Use `cmp` when you only need to know *whether* two files are byte-for-byte identical (e.g. verifying a copy or download).
+:::
+
+:::tip[Inspecting the differing region — full workflow]
+Once `cmp` reports a differing byte offset, use `dd` + `xxd` + `diff` to see exactly what changed around that position:
+
+```bash
+# 1. Find where the files first differ (limit to the smaller file's size with -n)
+cmp -n 2106826942 file-before.mkv file-after.mkv
+# output: files differ: byte 2106824424, line 7876101
+
+# 2. Extract ~4 KB around the differing offset from each file
+dd if="file-before.mkv" bs=1 skip=2106824000 count=4000 2>/dev/null | xxd > /tmp/before.hex
+dd if="file-after.mkv"  bs=1 skip=2106824000 count=4000 2>/dev/null | xxd > /tmp/after.hex
+
+# 3. Diff the two hex dumps to see exactly which bytes changed
+diff -u /tmp/before.hex /tmp/after.hex
+```
+
+- `bs=1 skip=<offset>` — seek to `<offset>` bytes into the file (`bs=1` means each skip unit is 1 byte).
+- `count=4000` — read 4000 bytes (adjust to capture the full area of interest).
+- `2>/dev/null` — suppress `dd`'s progress line so only the data goes to `xxd`.
 :::
 
 ---
@@ -559,6 +581,32 @@ Key bindings once inside `ncdu`:
 | `q` | Quit |
 
 Useful for quickly finding which folder is eating your disk before reaching for `du -sh *`.
+
+---
+
+### Copy and convert data at block level
+```bash
+dd if=/dev/sda of=/path/to/image.img bs=4M status=progress
+```
+`dd` reads from an input file (`if=`) and writes to an output file (`of=`) block by block. Both `if` and `of` can be a regular file, a disk device, or a special file like `/dev/zero` or `/dev/null`.
+
+- `if=` — input file or device to read from.
+- `of=` — output file or device to write to.
+- `bs=` — block size; larger values (e.g. `4M`) are faster for bulk transfers.
+- `status=progress` — print transfer speed and progress while running.
+
+Common uses:
+
+| Command | What it does |
+|---|---|
+| `dd if=/dev/sda of=disk.img bs=4M status=progress` | Clone an entire disk to an image file |
+| `dd if=disk.img of=/dev/sdb bs=4M status=progress` | Restore an image file to a disk |
+| `dd if=/dev/zero of=testfile bs=1M count=1024 status=progress` | Create a 1 GB zero-filled file (useful for write speed testing) |
+| `dd if=/dev/urandom of=testfile bs=1M count=100` | Fill a file with random data |
+
+:::danger[`of=` targets are overwritten silently]
+Writing to a wrong `of=` target (e.g. `of=/dev/sda` instead of `of=/dev/sdb`) will destroy data with no confirmation prompt. Double-check the device name with `lsblk` before running.
+:::
 
 ---
 
