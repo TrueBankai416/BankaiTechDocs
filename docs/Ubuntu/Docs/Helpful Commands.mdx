@@ -15,6 +15,8 @@ updates:
     note: "docs(ubuntu): add mkvinfo output redirect to file example"
   - date: 2026-08-23
     note: "docs(ubuntu): update frontmatter update note"
+  - date: 2026-08-26
+    note: "docs(ubuntu): add sed -n line range print command"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
@@ -490,6 +492,27 @@ sed -i 's/search/replacement/g' /path/to/file
 
 # save a backup as file.bak before editing
 sed -i.bak 's/search/replacement/g' /path/to/file
+```
+
+---
+
+### Print specific lines from a file
+```bash
+sed -n '45,55p' /path/to/file
+```
+Prints only lines 45 through 55 of a file without modifying it.
+
+- `-n` — **suppress** the default behavior of printing every line. Without this flag, `sed` prints all lines plus the matched ones.
+- `'45,55p'` — the address range `45,55` selects lines 45 to 55; `p` prints each selected line.
+
+Useful for inspecting a specific section of a large config file without opening it in an editor:
+```bash
+sudo sed -n '45,55p' /etc/sudoers
+```
+
+To print a single line, use the same number for both ends of the range, or just `'<N>p'`:
+```bash
+sed -n '72p' /path/to/file
 ```
 
 ---
