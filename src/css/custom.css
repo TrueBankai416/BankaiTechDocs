@@ -133,6 +133,10 @@ code {
     background: var(--ifm-background-color);
     background: color-mix(in srgb, var(--ifm-background-color) 92%, var(--ifm-color-primary) 8%);
     z-index: 1001;
+    /* Prevent bottom bar from covering the last sidebar items */
+    padding-bottom: var(--bottom-bar-height) !important;
+    overflow-y: auto;
+    max-height: 100dvh;
   }
 
   .navbar-sidebar__backdrop {
