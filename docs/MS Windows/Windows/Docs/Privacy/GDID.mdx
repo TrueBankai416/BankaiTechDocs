@@ -229,7 +229,21 @@ Disabling `wlidsvc` (Microsoft Account Sign-in Assistant) stops the service that
 
 When you select **Option 1**, the script will prompt you to create a local administrator account before proceeding. It is strongly recommended to accept this prompt if your Windows account is linked to a Microsoft account.
 
-You can also create a local account manually via Settings: **Settings → Accounts → Other users → Add account → "I don't have this person's sign-in information" → "Add a user without a Microsoft account"**
+**Option A — Switch your current account to a local account (recommended)**
+
+This converts your existing Windows login from a Microsoft account to a local account, so you keep the same profile without needing a second account:
+
+1. Open **Settings** → **Accounts** → **Your info**
+2. Click **"Stop signing into Microsoft apps automatically"** (or **"Sign in with a local account instead"** on some builds)
+3. Follow the prompts to set a local username and password
+
+After this, your account no longer relies on `wlidsvc` to stay signed in.
+
+**Option B — Create a separate local administrator account**
+
+If you prefer to keep your Microsoft account linked and just want a local fallback:
+
+**Settings → Accounts → Other users → Add account → "I don't have this person's sign-in information" → "Add a user without a Microsoft account"**
 
 Alternatively, see [Creating a Local Admin Account via CMD](../Local%20Admin%20Account) for a faster command-line method.
 :::
@@ -392,6 +406,7 @@ Blocking `login.live.com` or disabling `wlidsvc` without first creating a **loca
 ## References
 
 - [gdid-reversal](https://github.com/SmtimesIWndr/gdid-reversal)
+- [Change user account back to local or dissociate it from Microsoft Account](https://learn.microsoft.com/en-us/answers/questions/5520793/change-user-account-back-to-local-or-at-least-asso)
 
 ---
 
