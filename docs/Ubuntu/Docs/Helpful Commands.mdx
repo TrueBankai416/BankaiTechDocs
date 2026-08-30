@@ -262,6 +262,54 @@ mv /source /destination
 
 ---
 
+### Bulk rename files with rename
+
+Ubuntu ships with two different `rename` tools with incompatible syntax:
+
+| Package | Command syntax | Supports regex |
+|---|---|---|
+| `util-linux` (default) | `rename <from> <to> <files>` | No — literal strings only |
+| `rename` (Perl) | `rename 's/pattern/replacement/' <files>` | Yes |
+
+Check which version you have:
+```bash
+rename --version
+```
+If the output mentions `util-linux`, you have the basic version.
+
+**util-linux rename — literal string replacement:**
+```bash
+# rename every .txt file to .bak
+rename .txt .bak *.txt
+```
+
+**Perl rename — regex-based (install first):**
+```bash
+sudo apt install rename
+```
+```bash
+# remove [video_id] suffixes from filenames, e.g. "Title [abc123].mkv" → "Title.mkv"
+rename 's/ \[[^\]]*\]//' *.mkv
+
+# replace spaces with underscores
+rename 's/ /_/g' *.mkv
+
+# dry run — preview changes without renaming
+rename -n 's/ \[[^\]]*\]//' *.mkv
+```
+
+- `-n` — **dry run**: print what would be renamed without making any changes.
+- `s/pattern/replacement/` — Perl substitution expression; `g` at the end replaces all occurrences per filename.
+
+:::tip[Prefer the for loop if Perl rename is unavailable]
+If you can't install the Perl version, use a `for` loop with `sed` as a portable alternative:
+```bash
+for f in *.mkv; do mv "$f" "$(echo "$f" | sed 's/ \[[^]]*\]//')"; done
+```
+:::
+
+---
+
 ### Create links between files
 ```bash
 # symbolic (soft) link — like a shortcut
