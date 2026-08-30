@@ -129,12 +129,13 @@ yt-dlp -f best "URL"
 ```
 
 :::tip[Add to config]
-To apply MKV output, metadata tagging, and archive tracking to every download, add these to your config file:
+To apply MKV output, metadata tagging, archive tracking, and a default filename template to every download, add these to your config file:
 
 ```bash
 echo '--remux-video mkv' >> ~/.config/yt-dlp/config
 echo '--add-metadata' >> ~/.config/yt-dlp/config
 echo '--download-archive ~/.config/yt-dlp/archive.txt' >> ~/.config/yt-dlp/config
+echo '-o "%(title)s.%(ext)s"' >> ~/.config/yt-dlp/config
 ```
 
 With the archive flag in config, yt-dlp will automatically skip any video it has already downloaded, across all future runs.
