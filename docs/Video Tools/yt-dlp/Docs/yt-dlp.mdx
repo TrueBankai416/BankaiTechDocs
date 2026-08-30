@@ -300,6 +300,32 @@ yt-dlp --download-archive archive.txt -o "%(uploader)s/%(title)s.%(ext)s" "CHANN
 
 Every downloaded video ID is written to `archive.txt`. Re-running the command skips previously downloaded videos.
 
+To ignore the archive for a single run (e.g., to re-download everything):
+
+```bash
+yt-dlp --no-download-archive "URL"
+```
+
+### Auto-Download New Episodes via Cron
+
+If the archive flag is in your config, yt-dlp will only fetch videos it hasn't seen before. Schedule a cron job to poll the channel regularly:
+
+```bash
+crontab -e
+```
+
+Add an entry to run daily at 2 AM (adjust paths and URL as needed):
+
+```
+0 2 * * * /home/server/.local/bin/yt-dlp "https://www.youtube.com/@ChannelName/videos" -o "/path/to/downloads/%(title)s.%(ext)s" >> /home/server/yt-dlp.log 2>&1
+```
+
+The log file captures any errors or skipped videos for review. Since the archive is already set in your config, only new uploads will be downloaded on each run.
+
+:::tip
+Use `crontab -l` to list your current cron jobs and verify the entry was saved.
+:::
+
 ### Download Best MP4 with Metadata and Thumbnail
 
 ```bash
