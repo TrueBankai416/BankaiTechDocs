@@ -307,6 +307,71 @@ yt-dlp -a urls.txt
 
 ## Troubleshooting
 
+### No supported JavaScript runtime found
+
+```
+WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default...
+YouTube extraction without a JS runtime has been deprecated, and some formats may be missing.
+```
+
+yt-dlp requires a JavaScript runtime to extract some YouTube formats. The warning also states that **only Deno is enabled by default** — Node.js must be explicitly opted in even if installed. Ubuntu's built-in `nodejs` package is often too old; install Node.js via **nvm** for the current LTS.
+
+**Step 1 — Install nvm and Node.js LTS:**
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+nvm install --lts
+```
+
+**Step 2 — Make `node` available system-wide:**
+
+```bash
+# Symlink the nvm-managed binary into /usr/local/bin so yt-dlp can find it
+sudo ln -sf "$(which node)" /usr/local/bin/node
+```
+
+**Step 3 — Tell yt-dlp to use it:**
+
+```bash
+yt-dlp --js-runtimes "node:/usr/local/bin/node" "URL"
+```
+
+Save to config so you don't need to pass it every time:
+
+```bash
+mkdir -p ~/.config/yt-dlp
+echo '--js-runtimes node:/usr/local/bin/node' > ~/.config/yt-dlp/config
+```
+
+**Step 4 — Enable the remote challenge solver script (recommended):**
+
+After enabling Node.js you may see a second warning:
+
+```
+WARNING: [youtube] [jsc] Remote component challenge solver script (node) was skipped.
+You can enable the download with --remote-components ejs:github (recommended).
+```
+
+This allows yt-dlp to download YouTube's JS challenge solver from GitHub. Add it to your config:
+
+```bash
+echo '--remote-components ejs:github' >> ~/.config/yt-dlp/config
+```
+
+Verify it is detected:
+
+```bash
+yt-dlp --verbose "URL" 2>&1 | grep -i "runtime\|node"
+# Should show: [debug] JS runtimes: node
+```
+
+:::note
+The `This video is not available` API error is often also caused by YouTube's bot detection rather than the video actually being unavailable. Enabling the JS runtime and remote challenge solver (steps above) typically resolves it.
+:::
+
+---
+
 ### Impersonation target not available (firefox / chrome)
 
 ```
