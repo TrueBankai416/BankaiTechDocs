@@ -1,0 +1,366 @@
+---
+title: yt-dlp — Download Videos from the Command Line
+description: A complete guide to installing and using yt-dlp on Ubuntu/Linux to download videos, audio, playlists, and subtitles from YouTube and 1000+ sites.
+tags: [Video Tools, yt-dlp, Ubuntu, Linux, Command Line, Media Download]
+keywords: [yt-dlp, video downloader, ubuntu, linux, command line, youtube, ffmpeg, audio, playlist]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-08-30
+    note: "docs(video-tools): add yt-dlp installation and usage guide"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## What is yt-dlp?
+
+**yt-dlp** is a free, open-source command-line tool that downloads video and audio from YouTube and over 1,000 other websites including Vimeo, Twitter/X, SoundCloud, Instagram, Reddit, TikTok, and more. It is the actively maintained community fork of the original [youtube-dl](https://youtube-dl.org/) project, with faster updates, more features, and better compatibility with YouTube's frequent changes.
+
+If you have seen references to `youtube-dl` online, **yt-dlp is the modern replacement** — it is a drop-in substitute with the same commands.
+
+---
+
+## Installation
+
+### Prerequisites
+
+For format conversion (e.g., extracting MP3 audio), **FFmpeg** must be installed.
+
+:::note
+Ubuntu 23.04+ and Debian 12+ use **PEP 668** to block system-wide `pip3` installs. Use the binary or `pipx` method below instead.
+:::
+
+<Tabs>
+  <TabItem value="pipx" label="pipx (Recommended)" default>
+
+`pipx` installs yt-dlp into an isolated environment, avoids the PEP 668 restriction, and supports adding extra packages like `curl_cffi` for impersonation:
+
+```bash
+sudo apt update && sudo apt install -y pipx ffmpeg
+pipx install yt-dlp
+pipx ensurepath
+```
+
+:::warning
+`pipx ensurepath` adds `~/.local/bin` to your `PATH`, but the change only takes effect in new shell sessions. **Close and reopen your terminal** (or run `source ~/.bashrc`) before running `yt-dlp`.
+:::
+
+  </TabItem>
+  <TabItem value="binary" label="Binary">
+
+The standalone binary requires no Python at all:
+
+```bash
+# Install FFmpeg
+sudo apt update && sudo apt install -y ffmpeg
+
+# Download and install the yt-dlp binary
+sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+sudo chmod a+rx /usr/local/bin/yt-dlp
+```
+
+:::note
+The binary cannot use Python packages such as `curl_cffi` for impersonation support. Use the `pipx` method if you need that feature.
+:::
+
+  </TabItem>
+  <TabItem value="pip" label="pip (venv)">
+
+On modern Ubuntu/Debian, `pip3` requires a virtual environment:
+
+```bash
+python3 -m venv ~/.venv/yt-dlp
+~/.venv/yt-dlp/bin/pip install yt-dlp
+
+# Add a shell alias for convenience
+echo 'alias yt-dlp="$HOME/.venv/yt-dlp/bin/yt-dlp"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+  </TabItem>
+</Tabs>
+
+### Verify Installation
+
+```bash
+yt-dlp --version
+ffmpeg -version
+```
+
+---
+
+## Basic Usage
+
+### Download a Video
+
+```bash
+# Download a single video (best quality, default format)
+yt-dlp "https://www.youtube.com/watch?v=VIDEO_ID"
+
+# Download to a specific folder
+yt-dlp -o "~/Videos/%(title)s.%(ext)s" "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+### Specify Quality / Format
+
+```bash
+# List all available formats for a video
+yt-dlp -F "https://www.youtube.com/watch?v=VIDEO_ID"
+
+# Download a specific format by ID (from -F output)
+yt-dlp -f 137 "https://www.youtube.com/watch?v=VIDEO_ID"
+
+# Download best video + best audio, merged into MP4
+yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" --merge-output-format mp4 "URL"
+
+# Download best quality overall (yt-dlp default — usually best+audio merged)
+yt-dlp -f best "URL"
+```
+
+### Download Audio Only
+
+```bash
+# Extract audio as MP3 (requires FFmpeg)
+yt-dlp -x --audio-format mp3 "URL"
+
+# Extract audio as the best available format
+yt-dlp -x "URL"
+
+# Extract as FLAC
+yt-dlp -x --audio-format flac "URL"
+```
+
+---
+
+## Playlists and Channels
+
+```bash
+# Download an entire playlist
+yt-dlp "https://www.youtube.com/playlist?list=PLAYLIST_ID"
+
+# Download only the first 10 videos of a playlist
+yt-dlp --playlist-end 10 "PLAYLIST_URL"
+
+# Download a specific range (e.g., videos 5–15)
+yt-dlp --playlist-start 5 --playlist-end 15 "PLAYLIST_URL"
+
+# Download all videos from a channel
+yt-dlp "https://www.youtube.com/@ChannelName/videos"
+```
+
+---
+
+## Output Templates
+
+The `-o` flag controls where and how files are named. Use template variables from the metadata:
+
+| Template Variable | Description |
+|-------------------|-------------|
+| `%(title)s` | Video title |
+| `%(id)s` | Video ID |
+| `%(uploader)s` | Channel/uploader name |
+| `%(upload_date)s` | Upload date (YYYYMMDD) |
+| `%(ext)s` | File extension |
+| `%(resolution)s` | Video resolution |
+| `%(playlist_title)s` | Playlist title |
+| `%(playlist_index)s` | Position in playlist |
+
+**Examples:**
+
+```bash
+# Organize by uploader, then video title
+yt-dlp -o "~/Videos/%(uploader)s/%(title)s.%(ext)s" "URL"
+
+# Prefix with upload date
+yt-dlp -o "%(upload_date)s - %(title)s.%(ext)s" "URL"
+
+# Playlist: numbered by position
+yt-dlp -o "%(playlist_index)s - %(title)s.%(ext)s" "PLAYLIST_URL"
+```
+
+---
+
+## Subtitles and Thumbnails
+
+```bash
+# List available subtitles
+yt-dlp --list-subs "URL"
+
+# Download with English subtitles embedded
+yt-dlp --write-sub --sub-lang en --embed-subs "URL"
+
+# Download auto-generated subtitles
+yt-dlp --write-auto-sub --sub-lang en "URL"
+
+# Embed thumbnail into the file
+yt-dlp --embed-thumbnail "URL"
+```
+
+---
+
+## Rate Limiting and Throttling
+
+```bash
+# Limit download speed to 1 MB/s
+yt-dlp --rate-limit 1M "URL"
+
+# Add a sleep interval between downloads (useful for playlists)
+yt-dlp --sleep-interval 3 --max-sleep-interval 10 "PLAYLIST_URL"
+```
+
+---
+
+## Cookies (for Age-Restricted or Private Videos)
+
+Some videos require authentication. You can pass cookies from your browser:
+
+```bash
+# Export cookies from your browser using an extension like "Get cookies.txt LOCALLY"
+# Then pass the cookies file to yt-dlp
+yt-dlp --cookies ~/cookies.txt "URL"
+
+# Or use cookies directly from your browser (Chrome/Firefox)
+yt-dlp --cookies-from-browser chrome "URL"
+yt-dlp --cookies-from-browser firefox "URL"
+```
+
+:::caution
+Cookie files contain authentication tokens. Do not share them or store them in public locations.
+:::
+
+---
+
+## Update
+
+```bash
+# Binary install — self-update in place (sudo needed for /usr/local/bin)
+sudo yt-dlp -U
+
+# pipx install
+pipx upgrade yt-dlp
+
+# venv install
+~/.venv/yt-dlp/bin/pip install --upgrade yt-dlp
+```
+
+---
+
+## Common Options Reference
+
+| Flag | Description |
+|------|-------------|
+| `-F` | List all available formats |
+| `-f FORMAT` | Select a specific format |
+| `-x` | Extract audio only |
+| `--audio-format FORMAT` | Set audio format (mp3, aac, flac, m4a, opus, wav) |
+| `-o TEMPLATE` | Output filename template |
+| `--write-sub` | Download subtitle files |
+| `--embed-subs` | Embed subtitles into the video file |
+| `--embed-thumbnail` | Embed thumbnail into the file |
+| `--add-metadata` | Write metadata tags to the file |
+| `--download-archive FILE` | Skip videos already listed in the archive file |
+| `--no-playlist` | Download only the single video, not the playlist |
+| `--yes-playlist` | Download the full playlist |
+| `-q` | Quiet mode (less output) |
+| `--no-warnings` | Suppress warnings |
+| `-U` | Update yt-dlp to the latest version |
+
+---
+
+## Useful Recipes
+
+### Archive Mode — Skip Already-Downloaded Videos
+
+Ideal for channel mirroring or recurring downloads:
+
+```bash
+yt-dlp --download-archive archive.txt -o "%(uploader)s/%(title)s.%(ext)s" "CHANNEL_URL"
+```
+
+Every downloaded video ID is written to `archive.txt`. Re-running the command skips previously downloaded videos.
+
+### Download Best MP4 with Metadata and Thumbnail
+
+```bash
+yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" \
+       --merge-output-format mp4 \
+       --add-metadata \
+       --embed-thumbnail \
+       -o "%(title)s.%(ext)s" \
+       "URL"
+```
+
+### Batch Download from a URL List
+
+```bash
+# Create a text file with one URL per line
+# urls.txt:
+# https://www.youtube.com/watch?v=VIDEO1
+# https://www.youtube.com/watch?v=VIDEO2
+
+yt-dlp -a urls.txt
+```
+
+---
+
+## Troubleshooting
+
+### Impersonation target not available (firefox / chrome)
+
+```
+The extractor is attempting impersonation, but none of these impersonate targets are available: firefox.
+```
+
+yt-dlp uses browser impersonation to bypass bot detection on some sites (including YouTube). This requires the `curl_cffi` Python package, which is **not bundled with the standalone binary**.
+
+**Fix — install `curl_cffi` alongside yt-dlp:**
+
+<Tabs>
+  <TabItem value="pipx-imp" label="pipx (Recommended)" default>
+
+```bash
+pipx inject yt-dlp curl_cffi
+```
+
+  </TabItem>
+  <TabItem value="venv-imp" label="pip (venv)">
+
+```bash
+~/.venv/yt-dlp/bin/pip install curl_cffi
+```
+
+  </TabItem>
+  <TabItem value="binary-imp" label="Binary">
+
+The standalone binary cannot use Python packages. Switch to the `pipx` install method to gain impersonation support:
+
+```bash
+sudo apt install -y pipx
+pipx install yt-dlp
+pipx inject yt-dlp curl_cffi
+pipx ensurepath
+```
+
+  </TabItem>
+</Tabs>
+
+Once installed, verify available impersonation targets:
+
+```bash
+yt-dlp --list-impersonate-targets
+```
+
+---
+
+## References
+
+- [yt-dlp GitHub Repository](https://github.com/yt-dlp/yt-dlp)
+- [yt-dlp Releases](https://github.com/yt-dlp/yt-dlp/releases)
+- [Supported Sites List](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
+- [FFmpeg Download](https://ffmpeg.org/download.html)
+
+---
+
+<BuyMeACoffeeButton />
