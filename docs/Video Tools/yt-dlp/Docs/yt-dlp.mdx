@@ -117,9 +117,24 @@ yt-dlp -f 137 "https://www.youtube.com/watch?v=VIDEO_ID"
 # Download best video + best audio, merged into MP4
 yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" --merge-output-format mp4 "URL"
 
+# Remux output into MKV (no re-encoding — fast, preserves quality)
+yt-dlp --remux-video mkv "URL"
+
 # Download best quality overall (yt-dlp default — usually best+audio merged)
 yt-dlp -f best "URL"
 ```
+
+:::tip[Add to config]
+To apply MKV output, metadata tagging, and archive tracking to every download, add these to your config file:
+
+```bash
+echo '--remux-video mkv' >> ~/.config/yt-dlp/config
+echo '--add-metadata' >> ~/.config/yt-dlp/config
+echo '--download-archive ~/.config/yt-dlp/archive.txt' >> ~/.config/yt-dlp/config
+```
+
+With the archive flag in config, yt-dlp will automatically skip any video it has already downloaded, across all future runs.
+:::
 
 ### Download Audio Only
 
