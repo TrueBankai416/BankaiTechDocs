@@ -469,6 +469,49 @@ yt-dlp --list-impersonate-targets
 
 ---
 
+## Jellyfin Integration
+
+### Include Video ID in Filename (Required for YouTube Metadata Plugin)
+
+Jellyfin's YouTube metadata plugin requires the video ID to be present in the filename in the format `Title [VIDEO_ID].ext`.
+
+**Update your config for future downloads:**
+
+```bash
+sed -i 's|-o "%(title)s.%(ext)s"|-o "%(title)s [%(id)s].%(ext)s"|' ~/.config/yt-dlp/config
+```
+
+**Rename existing files** by re-fetching metadata without re-downloading:
+
+```bash
+# Install jq if not already present
+sudo apt install jq
+
+cd /path/to/your/videos
+
+# Fetch .info.json files only — no video downloading, ignore archive so all videos are processed
+yt-dlp --skip-download --no-download-archive --write-info-json -o "%(title)s.%(ext)s" "CHANNEL_URL"
+
+# Rename each .mkv that has a matching .info.json
+for json in *.info.json; do
+  base="${json%.info.json}"
+  id=$(jq -r '.id' "$json")
+  if [ -f "${base}.mkv" ]; then
+    mv "${base}.mkv" "${base} [${id}].mkv"
+    echo "Renamed: ${base}.mkv -> ${base} [${id}].mkv"
+  fi
+  rm "$json"
+done
+```
+
+`--write-info-json` uses the same filename sanitization as the actual download, so the `.info.json` base name matches your existing `.mkv` files exactly — no guesswork needed.
+
+:::note
+After renaming, update your archive file to reflect the new filenames. The archive stores video IDs, not filenames, so yt-dlp will still correctly skip already-downloaded videos regardless of the rename.
+:::
+
+---
+
 ## References
 
 - [yt-dlp GitHub Repository](https://github.com/yt-dlp/yt-dlp)
