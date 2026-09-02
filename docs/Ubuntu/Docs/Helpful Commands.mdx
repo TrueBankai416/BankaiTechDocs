@@ -1288,17 +1288,17 @@ To push files from Windows to an Ubuntu server using `rsync` with progress and r
 **From WSL (type `bash` or `wsl` in PowerShell):**
 In WSL, local Windows drives are mounted under `/mnt/` (e.g. `C:\` becomes `/mnt/c/`):
 ```bash
-rsync -avhP "/mnt/c/Users/John/Documents/MEGA downloads/Season 01" server@192.168.1.10:/media/merged/Downloads/
+rsync -avhP "/mnt/c/Users/John/Documents/downloads/Season 01" <user>@<host>:/remote/directory/
 ```
 
 **From Git Bash (right-click in the folder → *Open Git Bash here*):**
 In Git Bash, local Windows drives are mounted directly under `/` (e.g. `C:\` becomes `/c/`):
 ```bash
 # If launched from outside the folder (using absolute path):
-rsync -avhP "/c/Users/John/Documents/MEGA downloads/Season 01" server@192.168.1.10:/media/merged/Downloads/
+rsync -avhP "/c/Users/John/Documents/downloads/Season 01" <user>@<host>:/remote/directory/
 
 # If launched using "Open Git Bash here" inside the folder (using relative path):
-rsync -avhP "./Season 01" server@192.168.1.10:/media/merged/Downloads/
+rsync -avhP "./Season 01" <user>@<host>:/remote/directory/
 ```
 
 :::tip[Dry run first]
