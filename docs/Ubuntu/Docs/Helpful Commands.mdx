@@ -5,6 +5,8 @@ keywords: [Ubuntu, Linux, Commands, Terminal, CLI]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-09-02
+    note: "docs(ubuntu): add Windows to Ubuntu file transfer instructions for SCP, WSL, and Git Bash"
   - date: 2026-08-30
     note: "docs(ubuntu): add rename tool section with util-linux and Perl versions"
   - date: 2026-08-26
@@ -1175,6 +1177,27 @@ scp -r /local/folder <user>@<host>:/remote/path
 
 ---
 
+### Copy files from Windows to Ubuntu (SCP)
+```powershell
+scp -r "C:\path\to\folder" <user>@<host>:/remote/directory/
+```
+Run this command from a **local Windows terminal** (PowerShell or Command Prompt), not from inside your remote SSH session.
+
+- Windows 10 and 11 include the OpenSSH client by default.
+- Wrap paths containing spaces in double quotes.
+- The remote path uses standard Linux forward slashes (`/`).
+
+Example:
+```powershell
+scp -r "C:\Users\John\Documents\MEGA downloads\Season 01" server@192.168.1.10:/media/merged/Downloads/
+```
+
+:::note[Run SCP from the machine sending the files]
+If you are logged into your Ubuntu server via SSH and try to run `scp` to pull from Windows, Ubuntu tries to connect back to your Windows PC over port 22. Unless Windows has OpenSSH Server installed, running, and allowed through the firewall, the command will hang. Always push the files from a local Windows terminal instead.
+:::
+
+---
+
 ### Generate an SSH key pair
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
@@ -1258,6 +1281,31 @@ rsync -avhP /home/john/videos/ john@192.168.1.10:/mnt/storage/videos/
 rsync -avhP <user>@<host>:/remote/directory/ /local/directory/
 ```
 Same as above but the source and destination are swapped — pulling files from the remote machine to your local machine.
+
+---
+
+### Copy files from Windows to Ubuntu with Rsync (WSL or Git Bash)
+To push files from Windows to an Ubuntu server using `rsync` with progress and resume support, run the command from **WSL** (Windows Subsystem for Linux) or **Git Bash** on your Windows machine:
+
+**From WSL (type `bash` or `wsl` in PowerShell):**
+In WSL, local Windows drives are mounted under `/mnt/` (e.g. `C:\` becomes `/mnt/c/`):
+```bash
+rsync -avhP "/mnt/c/Users/John/Documents/MEGA downloads/Season 01" server@192.168.1.10:/media/merged/Downloads/
+```
+
+**From Git Bash (right-click in the folder → *Open Git Bash here*):**
+In Git Bash, local Windows drives are mounted directly under `/` (e.g. `C:\` becomes `/c/`):
+```bash
+# If launched from outside the folder (using absolute path):
+rsync -avhP "/c/Users/John/Documents/MEGA downloads/Season 01" server@192.168.1.10:/media/merged/Downloads/
+
+# If launched using "Open Git Bash here" inside the folder (using relative path):
+rsync -avhP "./Season 01" server@192.168.1.10:/media/merged/Downloads/
+```
+
+:::tip[Dry run first]
+Add `-n` (`rsync -avhnP ...`) to simulate the transfer and verify file paths before copying data.
+:::
 
 ---
 
