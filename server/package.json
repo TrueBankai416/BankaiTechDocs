@@ -12,7 +12,7 @@
     "cors": "^2.8.6",
     "discord.js": "^14.27.0",
     "dotenv": "^17.2.3",
-    "express": "^4.22.2"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
