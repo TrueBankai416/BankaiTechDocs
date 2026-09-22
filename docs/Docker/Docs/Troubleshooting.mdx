@@ -5,6 +5,8 @@ keywords: [Docker, Troubleshooting]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-09-22
+    note: "docs(docker): add NVML version mismatch / nvidia-persistenced socket troubleshooting entry"
   - date: 2026-08-23
     note: "docs(docker): add NVIDIA CDI stale driver troubleshooting entry"
   - date: 2026-08-07
@@ -246,6 +248,102 @@ docker compose up -d tdarr
 
 :::tip[Avoid unnecessary capabilities]
 Remove `NVIDIA_DRIVER_CAPABILITIES=all` from the Compose file if you have it. Tdarr already defaults to the capabilities it needs (`compute,video,utility`). Requesting `all` unnecessarily includes graphics/EGL libraries — which are also what triggers this error when they go stale after a driver update.
+:::
+
+---
+
+## **NVIDIA container fails: nvidia-persistenced socket missing + NVML version mismatch**
+
+### **Error**
+
+```
+Error response from daemon: failed to create task for container: failed to create shim task:
+OCI runtime create failed: runc create failed: unable to start container process:
+error during container init: failed to fulfil mount request:
+open /run/nvidia-persistenced/socket: no such file or directory
+```
+
+```
+$ sudo nvidia-smi
+Failed to initialize NVML: Driver/library version mismatch
+NVML library version: 580.178
+```
+
+### **Cause**
+
+This is a different failure mode than the stale CDI library paths above. `NVML library version mismatch` means the **userspace** NVIDIA libraries/tools were upgraded (typically via `apt upgrade` pulling in a newer `nvidia-driver-*`/`libnvidia-*` package) but the **kernel module** (`nvidia.ko`) currently loaded in memory is still the old version, because nothing has triggered a module reload yet.
+
+Since the kernel module is out of sync, the `nvidia-persistenced` service can't talk to it and exits, which removes its socket at `/run/nvidia-persistenced/socket`. Docker's CDI spec mounts that socket into the container, so container creation fails when the socket file doesn't exist.
+
+To confirm this was caused by a driver package upgrade, check the APT history. A plain `grep -i nvidia` only prints matching lines and won't include the `Start-Date:` timestamp, so pair each match with the timestamp of the transaction it belongs to:
+
+```bash
+awk '/^Start-Date:/{d=$0} /nvidia-driver/{print d; print; print ""}' /var/log/apt/history.log
+```
+
+Look specifically for an `Upgrade:` line containing `nvidia-driver-<version>` (not just any `nvidia-*` package — most are unrelated firmware/kernel-module builds that get pulled in automatically). Then compare that `Start-Date` against how long the system has been running:
+
+```bash
+uptime -s
+```
+
+If the driver package was upgraded **after** the system last booted, the running kernel module predates it — this confirms the mismatch, and a reboot (or manual module reload) is required.
+
+### **Resolution**
+
+#### **1. Reboot (recommended)**
+
+A reboot guarantees the kernel module and userspace driver come back in sync, with no risk of leaving the system in a half-reloaded state:
+
+```bash
+sudo reboot
+```
+
+After reboot, confirm everything matches before starting containers:
+
+```bash
+sudo nvidia-smi
+systemctl status nvidia-persistenced
+docker compose up -d jellyfin
+```
+
+#### **2. If you can't reboot right now, try reloading the kernel module**
+
+Only use this if something on the host can't be interrupted and a reboot isn't an option. Unlike a reboot, this can fail partway through and leave NVIDIA in a broken state until you do reboot anyway.
+
+Stop everything currently holding the NVIDIA modules open:
+
+```bash
+sudo docker compose down
+sudo systemctl stop nvidia-persistenced
+```
+
+Check what's still using the modules:
+
+```bash
+sudo lsof /dev/nvidia* 2>/dev/null
+sudo fuser -v /dev/nvidia*
+```
+
+If nothing is using them, unload and reload:
+
+```bash
+sudo modprobe -r nvidia_uvm nvidia_drm nvidia_modeset nvidia
+sudo modprobe nvidia
+sudo systemctl start nvidia-persistenced
+```
+
+Verify the socket exists again and the version mismatch is gone:
+
+```bash
+ls -l /run/nvidia-persistenced/socket
+sudo nvidia-smi
+```
+
+If `modprobe -r` fails with `in use` (desktop environments, other containers, or lingering processes often keep the modules loaded), stop deferring and reboot — it's the only reliable fix at that point.
+
+:::note
+This is distinct from the CDI stale-path error above: here `nvidia-smi` itself fails with a version mismatch, whereas the CDI issue only breaks container mounts while `nvidia-smi` on the host works fine. If `nvidia-smi` works normally on the host after reboot/reload but containers still fail, regenerate the CDI spec as described in the section above.
 :::
 
 <BuyMeACoffeeButton />
