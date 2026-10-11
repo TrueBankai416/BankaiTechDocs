@@ -1,4 +1,8 @@
 {
   "label": "Screenshot Upload to Discord",
-  "key": "cloudflare-screenshot-upload"
+  "key": "cloudflare-screenshot-upload",
+  "link": {
+    "type": "doc",
+    "id": "Cloudflare/Docs/Screenshot Upload to Discord/Introduction"
+  }
 }
