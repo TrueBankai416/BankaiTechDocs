@@ -1,0 +1,51 @@
+---
+title: Discord Webhook Setup
+description: Create and secure a Discord webhook that receives screenshot submissions from the Cloudflare upload page.
+tags: [Cloudflare, Discord, Webhook]
+keywords: [Discord Webhook, Discord Integrations]
+last_update:
+  author: BankaiTech
+updates:
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Step 1: Create a Discord Webhook**
+
+The webhook is what allows Cloudflare to post screenshots into your Discord channel automatically. It does **not** require a bot, bot token, or any special server permissions beyond managing the one channel.
+
+## **Create the Channel**
+
+1. Open Discord and navigate to your server.
+2. Create a channel called `#screenshot-submissions` (or choose an existing channel).
+
+## **Create the Webhook**
+
+1. Right-click the channel (or open its settings via the gear icon).
+2. Select **Edit Channel → Integrations → Webhooks**.
+3. Click **New Webhook**.
+4. Name it `Screenshot Upload Bot` (optional, but helpful for identifying the source of messages).
+5. Confirm the channel is set to your screenshot submission channel.
+6. Click **Copy Webhook URL**.
+
+:::danger[Keep this URL private]
+The webhook URL is a secret. Anyone who obtains it can post messages (including arbitrary content) directly to your channel. Never commit it to source control, put it in client-side/browser code, or share it publicly.
+:::
+
+The webhook URL will look like:
+
+```
+https://discord.com/api/webhooks/<webhook-id>/<webhook-token>
+```
+
+## **Where It's Stored**
+
+The webhook URL is **not** placed in the webpage's HTML/JS. Instead, it's stored as an encrypted environment variable (secret) on the Cloudflare Pages Function, so it's only ever read on the server side. This is covered in the next step.
+
+:::tip[Rotating a leaked webhook]
+If a webhook URL is ever exposed, delete it from **Integrations → Webhooks** in Discord and create a new one. The old URL stops working immediately.
+:::
+
+Continue to [Deploying to Cloudflare Workers](./Deploying%20to%20Cloudflare%20Workers) to set up the upload page and connect it to this webhook.
+
+<BuyMeACoffeeButton />

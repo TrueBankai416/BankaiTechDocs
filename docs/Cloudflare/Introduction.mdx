@@ -1,0 +1,31 @@
+---
+title: Introduction to Cloudflare
+description: Overview of how Cloudflare (Pages, Workers, Turnstile) is used across BankaiTech projects for hosting, serverless functions, and bot protection.
+tags: [Cloudflare, Hosting, Serverless]
+keywords: [Cloudflare, Cloudflare Pages, Cloudflare Workers, Turnstile]
+last_update:
+  author: BankaiTech
+updates:
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Introduction to Cloudflare**
+
+Cloudflare provides a free, global edge platform that this site and several related projects build on top of. This section covers Cloudflare-powered projects used alongside the main documentation site, including static hosting with **Cloudflare Pages** or **Workers**, serverless backend code, and bot protection with **Turnstile**.
+
+## **What's Covered Here**
+
+- **Hosting** — Deploying static sites and small full-stack projects on Cloudflare Pages or Workers (with static assets).
+- **Serverless Backends** — Adding dynamic API routes without running your own server, via Pages Functions or a Worker script.
+- **Abuse Protection** — Using Turnstile (Cloudflare's CAPTCHA alternative) and basic rate limiting to keep public-facing forms safe from bots and spam.
+
+## **Projects**
+
+- [Screenshot Upload to Discord](./Docs/Screenshot%20Upload%20to%20Discord/Introduction) — A public screenshot submission page that forwards uploads to a Discord channel via webhook, with no sign-in required.
+
+:::tip[Already deploying the main site?]
+If you haven't deployed this documentation site to Cloudflare Pages yet, see [Hosting Docusaurus on Cloudflare Pages from GitHub](../Docusaurus/Docs/Cloudflare%20Pages%20Deployment) first.
+:::
+
+<BuyMeACoffeeButton />

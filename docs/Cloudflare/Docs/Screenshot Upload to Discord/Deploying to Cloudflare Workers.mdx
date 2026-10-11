@@ -1,0 +1,186 @@
+---
+title: Deploying to Cloudflare Workers
+description: Deploy the screenshot upload page as a Cloudflare Worker with static assets, configure Turnstile bot protection, and wire up the Discord webhook secret.
+tags: [Cloudflare, Cloudflare Workers, Turnstile, Discord]
+keywords: [Cloudflare Workers, Static Assets, Turnstile, Discord Webhook, KV Rate Limiting]
+last_update:
+  author: BankaiTech
+updates:
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# **Step 2: Deploying to Cloudflare Workers**
+
+This project is deployed as a **separate** Cloudflare Worker (with static assets) — its own `*.workers.dev` site, or a custom domain like `screenshot-upload.yourdomain.com` — independent from this documentation site. This keeps the upload page simple to maintain and avoids touching the Docusaurus build.
+
+:::note[Workers vs. Pages]
+Cloudflare's dashboard now creates new Git-connected projects as **Workers with static assets** by default (the classic **Pages** project type is still available behind a "legacy workflow" link, but Cloudflare is steering new projects toward Workers). This guide uses the current Workers-based flow, which is also what this project's code is set up for.
+:::
+
+The source lives at [Cloudflare/screenshot-upload](https://github.com/TrueBankai416/BankaiTechDocs/tree/main/Cloudflare/screenshot-upload) in this repository:
+
+```
+Cloudflare/screenshot-upload/
+├── public/
+│   ├── index.html   # Upload form + drag-and-drop UI
+│   ├── style.css
+│   └── script.js
+├── src/
+│   └── index.js      # Worker script: serves public/ and handles /api/submit
+├── wrangler.jsonc     # Worker configuration (static assets + entry point)
+└── README.md
+```
+
+## **Step 2a — Create a Turnstile Widget**
+
+[Turnstile](https://developers.cloudflare.com/turnstile/) is Cloudflare's free, privacy-friendly CAPTCHA alternative. It gives the form a **site key** (public, used in the HTML) and a **secret key** (private, used to verify tokens server-side).
+
+1. In the [Cloudflare Dashboard](https://dash.cloudflare.com/?to=/:account/turnstile), select your account, then go to **Protect & connect → Application security → Turnstile** in the left sidebar (direct link above jumps straight there).
+2. Click **Add widget**.
+3. Give it a name (e.g. `Screenshot Upload`) and add the domain(s) it will run on (e.g. `screenshot-upload.workers.dev`, or your custom domain).
+4. Choose the **Managed** widget mode (recommended default).
+5. Click **Create**, then copy the **Site Key** and **Secret Key**.
+
+:::tip[Faster alternative]
+The Turnstile dashboard also offers a **Set up automatically** option that creates a widget for you in one click and hands back a site key right away. If you use it, you can skip straight to [Step 2d](#step-2d--add-the-turnstile-site-key-to-the-page) with that site key, then come back for the secret key under the widget's settings before continuing to Step 2c. The manual steps above and the automatic option both create the same kind of widget — use whichever is more convenient.
+:::
+
+## **Step 2b — Create the Cloudflare Worker**
+
+1. In the Cloudflare Dashboard, go to **Compute (Workers) → Workers & Pages**.
+2. Click **Create Application → Connect to Git** and select the repository containing this code. If you're using the [Cloudflare/screenshot-upload](https://github.com/TrueBankai416/BankaiTechDocs/tree/main/Cloudflare/screenshot-upload) source from this guide, copy the folder into your own repository first (it can live at the repo root or in a subdirectory).
+
+:::tip[Private repositories are supported]
+This repository can be public or private — no secrets ever live in the code, but keeping the project itself private is still good practice. Private repos just need to be explicitly authorized:
+
+- Use the **Select a repository** picker (not the **Clone a public repository via Git URL** option — that path only works for public repos and will show "Repository not found" for a private one).
+- The picker only lists repositories the Cloudflare GitHub App has already been granted access to — it doesn't offer a way to add more from inside the Cloudflare dashboard, and the list won't update on its own as you create new private repos.
+- To add a missing repo, go to [github.com/settings/installations](https://github.com/settings/installations) (while logged into the GitHub account/org that owns the repo), find the **Cloudflare Workers and Pages** app, and click **Configure**.
+- Under **Repository access**, either switch to **All repositories**, or keep **Only select repositories** and add the missing one(s) from the dropdown, then **Save**.
+- Return to the Cloudflare dashboard and reopen the repository picker — the repo should now appear.
+:::
+
+3. If the `screenshot-upload` folder isn't at the root of your repository, set it as the project's **root directory** when prompted. Everything else — the entry point and the static assets directory — is already defined in `wrangler.jsonc`, so there's no build command or output directory to configure.
+4. Click **Save and Deploy**.
+
+:::note[Why a `wrangler.jsonc` file is required]
+Unlike classic Pages projects, Workers don't auto-detect a `functions/` folder. `wrangler.jsonc` explicitly tells Cloudflare that `src/index.js` is the Worker script and `public/` is the static assets directory, and that's what makes `/api/submit` work alongside the static page.
+:::
+
+## **Step 2c — Set Environment Variables and Secrets**
+
+Once the Worker has deployed successfully (it needs a script attached first — an assets-only deployment won't have this option yet), go to **Settings → Runtime variables and secrets** and add these as **secrets** (encrypted, not visible after saving):
+
+:::warning[Select only "Production"]
+When adding each secret, the dashboard lets you check both **Production** and **Preview** environments at once. Leave **Preview** unchecked and select only **Production** — saving a secret with both checked can result in it not being applied correctly, and the Worker won't be able to read it at runtime.
+:::
+
+| Variable                | Value                                                   |
+| ------------------------ | -------------------------------------------------------- |
+| `DISCORD_WEBHOOK_URL`    | The webhook URL from [Discord Webhook Setup](./Discord%20Webhook%20Setup) |
+| `TURNSTILE_SECRET_KEY`   | The Turnstile **secret key** from Step 2a                  |
+
+:::danger[Never commit secrets]
+Do not put `DISCORD_WEBHOOK_URL` or `TURNSTILE_SECRET_KEY` in `public/` or `src/` files or commit them to the repository. They must only exist as Worker secrets (or in a local, git-ignored `.dev.vars` file for development).
+:::
+
+Redeploy the project after adding/changing secrets so the Worker picks them up.
+
+## **Step 2d — Add the Turnstile Site Key to the Page**
+
+Edit `public/index.html` and replace the placeholder with your **site key** (this one is public and safe to commit):
+
+```html title="public/index.html"
+<div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+```
+
+Commit and push — Cloudflare will redeploy automatically.
+
+## **Step 2e — (Optional) Enable Rate Limiting**
+
+The Worker supports basic per-IP rate limiting (5 submissions per 10 minutes) using a Cloudflare KV namespace, but runs fine without it.
+
+1. Go to **Storage & Databases → KV** in the dashboard and create a namespace (e.g. `screenshot-upload-rate-limit`).
+2. In the Worker's project, go to **Settings → Bindings** and add a **KV namespace** binding with **Variable name** `RATE_LIMIT` pointing to that namespace.
+3. Redeploy.
+
+## **Testing Locally**
+
+<Tabs groupId="local-dev-os">
+  <TabItem value="mac-linux" label="macOS / Linux">
+
+```bash
+cd Cloudflare/screenshot-upload
+npm install -D wrangler
+cat > .dev.vars <<EOF
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your-id/your-token
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+EOF
+npx wrangler dev
+```
+
+  </TabItem>
+  <TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+cd Cloudflare\screenshot-upload
+npm install -D wrangler
+@"
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your-id/your-token
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+"@ | Out-File -Encoding utf8 .dev.vars
+npx wrangler dev
+```
+
+  </TabItem>
+</Tabs>
+
+:::tip[Turnstile test keys]
+Cloudflare provides [dedicated test site/secret keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/) that always pass, useful for local development without solving real challenges.
+:::
+
+`.dev.vars` is git-ignored in this folder — never commit it. You can also deploy directly from your machine with `npx wrangler deploy`, as an alternative to connecting Git.
+
+## **How Abuse Protection Works**
+
+| Protection             | Where                          | What it does                                                                 |
+| ----------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
+| Turnstile verification | `src/index.js`                   | Rejects the request unless a valid Turnstile token is present.                 |
+| Honeypot field          | `public/index.html` + `script.js`| A hidden `website` field; real users leave it empty, simple bots often fill it.|
+| File type allow-list   | Client + server                  | Only `image/png`, `image/jpeg`, `image/webp`, `image/gif` are accepted.        |
+| File size/count limits | Client + server                  | Up to 5 files, 10 MB each; oversized requests are rejected by `Content-Length` before parsing. |
+| Rate limiting (optional)| `src/index.js` + KV             | Caps submissions per IP to 5 per 10 minutes.                                   |
+| Mention suppression    | `src/index.js`                   | `allowed_mentions: { parse: [] }` stops submitted text from pinging `@everyone`, roles, or users in Discord. |
+
+All validation is duplicated server-side in the Worker — client-side checks are only for a better user experience and can't be trusted on their own.
+
+## **Troubleshooting**
+
+**Can't add secrets — "Variables cannot be added to a Worker that only has static assets"**
+
+- This means Cloudflare didn't attach a Worker script to the deployment, so there's nothing for runtime secrets to be available to. Confirm `wrangler.jsonc` is committed at the project's root directory with a valid `main` field, and redeploy — once a script is attached, **Runtime variables and secrets** becomes available.
+
+**Submissions return a 500 error**
+
+- Confirm `DISCORD_WEBHOOK_URL` is set as a runtime secret and the project was redeployed afterward.
+- A 500 error mentioning "missing TURNSTILE_SECRET_KEY" means that secret was never set (or was added to the wrong section) — see the next item.
+- If you selected both **Production** and **Preview** when saving a secret, re-edit it with only **Production** checked — saving both at once can leave the secret unavailable at runtime.
+
+**Turnstile always fails, or the widget shows "Success!" but the page still says "Bot verification failed"**
+
+- Make sure the domain the page is served from is added to the Turnstile widget's allowed domains, and that the site key in `index.html` matches that exact widget.
+- Check the widget's **Turnstile Analytics** page in the dashboard. If it shows a banner saying **"Siteverify isn't being called for this widget"**, the Worker never reached the point of validating tokens — almost always because `TURNSTILE_SECRET_KEY` is missing or empty at runtime (not because the widget itself is misconfigured). Re-check that the secret is set under **Settings → Runtime variables and secrets** on the Worker, using the secret key for the *same* widget as the site key in `index.html`, then redeploy and submit again.
+- If you created the widget with Turnstile's **Set up automatically** option and skipped retrieving its secret key, open the widget's **Edit Widget** page in the dashboard to view or rotate its secret key.
+
+**Discord rejects the webhook (401/404)**
+
+- The webhook may have been deleted or regenerated in Discord. Create a new one and update the `DISCORD_WEBHOOK_URL` secret.
+
+**Files aren't appearing in Discord**
+
+- Discord webhooks have their own attachment size limits per message; very large multi-file submissions near the 10 MB × 5 limit may need to be reduced if your server has a lower boost level.
+
+<BuyMeACoffeeButton />

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submit a Screenshot</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <main class="container">
+    <h1>📸 Submit a Screenshot</h1>
+    <p class="subtitle">Share a screenshot with the team — no account needed.</p>
+
+    <form id="upload-form" novalidate>
+      <!-- Honeypot field: hidden from real users, bots tend to fill every field they find. -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="website">Leave this field empty</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div id="drop-zone" class="drop-zone">
+        <p>Drag &amp; drop screenshots here, or click to browse</p>
+        <p class="hint">PNG, JPG, WEBP, or GIF — up to 5 files, 10 MB each</p>
+        <input type="file" id="file-input" name="screenshots" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden />
+      </div>
+
+      <ul id="file-list" class="file-list"></ul>
+
+      <label class="field">
+        <span>Username / Player ID (optional)</span>
+        <input type="text" id="username" name="username" maxlength="256" placeholder="e.g. Steve123" />
+      </label>
+
+      <label class="field">
+        <span>Description (optional)</span>
+        <textarea id="description" name="description" maxlength="256" rows="3" placeholder="What are we looking at?"></textarea>
+      </label>
+
+      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+
+      <button type="submit" id="submit-btn">Submit Screenshot</button>
+    </form>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>
