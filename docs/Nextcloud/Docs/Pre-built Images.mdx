@@ -98,6 +98,21 @@ This table is automatically refreshed daily from [Docker Hub](https://hub.docker
 
 ---
 
+## **Supported Architectures**
+
+Published images are multi-arch, so `docker pull bankaitech/nextcloud:<tag>` automatically selects the right variant for your host:
+
+| Architecture | Typical hardware |
+|--------------|-------------------|
+| `linux/amd64` | Standard x86-64 servers and PCs |
+| `linux/arm64` | Raspberry Pi 4/5 (64-bit OS), AWS Graviton, Oracle Ampere, Apple Silicon |
+
+:::note
+Version tags published before multi-arch support (and any older than the rebuild workflow's range) may still be `amd64` only. See [Build & Publish Automation](#build--publish-automation) below.
+:::
+
+---
+
 ## **Image Features**
 
 These images are based on `nextcloud:production` and include additional packages and configurations for enhanced functionality.
@@ -162,14 +177,29 @@ gosu
 
 ## **Build & Publish Automation**
 
-Images are built and published automatically via a dedicated GitHub Actions pipeline. On each release:
+Images are built and published automatically via several GitHub Actions workflows under [`.github/workflows`](https://github.com/TrueBankai416/nextcloud/tree/main/.github/workflows) in the [nextcloud repo](https://github.com/TrueBankai416/nextcloud). Together they keep published images in sync with both this repo's own changes and upstream Nextcloud/PHP security patches, without manual rebuilds.
 
-1. The Docker image is built from a custom `Dockerfile` based on `nextcloud:production`
-2. All packages, PHP extensions, and configurations are applied at build time
-3. The image is tagged with both the version number and `latest`
-4. The final image is pushed to [Docker Hub](https://hub.docker.com/r/bankaitech/nextcloud)
+- **Build Multi-Arch Image** *(reusable)*: Shared by the workflows below to publish `linux/amd64` and `linux/arm64`. Each architecture is built natively on its own runner rather than under QEMU emulation, since compiling `dlib` is far too slow when emulated. Each image is pushed by digest, then merged into a single multi-arch manifest under every requested tag.
+- **Push Latest on Main**: Triggers on a push to `main` that touches the `Dockerfile`, entrypoint/cron scripts, or `supervisord.conf`. Rebuilds and publishes the multi-arch `bankaitech/nextcloud:latest` immediately, so fixes to this repo's own build go live right away.
+- **Build and Publish Nextcloud Image**: Runs hourly (plus manual dispatch or CI-relevant pushes). Tracks the upstream `nextcloud:production` base image and rebuilds (publishing both `:latest` and the matching version tag, e.g. `34.0.5`, as multi-arch) whenever upstream has actually changed — including when upstream re-publishes `production` with a security fix, such as a PHP CVE patch. It also forces a rebuild if `:latest` can't be pulled yet, has no recorded base-digest label, or isn't yet multi-arch. Posts a Discord notification when a rebuild happens or the workflow fails.
+- **Check Missing Nextcloud Version Tags**: Manual dispatch only. Compares the strict numeric Nextcloud versions published upstream against the version tags already published under `bankaitech/nextcloud` within a configurable range, and reports — or optionally builds and pushes — any that are missing, as multi-arch images.
+- **Rebuild Patched Nextcloud Version Tags**: Runs nightly (or manually with a dry-run preview). Revisits already-published version tags and rebuilds, re-labels, and re-pushes any whose upstream counterpart has since received a security patch, or that aren't yet multi-arch. Notifies Discord per rebuilt or failed tag.
 
-No manual build or push steps are required.
+:::note[Setup note]
+The Discord notifications used by **Build and Publish Nextcloud Image** and **Rebuild Patched Nextcloud Version Tags** require a `DISCORD_WEBHOOK_URL` repository secret. Builds and rebuilds still run normally without it — notifications are simply skipped.
+:::
+
+No manual build or push steps are required to keep images up to date.
+
+---
+
+## **Building the Image Locally**
+
+```bash
+sudo docker build -t your-registry/nextcloud:latest .
+```
+
+This builds for your host's architecture (`amd64` or `arm64`). To pin the base image, pass `--build-arg BASE_IMAGE=nextcloud:<version>`. The first build compiles `dlib` from source and is slow, especially under emulation, so build each architecture on matching hardware when possible.
 
 ---
 
