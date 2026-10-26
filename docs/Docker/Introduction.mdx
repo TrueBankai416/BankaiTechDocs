@@ -5,6 +5,8 @@ keywords: [Docker, Docker Engine, Tutorial]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-10-26
+    note: "docs(docker): add inline (short syntax) bind mount example"
   - date: 2025-09-21
     note: "Add clarification that pull_policy is ignored for build services"
   - date: 2025-09-21
@@ -1108,6 +1110,21 @@ services:
         source: ./my-app
         target: /usr/src/app
 ```
+
+Compose also accepts a shorter inline string for bind mounts, in the form `<host path>:<container path>[:<options>]`. It's equivalent to the long form above, just more compact:
+
+```yaml
+name: example
+services:
+  app:
+    image: my-nodejs-app
+    volumes:
+      - ./my-app:/usr/src/app
+      - ./config/app.conf:/etc/app/app.conf:ro
+```
+
+- `./my-app:/usr/src/app` mounts the host folder `./my-app` (relative to the Compose file) at `/usr/src/app` inside the container, read-write by default.
+- `:ro` on the second line mounts that file read-only, useful for configuration files the container should not be able to modify.
 
 ### **_tmpfs Mounts_**
 
