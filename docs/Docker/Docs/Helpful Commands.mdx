@@ -5,6 +5,8 @@ keywords: [Docker, Docker Engine, Commands]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-10-26
+    note: "docs(docker): add guide for copying files to a named volume"
   - date: 2025-12-03
     note: "Add reference for Docker System Prune command"
   - date: 2025-12-03
@@ -177,6 +179,47 @@ sudo docker system prune
 0 3 * * * /usr/bin/docker system prune -af
 ```
 
+:::
+
+### **Copy files to a named volume**
+
+Docker named volumes aren't directly accessible on the host filesystem (on Linux their data lives under `/var/lib/docker/volumes/`, and on Docker Desktop they live inside a VM), so you can't just `cp` files into them. Instead, mount the volume into a throwaway container and copy through that container.
+
+**Syntax**: `sudo docker run --rm -v <volume name>:/dest -v <source folder>:/src alpine cp -a /src/. /dest/`
+
+**Purpose**: Populates a named volume with files from the host without needing an already-running container that uses that volume.
+
+**Detailed Explanation**:
+
+- `docker run --rm` starts a temporary container and automatically removes it once the command finishes, so it leaves nothing behind.
+- `-v <volume name>:/dest` mounts the named volume at `/dest` inside the container.
+- `-v <source folder>:/src` bind-mounts a folder from the host at `/src` inside the same container, giving it access to the files you want to copy.
+- `alpine` is used as a small, lightweight image that already includes `cp`; any image with a shell works just as well.
+- `cp -a /src/. /dest/` copies everything inside `/src` (including hidden files, thanks to the trailing `/.`) into `/dest` in archive mode, preserving permissions, ownership, and timestamps.
+
+```bash
+sudo docker run --rm -v <volume name>:/dest -v <source folder>:/src alpine cp -a /src/. /dest/
+```
+
+If a container that already uses the volume is running, you can instead use `docker cp` to copy files directly into it:
+
+**Syntax**: `sudo docker cp <source file or folder> <container name>:<path inside volume>`
+
+**Purpose**: Copies files from the host straight into a running container's filesystem, including any path that is backed by a mounted volume.
+
+**Detailed Explanation**:
+
+- `docker cp` works between the host and a container, not directly with volumes, so the container must be running (or at least created) and the destination path must be where the volume is mounted inside that container.
+- `<source file or folder>` is the path on the host you want to copy.
+- `<container name>:<path inside volume>` is the destination container and the path inside it that maps to the named volume.
+- This approach is convenient when the target container is already up, avoiding the need to spin up a temporary one.
+
+```bash
+sudo docker cp /path/on/host/. <container name>:/path/inside/volume/
+```
+
+:::tip[Verify the copy]
+Inspect the volume's contents afterward with a quick throwaway container, e.g. `sudo docker run --rm -v <volume name>:/data alpine ls -la /data`.
 :::
 
 ## **References**

@@ -5,6 +5,8 @@ keywords: [Ubuntu, Linux, Commands, Terminal, CLI]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-10-26
+    note: "docs(ubuntu): add cp -p and -a flag sections"
   - date: 2026-09-02
     note: "docs(ubuntu): generalize placeholder paths in rsync commands"
   - date: 2026-09-02
@@ -235,6 +237,30 @@ cp -r /source /destination
 ```
 - `cp` copies files or directories.
 - `-r` means **recursive** — required when copying a directory, so it copies the folder and everything inside it. Without `-r`, `cp` will refuse to copy a directory.
+
+---
+
+### Copy files and preserve attributes
+```bash
+cp -p /source /destination
+```
+- `-p` means **preserve** — keeps the original file's mode (permissions), ownership, and timestamps instead of using the current user and time for the copy.
+- Combine with `-r` (`cp -rp`) when copying a directory so every file inside keeps its original attributes too.
+
+Useful when backing up files and you need the copy to behave identically to the original, for example preserving executable permissions or modification dates.
+
+---
+
+### Copy files in archive mode
+```bash
+cp -a /source /destination
+```
+- `-a` means **archive** — a shorthand for `-dR --preserve=all` that recursively copies directories, preserves symbolic links (rather than following them), and keeps mode, ownership, and timestamps.
+- This is the safest flag to reach for when mirroring an entire directory tree, since nothing about the original files is changed or lost in the copy.
+
+:::note[`-a` vs `-rp`]
+`-a` is a superset of `-rp` — it does everything they do plus preserves symlinks as links and retains extra metadata, making it the preferred choice for full backups or cloning a directory structure.
+:::
 
 ---
 
