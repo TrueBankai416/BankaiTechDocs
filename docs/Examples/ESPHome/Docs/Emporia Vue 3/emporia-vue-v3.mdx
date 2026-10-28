@@ -6,6 +6,8 @@ last_update:
   author: BankaiTech
 updates:
   - date: 2026-10-28
+    note: "docs(esphome): fix L1 voltage smoothing, icon consistency, and other cleanups"
+  - date: 2026-10-28
     note: "docs(esphome): fix compile warnings from the Emporia Vue 3 example"
   - date: 2026-10-28
     note: "docs(esphome): remove dead ethernet block, note wired option"
@@ -25,6 +27,8 @@ Before flashing this to your device:
 - Verify each `phase_id`/`input` pairing against which phase leg and CT clamp input your wiring is actually connected to.
 - Re-calibrate the `calibration` values for your panel's actual voltage (see the inline formula comment).
 - Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, and `emporiavue3_api_key` to your own `secrets.yaml` (not committed to source control). OTA updates reuse the same `emporiavue3_api_key`, so no separate OTA secret is needed.
+- Update the `manual_ip` block (`gateway`, `static_ip`, `subnet`, `dns1`, `dns2`) and `use_address` to match your own network's address range, or remove them to use DHCP instead.
+- The `external_components` source is pinned to the `@dev` branch of `emporia-vue-local/esphome`, which can change without notice. Consider pinning to a specific tag or commit instead for a reproducible build.
 
 :::note[Ethernet]
 The Emporia Vue v3 also has a built-in 10/100Base-T Ethernet port. This example uses `wifi:` for connectivity; ESPHome does not support `wifi:` and `ethernet:` in the same configuration, so if you'd rather use the wired port, replace the `wifi:` block with an `ethernet:` block instead.
@@ -102,14 +106,14 @@ ota:
 # The logger component automatically logs all log messages
 logger:
   baud_rate: 0 # Disable the hardware UART logging
-  level: VERBOSE  # Minimum log level
+  level: INFO  # Minimum log level
   logs:
     component: ERROR  # Silence warnings about execution/blocking time
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-    # Enable fallback hotspot (captive portal) in case wifi connection fails
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: Energy-Monitor Fallback Hotspot
     password: !secret fallback_ap_password
@@ -140,6 +144,8 @@ light:
       ignore_strapping_warning: true
     restore_mode: ALWAYS_OFF
 
+  # Only driven if you switch to the ethernet: block noted above; add
+  # ethernet on_connect/on_disconnect triggers to turn this LED on/off.
   - platform: status_led
     id: ethernet_led
     pin: 4
@@ -189,7 +195,8 @@ button:
 # This is used for the daily energy use calculation.
 time:
   - platform: sntp
-    id: my_time
+    # Set to your own time zone so the daily energy sensors reset at local midnight
+    timezone: America/New_York
 
 # these are called references in YAML. They allow you to reuse
 # this configuration in each sensor, while only defining it once
@@ -222,7 +229,7 @@ sensor:
         # To calculate new calibration value use the formula <in-use calibration value> * <accurate voltage> / <reporting voltage>
         voltage:
           name: "Phase L1 Voltage"
-          filters: [*pos, *pos]
+          filters: [*moving_avg, *pos]
           icon: $icon_voltage
       - id: phase_b  # Verify that this specific phase/leg is connected to correct input wire color on device listed below
         input: RED  # Vue device wire color
@@ -251,7 +258,7 @@ sensor:
           icon: $icon_power
       # Power Monitor
       # Pay close attention to set the phase_id for each breaker by matching it to the phase/leg it connects to in the panel
-      - { phase_id: phase_b, input:  "1", power: { name:  "${circuit_1} Power", id:  cir1, icon: $icon_power, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_1} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      - { phase_id: phase_b, input:  "1", power: { name:  "${circuit_1} Power", id:  cir1, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_1} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_a, input:  "2", power: { name:  "${circuit_2} Power", id:  cir2, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_2} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_b, input:  "3", power: { name:  "${circuit_3} Power", id:  cir3, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_3} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_a, input:  "4", power: { name:  "${circuit_4} Power", id:  cir4, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_4} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
@@ -296,6 +303,8 @@ sensor:
   - { power_id: cir10, platform: total_daily_energy, accuracy_decimals: 0, icon: $icon_energy, name: "${circuit_10} Daily Energy" }
   - { power_id: cir11, platform: total_daily_energy, accuracy_decimals: 0, icon: $icon_energy, name: "${circuit_11} Daily Energy" }
   - { power_id: cir12, platform: total_daily_energy, accuracy_decimals: 0, icon: $icon_energy, name: "${circuit_12} Daily Energy" }
+  # Circuits 13-16 (the 240V/double-pole breakers) intentionally omit daily energy sensors below;
+  # remove the comments to enable them if you want daily totals for those circuits too.
 #  - { power_id: cir13, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_13} Daily Energy" }
 #  - { power_id: cir14, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_14} Daily Energy" }
 #  - { power_id: cir15, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_15} Daily Energy" }
