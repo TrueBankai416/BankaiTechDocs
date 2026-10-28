@@ -6,6 +6,8 @@ last_update:
   author: BankaiTech
 updates:
   - date: 2026-10-28
+    note: "fix(esphome): select Vue 3 CT mapping and expose main current sensors"
+  - date: 2026-10-28
     note: "docs(esphome): fix L1 voltage smoothing, icon consistency, and other cleanups"
   - date: 2026-10-28
     note: "docs(esphome): fix compile warnings from the Emporia Vue 3 example"
@@ -221,6 +223,7 @@ time:
 
 sensor:
   - platform: emporia_vue
+    variant: vue3
     i2c_id: i2c_a
     phases:
       - id: phase_a  # Verify that this specific phase/leg is connected to correct input wire color on device listed below
@@ -248,6 +251,10 @@ sensor:
           device_class: power
           filters: [*moving_avg, *pos]
           icon: $icon_power
+        current:
+          name: "Phase L1 Current"
+          filters: [*moving_avg, *pos]
+          icon: $icon_current
       - phase_id: phase_b
         input: "C"  # Verify the CT going to this device input also matches the phase/leg
         power:
@@ -256,6 +263,10 @@ sensor:
           device_class: power
           filters: [*moving_avg, *pos]
           icon: $icon_power
+        current:
+          name: "Phase L2 Current"
+          filters: [*moving_avg, *pos]
+          icon: $icon_current
       # Power Monitor
       # Pay close attention to set the phase_id for each breaker by matching it to the phase/leg it connects to in the panel
       - { phase_id: phase_b, input:  "1", power: { name:  "${circuit_1} Power", id:  cir1, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_1} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
@@ -329,5 +340,13 @@ text_sensor:
       name: "MAC Address"
       disabled_by_default: true
 ```
+
+### Voltage Works but Power or Current Is Zero
+
+Keep `variant: vue3` under `platform: emporia_vue`. The external component defaults to Vue 2, which reverses the A/C main CT port mapping compared with Vue 3. Valid voltage readings do not confirm that the CT mapping is correct. Rebuild and upload the firmware after changing this setting.
+
+If power still reads zero while a known load is running, temporarily use `filters: [*moving_avg]` on the affected power sensor. The `*pos` filter clamps negative readings to zero, and `*invert` clamps positive input readings to zero after reversing their sign. A negative reading without these filters points to CT orientation or a mismatched `phase_id`; verify the phase assignment before choosing the sign filter. Do not use absolute values to hide a phase mismatch or legitimate exported power.
+
+The main CT entries explicitly define `current:` sensors to publish amps. If current also stays at zero under load, verify that the configured input matches the connected CT port. Have a qualified electrician check clamp installation and wiring; do not work inside an energized panel.
 
 <BuyMeACoffeeButton />
