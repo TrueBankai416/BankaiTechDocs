@@ -20,6 +20,10 @@ Before flashing this to your device:
 - Re-calibrate the `calibration` values for your panel's actual voltage (see the inline formula comment).
 - Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `emporiavue3_api_key`, and `emporiavue3_ota_password` to your own `secrets.yaml` (not committed to source control).
 
+:::note[Ethernet]
+The Emporia Vue v3 also has a built-in 10/100Base-T Ethernet port. This example uses `wifi:` for connectivity; ESPHome does not support `wifi:` and `ethernet:` in the same configuration, so if you'd rather use the wired port, replace the `wifi:` block with an `ethernet:` block instead.
+:::
+
 ```yaml
 # Core ESPHome Node Configuration.
 esphome:
@@ -118,16 +122,6 @@ wifi:
 
 # The captive portal component in ESPHome is a fallback mechanism used when connecting to WiFi fails.
 captive_portal:
-
-#ethernet:
-#  type: RTL8201
-#  mdc_pin: GPIO32
-#  mdio_pin: GPIO33
-#  clk_mode: GPIO0_IN
-#  on_connect:
-#    - light.turn_on: ethernet_led
-#  on_disconnect:
-#    - light.turn_off: ethernet_led
 
 # Configure the two status LEDs on the Emporia Vue v3 case.
 light:
