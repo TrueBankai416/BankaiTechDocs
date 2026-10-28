@@ -1,0 +1,164 @@
+---
+title: emporia-smart-plug.yaml
+tags: [ESPHome, Emporia Smart Plug]
+keywords: [ESPHome, Emporia Smart Plug, BL0937]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-10-28
+    note: "docs(esphome): add Emporia Smart Plug example"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+This configuration turns an Emporia Smart Plug (ESP8266 with a BL0937 energy monitoring chip) into a locally-controlled switch that reports current, voltage, power, and energy directly to Home Assistant via the native API. The physical button toggles the relay, and the status LED follows the relay state.
+
+Before flashing this to your device:
+
+- Update the `name`, `friendly_name`, and `area` substitutions and the `timezone` for your own plug.
+- Adjust `max_power` to suit your load. The relay switches off when power draw goes above it, and the Emporia Smart Plug is rated for 15 A (about 1800 W at 120 V).
+- Entity names are short (`Current`, `Power`, and so on) because ESPHome prefixes them with the device `friendly_name` in Home Assistant. If you're upgrading an older config that used longer names, remove and re-add the device in Home Assistant so the entity IDs are regenerated.
+- The relay uses `RESTORE_DEFAULT_ON` so the plug powers back on after an outage; change `restore_mode` if you'd rather it stay off.
+- Re-calibrate `voltage_divider`, `current_resistor`, and `current_multiply`. The values below were calibrated against one specific plug and will be slightly off for yours.
+- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, and `emporia_api_key` to your own `secrets.yaml` (not committed to source control). OTA updates reuse the same `emporia_api_key`, so no separate OTA secret is needed.
+
+:::note[Flashing]
+The Emporia Smart Plug ships with Emporia's own firmware, so the first flash must be done over a serial connection after opening the plug. After that, updates can be done over the air. The ESP8266 must be power-cycled after the serial flash, otherwise OTA updates fail with `Invalid bootstrapping`.
+:::
+
+```yaml
+# Basic Config
+esphome:
+  name: ${name}
+  area: ${area}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+
+esp8266:
+  board: esp01_1m
+
+substitutions:
+  name: emporia-smart-plug-1
+  friendly_name: Networking Cabinet
+  area: "Laundry Room"
+
+  # Icons for Home Assistant
+  icon_voltage: "mdi:transmission-tower"
+
+  # Relay turns off automatically above this power draw (watts)
+  max_power: "1800"
+
+  # Calibration Values
+  voltage_divider: "1529.4608114534758"
+  current_resistor: "0.0010521907630275831"
+  current_multiply: "0.867093549429682"
+
+# The logger component automatically logs all log messages
+logger:
+  baud_rate: 0 # Disable the hardware UART logging
+  level: INFO  # Minimum log level
+  logs:
+    component: ERROR  # Silence warnings about execution/blocking time
+
+# Enable Home Assistant API
+api:
+  encryption:
+    # Generate your own with `esphome secrets` or the ESPHome dashboard.
+    key: !secret emporia_api_key
+
+ota:
+  - platform: esphome
+    # Reuses the api.encryption.key above (recommended over ota password,
+    # which only authenticates uploads instead of encrypting the firmware image).
+    encryption:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: none
+  reboot_timeout: 15min
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: Emporia_SmartPlug Fallback Hotspot
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+# Device Specific Config
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO13
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button"
+    filters:
+      - delayed_on: 50ms # Debounce the button
+    on_press:
+      - switch.toggle: relay
+  - platform: status
+    name: "Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+  - platform: hlw8012
+    model: BL0937
+    current_resistor: ${current_resistor}
+    voltage_divider: ${voltage_divider}
+    sel_pin:
+      number: GPIO12
+      inverted: true
+    cf_pin: GPIO5
+    cf1_pin: GPIO14
+    current:
+      name: "Current"
+      filters:
+        - multiply: ${current_multiply}
+    voltage:
+      name: "Voltage"
+      icon: ${icon_voltage}
+      filters:
+        # filter out any values below 0.
+        - lambda: 'return max(x, 0.0f);'
+    power:
+      name: "Power"
+      id: my_power
+      on_value_range:
+        # Overload protection: cut power to the relay above max_power
+        - above: ${max_power}
+          then:
+            - switch.turn_off: relay
+    energy:
+      name: "Energy"
+    update_interval: 30s
+  - platform: total_daily_energy
+    name: "Daily Energy"
+    power_id: my_power
+
+switch:
+  - platform: gpio
+    name: "Relay"
+    pin: GPIO4
+    id: relay
+    # Networking gear should come back on after a power outage
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - light.turn_on: status_light
+    on_turn_off:
+      - light.turn_off: status_light
+
+time:
+  - platform: sntp
+    # Set to your own time zone so the daily energy resets at local midnight
+    timezone: America/New_York
+
+light:
+  - platform: status_led
+    pin: GPIO15
+    id: status_light
+    internal: true
+```
+
+<BuyMeACoffeeButton />
