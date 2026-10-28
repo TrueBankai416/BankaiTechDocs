@@ -1,0 +1,8 @@
+{
+  "label": "ESPHome",
+  "key": "esphome-examples",
+  "link": {
+    "type": "generated-index",
+    "description": "Example ESPHome device configurations."
+  }
+}

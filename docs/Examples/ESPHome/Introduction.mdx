@@ -1,0 +1,56 @@
+---
+title: Getting started with ESPHome
+tags: [ESPHome]
+keywords: [ESPHome]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-10-28
+    note: "Add ESPHome section with Emporia Vue 3 example"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+# Introduction to ESPHome
+
+ESPHome is a system to configure microcontrollers, such as the ESP32 and ESP8266, using simple yet powerful YAML configuration files and control them remotely through Home Assistant. It is designed to work out-of-the-box with Home Assistant, but its generated firmware can also operate completely standalone, even without an internet connection.
+
+## What is ESPHome?
+
+ESPHome lets you create custom firmware for microcontrollers without writing any code. Instead, devices are described declaratively in a YAML file, which ESPHome then compiles into firmware and flashes to the device. This makes it approachable for beginners while remaining flexible enough for advanced users to add custom components, lambdas, and automations.
+
+## Uses of ESPHome
+
+ESPHome is commonly used for:
+
+- **Home Automation**: Building custom sensors, switches, and controllers that integrate natively with Home Assistant.
+- **Energy Monitoring**: Reading data from energy monitoring hardware, such as current transformer (CT) clamp based devices, to track whole-home and circuit-level power usage.
+- **DIY Electronics**: Powering custom smart home projects built around off-the-shelf or custom PCBs.
+- **Sensor Networks**: Reporting temperature, humidity, motion, and other environmental data back to a central hub.
+- **Replacing Proprietary Firmware**: Re-flashing commercial smart devices with open, locally-controlled firmware.
+
+## Key Features
+
+- **YAML-based Configuration**: Devices are fully described in human-readable YAML, making configurations easy to version, share, and reuse.
+- **Native Home Assistant Integration**: The built-in `api` component exposes entities directly to Home Assistant with encrypted communication.
+- **Over-the-Air (OTA) Updates**: Firmware can be updated wirelessly after the initial flash, removing the need for repeated physical access to the device.
+- **Substitutions and Packages**: Reusable variables and configuration snippets help keep large configurations maintainable.
+- **External Components**: Community and custom components can be pulled in directly from GitHub repositories to extend ESPHome's built-in functionality.
+- **Local Fallback**: Devices continue to operate independently of the network connection or Home Assistant using local automations.
+
+## Integrations
+
+ESPHome integrates tightly with the broader smart home ecosystem:
+
+- **Home Assistant**: First-class native API integration with automatic entity discovery.
+- **MQTT**: Optional MQTT support for integrating with other automation platforms.
+- **Wi-Fi and Ethernet**: Flexible networking options, including fallback access points and static IP configuration.
+- **Custom Hardware**: Support for a wide range of sensors, displays, relays, and specialty boards such as energy monitors.
+
+## Conclusion
+
+ESPHome makes it straightforward to turn inexpensive microcontrollers into reliable, locally-controlled smart home devices. Its declarative configuration model, strong Home Assistant integration, and active community make it an excellent choice for both simple sensors and complex, multi-component devices.
+
+For more information and to get started with ESPHome, visit the [official ESPHome website](https://esphome.io/).
+
+<BuyMeACoffeeButton />

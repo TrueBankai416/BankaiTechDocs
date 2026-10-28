@@ -622,7 +622,19 @@
     "wstunnel",
     "Opcache",
     "homelabs",
-    "langium"
+    "langium",
+    "esphome",
+    "emporiavue",
+    "Countertop",
+    "Stovetop",
+    "UART",
+    "Dirtbike",
+    "mdio",
+    "ledc",
+    "rtttl",
+    "sntp",
+    "defaultfilters",
+    "microcontrollers"
   ],
   "ignorePaths": [
     "blog/**",
