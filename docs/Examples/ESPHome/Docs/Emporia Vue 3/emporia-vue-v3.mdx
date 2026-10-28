@@ -11,6 +11,15 @@ updates:
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
+This configuration turns an Emporia Vue v3 energy monitor into a two-phase, 16-circuit power and energy sensor reporting directly to Home Assistant via the native API. Each phase leg (`BLACK`/`RED`) feeds the main voltage sensors, while the 16 CT clamp inputs each report per-circuit power, current, and daily energy use.
+
+Before flashing this to your device:
+
+- Update the `circuit_1`-`circuit_16` substitutions to match the labels for your own breaker panel.
+- Verify each `phase_id`/`input` pairing against which phase leg and CT clamp input your wiring is actually connected to.
+- Re-calibrate the `calibration` values for your panel's actual voltage (see the inline formula comment).
+- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `emporiavue3_api_key`, and `emporiavue3_ota_password` to your own `secrets.yaml` (not committed to source control).
+
 ```yaml
 # Core ESPHome Node Configuration.
 esphome:
@@ -57,7 +66,6 @@ external_components:
     components:
       - emporia_vue
 
-      
 esp32:
   board: esp32dev
   framework:
@@ -67,16 +75,17 @@ esp32:
 preferences:
   # the default of 1min is far too short--flash chip is rated
   # for approx 100k writes.
-  flash_write_interval: "48h"   
+  flash_write_interval: "48h"
 
 # Enable Home Assistant API
 api:
   encryption:
-    key: "API_KEY_HERE"
+    # Generate your own with `esphome secrets` or the ESPHome dashboard.
+    key: !secret emporiavue3_api_key
 
 ota:
   platform: esphome
-  password: "OTA_PASSWORD_HERE"
+  password: !secret emporiavue3_ota_password
 
 # The logger component automatically logs all log messages
 logger:
@@ -91,13 +100,14 @@ wifi:
     # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: Energy-Monitor Fallback Hotspot
-    password: Dirtbike2416!
+    password: !secret fallback_ap_password
   on_connect:
     - light.turn_on: wifi_led
   on_disconnect:
     - light.turn_off: wifi_led
 
-# The captive portal component in ESPHome is a fallback mechanism used when connecting to WiFi fails.
+  # Static IP configuration for the primary wifi connection.
+  # Adjust to match your own network's address range.
   manual_ip:
     gateway: 192.168.11.1
     static_ip: 192.168.11.190
@@ -105,8 +115,6 @@ wifi:
     dns1: 1.1.1.1
     dns2: 1.0.0.1
   use_address: 192.168.11.190
-
-# The captive portal component in ESPHome is a fallback mechanism used when connecting to WiFi fails.
 
 # The captive portal component in ESPHome is a fallback mechanism used when connecting to WiFi fails.
 captive_portal:
@@ -166,17 +174,17 @@ button:
   - platform: safe_mode
     name: Restart (Safe Mode)
     id: safe_mode_button
-    icon: mdi:restart-alert 
+    icon: mdi:restart-alert
 
 #  - platform: template
 #    name: "Two Beeps"
 #    on_press:
-#      - rtttl.play: "two short:d=4,o=5,b=100:16e6,16e6" 
+#      - rtttl.play: "two short:d=4,o=5,b=100:16e6,16e6"
 
 # This is used for the daily energy use calculation.
 time:
   - platform: sntp
-    id: my_time    
+    id: my_time
 
 # these are called references in YAML. They allow you to reuse
 # this configuration in each sensor, while only defining it once
@@ -242,7 +250,6 @@ sensor:
       - { phase_id: phase_a, input:  "2", power: { name:  "${circuit_2} Power", id:  cir2, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_2} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_b, input:  "3", power: { name:  "${circuit_3} Power", id:  cir3, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_3} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_a, input:  "4", power: { name:  "${circuit_4} Power", id:  cir4, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_4} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
-#      - { phase_id: phase_a, input:  "5", power: { name:  "${circuit_5} Power", id:  cir5, icon: $icon_circuit, filters: [ *moving_avg, *pos, multiply: 2 ] } }
       - { phase_id: phase_b, input:  "5", power: { name:  "${circuit_5} Power", id:  cir5, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_5} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_a, input:  "6", power: { name:  "${circuit_6} Power", id:  cir6, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_6} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_b, input:  "7", power: { name:  "${circuit_7} Power", id:  cir7, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_7} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
@@ -250,7 +257,12 @@ sensor:
       - { phase_id: phase_b, input:  "9", power: { name:  "${circuit_9} Power", id:  cir9, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_9} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_a, input: "10", power: { name: "${circuit_10} Power", id: cir10, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_10} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
       - { phase_id: phase_b, input: "11", power: { name: "${circuit_11} Power", id: cir11, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos ] }, current: { name: "${circuit_11} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      # NOTE: Circuit 12 intentionally omits the *invert filter used by every other circuit below.
+      # Verify this is correct for your panel (e.g. CT clamp installed in the opposite orientation)
+      # before relying on this sensor's sign.
       - { phase_id: phase_b, input: "12", power: { name: "${circuit_12} Power", id: cir12, icon: $icon_circuit, filters: [ *moving_avg, *pos ] }, current: { name: "${circuit_12} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      # Circuits 13-16 are 240V/double-pole breakers (Stove, Oven, A/C, Dryer), so a single CT clamp
+      # only measures one leg; multiply: 2 accounts for the second leg drawing the same current.
       - { phase_id: phase_a, input: "13", power: { name: "${circuit_13} Power", id: cir13, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_13} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
       - { phase_id: phase_a, input: "14", power: { name: "${circuit_14} Power", id: cir14, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_14} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
       - { phase_id: phase_a, input: "15", power: { name: "${circuit_15} Power", id: cir15, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_15} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
@@ -283,6 +295,13 @@ sensor:
 #  - { power_id: cir14, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_14} Daily Energy" }
 #  - { power_id: cir15, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_15} Daily Energy" }
 #  - { power_id: cir16, platform: total_daily_energy, accuracy_decimals: 0, name: "${circuit_16} Daily Energy" }
+
+  # Diagnostic sensors to help remotely troubleshoot connectivity and node health.
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+  - platform: uptime
+    name: "Uptime"
 
 # Provide diagnostic information about the platform.
 text_sensor:
