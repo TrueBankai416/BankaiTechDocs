@@ -22,7 +22,7 @@ Before flashing this to your device:
 - Update the `circuit_1`-`circuit_16` substitutions to match the labels for your own breaker panel.
 - Verify each `phase_id`/`input` pairing against which phase leg and CT clamp input your wiring is actually connected to.
 - Re-calibrate the `calibration` values for your panel's actual voltage (see the inline formula comment).
-- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, `emporiavue3_api_key`, and `emporiavue3_ota_password` to your own `secrets.yaml` (not committed to source control).
+- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, and `emporiavue3_api_key` to your own `secrets.yaml` (not committed to source control). OTA updates reuse the same `emporiavue3_api_key`, so no separate OTA secret is needed.
 
 :::note[Ethernet]
 The Emporia Vue v3 also has a built-in 10/100Base-T Ethernet port. This example uses `wifi:` for connectivity; ESPHome does not support `wifi:` and `ethernet:` in the same configuration, so if you'd rather use the wired port, replace the `wifi:` block with an `ethernet:` block instead.
@@ -56,7 +56,7 @@ substitutions:
   circuit_12: "Washer"
   circuit_13: "Stove"
   circuit_14: "Oven"
-  circuit_15: "A/C Unit"
+  circuit_15: "AC Unit" # Avoid "/" in substitutions used for sensor names; ESPHome reserves it as a URL path separator
   circuit_16: "Dryer"
 
   # Icons for Home Assistant
@@ -92,8 +92,10 @@ api:
     key: !secret emporiavue3_api_key
 
 ota:
-  platform: esphome
-  password: !secret emporiavue3_ota_password
+  - platform: esphome
+    # Reuses the api.encryption.key above (recommended over ota password,
+    # which only authenticates uploads instead of encrypting the firmware image).
+    encryption:
 
 # The logger component automatically logs all log messages
 logger:
@@ -156,6 +158,9 @@ light:
 
 
 i2c:
+  # GPIO5 is a hardware strapping pin, but it's the fixed i2c bus wiring on
+  # the Emporia Vue v3's PCB, not something you can relocate in software.
+  # ESPHome will warn about it; this is expected and safe for this board.
   sda: 5
   scl: 18
   scan: false
