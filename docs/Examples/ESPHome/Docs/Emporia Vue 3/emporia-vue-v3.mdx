@@ -5,6 +5,10 @@ keywords: [ESPHome, Emporia Vue 3]
 last_update:
   author: BankaiTech
 updates:
+  - date: 2026-11-03
+    note: "docs(esphome): correct two-pole circuit current scaling"
+  - date: 2026-11-03
+    note: "docs(esphome): update Vue 3 circuit labels and API secret"
   - date: 2026-10-28
     note: "docs(esphome): fix L1 voltage smoothing, icon consistency, and other cleanups"
   - date: 2026-10-28
@@ -26,7 +30,7 @@ Before flashing this to your device:
 - Update the `circuit_1`-`circuit_16` substitutions to match the labels for your own breaker panel.
 - Verify each `phase_id`/`input` pairing against which phase leg and CT clamp input your wiring is actually connected to.
 - Re-calibrate the `calibration` values for your panel's actual voltage (see the inline formula comment).
-- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, and `emporiavue3_api_key` to your own `secrets.yaml` (not committed to source control). OTA updates reuse the same `emporiavue3_api_key`, so no separate OTA secret is needed.
+- Add `wifi_ssid`, `wifi_password`, `fallback_ap_password`, and `emporia_api_key` to your own `secrets.yaml` (not committed to source control). OTA updates reuse the same `emporia_api_key`, so no separate OTA secret is needed.
 - Update the `manual_ip` block (`gateway`, `static_ip`, `subnet`, `dns1`, `dns2`) and `use_address` to match your own network's address range, or remove them to use DHCP instead.
 - The `external_components` source is pinned to the `@dev` branch of `emporia-vue-local/esphome`, which can change without notice. Consider pinning to a specific tag or commit instead for a reproducible build.
 
@@ -48,22 +52,22 @@ substitutions:
   area: "Garage"
 
   # Circuit Labels used for publishing to Home Assistant
-  circuit_1:  "Tonal"                  #"Circuit 1"
-  circuit_2:  "Furnace"                #"Circuit 2"
-  circuit_3:  "Range Hood"             #"Circuit 3"
-  circuit_4:  "Countertop"             #"Circuit 4"
-  circuit_5:  "Garbage Disposal"       #"Circuit 5"
-  circuit_6:  "Microwave"              #"Circuit 6"
-  circuit_7:  "Coffee Bar"             #"Circuit 7"
-  circuit_8:  "Stovetop Counter"       #"Circuit 8"
-  circuit_9:  "Refrigerator"
-  circuit_10: "Garage"
-  circuit_11: "Living Room"
-  circuit_12: "Washer"
-  circuit_13: "Stove"
-  circuit_14: "Oven"
-  circuit_15: "AC Unit" # Avoid "/" in substitutions used for sensor names; ESPHome reserves it as a URL path separator
-  circuit_16: "Dryer"
+  circuit_1:  "Bedroom Lighting"       #"Breaker 14"
+  circuit_2:  "Hotub and Grill"        #"Breaker 6"
+  circuit_3:  "Old Electric"           #"Breaker 33"
+  circuit_4:  "Countertop"             #"Breaker 31"
+  circuit_5:  "Stovetop"               #"Breaker 19"
+  circuit_6:  "Microwave"              #"Breaker 25"
+  circuit_7:  "Coffee Bar"             #"Breaker 15"
+  circuit_8:  "Fireplace"              #"Breaker 26"
+  circuit_9:  "Reynas Room"            #"Breaker 12"
+  circuit_10: "Garage"                 #"Breaker 8"
+  circuit_11: "Living Room"            #"Breaker 21"
+  circuit_12: "Washer"                 #"Breaker 39"
+  circuit_13: "Stove"                  #"Breaker 34/36"
+  circuit_14: "Oven"                   #"Breaker 38/40"
+  circuit_15: "AC Unit"                #"Breaker 30/32"
+  circuit_16: "Dryer"                  #"Breaker 35/37"
 
   # Icons for Home Assistant
   icon_circuit: "mdi:power-plug"
@@ -95,7 +99,7 @@ preferences:
 api:
   encryption:
     # Generate your own with `esphome secrets` or the ESPHome dashboard.
-    key: !secret emporiavue3_api_key
+    key: !secret emporia_api_key
 
 ota:
   - platform: esphome
@@ -282,12 +286,13 @@ sensor:
       # Verify this is correct for your panel (e.g. CT clamp installed in the opposite orientation)
       # before relying on this sensor's sign.
       - { phase_id: phase_b, input: "12", power: { name: "${circuit_12} Power", id: cir12, icon: $icon_circuit, filters: [ *moving_avg, *pos ] }, current: { name: "${circuit_12} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
-      # Circuits 13-16 are 240V/double-pole breakers (Stove, Oven, A/C, Dryer), so a single CT clamp
-      # only measures one leg; multiply: 2 accounts for the second leg drawing the same current.
-      - { phase_id: phase_a, input: "13", power: { name: "${circuit_13} Power", id: cir13, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_13} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
-      - { phase_id: phase_a, input: "14", power: { name: "${circuit_14} Power", id: cir14, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_14} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
-      - { phase_id: phase_a, input: "15", power: { name: "${circuit_15} Power", id: cir15, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_15} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
-      - { phase_id: phase_a, input: "16", power: { name: "${circuit_16} Power", id: cir16, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_16} Current", icon: $icon_current, filters: [ *moving_avg, *pos, multiply: 2]} }
+      # Circuits 13-16 are 240V/double-pole breakers (Stove, Oven, A/C, Dryer). A single CT
+      # measures the current on one leg: double power to account for both legs, but leave current
+      # unchanged because the same current flows through both poles of a 240V load.
+      - { phase_id: phase_a, input: "13", power: { name: "${circuit_13} Power", id: cir13, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_13} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      - { phase_id: phase_a, input: "14", power: { name: "${circuit_14} Power", id: cir14, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_14} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      - { phase_id: phase_a, input: "15", power: { name: "${circuit_15} Power", id: cir15, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_15} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
+      - { phase_id: phase_a, input: "16", power: { name: "${circuit_16} Power", id: cir16, icon: $icon_circuit, filters: [ *invert, *moving_avg, *pos, multiply: 2 ] }, current: { name: "${circuit_16} Current", icon: $icon_current, filters: [ *moving_avg, *pos]} }
 
 
   - platform: template
