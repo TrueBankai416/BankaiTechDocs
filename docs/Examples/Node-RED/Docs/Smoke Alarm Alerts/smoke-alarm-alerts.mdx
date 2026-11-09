@@ -1,102 +1,248 @@
 ---
 title: Smoke Alarm Alerts
 tags: [Node-RED, Home Assistant, Smoke Alarm, Safety]
-keywords: [Node-RED, Home Assistant, Smoke Alarm, Carbon Monoxide, CO, Notifications, Zooz ZEN55]
+keywords: [Node-RED, Home Assistant, Smoke Alarm, Carbon Monoxide, CO, Notifications, Zooz ZEN55, Fire Alarm, Lights, Hue]
 last_update:
   author: BankaiTech
 updates:
   - date: 2026-11-09
     note: "docs(examples): add Node-RED Smoke Alarm Alerts example"
+  - date: 2026-11-09
+    note: "docs(examples): add fire alarm lights to Smoke Alarm Alerts example"
+  - date: 2026-11-09
+    note: "docs(examples): handle the alarm listener and the lights in one function node"
+  - date: 2026-11-09
+    note: "docs(examples): send one notification per alarm instead of one per sensor"
+  - date: 2026-11-09
+    note: "docs(examples): treat the alarm listener as a backup that can't tell fire from CO"
 ---
 
 import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
 
-This example shows a Node-RED flow that sends a high priority phone notification when a smoke or carbon monoxide (CO) sensor in Home Assistant goes off, and a quieter one when it clears.
+This example shows a Node-RED flow that watches a hardwired smoke and carbon monoxide (CO) detector, plus a battery powered listener that hears the detector's alarm, in Home Assistant. When any of them goes off, it sends a high priority phone notification and switches the living room lights to a fire alarm scene. When they clear, it sends a quieter notification and puts the lights back.
 
-- **Alarm detected**: a loud, vibrating notification titled `🚨 FIRE/SMOKE ALARM DETECTED` (or `CARBON MONOXIDE`) with a red fire or CO icon in the status bar.
-- **Alarm cleared**: a plain notification titled `✅ FIRE/SMOKE ALARM CLEARED` with a green check icon in the status bar, so it doesn't sound like another alarm.
-- **Test buttons**: four inject nodes simulate each alarm and clear without touching the real sensor.
+- **Alarm detected**: a loud, vibrating notification titled `🚨 FIRE/SMOKE ALARM DETECTED` (or `CARBON MONOXIDE`, or `SMOKE/CO` from the listener) with a red fire or CO icon in the status bar, and the lights switch to the fire alarm scene.
+- **Alarm cleared**: a plain notification titled `✅ FIRE/SMOKE ALARM CLEARED` with a green check icon in the status bar, so it doesn't sound like another alarm. The lights go back to the natural light scene once every sensor is clear.
+- **One notification per alarm**: the listener can't tell fire from CO, so it is only a backup. It notifies only if the ZEN55 doesn't report the alarm first, and it never repeats a ZEN55 notification.
+- **One function node**: `Alarm Logic` handles every sensor, so the notifications and the lights always agree.
+- **Test buttons**: four inject nodes simulate each alarm and clear without touching the real sensors or the lights.
 
 ## Prerequisites
 
 - Node-RED with the [node-red-contrib-home-assistant-websocket](https://github.com/zachowj/node-red-contrib-home-assistant-websocket) palette installed (exported with version 0.82.0) and a configured Home Assistant server connection.
-- A smoke and CO detector that exposes two binary sensors in Home Assistant. The export uses a Zooz ZEN55 with `binary_sensor.smoke_detector_smoke_detected` and `binary_sensor.smoke_detector_carbon_monoxide_detected`.
+- A smoke and CO detector that exposes two binary sensors in Home Assistant. The export uses a hardwired Zooz ZEN55 with `binary_sensor.smoke_detector_smoke_detected` and `binary_sensor.smoke_detector_carbon_monoxide_detected`.
+- A binary sensor that reports when the detector's alarm is sounding, without saying which kind. The export uses a battery powered alarm listener, `binary_sensor.alarm_listener_alarm_status`, which hears the detector but can't tell fire from CO.
 - A notify service for your phones. The export uses `notify.notify`, which sends to every device with the Home Assistant mobile app.
+- For the lights: the Philips Hue integration (the flow calls `hue.activate_scene`), the `light.living_room_switch` entity that powers the bulbs, and two Hue scenes: `scene.living_room_living_room_fire_alarm` and `scene.living_room_living_room_natural_light`.
+- **Enable Global Context Store** turned on in the Home Assistant server node. The function reads the current state of the sensors and the light from it. The export has it on.
 
 :::warning[This is not a replacement for your smoke alarm]
-The alarm itself must still sound on its own. This flow only adds a phone notification. It depends on Node-RED, Home Assistant, your network, and your phone, and any of them can fail.
+The alarm itself must still sound on its own. This flow only adds a phone notification and a lighting change. It depends on Node-RED, Home Assistant, your network, and your phone, and any of them can fail.
 :::
 
 ## How it works
 
-1. The `Zooz ZEN55 Monitor` node watches every entity matching the regex `binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$` and fires on each state change.
-2. The `Alarm Detector` function node decides whether the change is an alarm or a clear. Anything else is dropped.
-3. The `Notify User` node sends the notification, and `Notification Log` shows the final message in the debug sidebar.
+1. The `Alarm Sensors` node watches the two ZEN55 sensors (matched with the regex `binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$`) and the listener, and fires on each state change.
+2. The `Alarm Logic` function node decides whether the change is an alarm or a clear. Anything else is dropped. It has two outputs.
+3. Output 1 goes to `Notify User`, which sends the notification, and then to `Notification Log`, which shows the final message in the debug sidebar.
+4. Output 2 goes to `Light Action`, which turns the lights on or activates a scene.
 
-The function works out the alarm type from the entity name: `smoke_detected` is **FIRE/SMOKE** and `carbon_monoxide_detected` is **CARBON MONOXIDE**.
+The sensors are listed at the top of the function:
 
-| Sensor change | Result |
-| --- | --- |
-| Anything → `on` (from `off`, `unavailable`, `unknown`, or no previous state) | **DETECTED**, high priority |
-| `on` → `off` | **CLEARED**, normal priority |
-| Anything else, such as `on` → `unavailable` or `unavailable` → `off` | Ignored |
+| Sensor | Power | Label in notifications | Group | Role | Changes the lights |
+| --- | --- | --- | --- | --- | --- |
+| `binary_sensor.smoke_detector_smoke_detected` | Hardwired | FIRE/SMOKE | `fire` | Knows the alarm type | Yes |
+| `binary_sensor.smoke_detector_carbon_monoxide_detected` | Hardwired | CARBON MONOXIDE | `co` | Knows the alarm type | Yes |
+| `binary_sensor.alarm_listener_alarm_status` | Battery | SMOKE/CO | `listener` | Backup, can't tell fire from CO | Yes |
+
+Sensors in the same group share one notification (see below). Set `lights: false` for a sensor in the `SOURCES` list if it should send notifications but leave the lights alone. A sensor that isn't in the list still works, with the label `UNKNOWN`, its own group, and changing the lights. A sensor with `backup: true` behaves like the listener.
+
+| Sensor change | Notification | Lights |
+| --- | --- | --- |
+| A ZEN55 sensor → `on` (from `off`, `unavailable`, `unknown`, or no previous state) | **DETECTED**, high priority, unless another sensor in its group already raised the alarm | Fire alarm scene. If the light switch is off, it is turned on first |
+| The listener → `on` | **DETECTED** only if no ZEN55 sensor is on after 5 seconds | Fire alarm scene right away |
+| A ZEN55 sensor `on` → `off`, or `off` after an `unavailable` gap in the middle of an alarm | **CLEARED**, normal priority, once the last sensor in its group has cleared | Natural light scene, only if no other sensor is still on and the light is on |
+| The listener → `off` | **CLEARED** only if the listener sent the alarm | Natural light scene, under the same conditions |
+| Anything else, such as `on` → `unavailable` or `unavailable` → `off` with no alarm | Ignored | Nothing |
+
+You get one notification per alarm, not one per sensor.
+
+- **ZEN55 first, or at the same time:** the ZEN55 sensors know whether it's fire or CO, so their notification is the one you get. The listener stays quiet, and a pending listener notification is cancelled.
+- **Listener first:** it waits `BACKUP_DELAY_MS` (5 seconds) for a ZEN55 sensor to report. If one does, you only get the ZEN55 notification. If none does, you get a `SMOKE/CO` notification, so you still hear about an alarm the ZEN55 missed.
+- **ZEN55 reports after the listener notified:** you get the typed notification as well, because it tells you whether it's fire or CO.
+- **The listener flaps:** if it goes off again before the delay ends, nothing is sent.
+- **Smoke and CO together:** CO is in its own group, so it still notifies while a smoke alarm is active.
+
+The lights always follow every sensor, including the listener, and go back to normal only when every sensor is clear.
+
+To decide whether another sensor is still on, the function checks its current state in Home Assistant's global context. It also remembers which groups it has already notified, in node context. That memory is in the node, so it resets when Node-RED restarts, and the next alarm after a restart always notifies.
 
 The function adds these properties to the message: `alarmType`, `alarmStatus`, `deviceName`, `timestamp`, `priority`, `title`, and `message`. It also writes the event to the Node-RED debug log with `node.warn`.
 
 :::note[Why an alarm from `unavailable` still counts]
-Z-Wave sensors can briefly show `unavailable` or `unknown` when the controller restarts or the device reconnects. If an alarm is reported right after that, the previous state isn't `off`. Checking only for `off` → `on` would drop that alarm silently, so any previous state other than `on` counts as a new alarm.
+Z-Wave sensors can briefly show `unavailable` or `unknown` when the controller restarts or the device reconnects, and a battery powered sensor does this more often. If an alarm is reported right after that, the previous state isn't `off`. Checking only for `off` → `on` would drop that alarm silently, so any previous state other than `on` counts as a new alarm.
+:::
+
+:::note[Why the function remembers which sensors are on]
+A battery powered sensor can go `unavailable` between `on` and `off`. A check for `on` → `off` would miss that clear, so the lights would never go back. The function keeps a list in node context of the sensors it reported as `on` and sends a clear when one of them reports `off`. The list is in memory, so it resets when Node-RED restarts.
 :::
 
 The function node code:
 
 ```js
-// Check for fire or CO alarm conditions
+// Output 1: notification. Output 2: light calls.
+// Sensors in the same group share one notification.
+const SOURCES = {
+    'binary_sensor.smoke_detector_smoke_detected': { label: 'FIRE/SMOKE', group: 'fire', lights: true },
+    'binary_sensor.smoke_detector_carbon_monoxide_detected': { label: 'CARBON MONOXIDE', group: 'co', lights: true },
+    // Hears the detector but can't tell fire from CO, so it is only a backup
+    'binary_sensor.alarm_listener_alarm_status': { label: 'SMOKE/CO', group: 'listener', lights: true, backup: true }
+};
+const LIGHT = 'light.living_room_switch';
+const ALARM_SCENE = 'scene.living_room_living_room_fire_alarm';
+const NORMAL_SCENE = 'scene.living_room_living_room_natural_light';
+const POWER_ON_DELAY_MS = 2000; // time for the bulbs to connect after the switch turns on
+const BACKUP_DELAY_MS = 5000;   // how long a backup sensor waits for a typed sensor to report first
+
 const entity = msg.data && msg.data.entity_id;
 const newState = msg.payload;
 const oldState = msg.data && msg.data.old_state ? msg.data.old_state.state : null;
 if (!entity || typeof newState !== 'string') {
     return null;
 }
+const source = SOURCES[entity] || { label: 'UNKNOWN', group: entity, lights: true };
 
-// Determine alarm type based on entity name
-let alarmType = 'UNKNOWN'; // fallback
-if (entity.includes('smoke_detected')) {
-    alarmType = 'FIRE/SMOKE';
-} else if (entity.includes('carbon_monoxide_detected')) {
-    alarmType = 'CARBON MONOXIDE';
-}
+const ha = global.get('homeassistant');
+const states = ha?.homeAssistant?.states;
+const call = (action, entityId) => ({ payload: { action, target: { entity_id: entityId } } });
 
-// Alarm triggered. Any previous state other than "on" counts, so an alarm that
-// shows up right after the sensor was unavailable or unknown isn't missed.
+const cancelTimer = () => {
+    clearTimeout(context.get('lightTimer'));
+    context.set('lightTimer', null);
+};
+
+// Alarm lights on. An unreadable light state counts as "on" so the scene still runs.
+const lightsOn = () => {
+    // A second sensor shouldn't restart a scene that is already waiting for the bulbs
+    if (context.get('lightTimer')) {
+        return null;
+    }
+    if (states?.[LIGHT]?.state !== 'off') {
+        return call('hue.activate_scene', ALARM_SCENE);
+    }
+    node.send([null, call('light.turn_on', LIGHT)]);
+    context.set('lightTimer', setTimeout(() => {
+        context.set('lightTimer', null);
+        node.send([null, call('hue.activate_scene', ALARM_SCENE)]);
+    }, POWER_ON_DELAY_MS));
+    return null;
+};
+
+// Is another sensor that matches the filter on right now, according to Home Assistant?
+const othersOn = (match) => Object.keys(SOURCES).some((id) =>
+    id !== entity && match(SOURCES[id]) && states?.[id]?.state === 'on');
+
+// Back to normal, but only once every source that drives the lights is clear
+const lightsRestore = () => {
+    if (othersOn((s) => s.lights)) {
+        return null;
+    }
+    cancelTimer();
+    return states?.[LIGHT]?.state === 'on' ? call('hue.activate_scene', NORMAL_SCENE) : null;
+};
+
+// Sources reported as "on" that haven't cleared yet. This lets a clear through when
+// a battery sensor goes unavailable between "on" and "off".
+const active = context.get('active') || {};
+// Groups that sent a DETECTED notification and haven't sent CLEARED yet
+const notified = context.get('notified') || {};
+const sameGroup = (s) => s.group === source.group;
+
+// Is a sensor that knows the alarm type on right now? Reads the live state each time.
+const typedSensorOn = () => {
+    const live = global.get('homeassistant')?.homeAssistant?.states;
+    return Object.keys(SOURCES).some((id) => !SOURCES[id].backup && live?.[id]?.state === 'on');
+};
+
+const cancelBackup = () => {
+    clearTimeout(context.get('backupTimer'));
+    context.set('backupTimer', null);
+};
+
+const notification = (status) => ({
+    ...msg,
+    alarmType: source.label,
+    alarmStatus: status,
+    deviceName: entity,
+    timestamp: new Date().toISOString(),
+    priority: status === 'DETECTED' ? 'high' : 'normal',
+    title: (status === 'DETECTED' ? '🚨 ' : '✅ ') + source.label + ' ALARM ' + status,
+    message: source.label + ' alarm ' + status.toLowerCase() + ' on ' + entity
+});
+
+let status;
+let notify;
+let lightMsg = null;
+
+// Any previous state other than "on" counts, so an alarm that shows up right after
+// a sensor was unavailable or unknown isn't missed.
 if (newState === 'on' && oldState !== 'on') {
-    msg.alarmType = alarmType;
-    msg.alarmStatus = 'DETECTED';
-    msg.deviceName = entity;
-    msg.timestamp = new Date().toISOString();
-    msg.priority = 'high';
-    msg.title = '🚨 ' + alarmType + ' ALARM DETECTED';
-    msg.message = alarmType + ' alarm detected on ' + entity;
+    status = 'DETECTED';
+    active[entity] = true;
+    if (source.backup) {
+        // Notify only if no typed sensor reports the alarm within the delay
+        notify = false;
+        if (!typedSensorOn()) {
+            cancelBackup();
+            context.set('backupTimer', setTimeout(() => {
+                context.set('backupTimer', null);
+                if (typedSensorOn()) {
+                    return;
+                }
+                context.set('notified', { ...context.get('notified'), [source.group]: true });
+                node.warn(`${source.label} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);
+                node.send([notification('DETECTED'), null]);
+            }, BACKUP_DELAY_MS));
+        }
+    } else {
+        // A typed sensor reported, so a pending backup notification is redundant
+        cancelBackup();
+        // Skip the notification if another sensor in the group already raised this alarm
+        notify = !(notified[source.group] && othersOn(sameGroup));
+        notified[source.group] = true;
+    }
+    if (source.lights && !msg.test) {
+        lightMsg = lightsOn();
+    }
+} else if (newState === 'off' && (active[entity] || oldState === 'on')) {
+    status = 'CLEARED';
+    delete active[entity];
+    if (source.backup) {
+        // Only send a clear if the backup sensor actually sent the alarm
+        cancelBackup();
+        notify = Boolean(notified[source.group]);
+    } else {
+        // Wait for the last sensor in the group before sending the clear
+        notify = !othersOn(sameGroup);
+    }
+    if (notify) {
+        delete notified[source.group];
+    }
+    if (source.lights && !msg.test) {
+        lightMsg = lightsRestore();
+    }
+} else {
+    return null;
+}
+context.set('active', active);
+context.set('notified', notified);
 
-    node.warn(`${alarmType} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);
-    return msg;
+if (!notify) {
+    return lightMsg ? [null, lightMsg] : null;
 }
 
-// Alarm cleared (on -> off)
-if (newState === 'off' && oldState === 'on') {
-    msg.alarmType = alarmType;
-    msg.alarmStatus = 'CLEARED';
-    msg.deviceName = entity;
-    msg.timestamp = new Date().toISOString();
-    msg.priority = 'normal';
-    msg.title = '✅ ' + alarmType + ' ALARM CLEARED';
-    msg.message = alarmType + ' alarm cleared on ' + entity;
-
-    node.warn(`${alarmType} ALARM CLEARED: ${entity} changed from ${oldState} to ${newState}`);
-    return msg;
-}
-
-// No relevant state change, don't pass the message forward
-return null;
+node.warn(`${source.label} ALARM ${status}: ${entity} changed from ${oldState} to ${newState}`);
+return [notification(status), lightMsg];
 ```
 
 ## The notification
@@ -135,9 +281,21 @@ The `data` options are for the Android Home Assistant app:
 
 On iOS these Android options are ignored. For a critical alert there, add `push: { sound: { name: "default", critical: 1, volume: 1.0 } }` to the data. See the [Home Assistant companion app notification docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/) for all the options.
 
+## The lights
+
+The function's second output sends a message that names the call: `msg.payload.action` is the service (`light.turn_on` or `hue.activate_scene`) and `msg.payload.target` holds the entity. `Light Action` has no action configured and **Block Input Overrides** off, so the message decides what it does. The older `domain` and `service` payload format still works in palette version 0.82.0, but it logs a deprecation warning.
+
+A few behaviours to know:
+
+- **Light timing:** a second sensor going off while the light switch is still powering on doesn't restart the 2 second wait, so the scene is applied once.
+- **Light switch off:** the function turns the switch on, waits 2 seconds for the bulbs to connect, then activates the fire alarm scene.
+- **Cancelled scene:** if the alarm clears during that 2 second wait, the pending fire alarm scene is cancelled, so it can't fire after the lights are restored.
+- **Lights stay on:** the flow doesn't remember whether the lights were off before the alarm. After an alarm that started with the light off, it stays on with the natural light scene.
+- **Restarts:** `Output on connect` is off on the `Alarm Sensors` node, so deploying or restarting Node-RED doesn't change the lights. If you turn it on, an alarm that is already active at startup triggers the scene, but every restart also restores the natural light scene.
+
 ## Testing
 
-The four inject nodes (`Test Fire Alarm`, `Test CO Alarm`, `Test Fire Alarm Clear`, `Test CO Alarm Clear`) each feed a small function node that fakes the sensor event and sends it to `Alarm Detector`. The real sensor isn't touched, but the notifications are real and go to your phone. Warn your household before you test.
+The four inject nodes (`Test Fire Alarm`, `Test CO Alarm`, `Test Fire Alarm Clear`, `Test CO Alarm Clear`) each feed a small function node that fakes the sensor event and sends it to `Alarm Logic`. The real sensors aren't touched, and the fake events set `msg.test`, which tells the function to skip the lights. The notifications are real and go to your phone. Warn your household before you test.
 
 After you click one, check that:
 
@@ -145,28 +303,32 @@ After you click one, check that:
 - The `Notification Log` debug output shows the message with its `title`, `message`, and `alarmStatus`.
 - Clicking a `Clear` button sends a plain notification, not a loud one.
 
+The test buttons only cover the ZEN55 sensors and don't test the lights or the listener. To test the lights without a real alarm, temporarily add a toggle helper to the `Alarm Sensors` node and switch it on and off. A sensor that isn't in the `SOURCES` list uses the `UNKNOWN` label and changes the lights. To test the listener path, add the helper to `SOURCES` with `backup: true`.
+
 ## Before importing
 
-- Update the sensor names in the `Zooz ZEN55 Monitor` regex to match your own entities. The function also relies on the entity names containing `smoke_detected` and `carbon_monoxide_detected`.
+- Update the sensor names in the `Alarm Sensors` node and in the `SOURCES` list at the top of the function to match your own entities. The `Alarm Sensors` node and the function must list the same sensors. Give sensors that detect the same hazard the same `group`, and set `backup: true` on any sensor that can't tell which kind of alarm it heard.
+- Update the light and scene entity IDs at the top of the function.
 - Replace `notify.notify` with your own mobile app notify service if you only want specific phones alerted.
-- The flow doesn't alert when the sensor goes `unavailable`, which can mean a dead battery or a lost connection. Consider adding a separate notification for that.
+- The flow doesn't alert when a sensor goes `unavailable`, which can mean a dead battery or a lost connection, especially on the battery powered listener. Consider adding a separate notification for that.
 
 ## Flow
 
 ```json
 [{"id":"smoke-alarm-flow","type":"tab","label":"Smoke Alarm Automation","disabled":false,"info":"Automated smoke and CO alarm monitoring with Zooz ZEN55","env":[]},
-{"id":"zen55-monitor","type":"server-state-changed","z":"smoke-alarm-flow","name":"Zooz ZEN55 Monitor","server":"18bb22fb.3ce36d","version":6,"outputs":1,"exposeAsEntityConfig":"","entities":{"entity":[],"substring":[],"regex":["binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$"]},"outputInitially":false,"stateType":"str","ifState":"","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":120,"y":80,"wires":[["38d59b69d7feedab"]]},
+{"id":"zen55-monitor","type":"server-state-changed","z":"smoke-alarm-flow","name":"Alarm Sensors","server":"18bb22fb.3ce36d","version":6,"outputs":1,"exposeAsEntityConfig":"","entities":{"entity":["binary_sensor.alarm_listener_alarm_status"],"substring":[],"regex":["binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$"]},"outputInitially":false,"stateType":"str","ifState":"","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":120,"y":80,"wires":[["38d59b69d7feedab"]]},
 {"id":"notify-user","type":"api-call-service","z":"smoke-alarm-flow","name":"Notify User","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\n  \"title\": title,\n  \"message\": message,\n  \"data\": alarmStatus = \"DETECTED\" ? {\n    \"priority\": \"high\",\n    \"ttl\": 0,\n    \"channel\": \"alarm\",\n    \"importance\": \"high\",\n    \"notification_icon\": alarmType = \"CARBON MONOXIDE\" ? \"mdi:molecule-co\" : \"mdi:fire\",\n    \"color\": \"red\",\n    \"vibrationPattern\": \"100,1000,100,1000,100\"\n  } : {\n    \"notification_icon\": \"mdi:check-circle\",\n    \"color\": \"green\"\n  }\n}\n","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":570,"y":80,"wires":[["log-notification"]]},
 {"id":"log-notification","type":"debug","z":"smoke-alarm-flow","name":"Notification Log","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":780,"y":40,"wires":[]},
-{"id":"38d59b69d7feedab","type":"function","z":"smoke-alarm-flow","name":"Alarm Detector","func":"// Check for fire or CO alarm conditions\nconst entity = msg.data && msg.data.entity_id;\nconst newState = msg.payload;\nconst oldState = msg.data && msg.data.old_state ? msg.data.old_state.state : null;\nif (!entity || typeof newState !== 'string') {\n    return null;\n}\n\n// Determine alarm type based on entity name\nlet alarmType = 'UNKNOWN'; // fallback\nif (entity.includes('smoke_detected')) {\n    alarmType = 'FIRE/SMOKE';\n} else if (entity.includes('carbon_monoxide_detected')) {\n    alarmType = 'CARBON MONOXIDE';\n}\n\n// Alarm triggered. Any previous state other than \"on\" counts, so an alarm that\n// shows up right after the sensor was unavailable or unknown isn't missed.\nif (newState === 'on' && oldState !== 'on') {\n    msg.alarmType = alarmType;\n    msg.alarmStatus = 'DETECTED';\n    msg.deviceName = entity;\n    msg.timestamp = new Date().toISOString();\n    msg.priority = 'high';\n    msg.title = '🚨 ' + alarmType + ' ALARM DETECTED';\n    msg.message = alarmType + ' alarm detected on ' + entity;\n\n    node.warn(`${alarmType} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);\n    return msg;\n}\n\n// Alarm cleared (on -> off)\nif (newState === 'off' && oldState === 'on') {\n    msg.alarmType = alarmType;\n    msg.alarmStatus = 'CLEARED';\n    msg.deviceName = entity;\n    msg.timestamp = new Date().toISOString();\n    msg.priority = 'normal';\n    msg.title = '✅ ' + alarmType + ' ALARM CLEARED';\n    msg.message = alarmType + ' alarm cleared on ' + entity;\n\n    node.warn(`${alarmType} ALARM CLEARED: ${entity} changed from ${oldState} to ${newState}`);\n    return msg;\n}\n\n// No relevant state change, don't pass the message forward\nreturn null;\n","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":80,"wires":[["notify-user"]]},
-{"id":"d43aa9a2cf6c23f3","type":"function","z":"smoke-alarm-flow","name":"Test Processor","func":"// Simulate smoke alarm detection for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":180,"wires":[["38d59b69d7feedab"]]},
-{"id":"6cbf0d29dfae81da","type":"function","z":"smoke-alarm-flow","name":"Test CO Processor","func":"// Simulate CO alarm detection for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":240,"wires":[["38d59b69d7feedab"]]},
-{"id":"d0b31eb549dc2b0e","type":"function","z":"smoke-alarm-flow","name":"Test Clear Processor","func":"// Simulate smoke alarm cleared for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":280,"wires":[["38d59b69d7feedab"]]},
-{"id":"cc17b01f6c99cf93","type":"function","z":"smoke-alarm-flow","name":"Test CO Clear Processor","func":"// Simulate CO alarm cleared for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":340,"wires":[["38d59b69d7feedab"]]},
+{"id":"38d59b69d7feedab","type":"function","z":"smoke-alarm-flow","name":"Alarm Logic","func":"// Output 1: notification. Output 2: light calls.\n// Sensors in the same group share one notification.\nconst SOURCES = {\n    'binary_sensor.smoke_detector_smoke_detected': { label: 'FIRE/SMOKE', group: 'fire', lights: true },\n    'binary_sensor.smoke_detector_carbon_monoxide_detected': { label: 'CARBON MONOXIDE', group: 'co', lights: true },\n    // Hears the detector but can't tell fire from CO, so it is only a backup\n    'binary_sensor.alarm_listener_alarm_status': { label: 'SMOKE/CO', group: 'listener', lights: true, backup: true }\n};\nconst LIGHT = 'light.living_room_switch';\nconst ALARM_SCENE = 'scene.living_room_living_room_fire_alarm';\nconst NORMAL_SCENE = 'scene.living_room_living_room_natural_light';\nconst POWER_ON_DELAY_MS = 2000; // time for the bulbs to connect after the switch turns on\nconst BACKUP_DELAY_MS = 5000;   // how long a backup sensor waits for a typed sensor to report first\n\nconst entity = msg.data && msg.data.entity_id;\nconst newState = msg.payload;\nconst oldState = msg.data && msg.data.old_state ? msg.data.old_state.state : null;\nif (!entity || typeof newState !== 'string') {\n    return null;\n}\nconst source = SOURCES[entity] || { label: 'UNKNOWN', group: entity, lights: true };\n\nconst ha = global.get('homeassistant');\nconst states = ha?.homeAssistant?.states;\nconst call = (action, entityId) => ({ payload: { action, target: { entity_id: entityId } } });\n\nconst cancelTimer = () => {\n    clearTimeout(context.get('lightTimer'));\n    context.set('lightTimer', null);\n};\n\n// Alarm lights on. An unreadable light state counts as \"on\" so the scene still runs.\nconst lightsOn = () => {\n    // A second sensor shouldn't restart a scene that is already waiting for the bulbs\n    if (context.get('lightTimer')) {\n        return null;\n    }\n    if (states?.[LIGHT]?.state !== 'off') {\n        return call('hue.activate_scene', ALARM_SCENE);\n    }\n    node.send([null, call('light.turn_on', LIGHT)]);\n    context.set('lightTimer', setTimeout(() => {\n        context.set('lightTimer', null);\n        node.send([null, call('hue.activate_scene', ALARM_SCENE)]);\n    }, POWER_ON_DELAY_MS));\n    return null;\n};\n\n// Is another sensor that matches the filter on right now, according to Home Assistant?\nconst othersOn = (match) => Object.keys(SOURCES).some((id) =>\n    id !== entity && match(SOURCES[id]) && states?.[id]?.state === 'on');\n\n// Back to normal, but only once every source that drives the lights is clear\nconst lightsRestore = () => {\n    if (othersOn((s) => s.lights)) {\n        return null;\n    }\n    cancelTimer();\n    return states?.[LIGHT]?.state === 'on' ? call('hue.activate_scene', NORMAL_SCENE) : null;\n};\n\n// Sources reported as \"on\" that haven't cleared yet. This lets a clear through when\n// a battery sensor goes unavailable between \"on\" and \"off\".\nconst active = context.get('active') || {};\n// Groups that sent a DETECTED notification and haven't sent CLEARED yet\nconst notified = context.get('notified') || {};\nconst sameGroup = (s) => s.group === source.group;\n\n// Is a sensor that knows the alarm type on right now? Reads the live state each time.\nconst typedSensorOn = () => {\n    const live = global.get('homeassistant')?.homeAssistant?.states;\n    return Object.keys(SOURCES).some((id) => !SOURCES[id].backup && live?.[id]?.state === 'on');\n};\n\nconst cancelBackup = () => {\n    clearTimeout(context.get('backupTimer'));\n    context.set('backupTimer', null);\n};\n\nconst notification = (status) => ({\n    ...msg,\n    alarmType: source.label,\n    alarmStatus: status,\n    deviceName: entity,\n    timestamp: new Date().toISOString(),\n    priority: status === 'DETECTED' ? 'high' : 'normal',\n    title: (status === 'DETECTED' ? '🚨 ' : '✅ ') + source.label + ' ALARM ' + status,\n    message: source.label + ' alarm ' + status.toLowerCase() + ' on ' + entity\n});\n\nlet status;\nlet notify;\nlet lightMsg = null;\n\n// Any previous state other than \"on\" counts, so an alarm that shows up right after\n// a sensor was unavailable or unknown isn't missed.\nif (newState === 'on' && oldState !== 'on') {\n    status = 'DETECTED';\n    active[entity] = true;\n    if (source.backup) {\n        // Notify only if no typed sensor reports the alarm within the delay\n        notify = false;\n        if (!typedSensorOn()) {\n            cancelBackup();\n            context.set('backupTimer', setTimeout(() => {\n                context.set('backupTimer', null);\n                if (typedSensorOn()) {\n                    return;\n                }\n                context.set('notified', { ...context.get('notified'), [source.group]: true });\n                node.warn(`${source.label} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);\n                node.send([notification('DETECTED'), null]);\n            }, BACKUP_DELAY_MS));\n        }\n    } else {\n        // A typed sensor reported, so a pending backup notification is redundant\n        cancelBackup();\n        // Skip the notification if another sensor in the group already raised this alarm\n        notify = !(notified[source.group] && othersOn(sameGroup));\n        notified[source.group] = true;\n    }\n    if (source.lights && !msg.test) {\n        lightMsg = lightsOn();\n    }\n} else if (newState === 'off' && (active[entity] || oldState === 'on')) {\n    status = 'CLEARED';\n    delete active[entity];\n    if (source.backup) {\n        // Only send a clear if the backup sensor actually sent the alarm\n        cancelBackup();\n        notify = Boolean(notified[source.group]);\n    } else {\n        // Wait for the last sensor in the group before sending the clear\n        notify = !othersOn(sameGroup);\n    }\n    if (notify) {\n        delete notified[source.group];\n    }\n    if (source.lights && !msg.test) {\n        lightMsg = lightsRestore();\n    }\n} else {\n    return null;\n}\ncontext.set('active', active);\ncontext.set('notified', notified);\n\nif (!notify) {\n    return lightMsg ? [null, lightMsg] : null;\n}\n\nnode.warn(`${source.label} ALARM ${status}: ${entity} changed from ${oldState} to ${newState}`);\nreturn [notification(status), lightMsg];\n","outputs":2,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":80,"wires":[["notify-user"],["2af15a4df5c2430a"]]},
+{"id":"d43aa9a2cf6c23f3","type":"function","z":"smoke-alarm-flow","name":"Test Processor","func":"// Simulate smoke alarm detection for testing\nmsg.test = true; // skips the lights\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":180,"wires":[["38d59b69d7feedab"]]},
+{"id":"6cbf0d29dfae81da","type":"function","z":"smoke-alarm-flow","name":"Test CO Processor","func":"// Simulate CO alarm detection for testing\nmsg.test = true; // skips the lights\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":240,"wires":[["38d59b69d7feedab"]]},
+{"id":"d0b31eb549dc2b0e","type":"function","z":"smoke-alarm-flow","name":"Test Clear Processor","func":"// Simulate smoke alarm cleared for testing\nmsg.test = true; // skips the lights\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":280,"wires":[["38d59b69d7feedab"]]},
+{"id":"cc17b01f6c99cf93","type":"function","z":"smoke-alarm-flow","name":"Test CO Clear Processor","func":"// Simulate CO alarm cleared for testing\nmsg.test = true; // skips the lights\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":340,"wires":[["38d59b69d7feedab"]]},
 {"id":"4518db1472925591","type":"inject","z":"smoke-alarm-flow","name":"Test CO Alarm Clear","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":140,"y":340,"wires":[["cc17b01f6c99cf93"]]},
 {"id":"94ead4e099c7bf75","type":"inject","z":"smoke-alarm-flow","name":"Test Fire Alarm Clear","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":140,"y":280,"wires":[["d0b31eb549dc2b0e"]]},
 {"id":"97b3d6c24255df18","type":"inject","z":"smoke-alarm-flow","name":"Test CO Alarm","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"on","payloadType":"str","x":140,"y":240,"wires":[["6cbf0d29dfae81da"]]},
 {"id":"a68f073ff1f949eb","type":"inject","z":"smoke-alarm-flow","name":"Test Fire Alarm","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"on","payloadType":"str","x":140,"y":180,"wires":[["d43aa9a2cf6c23f3"]]},
+{"id":"2af15a4df5c2430a","type":"api-call-service","z":"smoke-alarm-flow","name":"Light Action","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"","service":"","x":570,"y":160,"wires":[[]]},
 {"id":"18bb22fb.3ce36d","type":"server","name":"Home Assistant","addon":true,"rejectUnauthorizedCerts":true,"ha_boolean":"","connectionDelay":false,"cacheJson":true,"heartbeat":false,"heartbeatInterval":"","areaSelector":"friendlyName","deviceSelector":"friendlyName","entitySelector":"friendlyName","statusSeparator":"","enableGlobalContextStore":true},
 {"id":"56ca0423ffec3a5b","type":"global-config","env":[],"modules":{"node-red-contrib-home-assistant-websocket":"0.82.0"}}]
 ```
