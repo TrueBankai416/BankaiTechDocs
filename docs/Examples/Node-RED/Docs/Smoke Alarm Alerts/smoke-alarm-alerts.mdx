@@ -1,0 +1,174 @@
+---
+title: Smoke Alarm Alerts
+tags: [Node-RED, Home Assistant, Smoke Alarm, Safety]
+keywords: [Node-RED, Home Assistant, Smoke Alarm, Carbon Monoxide, CO, Notifications, Zooz ZEN55]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(examples): add Node-RED Smoke Alarm Alerts example"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+This example shows a Node-RED flow that sends a high priority phone notification when a smoke or carbon monoxide (CO) sensor in Home Assistant goes off, and a quieter one when it clears.
+
+- **Alarm detected**: a loud, vibrating notification titled `🚨 FIRE/SMOKE ALARM DETECTED` (or `CARBON MONOXIDE`) with a red fire or CO icon in the status bar.
+- **Alarm cleared**: a plain notification titled `✅ FIRE/SMOKE ALARM CLEARED` with a green check icon in the status bar, so it doesn't sound like another alarm.
+- **Test buttons**: four inject nodes simulate each alarm and clear without touching the real sensor.
+
+## Prerequisites
+
+- Node-RED with the [node-red-contrib-home-assistant-websocket](https://github.com/zachowj/node-red-contrib-home-assistant-websocket) palette installed (exported with version 0.82.0) and a configured Home Assistant server connection.
+- A smoke and CO detector that exposes two binary sensors in Home Assistant. The export uses a Zooz ZEN55 with `binary_sensor.smoke_detector_smoke_detected` and `binary_sensor.smoke_detector_carbon_monoxide_detected`.
+- A notify service for your phones. The export uses `notify.notify`, which sends to every device with the Home Assistant mobile app.
+
+:::warning[This is not a replacement for your smoke alarm]
+The alarm itself must still sound on its own. This flow only adds a phone notification. It depends on Node-RED, Home Assistant, your network, and your phone, and any of them can fail.
+:::
+
+## How it works
+
+1. The `Zooz ZEN55 Monitor` node watches every entity matching the regex `binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$` and fires on each state change.
+2. The `Alarm Detector` function node decides whether the change is an alarm or a clear. Anything else is dropped.
+3. The `Notify User` node sends the notification, and `Notification Log` shows the final message in the debug sidebar.
+
+The function works out the alarm type from the entity name: `smoke_detected` is **FIRE/SMOKE** and `carbon_monoxide_detected` is **CARBON MONOXIDE**.
+
+| Sensor change | Result |
+| --- | --- |
+| Anything → `on` (from `off`, `unavailable`, `unknown`, or no previous state) | **DETECTED**, high priority |
+| `on` → `off` | **CLEARED**, normal priority |
+| Anything else, such as `on` → `unavailable` or `unavailable` → `off` | Ignored |
+
+The function adds these properties to the message: `alarmType`, `alarmStatus`, `deviceName`, `timestamp`, `priority`, `title`, and `message`. It also writes the event to the Node-RED debug log with `node.warn`.
+
+:::note[Why an alarm from `unavailable` still counts]
+Z-Wave sensors can briefly show `unavailable` or `unknown` when the controller restarts or the device reconnects. If an alarm is reported right after that, the previous state isn't `off`. Checking only for `off` → `on` would drop that alarm silently, so any previous state other than `on` counts as a new alarm.
+:::
+
+The function node code:
+
+```js
+// Check for fire or CO alarm conditions
+const entity = msg.data && msg.data.entity_id;
+const newState = msg.payload;
+const oldState = msg.data && msg.data.old_state ? msg.data.old_state.state : null;
+if (!entity || typeof newState !== 'string') {
+    return null;
+}
+
+// Determine alarm type based on entity name
+let alarmType = 'UNKNOWN'; // fallback
+if (entity.includes('smoke_detected')) {
+    alarmType = 'FIRE/SMOKE';
+} else if (entity.includes('carbon_monoxide_detected')) {
+    alarmType = 'CARBON MONOXIDE';
+}
+
+// Alarm triggered. Any previous state other than "on" counts, so an alarm that
+// shows up right after the sensor was unavailable or unknown isn't missed.
+if (newState === 'on' && oldState !== 'on') {
+    msg.alarmType = alarmType;
+    msg.alarmStatus = 'DETECTED';
+    msg.deviceName = entity;
+    msg.timestamp = new Date().toISOString();
+    msg.priority = 'high';
+    msg.title = '🚨 ' + alarmType + ' ALARM DETECTED';
+    msg.message = alarmType + ' alarm detected on ' + entity;
+
+    node.warn(`${alarmType} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);
+    return msg;
+}
+
+// Alarm cleared (on -> off)
+if (newState === 'off' && oldState === 'on') {
+    msg.alarmType = alarmType;
+    msg.alarmStatus = 'CLEARED';
+    msg.deviceName = entity;
+    msg.timestamp = new Date().toISOString();
+    msg.priority = 'normal';
+    msg.title = '✅ ' + alarmType + ' ALARM CLEARED';
+    msg.message = alarmType + ' alarm cleared on ' + entity;
+
+    node.warn(`${alarmType} ALARM CLEARED: ${entity} changed from ${oldState} to ${newState}`);
+    return msg;
+}
+
+// No relevant state change, don't pass the message forward
+return null;
+```
+
+## The notification
+
+`Notify User` builds its data with a JSONata expression, which reads `title`, `message`, `alarmStatus`, and `alarmType` straight from the message:
+
+```
+{
+  "title": title,
+  "message": message,
+  "data": alarmStatus = "DETECTED" ? {
+    "priority": "high",
+    "ttl": 0,
+    "channel": "alarm",
+    "importance": "high",
+    "notification_icon": alarmType = "CARBON MONOXIDE" ? "mdi:molecule-co" : "mdi:fire",
+    "color": "red",
+    "vibrationPattern": "100,1000,100,1000,100"
+  } : {
+    "notification_icon": "mdi:check-circle",
+    "color": "green"
+  }
+}
+```
+
+:::warning[`title` and `message` must be set on the message]
+In JSONata, a field that doesn't exist on the message is silently left out. If the function doesn't set `msg.title` and `msg.message`, the notification has no message, and Home Assistant's `notify` service requires one, so the call fails. That is why the function sets both.
+:::
+
+The `data` options are for the Android Home Assistant app:
+
+- **`priority: high` and `ttl: 0`**: deliver immediately, even when the phone is in a low power state.
+- **`channel: alarm` and `importance: high`**: put alerts in their own notification channel. In the app's notification settings you can choose its sound and whether it overrides Do Not Disturb.
+- **`vibrationPattern`**: a long, repeating vibration.
+- **`notification_icon` and `color`**: the small icon in the status bar and at the top of the notification, tinted with the color. It isn't a picture inside the notification body. The 🚨 and ✅ in the title are plain emoji set by the function.
+
+On iOS these Android options are ignored. For a critical alert there, add `push: { sound: { name: "default", critical: 1, volume: 1.0 } }` to the data. See the [Home Assistant companion app notification docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/) for all the options.
+
+## Testing
+
+The four inject nodes (`Test Fire Alarm`, `Test CO Alarm`, `Test Fire Alarm Clear`, `Test CO Alarm Clear`) each feed a small function node that fakes the sensor event and sends it to `Alarm Detector`. The real sensor isn't touched, but the notifications are real and go to your phone. Warn your household before you test.
+
+After you click one, check that:
+
+- The phone notification has the right title and message, with 🚨 or ✅ in the title and the right icon in the status bar.
+- The `Notification Log` debug output shows the message with its `title`, `message`, and `alarmStatus`.
+- Clicking a `Clear` button sends a plain notification, not a loud one.
+
+## Before importing
+
+- Update the sensor names in the `Zooz ZEN55 Monitor` regex to match your own entities. The function also relies on the entity names containing `smoke_detected` and `carbon_monoxide_detected`.
+- Replace `notify.notify` with your own mobile app notify service if you only want specific phones alerted.
+- The flow doesn't alert when the sensor goes `unavailable`, which can mean a dead battery or a lost connection. Consider adding a separate notification for that.
+
+## Flow
+
+```json
+[{"id":"smoke-alarm-flow","type":"tab","label":"Smoke Alarm Automation","disabled":false,"info":"Automated smoke and CO alarm monitoring with Zooz ZEN55","env":[]},
+{"id":"zen55-monitor","type":"server-state-changed","z":"smoke-alarm-flow","name":"Zooz ZEN55 Monitor","server":"18bb22fb.3ce36d","version":6,"outputs":1,"exposeAsEntityConfig":"","entities":{"entity":[],"substring":[],"regex":["binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$"]},"outputInitially":false,"stateType":"str","ifState":"","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":120,"y":80,"wires":[["38d59b69d7feedab"]]},
+{"id":"notify-user","type":"api-call-service","z":"smoke-alarm-flow","name":"Notify User","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\n  \"title\": title,\n  \"message\": message,\n  \"data\": alarmStatus = \"DETECTED\" ? {\n    \"priority\": \"high\",\n    \"ttl\": 0,\n    \"channel\": \"alarm\",\n    \"importance\": \"high\",\n    \"notification_icon\": alarmType = \"CARBON MONOXIDE\" ? \"mdi:molecule-co\" : \"mdi:fire\",\n    \"color\": \"red\",\n    \"vibrationPattern\": \"100,1000,100,1000,100\"\n  } : {\n    \"notification_icon\": \"mdi:check-circle\",\n    \"color\": \"green\"\n  }\n}\n","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":570,"y":80,"wires":[["log-notification"]]},
+{"id":"log-notification","type":"debug","z":"smoke-alarm-flow","name":"Notification Log","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":780,"y":40,"wires":[]},
+{"id":"38d59b69d7feedab","type":"function","z":"smoke-alarm-flow","name":"Alarm Detector","func":"// Check for fire or CO alarm conditions\nconst entity = msg.data && msg.data.entity_id;\nconst newState = msg.payload;\nconst oldState = msg.data && msg.data.old_state ? msg.data.old_state.state : null;\nif (!entity || typeof newState !== 'string') {\n    return null;\n}\n\n// Determine alarm type based on entity name\nlet alarmType = 'UNKNOWN'; // fallback\nif (entity.includes('smoke_detected')) {\n    alarmType = 'FIRE/SMOKE';\n} else if (entity.includes('carbon_monoxide_detected')) {\n    alarmType = 'CARBON MONOXIDE';\n}\n\n// Alarm triggered. Any previous state other than \"on\" counts, so an alarm that\n// shows up right after the sensor was unavailable or unknown isn't missed.\nif (newState === 'on' && oldState !== 'on') {\n    msg.alarmType = alarmType;\n    msg.alarmStatus = 'DETECTED';\n    msg.deviceName = entity;\n    msg.timestamp = new Date().toISOString();\n    msg.priority = 'high';\n    msg.title = '🚨 ' + alarmType + ' ALARM DETECTED';\n    msg.message = alarmType + ' alarm detected on ' + entity;\n\n    node.warn(`${alarmType} ALARM DETECTED: ${entity} changed from ${oldState} to ${newState}`);\n    return msg;\n}\n\n// Alarm cleared (on -> off)\nif (newState === 'off' && oldState === 'on') {\n    msg.alarmType = alarmType;\n    msg.alarmStatus = 'CLEARED';\n    msg.deviceName = entity;\n    msg.timestamp = new Date().toISOString();\n    msg.priority = 'normal';\n    msg.title = '✅ ' + alarmType + ' ALARM CLEARED';\n    msg.message = alarmType + ' alarm cleared on ' + entity;\n\n    node.warn(`${alarmType} ALARM CLEARED: ${entity} changed from ${oldState} to ${newState}`);\n    return msg;\n}\n\n// No relevant state change, don't pass the message forward\nreturn null;\n","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":80,"wires":[["notify-user"]]},
+{"id":"d43aa9a2cf6c23f3","type":"function","z":"smoke-alarm-flow","name":"Test Processor","func":"// Simulate smoke alarm detection for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":180,"wires":[["38d59b69d7feedab"]]},
+{"id":"6cbf0d29dfae81da","type":"function","z":"smoke-alarm-flow","name":"Test CO Processor","func":"// Simulate CO alarm detection for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'off' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":240,"wires":[["38d59b69d7feedab"]]},
+{"id":"d0b31eb549dc2b0e","type":"function","z":"smoke-alarm-flow","name":"Test Clear Processor","func":"// Simulate smoke alarm cleared for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_smoke_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":280,"wires":[["38d59b69d7feedab"]]},
+{"id":"cc17b01f6c99cf93","type":"function","z":"smoke-alarm-flow","name":"Test CO Clear Processor","func":"// Simulate CO alarm cleared for testing\nmsg.data = {\n    entity_id: 'binary_sensor.smoke_detector_carbon_monoxide_detected',\n    old_state: { state: 'on' }\n};\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":360,"y":340,"wires":[["38d59b69d7feedab"]]},
+{"id":"4518db1472925591","type":"inject","z":"smoke-alarm-flow","name":"Test CO Alarm Clear","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":140,"y":340,"wires":[["cc17b01f6c99cf93"]]},
+{"id":"94ead4e099c7bf75","type":"inject","z":"smoke-alarm-flow","name":"Test Fire Alarm Clear","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"off","payloadType":"str","x":140,"y":280,"wires":[["d0b31eb549dc2b0e"]]},
+{"id":"97b3d6c24255df18","type":"inject","z":"smoke-alarm-flow","name":"Test CO Alarm","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"on","payloadType":"str","x":140,"y":240,"wires":[["6cbf0d29dfae81da"]]},
+{"id":"a68f073ff1f949eb","type":"inject","z":"smoke-alarm-flow","name":"Test Fire Alarm","props":[{"p":"payload"},{"p":"data"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"on","payloadType":"str","x":140,"y":180,"wires":[["d43aa9a2cf6c23f3"]]},
+{"id":"18bb22fb.3ce36d","type":"server","name":"Home Assistant","addon":true,"rejectUnauthorizedCerts":true,"ha_boolean":"","connectionDelay":false,"cacheJson":true,"heartbeat":false,"heartbeatInterval":"","areaSelector":"friendlyName","deviceSelector":"friendlyName","entitySelector":"friendlyName","statusSeparator":"","enableGlobalContextStore":true},
+{"id":"56ca0423ffec3a5b","type":"global-config","env":[],"modules":{"node-red-contrib-home-assistant-websocket":"0.82.0"}}]
+```
+
+<BuyMeACoffeeButton />
