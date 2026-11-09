@@ -1,0 +1,190 @@
+---
+title: Writing Functions
+description: The basics of the Node-RED Function node, including what it is, how to return a message, the editor tabs, the objects you can use, logging, status, and error handling.
+sidebar_position: 1
+tags: [Node-RED, Function Node, JavaScript, Tutorial]
+keywords: [Node-RED, Function node, JavaScript, msg, return, node.warn, node.status, node.error]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add writing functions"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+The **function** node runs JavaScript against each message that arrives. Use it when the built-in [core nodes](../Core%20Nodes.mdx) can't express your logic cleanly: several conditions, math with several values, remembered state, or building a complex message.
+
+This page covers the basics. The rest of the section builds on it:
+
+- [Outputs and messages](./Outputs%20and%20Messages.mdx)
+- [Context and timers](./Context%20and%20Timers.mdx)
+- [Async code and modules](./Async%20Code%20and%20Modules.mdx)
+- [Cookbook](./Cookbook.mdx)
+
+## The code is the body of a function
+
+What you type in the **On Message** tab is the *body* of a function. Node-RED calls it once for each message, and the message is available as `msg`. The simplest function returns the message unchanged:
+
+```js
+return msg;
+```
+
+Here is one that changes the payload:
+
+```js
+msg.payload = msg.payload * 2;
+return msg;
+```
+
+### What you can return
+
+| You return | What happens |
+| --- | --- |
+| `msg` (an object) | The message is sent to the output. |
+| `null` or nothing | No message is sent, and the flow stops here. |
+| An array | The messages go to different outputs. See [outputs and messages](./Outputs%20and%20Messages.mdx). |
+| A number, string, or boolean | An error. A function must return a message **object**. |
+
+Returning `null` is how you filter. This passes only payloads above 75:
+
+```js
+if (msg.payload > 75) {
+    return msg;
+}
+return null;
+```
+
+### Reuse the incoming message
+
+You can build a brand new message instead of reusing `msg`:
+
+```js
+return { payload: msg.payload.length };
+```
+
+That works, but the new message **loses every other property** of the old one, including `msg.topic`, `msg.data`, and anything an earlier node added. Some nodes depend on those properties being passed along. As a habit, change the message you were given and return it, and only start from scratch when you mean to.
+
+## The editor dialog
+
+Double-click a function node to open it. It has several tabs:
+
+| Tab | Runs | Use it for |
+| --- | --- | --- |
+| **Setup** | Never. It holds settings. | The node's **Name**, the number of **Outputs**, the **Timeout**, and the list of extra **Modules**. |
+| **On Start** | Once, when the node starts after a deploy or restart. | Setting up values, such as default context. Messages that arrive while it runs wait until it finishes. |
+| **On Message** | For every incoming message. | Your main logic. |
+| **On Stop** | When the node stops, because of a deploy or shutdown. | Closing connections or other tidying up. |
+
+The **Timeout** is in seconds, where 0 means no limit, and it only applies to synchronous code. Older versions of Node-RED call the On Start tab *Setup* and keep the settings on the first tab.
+
+:::tip[Use the full-screen editor]
+Click the expand icon at the bottom right of the code box for a bigger editor with syntax highlighting. It flags many typing mistakes before you deploy.
+:::
+
+## What you can use inside a function
+
+These objects are always available:
+
+| Object | What it is |
+| --- | --- |
+| `msg` | The incoming message. |
+| `node` | The function node itself, for logging, status, and sending messages. |
+| `context`, `flow`, `global` | Storage for values you want to keep. See [context and timers](./Context%20and%20Timers.mdx). |
+| `env` | Environment variables. `env.get("TZ")` reads one. |
+| `RED.util.cloneMessage(msg)` | Makes a safe copy of a message. |
+| `setTimeout`, `clearTimeout`, `setInterval`, `clearInterval` | JavaScript timers. |
+| `Buffer`, `util`, `console` | Standard Node.js helpers. Prefer `node.log` over `console`. |
+
+Modern JavaScript works, including `const`, `let`, arrow functions, template strings, destructuring, and optional chaining (`?.`). What is available depends on the Node.js version Node-RED runs on.
+
+## Log what is happening
+
+Use these to see what your code is doing:
+
+```js
+node.log("Something happened");
+node.warn("Something happened that you should know about");
+node.error("Something went wrong");
+```
+
+`node.warn` and `node.error` show up in the **Debug** sidebar, which makes `node.warn` the easiest way to look at a value while you build:
+
+```js
+node.warn("payload is " + JSON.stringify(msg.payload));
+```
+
+`node.log` goes to the Node-RED log, which is the console you started it from, or the add-on or container log. There are also `node.debug` and `node.trace` for finer-grained logging, but they only appear if the log level is set to show them.
+
+:::note[Remove the noise when you're done]
+A `node.warn` that runs on every message will flood the Debug sidebar and your log. Remove it once the function works, or wrap it so it only runs when something is wrong.
+:::
+
+## Show a status under the node
+
+A function node can show its own status text and color under the node, like other nodes do:
+
+```js
+node.status({ fill: "green", shape: "dot", text: "Home" });
+node.status({ fill: "red", shape: "ring", text: "Not home" });
+node.status({ text: "Just some text" });
+node.status({});  // clears the status
+```
+
+Colors are `red`, `green`, `yellow`, `blue`, and `grey`, and shapes are `dot` and `ring`. A status is a quick way to see what a function last decided without opening the Debug sidebar. It only changes when you call `node.status`, so it can show an old result until the next message.
+
+## Handle errors
+
+Two things can go wrong: your code throws an error, or you detect a problem yourself.
+
+If code throws an error, for example by reading a property of `undefined`, Node-RED logs the error and stops handling that message. A **catch** node on the same tab receives it.
+
+To report a problem yourself and make a catch node react, call `node.error` with the original message as the second argument, then return nothing:
+
+```js
+if (typeof msg.payload !== "number") {
+    node.error("Expected a number but got " + typeof msg.payload, msg);
+    return null;
+}
+return msg;
+```
+
+### Check before you read
+
+The most common error is `Cannot read properties of undefined`. It happens when you read a property of something that isn't there. Optional chaining (`?.`) and a default value (`??`) avoid it:
+
+```js
+// Throws if msg.data or new_state is missing:
+const state = msg.data.new_state.state;
+
+// Safe. Gives undefined if anything along the way is missing:
+const safeState = msg.data?.new_state?.state;
+
+// Safe, with a default:
+const stateOrDefault = msg.data?.new_state?.state ?? "unknown";
+```
+
+## Test a function
+
+The quickest way to test is to wire an **inject** node into the function and a **debug** node after it. Set the inject node to send the kind of payload you expect, such as a JSON object, click it, and read the result in the Debug sidebar. Test the odd cases too: a missing property, an empty string, and the wrong type.
+
+A handy trick is to use `node.warn` at the top of the function to show the whole incoming message:
+
+```js
+node.warn(msg);
+```
+
+Click the message in the Debug sidebar to expand every property.
+
+## Common mistakes
+
+| Mistake | What you'll see | Fix |
+| --- | --- | --- |
+| Forgetting `return msg` | Nothing comes out. | Return the message. |
+| Returning a string or number | An error saying the function must return an object. | Put the value in `msg.payload` and return `msg`. |
+| Building a new message and losing properties | A later node can't find `msg.topic` or similar. | Change and return `msg` instead. |
+| Using `return` inside a callback or timer | Nothing is sent. | Use `node.send()`. See [outputs and messages](./Outputs%20and%20Messages.mdx). |
+| Comparing a string to a number | `"5" === 5` is false. | Convert with `Number()` or `String()`. |
+| Reading a property that may not exist | `Cannot read properties of undefined`. | Use `?.` and `??`. |
+
+<BuyMeACoffeeButton />

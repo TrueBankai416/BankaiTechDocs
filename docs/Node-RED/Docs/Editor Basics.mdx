@@ -1,0 +1,109 @@
+---
+title: Editor Basics
+description: A tour of the Node-RED editor, including the palette, workspace, and sidebar, how to build and deploy flows, import and export JSON, and back up your work.
+sidebar_position: 1
+tags: [Node-RED, Editor, Tutorial]
+keywords: [Node-RED, Editor, Deploy, Import, Export, Backup, Palette]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add editor basics"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+This page covers the parts of the Node-RED editor you will use every day. If you haven't installed Node-RED yet, start with the [introduction](../Introduction.mdx).
+
+## The editor layout
+
+The editor has three main areas:
+
+| Area | Where | What it does |
+| --- | --- | --- |
+| **Palette** | Left | The list of nodes you can add. Drag a node from here onto the workspace. Use the search box at the top to find one. |
+| **Workspace** | Middle | Where you build flows. Each tab is a separate flow. |
+| **Sidebar** | Right | A set of panels for help, debugging, and inspecting your flows. |
+
+The sidebar has several tabs. You can switch between them with the drop-down arrow at the top of the sidebar.
+
+- **Help** shows the documentation for the selected node. Click a node and read this tab to see exactly what it expects and what it outputs.
+- **Debug** shows the messages that `debug` nodes send, plus warnings and errors from nodes. You will spend a lot of time here.
+- **Configuration nodes** lists shared settings, such as the Home Assistant server connection.
+- **Context data** lets you look at the values stored in context. See [messages and context](./Messages%20and%20Context.mdx).
+- **Info** shows details about the selected node, flow, or group.
+
+## Build a flow
+
+1. **Add nodes.** Drag them from the palette, or press **Ctrl+Space** to open the quick-add box, type a node's name, and press Enter.
+2. **Wire them.** Click and drag from the small square on the right of one node to the square on the left of another.
+3. **Edit a node.** Double-click it, change its settings, and click **Done**.
+4. **Deploy.** Click the red **Deploy** button at the top right. A blue dot on a node, or a highlighted Deploy button, means you have changes that aren't running yet.
+
+Other things worth knowing:
+
+- **Name your nodes.** A node with a clear name like `Check bypass` is much easier to read than a default one. Every node has a **Name** field.
+- **Comments.** Add a `comment` node to explain a section, like the notes in the [example flows](../../Examples/Node-RED/Introduction.mdx).
+- **Groups.** Select several nodes and use the right-click menu to group them, so you can move and label them together.
+- **Disable a node.** Open a node and use the toggle in its dialog to disable it without deleting it. A disabled node looks faded and passes nothing.
+- **Copy and paste.** Select nodes and use **Ctrl+C** and **Ctrl+V**, including between tabs.
+- **Tabs.** Use tabs to keep unrelated flows apart. Click the **+** at the end of the tab bar to add one.
+- **Keyboard shortcuts.** Open the main menu and choose **Keyboard shortcuts** for the full list.
+
+### Deploy options
+
+The arrow next to the Deploy button lets you choose how much to restart:
+
+| Option | What it restarts |
+| --- | --- |
+| **Full** | Every flow. Use this if something seems stuck. |
+| **Modified Flows** | Only the tabs that have changes. |
+| **Modified Nodes** | Only the nodes you changed. This is the quickest, and it's the one to use most of the time. |
+
+Restarting a node clears its in-progress work, such as pending timers. See [context and timers](./Function%20Node/Context%20and%20Timers.mdx).
+
+### Node status
+
+Most nodes show a small colored dot and some text under them while they run. For example, a Home Assistant node shows `running`, and a call to an action shows `hue.activate_scene called at: Nov 6, 17:12`. Function nodes can set their own status. See [writing functions](./Function%20Node/Writing%20Functions.mdx).
+
+## Add more nodes with the palette manager
+
+The built-in nodes cover a lot, and the community adds thousands more.
+
+1. Open the main menu (the three lines at the top right) and choose **Manage palette**.
+2. Open the **Install** tab and search for a package.
+3. Click **Install**.
+
+New nodes appear in the palette on the left. To remove or update a package, use the **Nodes** tab in the same dialog.
+
+## Import and export flows
+
+Flows are stored as JSON, which makes them easy to share and back up.
+
+- **Export.** Select the nodes you want, press **Ctrl+E**, choose **selected nodes** or **current flow**, and copy the JSON.
+- **Import.** Press **Ctrl+I**, paste JSON, and choose whether to import into the current flow or a new one.
+
+If the JSON contains nodes with the same IDs as ones already in your workspace, the import dialog asks whether to replace them or import copies. After importing, check any settings that point at your own devices, such as entity IDs and notify services.
+
+:::warning[Check an export before you share it]
+An export can contain things you may not want to publish, such as entity names that identify your devices, notification service names, and alarm codes typed into a node. Read through the JSON and replace anything personal before you post it. Credentials such as access tokens are stored separately and are not part of a normal export, but passwords typed straight into a node's fields are.
+:::
+
+## Subflows
+
+A **subflow** is a group of nodes packaged as one reusable node. Select the nodes, open the main menu, and choose **Subflows → Selection to Subflow**. You can then add that subflow to any flow from the palette. The [thermostat example](../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) uses one for a bedroom space heater.
+
+## Back up your flows
+
+Node-RED saves your work to its user data folder, which is `/data` in Docker, `~/.node-red` for an npm install, and the add-on's storage in Home Assistant. The important files are:
+
+| File | What it holds |
+| --- | --- |
+| `flows.json` | All of your flows. |
+| `flows_cred.json` | Credentials, such as access tokens, stored encrypted. |
+| `settings.js` | Node-RED's settings. |
+| `package.json` and `node_modules` | The extra palette nodes you installed. |
+
+Back up the whole folder. A copy of `flows.json` alone isn't enough to restore credentials. Credentials are encrypted with a key, which is either the `credentialSecret` in `settings.js` or, if you never set one, a key Node-RED generated and saved in the hidden `.config.runtime.json` file. Keep that key with your backup, or the credentials file can't be read after a restore.
+
+<BuyMeACoffeeButton />

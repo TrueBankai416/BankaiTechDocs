@@ -1,0 +1,239 @@
+---
+title: Cookbook
+description: Ready-to-use Node-RED Function node recipes for filtering, routing, counting, throttling, averaging, detecting changes, quiet hours, and building Home Assistant messages.
+sidebar_position: 5
+tags: [Node-RED, Function Node, JavaScript, Recipes]
+keywords: [Node-RED, Function node, recipes, examples, filter, throttle, moving average, quiet hours, Home Assistant]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add function node cookbook"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+A collection of small, copy-and-paste function node recipes. Paste each into the **On Message** tab, adjust the values at the top, and wire up the outputs. Each one explains what it does and what to wire.
+
+If any of these use something unfamiliar, read [writing functions](./Writing%20Functions.mdx), [outputs and messages](./Outputs%20and%20Messages.mdx), and [context and timers](./Context%20and%20Timers.mdx) first.
+
+## Clean up values
+
+### Convert a temperature
+
+Converts a Fahrenheit payload to Celsius and rounds it to one decimal place.
+
+```js
+const fahrenheit = Number(msg.payload);
+msg.payload = Math.round(((fahrenheit - 32) * 5 / 9) * 10) / 10;
+return msg;
+```
+
+### Make sure a value is a number
+
+Sensors sometimes send text such as `unavailable`. This drops anything that isn't a real number, and warns you.
+
+```js
+const value = Number(msg.payload);
+if (!Number.isFinite(value)) {
+    node.warn("Not a number: " + msg.payload);
+    return null;
+}
+msg.payload = value;
+return msg;
+```
+
+### Average the last few readings
+
+Keeps the last five readings in context and outputs their average. It smooths a jumpy sensor.
+
+```js
+const SIZE = 5;
+const values = context.get("values") || [];
+
+values.push(Number(msg.payload));
+if (values.length > SIZE) {
+    values.shift();   // drop the oldest
+}
+context.set("values", values);
+
+msg.payload = values.reduce((total, v) => total + v, 0) / values.length;
+return msg;
+```
+
+## Filter and route
+
+### Pass only values above a limit
+
+Only messages with a payload over 75 continue. Everything else stops here.
+
+```js
+if (msg.payload > 75) {
+    return msg;
+}
+return null;
+```
+
+### Ignore repeats
+
+Passes a message only when the payload is different from the last one. A [filter node](../Core%20Nodes.mdx) can do this too, but this version lets you add your own rules.
+
+```js
+const last = context.get("last");
+context.set("last", msg.payload);
+
+if (msg.payload === last) {
+    return null;
+}
+return msg;
+```
+
+### Send to different outputs
+
+Set **Outputs** to 2. Output 1 gets normal readings, and output 2 gets high ones. Wire output 2 to a notification.
+
+```js
+if (msg.payload > 80) {
+    return [null, msg];
+}
+return [msg, null];
+```
+
+### Split a list into separate messages
+
+Turns an array payload into one message per item. The next nodes receive them one at a time.
+
+```js
+const items = Array.isArray(msg.payload) ? msg.payload : [msg.payload];
+return [items.map((item) => ({ payload: item }))];
+```
+
+## Remember and count
+
+### Count messages
+
+Counts how many messages have passed through and adds the count to the message.
+
+```js
+const count = (context.get("count") || 0) + 1;
+context.set("count", count);
+msg.count = count;
+return msg;
+```
+
+### React to a change, not a value
+
+Fires only when a sensor goes from `off` to `on`. The first message is ignored, because there is nothing to compare it with yet.
+
+```js
+const previous = context.get("previous");
+context.set("previous", msg.payload);
+
+if (previous === "off" && msg.payload === "on") {
+    msg.event = "turned on";
+    return msg;
+}
+return null;
+```
+
+### Limit how often something is sent
+
+Lets one message through per minute and ignores the rest. Use it so a flapping sensor can't flood your phone with notifications.
+
+```js
+const MIN_GAP_MS = 60 * 1000;
+const lastSent = context.get("lastSent") || 0;
+
+if (Date.now() - lastSent < MIN_GAP_MS) {
+    return null;
+}
+context.set("lastSent", Date.now());
+return msg;
+```
+
+This keeps the first message in each minute and drops the rest. If you would rather act on the *latest* message after things go quiet, use the debounce pattern in [context and timers](./Context%20and%20Timers.mdx).
+
+## Time
+
+### Only allow certain hours
+
+Lets messages through between 08:00 and 22:00, and blocks them otherwise. It's useful to keep voice announcements from waking people up.
+
+```js
+const hour = new Date().getHours();
+
+if (hour >= 8 && hour < 22) {
+    node.status({ fill: "green", shape: "dot", text: "Allowed" });
+    return msg;
+}
+
+node.status({ fill: "grey", shape: "ring", text: "Quiet hours" });
+return null;
+```
+
+`getHours()` uses the timezone of the machine Node-RED runs on. In Docker that is UTC unless you set the `TZ` environment variable.
+
+### Add a readable timestamp
+
+Adds the time as text to the message.
+
+```js
+msg.time = new Date().toLocaleString();
+return msg;
+```
+
+## Home Assistant
+
+These recipes use the [Home Assistant nodes](../Home%20Assistant%20Nodes.mdx).
+
+### Read an entity's state from a function
+
+If **Enable Global Context Store** is turned on in the Home Assistant server node, every entity's current state is in global context. This sends the message to output 1 if the light is on and to output 2 otherwise.
+
+```js
+const states = global.get("homeassistant")?.homeAssistant?.states;
+const light = states?.["light.living_room"]?.state;
+
+return light === "on" ? [msg, null] : [null, msg];
+```
+
+The optional chaining (`?.`) means that if the entity is missing, `light` is `undefined` and the message goes to output 2 instead of the function throwing an error.
+
+### Build an action for the Action node
+
+The **Action** node reads the action and its target from the message. Leave its own action empty, turn **Block input overrides** off, and send it a message like this:
+
+```js
+return {
+    payload: {
+        action: "light.turn_on",
+        target: { entity_id: "light.living_room" },
+        data: { brightness_pct: 50 }
+    }
+};
+```
+
+### Build a notification message
+
+Builds a title and a message from the details of a state change. A notify action that reads `title` and `message` from the message can then send it.
+
+```js
+const name = msg.data?.new_state?.attributes?.friendly_name
+    ?? msg.data?.entity_id
+    ?? "Unknown device";
+
+msg.title = "Door";
+msg.message = `${name} is now ${msg.payload}`;
+return msg;
+```
+
+## Safety habits
+
+A few habits will save you time when something goes wrong:
+
+- **Check for missing values.** Use `?.` and `??` so an unexpected message doesn't throw an error.
+- **Do nothing when unsure.** If a state is `unavailable` or `unknown`, returning `null` is usually safer than guessing.
+- **Set limits.** If your function writes a value to a device, clamp it to a safe range so a bug can't send an extreme number. The [thermostat example](../../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) does this.
+- **Show your work.** A `node.status` that says what the function decided makes later debugging much easier.
+
+<BuyMeACoffeeButton />

@@ -1,0 +1,139 @@
+---
+title: Troubleshooting
+description: How to debug Node-RED flows, with fixes for common problems such as nothing happening, undefined errors, Invalid JSON in Home Assistant actions, wrong timezones, lost context, loops, and duplicate notifications.
+sidebar_position: 6
+tags: [Node-RED, Troubleshooting, Home Assistant]
+keywords: [Node-RED, Troubleshooting, Debug, Invalid JSON, Cannot read properties of undefined, Timezone, Context, Safe mode]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add troubleshooting"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+When a flow doesn't do what you expect, work out **where** the message stops or changes. This page shows how to find that out, and then lists common problems and their fixes.
+
+## How to debug a flow
+
+1. **Look at the message after each node.** Wire a **debug** node to the output of a node and set it to **complete msg object**. Open the **Debug** sidebar and expand the message. This shows you what the node really sent.
+2. **Work from the start.** Check the first node, then the next, until the message looks wrong. The problem is in the node just before that point.
+3. **Read the node's status.** The text under a node often says what happened, such as `running`, an error, or the last call it made.
+4. **Check the Debug sidebar for errors.** Errors and warnings appear there in red and orange, and they name the node. Click the node name in the message to jump to it.
+5. **Narrow it down.** Use an **inject** node to send a test message straight into the node you suspect, so you don't have to wait for a real event.
+6. **Disable noise.** Use the button on a debug node to turn it off, and the filter at the top of the sidebar to show only the current flow.
+
+## Where the logs are
+
+Errors that don't reach the Debug sidebar, and anything from `node.log`, go to the Node-RED log.
+
+| How you run it | Where to look |
+| --- | --- |
+| Docker | `docker logs node-red` (use your container's name). Add `-f` to follow it. |
+| Home Assistant add-on | The **Log** tab of the add-on page. |
+| Command line | The terminal you started it in. |
+| Raspberry Pi install script | Run `node-red-log`. |
+
+## Common problems
+
+### Nothing happens
+
+- You haven't deployed. Look for a highlighted **Deploy** button.
+- The tab or the node is **disabled**. Disabled nodes look faded.
+- An **inject** node needs its button clicked, unless it is set to repeat or run once.
+- A Home Assistant node says `disconnected` or `connecting`. Check the server config and your token.
+- A **switch** or **current state** node is sending the message to an output you haven't wired.
+- A function node returns `null`, so the flow stops there. Put a `node.warn` before the `return` to see which path it takes.
+
+### Cannot read properties of undefined
+
+```text
+TypeError: Cannot read properties of undefined (reading 'state')
+```
+
+Your code read a property of something that doesn't exist, for example `msg.data.new_state.state` when `new_state` is missing. Check the message in a debug node, then use optional chaining in the function:
+
+```js
+const state = msg.data?.new_state?.state ?? "unknown";
+```
+
+### A function sends nothing
+
+The function didn't return a message. Either it has no `return msg`, or the `return` is inside a callback or timer. Use `node.send(msg)` there. See [outputs and messages](./Function%20Node/Outputs%20and%20Messages.mdx).
+
+### The function must return an object
+
+A function can only return a message object (or an array of them). If you return a string or number, put it in `msg.payload` and return `msg`.
+
+### InputError: Invalid JSON
+
+```text
+InputError: Invalid JSON: {"title":"Thermostat Bypass","message":message}
+```
+
+This comes from a Home Assistant **action** node whose **Data** field is set to the **JSON** type, but the text isn't valid JSON because it refers to a message property. The fix is to change the type drop-down next to the Data field from **JSON** to **JSONata**. See [Home Assistant nodes](./Home%20Assistant%20Nodes.mdx).
+
+### A notification arrives with no message, or fails
+
+In a JSONata expression, a property that doesn't exist on the message is silently dropped. If your function never sets `msg.message`, the call goes out without one. Check that the function sets every property the expression uses, and look at the message in a debug node.
+
+### Timed flows run at the wrong hour
+
+Schedules, the inject node's timer, and `new Date()` use the timezone of the machine running Node-RED. In Docker that is UTC unless you set the `TZ` environment variable, for example `TZ=America/New_York`. Restart the container after changing it.
+
+### Stored values disappear
+
+Context is kept in memory by default, so it is lost on restart, and a deploy can clear it too. Use a [persistent context store](./Messages%20and%20Context.mdx) for anything that must survive. Timer handles can't be persisted at all.
+
+### Home Assistant states aren't in global context
+
+- Turn on **Enable Global Context Store** in the Home Assistant server config, then deploy.
+- Use the right key. It is `homeassistant`, then the server config's name in camelCase. Look at the **Context data** sidebar tab to see what is actually there.
+- States are stored after Node-RED connects, so a lookup during startup can come back empty. Use `?.` so it doesn't throw.
+
+### A flow keeps triggering itself
+
+If a flow changes the same entity it listens to, each change triggers it again, and the values can run away. Find the loop by following what the **action** node changes back to what the first node listens for. Break it by:
+
+- Ignoring events your own flow caused.
+- Only acting when the new value differs from what you would set.
+- Limiting any value your flow writes to a safe range.
+- Adding a bypass switch that stops the flow from acting while you work.
+
+The [thermostat example](../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) walks through a real case and these fixes.
+
+### Duplicate or surprise actions after a deploy or restart
+
+An **events: state** node with **Output on connect** turned on sends the current state as soon as Node-RED starts, so any action after it runs again. Turn the option off unless you want that.
+
+### A red dashed node, or an unknown node type
+
+A package your flow uses isn't installed. Open **Manage palette**, find the node name, and install the package it comes from. After an import, install any missing palettes and deploy again.
+
+### A deprecation warning about domain and service
+
+The message used `payload.domain` and `payload.service`. Change it to `payload.action` and `payload.target`. See [Home Assistant nodes](./Home%20Assistant%20Nodes.mdx).
+
+## If Node-RED won't start, or a flow crashes it
+
+Start Node-RED in **safe mode**. It loads your flows but doesn't run them, so you can open the editor and fix or disable the problem:
+
+```bash
+node-red --safe
+```
+
+In Docker, set the environment variable `NODE_RED_ENABLE_SAFE_MODE=true` and restart the container. Remove it once you have fixed the flow.
+
+## Ask for help
+
+If you're stuck, share what someone else needs to help:
+
+- What you expected, and what happened instead.
+- The relevant nodes, exported as JSON.
+- The error text from the Debug sidebar or the log.
+- Your Node-RED version and the palette versions.
+
+Read the JSON before you post it and replace entity names, notification services, and alarm codes that you don't want to share.
+
+<BuyMeACoffeeButton />

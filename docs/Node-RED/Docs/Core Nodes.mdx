@@ -1,0 +1,127 @@
+---
+title: Core Nodes
+description: A guide to the built-in Node-RED nodes you will use most, including inject, debug, change, switch, template, delay, trigger, filter, and the nodes that handle errors and link flows together.
+sidebar_position: 3
+tags: [Node-RED, Nodes, Tutorial]
+keywords: [Node-RED, inject, debug, change, switch, template, delay, trigger, filter, catch, link]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add core nodes"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+These are the built-in nodes you will reach for most often. Node-RED ships with many more, and each node's **Help** tab in the sidebar explains every option.
+
+## Prefer a core node when it can do the job
+
+A [function node](./Function%20Node/Writing%20Functions.mdx) can do almost anything, but it hides its logic inside code. A core node shows what it does right on the flow, and it's easier to read and fix later. As a rule of thumb:
+
+| You want to | Use |
+| --- | --- |
+| Set, rename, delete, or move a message property | `change` |
+| Send a message down a different path depending on a value | `switch` |
+| Build text from values | `template` |
+| Wait, or limit how often messages pass | `delay` |
+| Only pass a message when the value changed | `filter` |
+| Do several steps, math with several values, loops, or remember state | `function` |
+
+## Start and inspect
+
+### inject
+
+Starts a flow. It sends a message when you click the button on its left, and it can also send automatically:
+
+- **Inject once** after a delay when Node-RED starts.
+- **Repeat** at an interval.
+- **At a specific time** using a schedule, such as every day at 08:00.
+
+You choose what goes in `msg.payload` and `msg.topic`: a string, number, boolean, JSON, timestamp, and more. Schedules use the timezone of the machine running Node-RED, so check yours if a timed flow fires at the wrong hour.
+
+### debug
+
+Shows messages in the **Debug** sidebar. By default it shows `msg.payload`. Change it to **complete msg object** to see everything on the message, which is what you want when you're working out what a node sends. It can also write to the node's status or the console.
+
+The button on the right of a debug node turns it on and off, so you can leave debug nodes in a flow and silence them when you're done.
+
+## Change messages
+
+### change
+
+Edits message properties without code. A single node can hold several rules, which run in order:
+
+| Rule | What it does |
+| --- | --- |
+| **Set** | Sets a property to a value, such as `msg.payload` to the string `on`. |
+| **Change** | Searches a property for text and replaces it. |
+| **Delete** | Removes a property. |
+| **Move** | Moves a value from one property to another. |
+
+The value can be a fixed value, another property, a flow or global value, or a JSONata expression.
+
+### template
+
+Builds text from a template using Mustache syntax. Put the property name inside double curly braces, and the node fills in the value. For example, the template `Temperature is {{payload}} degrees` turns a payload of `71` into `Temperature is 71 degrees`. It can write the result to `msg.payload` or any other property.
+
+## Route messages
+
+### switch
+
+Sends a message to different outputs depending on a property. Each rule you add creates its own output. A rule can test whether the value equals, is greater than, is between, contains, matches a regular expression, is true, is empty, is of a certain type, and more. There is also an **otherwise** rule for anything that matched nothing.
+
+Choose how it behaves:
+
+- **Stopping after first match** sends the message only to the first rule that matches.
+- **Checking all rules** can send the same message to several outputs.
+
+### link in, link out, and link call
+
+Link nodes connect nodes without drawing a wire across the screen, even between tabs. A **link out** sends to a **link in** with the same name. A **link call** sends a message to a link in node and waits for the answer, which is handy for reusable utility flows.
+
+## Control timing
+
+### delay
+
+Has two modes:
+
+- **Delay each message** holds every message for a set time.
+- **Rate limit** lets only a certain number of messages through per period. It can queue the extras, or drop them.
+
+Dropping messages is simple, but you can lose the one that mattered. If a flow reacts to the most recent value, think about what happens to the messages the rate limiter discards.
+
+### trigger
+
+Sends a message, waits, and then sends another. A common use is a timeout: send `on`, and then send `off` after ten minutes. A new incoming message can extend the delay, so the `off` only happens once things have been quiet. You can also make it send nothing at all after the wait.
+
+### filter
+
+Also known as **report by exception**. It blocks a message unless the value has changed, or unless it has changed by more than a set amount. This is useful for noisy sensors that report the same value over and over, because a flow downstream only runs when something actually changed.
+
+## Handle errors and follow along
+
+These nodes watch other nodes and react to what happens to them.
+
+| Node | What it does |
+| --- | --- |
+| **catch** | Receives errors from the nodes on its tab, so you can react to them, such as sending a notification. |
+| **status** | Receives a message whenever another node's status changes. |
+| **complete** | Receives a message when another node has finished handling a message. |
+
+A function node can send an error to a catch node with `node.error("message", msg)`. See [writing functions](./Function%20Node/Writing%20Functions.mdx).
+
+## Work with lists and text
+
+| Node | What it does |
+| --- | --- |
+| **split** | Turns one message holding an array, string, or object into a stream of messages. |
+| **join** | Collects a stream of messages back into one. |
+| **sort** and **batch** | Sort a sequence of messages, or group them in batches. |
+| **json** | Converts between a JSON string and a JavaScript object. |
+
+## Connect to the outside world
+
+The palette also has nodes for **http request**, **http in** and **http response** for web services, **mqtt in** and **mqtt out** for MQTT, **tcp** and **udp**, **websocket**, **file**, and **exec** for running commands. For Home Assistant, see [Home Assistant nodes](./Home%20Assistant%20Nodes.mdx).
+
+<BuyMeACoffeeButton />

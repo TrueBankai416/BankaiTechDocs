@@ -1,0 +1,155 @@
+---
+title: Introduction to Node-RED
+description: What Node-RED is, how flows, nodes, and messages work, how to install it with Docker, npm, or the Home Assistant add-on, and how to build your first flow.
+tags: [Node-RED, Home Assistant, Automation, Tutorial]
+keywords: [Node-RED, Flow-based programming, Home Assistant, Automation, Docker, Install]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add Node-RED introduction"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Node-RED is a free, open-source tool for building automations by wiring blocks together in your browser. Each block does one small job, such as reacting to a sensor, changing a value, or sending a notification. You connect them with lines to describe what should happen, and Node-RED runs the result.
+
+It runs on Node.js and works well for home automation, IoT projects, and connecting services that don't know about each other. This section explains how it works and how to use it, with extra detail on the **Function node**, which lets you write your own JavaScript when the built-in blocks aren't enough.
+
+:::tip[Looking for ready-made flows?]
+The [Node-RED examples](../Examples/Node-RED/Introduction.mdx) section has complete flows you can import, including a thermostat controller, a smoke alarm notifier, and a home security panel.
+:::
+
+## How Node-RED works
+
+A few terms cover almost everything you will see in the editor:
+
+| Term | What it is |
+| --- | --- |
+| **Node** | One block that does one job. Examples are an `inject` node that starts a flow, a `function` node that runs your code, and a `debug` node that shows a message. |
+| **Wire** | A line from one node's output to another node's input. Messages travel along wires. |
+| **Message** | A JavaScript object, usually called `msg`, that carries data from node to node. The main data is in `msg.payload`. |
+| **Flow** | A group of connected nodes. Flows live on tabs in the editor. |
+| **Deploy** | Pressing the **Deploy** button saves your changes and starts them running. Nothing you build runs until you deploy. |
+
+A flow is a chain of nodes that pass a message along:
+
+```text
+[ inject ] ───► [ function ] ───► [ debug ]
+  starts the      changes the      shows the
+  flow            message          result
+```
+
+Each node waits for a message, does its job, and sends a message on. A node can have several outputs, so a flow can branch, and several nodes can feed the same input.
+
+## What it's good for
+
+- **Home automation.** React to device states, schedules, and presence, and control lights, thermostats, and locks.
+- **Multi-step logic.** Remember state, wait, branch, and combine several conditions, then see the whole thing as a diagram.
+- **Connecting things.** Pass data between MQTT, HTTP APIs, databases, and many other services using the library of community nodes.
+- **Prototyping.** Try an idea in minutes and change it without redeploying a whole program.
+
+### Node-RED and Home Assistant
+
+Node-RED is a popular companion to [Home Assistant](https://www.home-assistant.io/). The [node-red-contrib-home-assistant-websocket](https://github.com/zachowj/node-red-contrib-home-assistant-websocket) palette adds nodes that listen for state changes and call Home Assistant actions. Home Assistant's own automations are a good fit for simple "when this happens, do that" rules. Node-RED is useful when a rule needs several steps, remembered state, timers, or branching, or when you want to see the logic laid out visually. The two work together, so you can use both. See [Home Assistant nodes](./Docs/Home%20Assistant%20Nodes.mdx) for details.
+
+## Install Node-RED
+
+Pick the method that matches how you run your server.
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+Run it with Docker Compose. Save this as `docker-compose.yml`:
+
+```yaml
+services:
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    environment:
+      - TZ=America/New_York # your timezone
+    volumes:
+      - ./node-red-data:/data
+```
+
+Create the data folder and give it to the container's user, then start it:
+
+```bash
+mkdir -p node-red-data
+sudo chown -R 1000:1000 node-red-data
+docker compose up -d
+```
+
+:::note[Set your timezone]
+Schedules, the `inject` node's timer, and JavaScript like `new Date().getHours()` all use the timezone of the machine Node-RED runs on. In Docker that defaults to UTC, which is why the `TZ` variable is set above.
+:::
+
+The `/data` folder holds your flows, settings, and installed palette nodes, so keep it on a volume or bind mount and back it up. To try it without a compose file, the official quick start is `docker run -it -p 1880:1880 -v node_red_data:/data --name mynodered nodered/node-red`.
+
+  </TabItem>
+  <TabItem value="npm" label="npm">
+
+Install it globally with npm, then start it:
+
+```bash
+sudo npm install -g --unsafe-perm node-red
+node-red
+```
+
+You need a supported Node.js release first. See the [official getting started guide](https://nodered.org/docs/getting-started/) for the current requirements and for running Node-RED as a service. Your flows and settings are stored in `~/.node-red`.
+
+  </TabItem>
+  <TabItem value="addon" label="Home Assistant add-on">
+
+If you run Home Assistant OS or Supervised, use the community add-on:
+
+1. In Home Assistant, go to **Settings → Add-ons → Add-on Store** and search for **Node-RED**.
+2. Install it, then start it.
+3. Open the web UI from the add-on page.
+
+The add-on comes with the Home Assistant nodes already installed and connected, so you can start building straight away. Its data lives in the add-on's own storage, so include it in your Home Assistant backups.
+
+  </TabItem>
+</Tabs>
+
+When it's running, open the editor at `http://YOUR-SERVER-IP:1880`.
+
+## Build your first flow
+
+This flow sends a message through a function and shows the result.
+
+1. Drag an **inject** node, a **function** node, and a **debug** node from the palette on the left onto the workspace.
+2. Wire the inject node's output to the function node's input, and the function node's output to the debug node's input.
+3. Double-click the **function** node and paste this into the **On Message** tab:
+
+   ```js
+   msg.payload = "Hello from Node-RED";
+   return msg;
+   ```
+
+4. Click **Done**, then click **Deploy** at the top right.
+5. Open the **Debug** tab in the sidebar on the right, then click the button on the left of the inject node.
+
+You should see `"Hello from Node-RED"` in the debug sidebar. You just built and ran a flow. Next, learn the editor in [Editor basics](./Docs/Editor%20Basics.mdx).
+
+## What's in this section
+
+- [Editor basics](./Docs/Editor%20Basics.mdx): the editor layout, deploying, importing and exporting flows, and backups.
+- [Messages and context](./Docs/Messages%20and%20Context.mdx): how data moves through a flow and how to remember values.
+- [Core nodes](./Docs/Core%20Nodes.mdx): the built-in nodes you will use most.
+- **Function node**: a set of guides on writing JavaScript in Node-RED.
+  - [Writing functions](./Docs/Function%20Node/Writing%20Functions.mdx)
+  - [Outputs and messages](./Docs/Function%20Node/Outputs%20and%20Messages.mdx)
+  - [Context and timers](./Docs/Function%20Node/Context%20and%20Timers.mdx)
+  - [Async code and modules](./Docs/Function%20Node/Async%20Code%20and%20Modules.mdx)
+  - [Cookbook](./Docs/Function%20Node/Cookbook.mdx)
+- [Home Assistant nodes](./Docs/Home%20Assistant%20Nodes.mdx): connecting Node-RED to Home Assistant.
+- [Troubleshooting](./Docs/Troubleshooting.mdx): common errors and how to debug them.
+
+<BuyMeACoffeeButton />

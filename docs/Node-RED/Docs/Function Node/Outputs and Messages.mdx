@@ -1,0 +1,167 @@
+---
+title: Outputs and Messages
+description: How to send messages from a Node-RED Function node, including multiple outputs, multiple messages, sending later with node.send, finishing with node.done, and how messages are copied.
+sidebar_position: 2
+tags: [Node-RED, Function Node, JavaScript, Outputs]
+keywords: [Node-RED, Function node, multiple outputs, node.send, node.done, cloneMessage, return array]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add outputs and messages"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+A function node can send a message to one output, send different messages to several outputs, send several messages at once, or send messages later. This page shows how each one works.
+
+## One output
+
+With one output, return a message to send it, or return `null` to send nothing:
+
+```js
+return msg;
+```
+
+## Multiple outputs
+
+Set the number of **Outputs** on the function's **Setup** tab. Each output appears as a separate dot on the right of the node. To use them, return an **array** with one entry per output:
+
+```js
+return [msgForOutput1, msgForOutput2];
+```
+
+An entry of `null` means "send nothing to that output". This routes a message to the second output when the payload is large:
+
+```js
+if (msg.payload > 75) {
+    return [null, msg];   // output 2
+}
+return [msg, null];       // output 1
+```
+
+You can also send a different message to each output at the same time:
+
+```js
+const warning = { payload: "Too hot: " + msg.payload };
+return [msg, warning];
+```
+
+### Which entry is which output
+
+The position in the array is the output number, starting from the first:
+
+| You return | Output 1 | Output 2 | Output 3 |
+| --- | --- | --- | --- |
+| `[msg, null, null]` | `msg` | nothing | nothing |
+| `[null, msg, null]` | nothing | `msg` | nothing |
+| `[null, null, msg]` | nothing | nothing | `msg` |
+
+If you return fewer entries than there are outputs, the missing outputs get nothing. Returning `[null, null, null]` and returning `null` both send nothing at all.
+
+### Name your outputs in the flow
+
+It is easy to lose track of which output does what. Put a clear name on the nodes each output connects to, and add a comment above the function. The [thermostat example](../../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) uses four outputs, one for each kind of action: setting the setpoints, a safety change, turning the thermostat off, and a notification.
+
+### A flexible number of outputs
+
+`node.outputCount` holds the number of outputs you set in the dialog. You can use it to write a function that works with any number:
+
+```js
+// Send the message to one random output
+const messages = new Array(node.outputCount);
+messages[Math.floor(Math.random() * node.outputCount)] = msg;
+return messages;
+```
+
+## Multiple messages from one output
+
+To send several messages out of the **same** output, put them in an array inside the outer array:
+
+```js
+const first = { payload: "first" };
+const second = { payload: "second" };
+return [[first, second]];     // both go to output 1, in order
+```
+
+The next node receives them one at a time, in order. This splits a payload into one message per word:
+
+```js
+const words = msg.payload.split(" ");
+return [words.map((word) => ({ payload: word }))];
+```
+
+You can mix both ideas: `[[a, b], c]` sends `a` and `b` to output 1 and `c` to output 2.
+
+## Send later with node.send
+
+`return` can only send a message when the function finishes. If you want to send a message later, from a timer or after waiting, use `node.send()`:
+
+```js
+node.send({ payload: "sent right now" });
+
+setTimeout(() => {
+    node.send({ payload: "sent two seconds later" });
+}, 2000);
+
+return null;   // nothing more to send right now
+```
+
+`node.send` takes the same shapes as `return`: a message, an array for several outputs, or an array of arrays for several messages.
+
+```js
+node.send([null, { payload: "to output 2" }]);
+```
+
+:::warning[A return inside a callback or timer sends nothing]
+This does **not** work, because the `return` belongs to the timer's function, not to your node:
+
+```js
+setTimeout(() => {
+    return msg;      // lost
+}, 2000);
+```
+
+Use `node.send(msg)` inside the timer instead.
+:::
+
+This is how the [home lights example](../../../Examples/Node-RED/Docs/Smoke%20Alarm%20Alerts/smoke-alarm-alerts.mdx) switches a light on, waits two seconds for the bulbs to connect, and then sends a second command.
+
+## Tell Node-RED you're finished
+
+If your function does work later, as in the timer above, Node-RED can't tell when it has finished with the message. Calling `node.done()` lets it track messages properly. It matters most when you use a **complete** node, or in busy flows.
+
+```js
+setTimeout(() => {
+    node.send(msg);
+    node.done();
+}, 2000);
+return null;
+```
+
+You don't need `node.done()` when the function sends its result with `return`.
+
+## Messages are copied
+
+When you call `node.send`, Node-RED sends a **copy** of the message, so later changes to your variable don't change what was sent. This stops one message from being altered by accident while another part of your code still uses it.
+
+```js
+node.send(msg);
+msg.payload = "changed after sending";   // the sent message is not affected
+return msg;
+```
+
+Most messages copy without any trouble. If a message contains something that can't be copied, or you need speed for large messages, you can tell `node.send` not to copy the first message by passing `false` as the second argument: `node.send(msg, false)`.
+
+To make your own safe copy of a message, for example to send variations of it, use:
+
+```js
+const copy = RED.util.cloneMessage(msg);
+copy.payload = "a variation";
+node.send(copy);
+return msg;
+```
+
+Also remember that when one output is wired to several nodes, each of them receives its own copy.
+
+<BuyMeACoffeeButton />

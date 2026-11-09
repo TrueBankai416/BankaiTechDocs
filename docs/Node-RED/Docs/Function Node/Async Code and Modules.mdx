@@ -1,0 +1,140 @@
+---
+title: Async Code and Modules
+description: How to use await and promises in the Node-RED Function node, handle async errors, set a timeout, and load extra Node.js modules.
+sidebar_position: 4
+tags: [Node-RED, Function Node, JavaScript, Async, Modules]
+keywords: [Node-RED, Function node, async, await, promise, modules, functionExternalModules, functionGlobalContext, timeout]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add async code and modules"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Some work takes time: waiting, talking to a service, or reading a file. This page explains how to do that in a function node, and how to bring in extra JavaScript modules when the built-in tools aren't enough.
+
+## Use await
+
+Current versions of Node-RED let you use `await` directly in the function body, so waiting for something doesn't need callbacks. This waits two seconds and then passes the message on:
+
+```js
+await new Promise((resolve) => setTimeout(resolve, 2000));
+return msg;
+```
+
+Because the function now waits, you can still use a plain `return msg` at the end. You don't need `node.send` for this case.
+
+Use `node.send` when you want to send **more than one** message at different times, or when you send without waiting for something to finish. See [outputs and messages](./Outputs%20and%20Messages.mdx).
+
+:::note[Older versions]
+Very old versions of Node-RED don't support `await` and need callbacks with `node.send`. If you get a syntax error on the word `await`, update Node-RED.
+:::
+
+### While a function waits
+
+Node-RED keeps running other flows while one function is waiting, so waiting doesn't freeze anything. But JavaScript only runs one piece of code at a time, so a long **synchronous** loop does:
+
+```js
+// Don't do this. It blocks all of Node-RED until it finishes.
+while (true) { }
+```
+
+Keep synchronous work short. If you need to loop for a long time, use timers or split the work into messages.
+
+## Handle errors
+
+Wrap code that can fail in `try` and `catch`, and report the problem with `node.error`. Passing the message as the second argument lets a **catch** node react:
+
+```js
+try {
+    msg.payload = JSON.parse(msg.payload);
+    return msg;
+} catch (err) {
+    node.error("Invalid JSON: " + err.message, msg);
+    return null;
+}
+```
+
+If an `await` rejects and you don't catch it, the error is reported to Node-RED and the message stops, so catching it yourself lets you decide what happens next.
+
+## Call another flow
+
+Newer versions of Node-RED (5.0 and later) let a function node call a **link in** node and wait for the reply with `node.linkcall`. That lets you build a reusable utility flow, such as one that queries a database, and call it from code:
+
+```js
+msg.topic = "select * from orders";
+const result = await node.linkcall("database-query", msg);
+msg.payload = result.payload;
+return msg;
+```
+
+The first argument is the name or ID of the link in node. The link out node at the end of that flow must have **Return to calling link node** turned on. The call times out after five seconds unless you pass a `timeout` option in milliseconds.
+
+## Async setup on start
+
+The **On Start** tab can return a promise. Messages that arrive before it finishes are queued, then handled once it's ready:
+
+```js
+return new Promise((resolve) => {
+    setTimeout(() => {
+        context.set("ready", true);
+        resolve();
+    }, 1000);
+});
+```
+
+## Timeouts
+
+The **Timeout** setting on the function's **Setup** tab is the number of seconds Node-RED lets the code run before it raises an error. `0`, the default, means no limit. It only applies to synchronous code, so it won't stop a function that is waiting on a promise.
+
+## Extra modules
+
+A function node can use Node.js modules, including built-in ones such as `os` and `fs` and packages from npm. There are two ways to add them.
+
+### Option 1: the Modules list
+
+Turn on `functionExternalModules` in `settings.js`:
+
+```js
+functionExternalModules: true,
+```
+
+Restart Node-RED. The **Setup** tab of the function's dialog then has a list where you add a module's name and the variable name you want to use for it. Node-RED installs the module for you when you deploy. For example, add the built-in `os` module as `os`, then use it:
+
+```js
+msg.payload = os.hostname();
+return msg;
+```
+
+### Option 2: functionGlobalContext
+
+Load the module in `settings.js` and expose it to every function through global context:
+
+```js
+functionGlobalContext: {
+    osModule: require("os")
+},
+```
+
+Restart Node-RED, then read it in a function:
+
+```js
+const os = global.get("osModule");
+msg.payload = os.hostname();
+return msg;
+```
+
+Modules loaded this way must be installed in the same folder as `settings.js`, such as `~/.node-red` or the `/data` folder in Docker:
+
+```bash
+cd ~/.node-red
+npm install name-of-the-module
+```
+
+:::tip[Before you reach for a module]
+Check whether a core node already does the job. The `http request` node, the `json` node, and the `file` node cover many things people write code for, and they're easier to read in a flow.
+:::
+
+<BuyMeACoffeeButton />

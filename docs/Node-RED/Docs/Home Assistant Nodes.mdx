@@ -1,0 +1,147 @@
+---
+title: Home Assistant Nodes
+description: How to connect Node-RED to Home Assistant with the node-red-contrib-home-assistant-websocket palette, including the server config, state and action nodes, JSONata, and reading states from context.
+sidebar_position: 5
+tags: [Node-RED, Home Assistant, Tutorial]
+keywords: [Node-RED, Home Assistant, node-red-contrib-home-assistant-websocket, Events state, Current state, Action, JSONata, Global context]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add Home Assistant nodes"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+The [node-red-contrib-home-assistant-websocket](https://github.com/zachowj/node-red-contrib-home-assistant-websocket) palette connects Node-RED to Home Assistant over its WebSocket API. It lets a flow react to state changes, read states, and call Home Assistant actions such as turning on a light or sending a notification. The examples in this documentation use version 0.82.0, and the official [documentation](https://zachowj.github.io/node-red-contrib-home-assistant-websocket/) covers every option.
+
+## Install and connect
+
+If you use the Home Assistant add-on, the palette is already installed and connected. Otherwise, install `node-red-contrib-home-assistant-websocket` with the [palette manager](./Editor%20Basics.mdx), then add a server.
+
+1. Add any Home Assistant node, such as **events: state**, and open it.
+2. Click the pencil next to **Server** to create a server config.
+3. Either turn on **Using the Home Assistant add-on**, or enter your Home Assistant **Base URL** (for example `http://192.168.1.10:8123`) and a **long-lived access token**.
+
+To create a token, open your profile in Home Assistant, go to **Security**, and create a long-lived access token at the bottom of the page. Copy it right away, because Home Assistant only shows it once.
+
+The server config's **Name** is also the name Node-RED uses for the global context data it creates. If you rename it, any code that reads that data needs updating. See [read states from a function](#read-states-from-a-function).
+
+## The main nodes
+
+| Node | Use it to |
+| --- | --- |
+| **events: state** | Start a flow when an entity changes state. |
+| **trigger: state** | Start a flow when an entity matches conditions you define. |
+| **current state** | Read an entity's state when a message arrives, and branch on it. |
+| **poll state** | Read an entity's state on a schedule. |
+| **action** | Call a Home Assistant action, such as `light.turn_on` or `notify.notify`. |
+| **get entities** | Search for entities by their properties. |
+| **wait until** | Pause a flow until an entity reaches a state. |
+| **events: all**, **fire event** | Listen for, or send, Home Assistant events. |
+
+The palette also has **entity** nodes (sensor, binary sensor, switch, and so on) that create entities in Home Assistant from Node-RED. They need the Node-RED companion integration installed in Home Assistant.
+
+### events: state
+
+This is the most common starting point. It outputs a message each time an entity's state changes.
+
+- **Entity.** Choose one or more entities. You can also match by a text fragment (substring) or a regular expression, which is handy for a family of similar entities, like the `binary_sensor.smoke_detector_(smoke_detected|carbon_monoxide_detected)$` regex in the [smoke alarm example](../../Examples/Node-RED/Docs/Smoke%20Alarm%20Alerts/smoke-alarm-alerts.mdx).
+- **If state.** Only treat it as a match when the new state is a certain value. The node has **two outputs**: the first when the condition is true, and the second when it isn't.
+- **For.** Require the state to hold for a time before it outputs.
+- **Output on connect.** Sends the current state straight away when you deploy or restart. Leave this off unless you really want your flow to run at start, because it can fire actions every time Node-RED restarts.
+- **Ignore state change event when.** Skips events where the previous or current state is `unknown` or `unavailable`, or where nothing changed.
+
+The message it sends:
+
+| Property | Contents |
+| --- | --- |
+| `msg.payload` | The new state, such as `on`, `off`, or `71.4`. |
+| `msg.data` | The event details, including `entity_id`, `old_state`, and `new_state`. Each state has `state`, `attributes`, and timestamps. |
+| `msg.topic` | The trigger ID. |
+
+The state is always a **string**. Convert it before you do math: `Number(msg.payload)`.
+
+### trigger: state
+
+Similar to **events: state**, but built around conditions you define, with options for more than one entity. The shape of its message can differ: in the [thermostat example](../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) the states are under `msg.data.event`. Always check the message with a debug node.
+
+### current state
+
+Reads an entity's state **at the moment a message arrives**, which makes it a good gate. For example, a flow can check whether a bypass switch is on before it acts. Like **events: state**, it has two outputs, for true and false.
+
+### action
+
+Calls a Home Assistant action. You can fill in the action and its data in the node, or send them in the message.
+
+In the message, everything goes under `msg.payload`:
+
+```json
+{
+  "action": "light.turn_on",
+  "target": { "entity_id": "light.living_room" },
+  "data": { "brightness_pct": 50 }
+}
+```
+
+How the node combines the two:
+
+- If the message has a `payload.action`, it overrides the action in the node. The node's own target settings and the message's `payload.target` are merged.
+- `payload.data` is **merged** into the node's **Data**, and the message wins when both set the same key.
+- Turn on **Block input overrides** to ignore the message and use only what is in the node. This is useful when the data should never change, such as a fixed notification, and it also stops a message's own data from being merged in by accident.
+
+:::note[The older domain and service format]
+Messages with `payload.domain` and `payload.service` still work in version 0.82.0 but log a deprecation warning. Use `payload.action` instead.
+:::
+
+#### JSON or JSONata
+
+The **Data** field has a type drop-down. Pick one:
+
+| Type | Use it when |
+| --- | --- |
+| **JSON** | The data is fixed, such as `{"message": "Door opened"}`. The value must be valid JSON. You can use Mustache placeholders for values from the message. |
+| **JSONata** | The data depends on the message. The expression can read message properties by name, such as `{"message": message}`. |
+
+If you type an expression like `{"title": "Door", "message": message}` into a field set to **JSON**, you get `InputError: Invalid JSON`, because `message` isn't valid JSON. Change the type to **JSONata**. See [troubleshooting](./Troubleshooting.mdx).
+
+### JSONata in Home Assistant nodes
+
+[JSONata](https://jsonata.org/) is a small query and expression language. In the Home Assistant nodes it runs against the whole message, so a property called `msg.title` is just `title` in the expression. A property that doesn't exist is silently **left out** rather than causing an error, which can make a call fail later because a required value, such as a notification's `message`, is missing.
+
+The nodes add a few extra helper functions, including:
+
+| Function | Returns |
+| --- | --- |
+| `$entity()` | The entity that triggered the node. |
+| `$prevEntity()` | The previous state of that entity. |
+| `$entities("light.kitchen")` | The current state of any entity. |
+
+## Read states from a function
+
+Turn on **Enable Global Context Store** in the server config. The palette then keeps every entity's current state in Node-RED's global context, which a function node can read without waiting for a message.
+
+```js
+const states = global.get("homeassistant")?.homeAssistant?.states;
+const state = states?.["light.living_room"]?.state;
+```
+
+The `homeassistant` part is fixed. The next part, `homeAssistant`, is the **server config's name** in camelCase, so a server named `Home Assistant` becomes `homeAssistant`. Check it in the **Context data** sidebar tab if your lookup comes back empty.
+
+Each entity's object has `state` (a string) and `attributes`:
+
+```js
+const climate = states?.["climate.thermostat"];
+const currentTemp = climate?.attributes?.current_temperature;
+```
+
+Use optional chaining, because the entity may not exist yet, for example just after a restart.
+
+## Patterns that work well
+
+- **Guard with current state.** Before acting, check another entity, such as a bypass switch or a mode, and stop if it says no.
+- **Ignore `unavailable` and `unknown`.** Devices drop off briefly. If a state change from `unavailable` shouldn't count, turn on the ignore options in the **events: state** node, or handle it in your code.
+- **Watch for loops.** If a flow changes the same entity it listens to, it can trigger itself. Compare the new and old values, ignore your own changes, and set limits on anything you write. The [thermostat example](../../Examples/Node-RED/Docs/Temp%20Control/temp-control.mdx) explains a real case.
+- **Name your nodes.** Entity IDs aren't friendly. A node called `Front door opened` is easier to read than `binary_sensor.front_door_contact`.
+
+<BuyMeACoffeeButton />

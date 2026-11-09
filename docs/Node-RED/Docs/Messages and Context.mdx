@@ -1,0 +1,117 @@
+---
+title: Messages and Context
+description: How data moves through a Node-RED flow in the msg object, how to read and set properties, and how to remember values with node, flow, and global context.
+sidebar_position: 2
+tags: [Node-RED, Messages, Context]
+keywords: [Node-RED, msg, payload, Context, Flow context, Global context, Persistent storage]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add messages and context"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+Two ideas explain most of how Node-RED works: **messages** carry data from node to node, and **context** remembers data between messages. This page covers both.
+
+## Messages
+
+A message is a JavaScript object. Nodes pass messages along wires, and each node can read, change, or replace the message it receives. By convention the main data is in `msg.payload`, and other properties describe it.
+
+```json
+{
+  "_msgid": "6b8f3a1c2d4e5f60",
+  "topic": "sensor.kitchen_temperature",
+  "payload": 71.4
+}
+```
+
+| Property | Meaning |
+| --- | --- |
+| `payload` | The main data. It can be a string, number, boolean, object, array, or buffer. |
+| `topic` | An optional label for the message. Some nodes use it to group or route messages. |
+| `_msgid` | A unique ID Node-RED adds so it can follow a message through the flow. Leave it alone. |
+
+Nodes add their own properties too. For example, a Home Assistant state node adds `msg.data` with the event details. Always check a node's **Help** tab in the sidebar to see what it sets.
+
+### Look at a message
+
+Wire a **debug** node to the output of any node and deploy. Click a message in the **Debug** sidebar to expand it and see every property. This is the quickest way to learn what a node really sends.
+
+### Read and write properties
+
+Property names use JavaScript's dot and bracket notation:
+
+| Expression | Reads |
+| --- | --- |
+| `msg.payload` | The payload. |
+| `msg.payload.temperature` | A property inside an object payload. |
+| `msg.payload[0]` | The first item of an array payload. |
+| `msg["my-property"]` | A property whose name has characters like `-` that dot notation can't handle. |
+
+In a node's settings you will often see a **typed input**: a small drop-down next to a field that says what kind of value to use. The common types are:
+
+| Type | Example | Meaning |
+| --- | --- | --- |
+| `msg.` | `msg.payload` | A property of the current message. |
+| `flow.` | `flow.mode` | A value from flow context. |
+| `global.` | `global.house` | A value from global context. |
+| `string`, `number`, `boolean` | `on` | A fixed value. |
+| `JSON` | `{"a":1}` | A fixed object or array. |
+| `timestamp` | | The current time, in milliseconds. |
+| `env variable` | `TZ` | An environment variable. |
+| `JSONata` | `$now()` | The result of a [JSONata](https://jsonata.org/) expression, evaluated against the message. |
+
+### Messages are copied
+
+If one output is wired to several nodes, each of them gets its own copy of the message. Changing the message in one branch doesn't affect the others, so you don't have to worry about branches interfering.
+
+## Context
+
+A message only lives while it travels through the flow. **Context** is a store that lasts longer, so you can keep a counter, remember the last value, or share a setting between flows.
+
+### Scopes
+
+| Scope | Visible to | Use it for |
+| --- | --- | --- |
+| **Node** | Only that node. | Private state, such as the last value a function node saw. |
+| **Flow** | Every node on the same tab. | Values several nodes on one tab share. |
+| **Global** | Every node on every tab. | Settings and values shared across the whole system. |
+
+You can read and write context in two places:
+
+- **Function nodes** use the `context`, `flow`, and `global` objects. See [context and timers](./Function%20Node/Context%20and%20Timers.mdx).
+- **Change and switch nodes** can set or test `flow.` and `global.` values using a typed input, with no code at all. For example, a `change` node can set `flow.mode` to the string `away`, and a `switch` node can test it later.
+
+### Look at stored values
+
+Open the **Context data** tab in the sidebar and press the refresh button for a scope. Seeing the actual stored values is the fastest way to find out why a flow isn't behaving.
+
+### Memory and persistent storage
+
+By default context is kept **in memory**. It is fast, but the values are lost when Node-RED restarts. It can also be cleared by a deploy, depending on the deploy type and what changed, so don't rely on it for anything you can't recreate.
+
+To keep values across restarts, add a persistent store in `settings.js`:
+
+```js
+contextStorage: {
+    default: { module: "memory" },
+    persistent: { module: "localfilesystem" }
+},
+```
+
+Restart Node-RED, then name the store when you read or write a value:
+
+```js
+flow.set("mode", "away", "persistent");
+const mode = flow.get("mode", "persistent");
+```
+
+Values in a file-based store are saved to disk in the Node-RED data folder. Store plain data such as strings, numbers, arrays, and simple objects. Functions and timer handles can't be saved, so keep those in memory.
+
+:::note[Home Assistant states are already in context]
+If you turn on **Enable Global Context Store** in the Home Assistant server node, the current state of every entity is available in global context. See [Home Assistant nodes](./Home%20Assistant%20Nodes.mdx).
+:::
+
+<BuyMeACoffeeButton />

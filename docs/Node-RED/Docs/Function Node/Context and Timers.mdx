@@ -1,0 +1,186 @@
+---
+title: Context and Timers
+description: How to remember values between messages in a Node-RED Function node using node, flow, and global context, and how to use timers to delay, debounce, and cancel work.
+sidebar_position: 3
+tags: [Node-RED, Function Node, JavaScript, Context, Timers]
+keywords: [Node-RED, Function node, context, flow context, global context, setTimeout, debounce, state machine]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(node-red): add context and timers"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+A function node starts fresh for every message. To remember something from an earlier message, such as the last value, a counter, or whether an alarm is active, store it in **context**. To wait before acting, or to cancel a pending action, use **timers**. This page covers both.
+
+For the background on scopes and storage, see [messages and context](../Messages%20and%20Context.mdx).
+
+## Read and write context
+
+A function node has three context objects, one for each scope:
+
+| Object | Scope |
+| --- | --- |
+| `context` | This node only. |
+| `flow` | Every node on this tab. |
+| `global` | Every node on every tab. |
+
+They all work the same way:
+
+```js
+flow.set("mode", "away");           // store a value
+const mode = flow.get("mode");      // read it back
+```
+
+If a value hasn't been set yet, `get` returns `undefined`. Give it a default so your code doesn't trip over it:
+
+```js
+const count = (context.get("count") || 0) + 1;
+context.set("count", count);
+msg.count = count;
+return msg;
+```
+
+You can read or write several values at once with arrays of names:
+
+```js
+const [count, colour] = flow.get(["count", "colour"]);
+flow.set(["count", "colour"], [123, "red"]);
+```
+
+### Which scope should I use?
+
+- Use **`context`** for state only this function needs, such as the last value it saw. It can't clash with anything else.
+- Use **`flow`** to share a value between several nodes on one tab, such as a timer handle that another function cancels.
+- Use **`global`** for settings and states that many flows use, such as the Home Assistant states.
+
+### Nested values
+
+Names can be property paths, which lets you reach into an object in one call:
+
+```js
+global.set("house.mode", "away");
+const mode = global.get("house.mode");
+```
+
+This is also how you read the Home Assistant states without pulling the whole object: `global.get("homeassistant.homeAssistant.states")`.
+
+### Objects need a `set`
+
+When you store an object, read it, change it, and then store it again:
+
+```js
+const seen = context.get("seen") || {};
+seen[msg.topic] = Date.now();
+context.set("seen", seen);   // always set it back
+```
+
+With the default in-memory store, `get` hands you the same object that is stored, so a change can appear to save without the `set`. That doesn't hold for file-based stores, which only save when you call `set`. Always set it back so your function works with any store.
+
+### Persistent storage
+
+By default context lives in memory and is lost when Node-RED restarts. To keep a value across restarts, set up a file-based store (see [messages and context](../Messages%20and%20Context.mdx)) and name it:
+
+```js
+flow.set("mode", "away", "persistent");
+const mode = flow.get("mode", "persistent");
+```
+
+Anything stored in a file store must be plain data. Timer handles and functions can't be saved.
+
+### Set defaults on start
+
+Use the **On Start** tab to give values a starting point, so your main code can rely on them:
+
+```js
+if (context.get("count") === undefined) {
+    context.set("count", 0);
+}
+```
+
+## Remember the previous state
+
+Many automations need to react to a *change*, not just to a value. Store the last value and compare:
+
+```js
+const last = context.get("last");
+context.set("last", msg.payload);
+
+if (msg.payload === last) {
+    return null;        // nothing changed
+}
+return msg;             // changed
+```
+
+The [smoke alarm example](../../../Examples/Node-RED/Docs/Smoke%20Alarm%20Alerts/smoke-alarm-alerts.mdx) uses this idea to track which sensors are currently in an alarm, so it can send one notification per alarm and one clear when the last sensor stops.
+
+## Timers
+
+A function node can use `setTimeout` to run code later and `setInterval` to run it repeatedly. Anything it sends from inside a timer must use `node.send`. See [outputs and messages](./Outputs%20and%20Messages.mdx).
+
+```js
+setTimeout(() => {
+    node.send({ payload: "five seconds later" });
+}, 5000);
+return null;
+```
+
+### Node-RED cleans up for you
+
+Node-RED clears any outstanding timers when the function node stops or is redeployed, so a timer can't fire after you've replaced the node. You don't need to clear them yourself for that.
+
+### Cancel or replace a pending timer
+
+You do need to manage timers when *your own logic* should cancel them. For example, a new event should replace the one that is waiting. Save the timer in context, and clear it before you start another one:
+
+```js
+clearTimeout(context.get("timer"));
+
+context.set("timer", setTimeout(() => {
+    context.set("timer", null);
+    node.send({ payload: "still here after 10 seconds" });
+}, 10000));
+
+return null;
+```
+
+Timer handles live in memory only, so don't store them in a file-based store.
+
+### Debounce
+
+A debounce waits until messages stop arriving, then sends the most recent one. It is the pattern above: every new message cancels the last timer and starts a new one, and only the final message gets through.
+
+```js
+clearTimeout(context.get("timer"));
+context.set("timer", setTimeout(() => {
+    node.send(msg);
+}, 3000));
+return null;
+```
+
+### Do something, then undo it
+
+A timer is a natural fit for "turn it on, and turn it off in ten minutes if nothing else happens". Cancel the timer when a newer event makes the plan obsolete. For example, if a light was set to turn off in ten minutes and someone switches it off sooner, clear the timer so it doesn't fire later:
+
+```js
+if (msg.payload === "off") {
+    clearTimeout(context.get("offTimer"));
+    context.set("offTimer", null);
+    return msg;
+}
+
+// turned on: schedule the off
+clearTimeout(context.get("offTimer"));
+context.set("offTimer", setTimeout(() => {
+    node.send({ payload: "off" });
+}, 10 * 60 * 1000));
+return msg;
+```
+
+### A timer and a restart
+
+Timers and in-memory context are lost when Node-RED restarts, so a pending "turn it off in ten minutes" disappears with it. If something must happen even after a restart, don't rely on a timer. Store a timestamp in a persistent store and check it when Node-RED starts, or use the Home Assistant side for the schedule.
+
+<BuyMeACoffeeButton />
