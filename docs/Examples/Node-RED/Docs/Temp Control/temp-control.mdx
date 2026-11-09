@@ -28,7 +28,7 @@ This example shows a Node-RED flow that keeps a Home Assistant thermostat inside
 - A thermostat that supports a heat and cool setpoint range, exposed as `climate.thermostat`. The export uses a Z-Wave thermostat, so the node status, battery, and reminder entities below come from the Z-Wave integration.
 - A toggle helper named `input_boolean.thermostat_bypass`. Create it under **Settings → Devices & services → Helpers → Toggle**.
 - **Enable Global Context Store** turned on in the Home Assistant server node, which the function uses to read the bypass state. The export has it on. The function looks the state up under `global.get('homeassistant').homeAssistant`, where `homeAssistant` is the server node's name (`Home Assistant`) in camelCase, so renaming the server node means changing that line.
-- `input_boolean.home_occupied` for the Bedroom subflow. This is the occupancy switch set by the [Home Security Panel](../Home%20Security%20Panel/home-security-panel.mdx) example.
+- `input_boolean.home_occupied` for the Bedroom subflow. This is the occupancy switch set by the Home Security Panel example (coming soon).
 - A notify service for all devices (`notify.notify`) and one for a specific phone (`notify.mobile_app_your_phone`).
 
 ## How the thermostat logic works
