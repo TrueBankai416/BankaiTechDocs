@@ -16,7 +16,7 @@ This example shows a Node-RED flow that keeps a Home Assistant thermostat inside
 - **Setpoint spread**: when you change the heat or cool setpoint, the other one follows so there is always a 5 degree gap. The setpoints it sends are limited to 63–78.
 - **Temperature safety**: if the room drops to 58 or below, the heat setpoints are forced to 61/66. If it reaches 82 or above, the cool setpoints are forced to 74/79.
 - **Extreme setpoints**: if the cool setpoint is 60 or below, or the heat setpoint is 80 or above, the thermostat is turned off and you are notified.
-- **Bypass**: a toggle that disables the spread and the extreme setpoint shutoff while you make manual changes. The temperature safety ignores it.
+- **Bypass**: a toggle that disables the spread and the extreme setpoint shutoff while you make manual changes. If someone changes the temperature while it's on, everyone gets a notification to turn it off, and the change is applied when the bypass turns off. The temperature safety ignores it.
 - **Thermostat monitoring**: notifications for the thermostat going online or erroring, a low battery, the bypass toggle changing, and (disabled in the export) filter and humidifier pad reminders.
 - **Bedroom**: a subflow that runs a space heater on a schedule and shuts it off if the room gets too warm or the house is empty.
 
@@ -31,13 +31,14 @@ This example shows a Node-RED flow that keeps a Home Assistant thermostat inside
 
 ## How the thermostat logic works
 
-The `Temp Changed` node fires on every update to `climate.thermostat`, including plain temperature readings, and sends each one straight to the `Adjust Temperature Difference` function node, which decides what to do. It has three outputs, and each one goes straight to the node that acts on it:
+The `Temp Changed` node fires on every update to `climate.thermostat`, including plain temperature readings, and sends each one straight to the `Adjust Temperature Difference` function node, which decides what to do. The `Bypass Enabled` node also sends a message to the function when the bypass turns off. The function has four outputs, and each one goes straight to the node that acts on it:
 
 | Output | Goes to | Used for |
 | --- | --- | --- |
-| 1 | `Set Thermostat` | Keeping the 5 degree spread |
+| 1 | `Set Thermostat` | Keeping the 5 degree spread, and re-applying a change after the bypass turns off |
 | 2 | `Notify Safety Turn-on` → `Set Thermostat` | Forcing heat or cool when the room is too cold or hot |
 | 3 | `Notify Safety Turn-off` → `Turn Off Thermostat` | Extreme setpoints |
+| 4 | `Notify Bypass Blocked` | Telling everyone to turn the bypass off to change the temperature |
 
 The function checks these in order and stops at the first match:
 
@@ -45,17 +46,27 @@ The function checks these in order and stops at the first match:
 | --- | --- | --- |
 | Too cold | Room at or below 58 | Set heat/cool to 61/66 (output 2) |
 | Too hot | Room at or above 82 | Set heat/cool to 74/79 (output 2) |
-| Bypass | `input_boolean.thermostat_bypass` is not `off` | Stop. Nothing below runs |
+| Bypass | `input_boolean.thermostat_bypass` is not `off` | Stop. If a setpoint was changed while it is `on`, the change is held and everyone is notified (output 4). Nothing below runs |
 | Extreme setpoints | Cool setpoint at or below 60, or heat setpoint at or above 80 | Turn the thermostat off (output 3) |
 | Spread | The heat or cool setpoint changed | The setpoint you didn't touch follows, keeping the 5 degree gap. Heat stays between 63 and 73 and cool between 68 and 78 (output 1) |
 
 The bypass check sits after the two temperature checks on purpose, so the temperature safety always runs, even while the bypass is on.
 
-The function reads the bypass state from Node-RED's global context, which the Home Assistant server node fills with every entity state. If it can't read the state, or the helper is `unavailable`, it behaves as if the bypass is on and does nothing, and it logs a warning in the unreadable case.
+The function reads the bypass state from Node-RED's global context, which the Home Assistant server node fills with every entity state. If it can't read the state, or the helper is `unavailable`, it behaves as if the bypass is on and does nothing, and it logs a warning in the unreadable case. It only sends the "turn off the bypass" notification when the bypass is really `on`.
+
+### Changing the temperature while the bypass is on
+
+The bypass stops the flow from correcting setpoints, but you can still change the thermostat card in Home Assistant. When that happens, the function:
+
+1. **Holds the change.** It stores the latest setpoints that were requested, and which one you moved. Each new change replaces the stored one.
+2. **Notifies everyone.** `Notify Bypass Blocked` sends `Thermostat bypass is on. Turn it off to change the temperature. Your last change (heat 70, cool 73) will be applied when you do.` to every device with the mobile app. Its **Data** field must use the **JSONata** type, because `message` is read from the message. With the default JSON type, Node-RED fails with `InputError: Invalid JSON`. It doesn't send another notification for the same values, and it sends at most one a minute (`BYPASS_NOTICE_COOLDOWN_MS`), so tapping the card several times doesn't flood your phone.
+3. **Re-applies the change.** When the bypass turns off, `Bypass Enabled` sends a message to the function. The function runs the stored setpoints through the normal logic: the clamp, the extreme setpoint check and the 5 degree spread. It then sends them to the thermostat through output 1, so Home Assistant and the thermostat end up in sync. The stored change is used once and then cleared.
+
+The stored change and the notification timer live in flow context, so they reset when Node-RED restarts.
 
 Nothing is sent when:
 
-- The bypass is on, unless the room is too cold or too hot.
+- The bypass is on, unless the room is too cold or too hot, or a setpoint was changed (which only sends the notification).
 - Only the current temperature changed, or the setpoints already match what the function would set. This keeps the flow from repeating notifications and service calls on every update.
 - The safety setpoints are already applied.
 - The thermostat is already off when the extreme setpoint check matches.
@@ -68,7 +79,7 @@ Home Assistant can report thermostat changes late or out of order. In an earlier
 
 - **Clamp**: the spread logic never sends a setpoint outside 63–78, so a runaway value is impossible even if everything else fails.
 - **Echo check**: for 30 seconds after the function changes the setpoints, it ignores events that still show the setpoints from before or after that change. Those are late reports of its own change, not something you did. A real change, such as raising the setpoint by 1 degree at a time, has different values and is always processed.
-- **Bypass switch**: turn on `input_boolean.thermostat_bypass` and the function stops sending the spread and extreme setpoint shutoff commands, so you can make changes by hand or stop a misbehaving flow immediately. The temperature safety still works, because it only ever sends fixed setpoints.
+- **Bypass switch**: turn on `input_boolean.thermostat_bypass` and the function stops sending the spread and extreme setpoint shutoff commands, so you can make changes by hand or stop a misbehaving flow immediately. Changes made while it's on are held and applied when it turns off. The temperature safety still works, because it only ever sends fixed setpoints.
 
 :::note[Why there is no rate limiter]
 The original flow had a rate limiter that passed one event every 5 seconds. It was removed because it dropped events. The thermostat card in Home Assistant would show a new setpoint while the flow never acted on it, leaving Home Assistant and the thermostat out of sync. The echo check handles late events without discarding real changes.
@@ -93,10 +104,37 @@ const MIN_SETPOINT = 63;        // lowest heat setpoint this flow will ever send
 const MAX_SETPOINT = 78;        // highest cool setpoint this flow will ever send
 const ECHO_WINDOW_MS = 30000;   // how long late events from our own change are ignored
 const BYPASS_ENTITY = 'input_boolean.thermostat_bypass';
+const THERMOSTAT_ENTITY = 'climate.thermostat';
+const BYPASS_NOTICE_COOLDOWN_MS = 60000; // minimum time between "bypass is on" notifications
 
-const event = msg.data && msg.data.event;
-const previous = event && event.old_state && event.old_state.attributes;
-const current = event && event.new_state && event.new_state.attributes;
+const states = global.get('homeassistant')?.homeAssistant?.states;
+
+// Two kinds of message arrive here: a thermostat update, or the bypass switch changing
+let previous;
+let current;
+let thermostatState;
+let bypassState;
+let moved = null; // which setpoint was moved, when re-applying a change held back by the bypass
+if (msg.data && msg.data.entity_id === BYPASS_ENTITY) {
+    // The bypass turned off: re-apply the last change that was requested while it was on
+    const pending = flow.get('tempControlPending');
+    const live = states?.[THERMOSTAT_ENTITY];
+    if (msg.data.new_state?.state !== 'off' || !pending || !live) {
+        return null;
+    }
+    flow.set('tempControlPending', null);
+    previous = live.attributes;
+    current = { ...live.attributes, target_temp_low: pending.low, target_temp_high: pending.high };
+    thermostatState = live.state;
+    bypassState = 'off';
+    moved = pending.moved;
+} else {
+    const event = msg.data && msg.data.event;
+    previous = event?.old_state?.attributes;
+    current = event?.new_state?.attributes;
+    thermostatState = event?.new_state?.state;
+    bypassState = states?.[BYPASS_ENTITY]?.state;
+}
 if (!previous || !current) {
     return null;
 }
@@ -125,33 +163,47 @@ if (currentTemp >= HIGH_TEMP) {
     return forceSetpoints(SAFE_COOL);
 }
 
-// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.
-// The temperature safety above always runs. If the state can't be read, the
-// flow is treated as bypassed.
-const ha = global.get('homeassistant');
-const bypass = ha?.homeAssistant?.states?.[BYPASS_ENTITY];
-if (!bypass) {
-    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');
-    return null;
-}
-if (bypass.state !== 'off') {
-    return null;
-}
-
 if (!Number.isFinite(targetHeat) || !Number.isFinite(targetCool)) {
     return null;
 }
 
+const heatChanged = moved ? moved === 'heat' : previous.target_temp_low !== targetHeat;
+const coolChanged = moved ? moved === 'cool' : previous.target_temp_high !== targetCool;
+
+// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.
+// The temperature safety above always runs. If the state can't be read, the
+// flow is treated as bypassed.
+if (bypassState === undefined) {
+    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');
+    return null;
+}
+if (bypassState !== 'off') {
+    // Only a setpoint change made while the bypass is on needs attention
+    if (bypassState !== 'on' || (!heatChanged && !coolChanged)) {
+        return null;
+    }
+    // Remember the latest requested setpoints so they can be applied when the bypass turns off
+    const held = flow.get('tempControlPending');
+    flow.set('tempControlPending', { low: targetHeat, high: targetCool, moved: heatChanged ? 'heat' : 'cool' });
+    const repeat = held && held.low === targetHeat && held.high === targetCool;
+    if (repeat || Date.now() - (flow.get('tempControlNoticeAt') || 0) < BYPASS_NOTICE_COOLDOWN_MS) {
+        return null;
+    }
+    flow.set('tempControlNoticeAt', Date.now());
+    // Output 4: notify everyone that the change is on hold
+    return [null, null, null, {
+        message: 'Thermostat bypass is on. Turn it off to change the temperature. '
+            + `Your last change (heat ${targetHeat}, cool ${targetCool}) will be applied when you do.`
+    }];
+}
+
 // Extreme setpoints: turn the thermostat off (unless it already is)
 if (targetCool <= MIN_COOL_SETPOINT || targetHeat >= MAX_HEAT_SETPOINT) {
-    if (event.new_state.state === 'off') {
+    if (thermostatState === 'off') {
         return null;
     }
     return [null, null, { payload: {} }];
 }
-
-const heatChanged = previous.target_temp_low !== targetHeat;
-const coolChanged = previous.target_temp_high !== targetCool;
 
 // Only the current temperature (or another attribute) changed
 if (!heatChanged && !coolChanged) {
@@ -161,7 +213,8 @@ if (!heatChanged && !coolChanged) {
 // Lagging events from our own last change report the setpoints from before or
 // after it. Acting on them would undo the change and can start a runaway loop.
 // A genuine new change (such as a +1 tap) has different values and gets through.
-const last = flow.get('tempControlLast');
+// A re-applied change skips this check, because it isn't an event from the thermostat.
+const last = moved ? null : flow.get('tempControlLast');
 if (last && Date.now() - last.time < ECHO_WINDOW_MS) {
     const matches = (s) => s.low === targetHeat && s.high === targetCool;
     if (matches(last.trigger) || matches(last.sent)) {
@@ -175,8 +228,8 @@ const wantedHeat = heatChanged ? targetHeat : targetCool - SPREAD;
 const newHeat = Math.min(Math.max(wantedHeat, MIN_SETPOINT), MAX_SETPOINT - SPREAD);
 const newCool = newHeat + SPREAD;
 
-// Already in sync, nothing to send
-if (newHeat === targetHeat && newCool === targetCool) {
+// Already in sync, nothing to send. A change re-applied after the bypass is always sent.
+if (!moved && newHeat === targetHeat && newCool === targetCool) {
     return null;
 }
 
@@ -197,7 +250,7 @@ The `Set Thermostat` and `Turn Off Thermostat` nodes target `climate.thermostat`
 | --- | --- | --- |
 | `Thermostat Status` | `sensor.thermostat_node_status` | "Thermostat is Online" when it reports `alive` for 1 minute, otherwise "Thermostat has Error" |
 | `Battery Normal` | `sensor.hallway_thermostat_battery_level` | "Replace Thermostat Batteries" when the level is below 30 |
-| `Bypass Enabled` | `input_boolean.thermostat_bypass` | "Thermostat bypass enabled" or "Thermostat bypass disabled" |
+| `Bypass Enabled` | `input_boolean.thermostat_bypass` | "Thermostat bypass enabled" or "Thermostat bypass disabled". When it turns off, it also tells the function to re-apply any change held during the bypass |
 | `Filter Life Expired`, `Filter Life Reset`, `Humidifier Pad Life Expired` | Z-Wave reminder `select` entities | Filter and humidifier pad reminders. Disabled in the export. |
 
 ## Bedroom subflow
@@ -254,7 +307,7 @@ The `Bedroom` subflow controls a space heater and runs alongside the thermostat 
 {"id":"9f59dab5d4dee53d","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Homvana Humidifier Pad Life Expired.\",\"title\":\"Humidifier Pad Life\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":580,"wires":[[]]},
 {"id":"8fce968a14ae5055","type":"server-state-changed","z":"035457e7c5672996","d":true,"name":"Filter Life Reset","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["select.t6_pro_z_wave_programmable_thermostat_air_filter_1_reminder"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"str","ifState":"30 days","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":100,"y":480,"wires":[["bcd084211630dcef"],[]]},
 {"id":"bcd084211630dcef","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"A/C Filter Life Reset.\",\"title\":\"Air Filter Reset\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":480,"wires":[[]]},
-{"id":"938989aac1d80e48","type":"server-state-changed","z":"035457e7c5672996","name":"Bypass Enabled","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["input_boolean.thermostat_bypass"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"habool","ifState":"true","ifStateType":"bool","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":600,"y":360,"wires":[["089f00a5dce69647"],["86fa8d4d8e6d2fb1"]]},
+{"id":"938989aac1d80e48","type":"server-state-changed","z":"035457e7c5672996","name":"Bypass Enabled","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["input_boolean.thermostat_bypass"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"habool","ifState":"true","ifStateType":"bool","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":600,"y":360,"wires":[["089f00a5dce69647"],["86fa8d4d8e6d2fb1","b8c4e207d40f2e4e"]]},
 {"id":"089f00a5dce69647","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat bypass enabled\",\"title\":\"Thermostat Bypass\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":810,"y":320,"wires":[[]]},
 {"id":"86fa8d4d8e6d2fb1","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat bypass disabled\",\"title\":\"Thermostat Bypass\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":810,"y":400,"wires":[[]]},
 {"id":"8ca345c49f9ef888","type":"api-call-service","z":"035457e7c5672996","name":"Set Thermostat","server":"18bb22fb.3ce36d","version":7,"debugenabled":true,"action":"climate.set_temperature","floorId":[],"areaId":[],"deviceId":[],"entityId":["climate.thermostat"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"climate","service":"set_temperature","output_location":"","output_location_type":"none","x":1060,"y":60,"wires":[[]]},
@@ -262,6 +315,7 @@ The `Bedroom` subflow controls a space heater and runs alongside the thermostat 
 {"id":"13cff0536923decc","type":"api-call-service","z":"035457e7c5672996","name":"Notify Safety Turn-off","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat turned off for safety reasons.\"}","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","output_location":"","output_location_type":"none","x":940,"y":240,"wires":[["9b2521166bc490d6"]]},
 {"id":"9b2521166bc490d6","type":"api-call-service","z":"035457e7c5672996","name":"Turn Off Thermostat","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"climate.turn_off","floorId":[],"areaId":[],"deviceId":[],"entityId":["climate.thermostat"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"climate","service":"turn_off","output_location":"","output_location_type":"none","x":1180,"y":240,"wires":[[]]},
 {"id":"7af2b6675720a0a6","type":"api-call-service","z":"035457e7c5672996","name":"Notify Safety Turn-on","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat turned on for safety reasons.\"}","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":true,"domain":"notify","service":"notify","output_location":"","output_location_type":"none","x":800,"y":140,"wires":[["8ca345c49f9ef888"]]},
+{"id":"b9c7e1a4d3f25068","type":"api-call-service","z":"035457e7c5672996","name":"Notify Bypass Blocked","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"title\":\"Thermostat Bypass\",\"message\":message}","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":true,"domain":"notify","service":"notify","x":810,"y":180,"wires":[[]]},
 {"id":"149d357911bfa593","type":"comment","z":"035457e7c5672996","name":"Monitors for target temp changes","info":"","x":150,"y":40,"wires":[]},
 {"id":"ed02ecf4c701cc86","type":"comment","z":"035457e7c5672996","name":"Processes the data","info":"","x":470,"y":100,"wires":[]},
 {"id":"4ef2f896fbb3c296","type":"comment","z":"035457e7c5672996","name":"Forces heat at 58 or below, cool at 82 or above","info":"","x":1090,"y":140,"wires":[]},
@@ -274,7 +328,7 @@ The `Bedroom` subflow controls a space heater and runs alongside the thermostat 
 {"id":"f419796504562b64","type":"comment","z":"035457e7c5672996","name":"Monitors Humidifier Pad life","info":"","x":140,"y":540,"wires":[]},
 {"id":"60e8c79897d1d3e5","type":"comment","z":"035457e7c5672996","name":"Monitors battery life","info":"","x":110,"y":640,"wires":[]},
 {"id":"a67510807a922ca3","type":"comment","z":"035457e7c5672996","name":"Controls bedroom","info":"","x":630,"y":460,"wires":[]},
-{"id":"b8c4e207d40f2e4e","type":"function","z":"035457e7c5672996","name":"Adjust Temperature Difference","func":"// Temperatures are in °F\nconst SPREAD = 5;               // required gap between heat and cool setpoints\nconst LOW_TEMP = 58;            // room at or below this forces heating\nconst HIGH_TEMP = 82;           // room at or above this forces cooling\nconst SAFE_HEAT = { target_temp_low: 61, target_temp_high: 66 };\nconst SAFE_COOL = { target_temp_low: 74, target_temp_high: 79 };\nconst MIN_COOL_SETPOINT = 60;   // cool setpoint at or below this turns the thermostat off\nconst MAX_HEAT_SETPOINT = 80;   // heat setpoint at or above this turns the thermostat off\nconst MIN_SETPOINT = 63;        // lowest heat setpoint this flow will ever send\nconst MAX_SETPOINT = 78;        // highest cool setpoint this flow will ever send\nconst ECHO_WINDOW_MS = 30000;   // how long late events from our own change are ignored\nconst BYPASS_ENTITY = 'input_boolean.thermostat_bypass';\n\nconst event = msg.data && msg.data.event;\nconst previous = event && event.old_state && event.old_state.attributes;\nconst current = event && event.new_state && event.new_state.attributes;\nif (!previous || !current) {\n    return null;\n}\n\nconst currentTemp = current.current_temperature;\nconst targetHeat = current.target_temp_low;\nconst targetCool = current.target_temp_high;\nif (!Number.isFinite(currentTemp)) {\n    return null;\n}\n\n// Output 2 ignores the bypass switch. Skipped when the setpoints are already\n// applied, which stops repeat notifications while the room stays too hot/cold.\nconst forceSetpoints = (setpoints) => {\n    if (targetHeat === setpoints.target_temp_low && targetCool === setpoints.target_temp_high) {\n        return null;\n    }\n    msg.payload = { data: { ...setpoints } };\n    return [null, msg, null];\n};\n\nif (currentTemp <= LOW_TEMP) {\n    return forceSetpoints(SAFE_HEAT);\n}\nif (currentTemp >= HIGH_TEMP) {\n    return forceSetpoints(SAFE_COOL);\n}\n\n// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.\n// The temperature safety above always runs. If the state can't be read, the\n// flow is treated as bypassed.\nconst ha = global.get('homeassistant');\nconst bypass = ha?.homeAssistant?.states?.[BYPASS_ENTITY];\nif (!bypass) {\n    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');\n    return null;\n}\nif (bypass.state !== 'off') {\n    return null;\n}\n\nif (!Number.isFinite(targetHeat) || !Number.isFinite(targetCool)) {\n    return null;\n}\n\n// Extreme setpoints: turn the thermostat off (unless it already is)\nif (targetCool <= MIN_COOL_SETPOINT || targetHeat >= MAX_HEAT_SETPOINT) {\n    if (event.new_state.state === 'off') {\n        return null;\n    }\n    return [null, null, { payload: {} }];\n}\n\nconst heatChanged = previous.target_temp_low !== targetHeat;\nconst coolChanged = previous.target_temp_high !== targetCool;\n\n// Only the current temperature (or another attribute) changed\nif (!heatChanged && !coolChanged) {\n    return null;\n}\n\n// Lagging events from our own last change report the setpoints from before or\n// after it. Acting on them would undo the change and can start a runaway loop.\n// A genuine new change (such as a +1 tap) has different values and gets through.\nconst last = flow.get('tempControlLast');\nif (last && Date.now() - last.time < ECHO_WINDOW_MS) {\n    const matches = (s) => s.low === targetHeat && s.high === targetCool;\n    if (matches(last.trigger) || matches(last.sent)) {\n        return null;\n    }\n}\n\n// The setpoint that was just moved wins; the other follows to keep the spread.\n// The result is clamped so the flow can never send a runaway value.\nconst wantedHeat = heatChanged ? targetHeat : targetCool - SPREAD;\nconst newHeat = Math.min(Math.max(wantedHeat, MIN_SETPOINT), MAX_SETPOINT - SPREAD);\nconst newCool = newHeat + SPREAD;\n\n// Already in sync, nothing to send\nif (newHeat === targetHeat && newCool === targetCool) {\n    return null;\n}\n\nflow.set('tempControlLast', {\n    time: Date.now(),\n    trigger: { low: targetHeat, high: targetCool },\n    sent: { low: newHeat, high: newCool }\n});\nmsg.payload = { data: { target_temp_low: newHeat, target_temp_high: newCool } };\nreturn [msg, null, null];\n","outputs":3,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":510,"y":140,"wires":[["8ca345c49f9ef888"],["7af2b6675720a0a6"],["13cff0536923decc"]]},
+{"id":"b8c4e207d40f2e4e","type":"function","z":"035457e7c5672996","name":"Adjust Temperature Difference","func":"// Temperatures are in °F\nconst SPREAD = 5;               // required gap between heat and cool setpoints\nconst LOW_TEMP = 58;            // room at or below this forces heating\nconst HIGH_TEMP = 82;           // room at or above this forces cooling\nconst SAFE_HEAT = { target_temp_low: 61, target_temp_high: 66 };\nconst SAFE_COOL = { target_temp_low: 74, target_temp_high: 79 };\nconst MIN_COOL_SETPOINT = 60;   // cool setpoint at or below this turns the thermostat off\nconst MAX_HEAT_SETPOINT = 80;   // heat setpoint at or above this turns the thermostat off\nconst MIN_SETPOINT = 63;        // lowest heat setpoint this flow will ever send\nconst MAX_SETPOINT = 78;        // highest cool setpoint this flow will ever send\nconst ECHO_WINDOW_MS = 30000;   // how long late events from our own change are ignored\nconst BYPASS_ENTITY = 'input_boolean.thermostat_bypass';\nconst THERMOSTAT_ENTITY = 'climate.thermostat';\nconst BYPASS_NOTICE_COOLDOWN_MS = 60000; // minimum time between \"bypass is on\" notifications\n\nconst states = global.get('homeassistant')?.homeAssistant?.states;\n\n// Two kinds of message arrive here: a thermostat update, or the bypass switch changing\nlet previous;\nlet current;\nlet thermostatState;\nlet bypassState;\nlet moved = null; // which setpoint was moved, when re-applying a change held back by the bypass\nif (msg.data && msg.data.entity_id === BYPASS_ENTITY) {\n    // The bypass turned off: re-apply the last change that was requested while it was on\n    const pending = flow.get('tempControlPending');\n    const live = states?.[THERMOSTAT_ENTITY];\n    if (msg.data.new_state?.state !== 'off' || !pending || !live) {\n        return null;\n    }\n    flow.set('tempControlPending', null);\n    previous = live.attributes;\n    current = { ...live.attributes, target_temp_low: pending.low, target_temp_high: pending.high };\n    thermostatState = live.state;\n    bypassState = 'off';\n    moved = pending.moved;\n} else {\n    const event = msg.data && msg.data.event;\n    previous = event?.old_state?.attributes;\n    current = event?.new_state?.attributes;\n    thermostatState = event?.new_state?.state;\n    bypassState = states?.[BYPASS_ENTITY]?.state;\n}\nif (!previous || !current) {\n    return null;\n}\n\nconst currentTemp = current.current_temperature;\nconst targetHeat = current.target_temp_low;\nconst targetCool = current.target_temp_high;\nif (!Number.isFinite(currentTemp)) {\n    return null;\n}\n\n// Output 2 ignores the bypass switch. Skipped when the setpoints are already\n// applied, which stops repeat notifications while the room stays too hot/cold.\nconst forceSetpoints = (setpoints) => {\n    if (targetHeat === setpoints.target_temp_low && targetCool === setpoints.target_temp_high) {\n        return null;\n    }\n    msg.payload = { data: { ...setpoints } };\n    return [null, msg, null];\n};\n\nif (currentTemp <= LOW_TEMP) {\n    return forceSetpoints(SAFE_HEAT);\n}\nif (currentTemp >= HIGH_TEMP) {\n    return forceSetpoints(SAFE_COOL);\n}\n\nif (!Number.isFinite(targetHeat) || !Number.isFinite(targetCool)) {\n    return null;\n}\n\nconst heatChanged = moved ? moved === 'heat' : previous.target_temp_low !== targetHeat;\nconst coolChanged = moved ? moved === 'cool' : previous.target_temp_high !== targetCool;\n\n// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.\n// The temperature safety above always runs. If the state can't be read, the\n// flow is treated as bypassed.\nif (bypassState === undefined) {\n    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');\n    return null;\n}\nif (bypassState !== 'off') {\n    // Only a setpoint change made while the bypass is on needs attention\n    if (bypassState !== 'on' || (!heatChanged && !coolChanged)) {\n        return null;\n    }\n    // Remember the latest requested setpoints so they can be applied when the bypass turns off\n    const held = flow.get('tempControlPending');\n    flow.set('tempControlPending', { low: targetHeat, high: targetCool, moved: heatChanged ? 'heat' : 'cool' });\n    const repeat = held && held.low === targetHeat && held.high === targetCool;\n    if (repeat || Date.now() - (flow.get('tempControlNoticeAt') || 0) < BYPASS_NOTICE_COOLDOWN_MS) {\n        return null;\n    }\n    flow.set('tempControlNoticeAt', Date.now());\n    // Output 4: notify everyone that the change is on hold\n    return [null, null, null, {\n        message: 'Thermostat bypass is on. Turn it off to change the temperature. '\n            + `Your last change (heat ${targetHeat}, cool ${targetCool}) will be applied when you do.`\n    }];\n}\n\n// Extreme setpoints: turn the thermostat off (unless it already is)\nif (targetCool <= MIN_COOL_SETPOINT || targetHeat >= MAX_HEAT_SETPOINT) {\n    if (thermostatState === 'off') {\n        return null;\n    }\n    return [null, null, { payload: {} }];\n}\n\n// Only the current temperature (or another attribute) changed\nif (!heatChanged && !coolChanged) {\n    return null;\n}\n\n// Lagging events from our own last change report the setpoints from before or\n// after it. Acting on them would undo the change and can start a runaway loop.\n// A genuine new change (such as a +1 tap) has different values and gets through.\n// A re-applied change skips this check, because it isn't an event from the thermostat.\nconst last = moved ? null : flow.get('tempControlLast');\nif (last && Date.now() - last.time < ECHO_WINDOW_MS) {\n    const matches = (s) => s.low === targetHeat && s.high === targetCool;\n    if (matches(last.trigger) || matches(last.sent)) {\n        return null;\n    }\n}\n\n// The setpoint that was just moved wins; the other follows to keep the spread.\n// The result is clamped so the flow can never send a runaway value.\nconst wantedHeat = heatChanged ? targetHeat : targetCool - SPREAD;\nconst newHeat = Math.min(Math.max(wantedHeat, MIN_SETPOINT), MAX_SETPOINT - SPREAD);\nconst newCool = newHeat + SPREAD;\n\n// Already in sync, nothing to send. A change re-applied after the bypass is always sent.\nif (!moved && newHeat === targetHeat && newCool === targetCool) {\n    return null;\n}\n\nflow.set('tempControlLast', {\n    time: Date.now(),\n    trigger: { low: targetHeat, high: targetCool },\n    sent: { low: newHeat, high: newCool }\n});\nmsg.payload = { data: { target_temp_low: newHeat, target_temp_high: newCool } };\nreturn [msg, null, null];\n","outputs":4,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":510,"y":140,"wires":[["8ca345c49f9ef888"],["7af2b6675720a0a6"],["13cff0536923decc"],["b9c7e1a4d3f25068"]]},
 {"id":"9fe28d17cc7b80fd","type":"global-config","env":[],"modules":{"node-red-contrib-home-assistant-websocket":"0.82.0"}}]
 ```
 
