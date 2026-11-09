@@ -1,0 +1,281 @@
+---
+title: Temp Control
+tags: [Node-RED, Home Assistant, Thermostat, Climate]
+keywords: [Node-RED, Home Assistant, Temp Control, Thermostat, Climate, Setpoints]
+last_update:
+  author: BankaiTech
+updates:
+  - date: 2026-11-09
+    note: "docs(examples): add Node-RED Temp Control example"
+---
+
+import BuyMeACoffeeButton from '@site/src/components/BuyMeACoffeeButton';
+
+This example shows a Node-RED flow that keeps a Home Assistant thermostat inside safe limits and reports on its health. All temperatures are in °F.
+
+- **Setpoint spread**: when you change the heat or cool setpoint, the other one follows so there is always a 5 degree gap. The setpoints it sends are limited to 63–78.
+- **Temperature safety**: if the room drops to 58 or below, the heat setpoints are forced to 61/66. If it reaches 82 or above, the cool setpoints are forced to 74/79.
+- **Extreme setpoints**: if the cool setpoint is 60 or below, or the heat setpoint is 80 or above, the thermostat is turned off and you are notified.
+- **Bypass**: a toggle that disables the spread and the extreme setpoint shutoff while you make manual changes. The temperature safety ignores it.
+- **Thermostat monitoring**: notifications for the thermostat going online or erroring, a low battery, the bypass toggle changing, and (disabled in the export) filter and humidifier pad reminders.
+- **Bedroom**: a subflow that runs a space heater on a schedule and shuts it off if the room gets too warm or the house is empty.
+
+## Prerequisites
+
+- Node-RED with the [node-red-contrib-home-assistant-websocket](https://github.com/zachowj/node-red-contrib-home-assistant-websocket) palette installed (exported with version 0.82.0) and a configured Home Assistant server connection.
+- A thermostat that supports a heat and cool setpoint range, exposed as `climate.thermostat`. The export uses a Z-Wave thermostat, so the node status, battery, and reminder entities below come from the Z-Wave integration.
+- A toggle helper named `input_boolean.thermostat_bypass`. Create it under **Settings → Devices & services → Helpers → Toggle**.
+- **Enable Global Context Store** turned on in the Home Assistant server node, which the function uses to read the bypass state. The export has it on. The function looks the state up under `global.get('homeassistant').homeAssistant`, where `homeAssistant` is the server node's name (`Home Assistant`) in camelCase, so renaming the server node means changing that line.
+- `input_boolean.home_occupied` for the Bedroom subflow. This is the occupancy switch set by the [Home Security Panel](../Home%20Security%20Panel/home-security-panel.mdx) example.
+- A notify service for all devices (`notify.notify`) and one for a specific phone (`notify.mobile_app_your_phone`).
+
+## How the thermostat logic works
+
+The `Temp Changed` node fires on every update to `climate.thermostat`, including plain temperature readings, and sends each one straight to the `Adjust Temperature Difference` function node, which decides what to do. It has three outputs, and each one goes straight to the node that acts on it:
+
+| Output | Goes to | Used for |
+| --- | --- | --- |
+| 1 | `Set Thermostat` | Keeping the 5 degree spread |
+| 2 | `Notify Safety Turn-on` → `Set Thermostat` | Forcing heat or cool when the room is too cold or hot |
+| 3 | `Notify Safety Turn-off` → `Turn Off Thermostat` | Extreme setpoints |
+
+The function checks these in order and stops at the first match:
+
+| Check | Condition | Result |
+| --- | --- | --- |
+| Too cold | Room at or below 58 | Set heat/cool to 61/66 (output 2) |
+| Too hot | Room at or above 82 | Set heat/cool to 74/79 (output 2) |
+| Bypass | `input_boolean.thermostat_bypass` is not `off` | Stop. Nothing below runs |
+| Extreme setpoints | Cool setpoint at or below 60, or heat setpoint at or above 80 | Turn the thermostat off (output 3) |
+| Spread | The heat or cool setpoint changed | The setpoint you didn't touch follows, keeping the 5 degree gap. Heat stays between 63 and 73 and cool between 68 and 78 (output 1) |
+
+The bypass check sits after the two temperature checks on purpose, so the temperature safety always runs, even while the bypass is on.
+
+The function reads the bypass state from Node-RED's global context, which the Home Assistant server node fills with every entity state. If it can't read the state, or the helper is `unavailable`, it behaves as if the bypass is on and does nothing, and it logs a warning in the unreadable case.
+
+Nothing is sent when:
+
+- The bypass is on, unless the room is too cold or too hot.
+- Only the current temperature changed, or the setpoints already match what the function would set. This keeps the flow from repeating notifications and service calls on every update.
+- The safety setpoints are already applied.
+- The thermostat is already off when the extreme setpoint check matches.
+- The event has no previous state, or no valid current temperature.
+- The event is a late echo of the function's own last change (see below).
+
+### Why the clamp, echo check, and bypass exist
+
+Home Assistant can report thermostat changes late or out of order. In an earlier version of this flow, the function guessed which setpoint you had moved by comparing each event with its own previous state. A late event looked like a fresh change, the function "corrected" it, and that correction produced another event. The two setpoints kept chasing each other upward until the thermostat reached more than 500 degrees. Three safeguards now stop that:
+
+- **Clamp**: the spread logic never sends a setpoint outside 63–78, so a runaway value is impossible even if everything else fails.
+- **Echo check**: for 30 seconds after the function changes the setpoints, it ignores events that still show the setpoints from before or after that change. Those are late reports of its own change, not something you did. A real change, such as raising the setpoint by 1 degree at a time, has different values and is always processed.
+- **Bypass switch**: turn on `input_boolean.thermostat_bypass` and the function stops sending the spread and extreme setpoint shutoff commands, so you can make changes by hand or stop a misbehaving flow immediately. The temperature safety still works, because it only ever sends fixed setpoints.
+
+:::note[Why there is no rate limiter]
+The original flow had a rate limiter that passed one event every 5 seconds. It was removed because it dropped events. The thermostat card in Home Assistant would show a new setpoint while the flow never acted on it, leaving Home Assistant and the thermostat out of sync. The echo check handles late events without discarding real changes.
+:::
+
+:::note[Why `Notify Safety Turn-on` blocks input overrides]
+`Notify Safety Turn-on` sits between the function and `Set Thermostat`, so the message carries the new setpoints in `msg.payload.data`. Call service nodes merge that into their own data, and `notify.notify` rejects the extra `target_temp_low` and `target_temp_high` fields. **Block Input Overrides** is enabled on that node so it only sends its fixed message, and the original message still passes through to `Set Thermostat`.
+:::
+
+The function node code:
+
+```js
+// Temperatures are in °F
+const SPREAD = 5;               // required gap between heat and cool setpoints
+const LOW_TEMP = 58;            // room at or below this forces heating
+const HIGH_TEMP = 82;           // room at or above this forces cooling
+const SAFE_HEAT = { target_temp_low: 61, target_temp_high: 66 };
+const SAFE_COOL = { target_temp_low: 74, target_temp_high: 79 };
+const MIN_COOL_SETPOINT = 60;   // cool setpoint at or below this turns the thermostat off
+const MAX_HEAT_SETPOINT = 80;   // heat setpoint at or above this turns the thermostat off
+const MIN_SETPOINT = 63;        // lowest heat setpoint this flow will ever send
+const MAX_SETPOINT = 78;        // highest cool setpoint this flow will ever send
+const ECHO_WINDOW_MS = 30000;   // how long late events from our own change are ignored
+const BYPASS_ENTITY = 'input_boolean.thermostat_bypass';
+
+const event = msg.data && msg.data.event;
+const previous = event && event.old_state && event.old_state.attributes;
+const current = event && event.new_state && event.new_state.attributes;
+if (!previous || !current) {
+    return null;
+}
+
+const currentTemp = current.current_temperature;
+const targetHeat = current.target_temp_low;
+const targetCool = current.target_temp_high;
+if (!Number.isFinite(currentTemp)) {
+    return null;
+}
+
+// Output 2 ignores the bypass switch. Skipped when the setpoints are already
+// applied, which stops repeat notifications while the room stays too hot/cold.
+const forceSetpoints = (setpoints) => {
+    if (targetHeat === setpoints.target_temp_low && targetCool === setpoints.target_temp_high) {
+        return null;
+    }
+    msg.payload = { data: { ...setpoints } };
+    return [null, msg, null];
+};
+
+if (currentTemp <= LOW_TEMP) {
+    return forceSetpoints(SAFE_HEAT);
+}
+if (currentTemp >= HIGH_TEMP) {
+    return forceSetpoints(SAFE_COOL);
+}
+
+// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.
+// The temperature safety above always runs. If the state can't be read, the
+// flow is treated as bypassed.
+const ha = global.get('homeassistant');
+const bypass = ha?.homeAssistant?.states?.[BYPASS_ENTITY];
+if (!bypass) {
+    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');
+    return null;
+}
+if (bypass.state !== 'off') {
+    return null;
+}
+
+if (!Number.isFinite(targetHeat) || !Number.isFinite(targetCool)) {
+    return null;
+}
+
+// Extreme setpoints: turn the thermostat off (unless it already is)
+if (targetCool <= MIN_COOL_SETPOINT || targetHeat >= MAX_HEAT_SETPOINT) {
+    if (event.new_state.state === 'off') {
+        return null;
+    }
+    return [null, null, { payload: {} }];
+}
+
+const heatChanged = previous.target_temp_low !== targetHeat;
+const coolChanged = previous.target_temp_high !== targetCool;
+
+// Only the current temperature (or another attribute) changed
+if (!heatChanged && !coolChanged) {
+    return null;
+}
+
+// Lagging events from our own last change report the setpoints from before or
+// after it. Acting on them would undo the change and can start a runaway loop.
+// A genuine new change (such as a +1 tap) has different values and gets through.
+const last = flow.get('tempControlLast');
+if (last && Date.now() - last.time < ECHO_WINDOW_MS) {
+    const matches = (s) => s.low === targetHeat && s.high === targetCool;
+    if (matches(last.trigger) || matches(last.sent)) {
+        return null;
+    }
+}
+
+// The setpoint that was just moved wins; the other follows to keep the spread.
+// The result is clamped so the flow can never send a runaway value.
+const wantedHeat = heatChanged ? targetHeat : targetCool - SPREAD;
+const newHeat = Math.min(Math.max(wantedHeat, MIN_SETPOINT), MAX_SETPOINT - SPREAD);
+const newCool = newHeat + SPREAD;
+
+// Already in sync, nothing to send
+if (newHeat === targetHeat && newCool === targetCool) {
+    return null;
+}
+
+flow.set('tempControlLast', {
+    time: Date.now(),
+    trigger: { low: targetHeat, high: targetCool },
+    sent: { low: newHeat, high: newCool }
+});
+msg.payload = { data: { target_temp_low: newHeat, target_temp_high: newCool } };
+return [msg, null, null];
+```
+
+The `Set Thermostat` and `Turn Off Thermostat` nodes target `climate.thermostat` from their own configuration, so the function doesn't need to include an entity ID.
+
+## Thermostat monitoring
+
+| Node | Watches | Notifies |
+| --- | --- | --- |
+| `Thermostat Status` | `sensor.thermostat_node_status` | "Thermostat is Online" when it reports `alive` for 1 minute, otherwise "Thermostat has Error" |
+| `Battery Normal` | `sensor.hallway_thermostat_battery_level` | "Replace Thermostat Batteries" when the level is below 30 |
+| `Bypass Enabled` | `input_boolean.thermostat_bypass` | "Thermostat bypass enabled" or "Thermostat bypass disabled" |
+| `Filter Life Expired`, `Filter Life Reset`, `Humidifier Pad Life Expired` | Z-Wave reminder `select` entities | Filter and humidifier pad reminders. Disabled in the export. |
+
+## Bedroom subflow
+
+The `Bedroom` subflow controls a space heater and runs alongside the thermostat logic.
+
+- **Schedule**: the heater turns on at 8 PM and off at 9 AM, with a notification each time.
+- **Unoccupied**: the heater turns off when `input_boolean.home_occupied` has been off for 1 minute.
+- **Temperature monitoring**: a `Temp` node reads the room sensor every 60 seconds. From 73 to 75 degrees, it sends a "temperature is raising" warning if the heater is on, and only when the reading moves by more than 1 degree. Above 75 degrees, it turns the heater off and sends an emergency notification if the heater was on.
+
+## Before importing
+
+- Create the `input_boolean.thermostat_bypass` helper first, or the function node will treat the flow as bypassed and ignore setpoint changes.
+- Update the entity IDs to match your own Home Assistant. This includes `climate.thermostat`, `sensor.thermostat_node_status`, `sensor.hallway_thermostat_battery_level`, the Z-Wave reminder `select` entities, and the Bedroom entities. The ones in this export are examples.
+- Replace `notify.mobile_app_your_phone` with your own mobile app notify service.
+- In the `Bedroom` subflow, the heater nodes target the `bedroom` area as well as `switch.bedroom_space_heater`, so they act on every switch in that area. Remove the area, or change it, if that isn't what you want.
+- The thresholds are in °F. If your thermostat uses °C, change the values at the top of the function node.
+- The 63–78 limits, the 30 second echo window, and the other thresholds are constants at the top of the function node. The echo check keeps its state in flow context, so it resets when Node-RED restarts.
+
+## Flow
+
+```json
+[{"id":"a6e83cdb9f462de5","type":"subflow","name":"Bedroom","info":"","category":"","in":[],"out":[],"env":[],"meta":{},"color":"#DDAA99","status":{"x":820,"y":200,"wires":[{"id":"5e7a93d14f379feb","port":0},{"id":"91d82cecd977b2e5","port":0},{"id":"2d6da8a949552cb4","port":0},{"id":"846c67623c973fcf","port":0},{"id":"4a2cbafa05fb4fdc","port":0},{"id":"e1128a82d30bc454","port":0}]}},
+{"id":"43e94d71eb2b655d","type":"server-state-changed","z":"a6e83cdb9f462de5","name":"Occupied?","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["input_boolean.home_occupied"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"str","ifState":"true","ifStateType":"bool","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"1","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":140,"y":100,"wires":[[],["3f2c774a8856542c"]]},
+{"id":"3f2c774a8856542c","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Off - Space Heater","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"switch.turn_off","floorId":[],"areaId":["bedroom"],"deviceId":[],"entityId":["switch.bedroom_space_heater"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"switch","service":"turn_off","x":410,"y":100,"wires":[["91d82cecd977b2e5"]]},
+{"id":"b951b7dc8148f9cd","type":"inject","z":"a6e83cdb9f462de5","name":"8PM","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"00 20 * * *","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":130,"y":200,"wires":[["83c3bbad29117c21"]]},
+{"id":"83c3bbad29117c21","type":"api-call-service","z":"a6e83cdb9f462de5","name":"On - Space Heater","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"switch.turn_on","floorId":[],"areaId":["bedroom"],"deviceId":[],"entityId":["switch.bedroom_space_heater"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"switch","service":"turn_on","x":410,"y":200,"wires":[["5e7a93d14f379feb"]]},
+{"id":"6d8698a56c0d6603","type":"inject","z":"a6e83cdb9f462de5","name":"9AM","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"00 09 * * *","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":130,"y":280,"wires":[["9bd6798236846a9a"]]},
+{"id":"9bd6798236846a9a","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Off - Space Heater","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"switch.turn_off","floorId":[],"areaId":["bedroom"],"deviceId":[],"entityId":["switch.bedroom_space_heater"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"switch","service":"turn_off","x":410,"y":280,"wires":[["2d6da8a949552cb4"]]},
+{"id":"91d82cecd977b2e5","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Bedroom Heater has been turned off.\",\"title\":\"Home Unoccupied\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":630,"y":100,"wires":[[]]},
+{"id":"2d6da8a949552cb4","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Bedroom Heater has been turned off.\",\"title\":\"Bedroom\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":630,"y":280,"wires":[[]]},
+{"id":"5e7a93d14f379feb","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Bedroom Heater has been turned on.\",\"title\":\"Bedroom\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":630,"y":200,"wires":[[]]},
+{"id":"b3a5fa5230442bb9","type":"switch","z":"a6e83cdb9f462de5","name":"Temp Monitoring","property":"payload","propertyType":"msg","rules":[{"t":"btwn","v":"73.0","vt":"num","v2":"75.0","v2t":"num"},{"t":"gt","v":"75","vt":"num"}],"checkall":"true","repair":false,"outputs":2,"x":330,"y":400,"wires":[["5ff604f8735b704a"],["276d18d6e110a3c1"]]},
+{"id":"e1128a82d30bc454","type":"poll-state","z":"a6e83cdb9f462de5","name":"Temp","server":"18bb22fb.3ce36d","version":3,"exposeAsEntityConfig":"","updateInterval":"60","updateIntervalType":"num","updateIntervalUnits":"seconds","outputInitially":false,"outputOnChanged":false,"entityId":"sensor.bedroom_temp_temperature","stateType":"str","ifState":"","ifStateType":"str","ifStateOperator":"is","outputs":1,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"entity"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":130,"y":400,"wires":[["b3a5fa5230442bb9"]]},
+{"id":"276d18d6e110a3c1","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Off - Space Heater","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"switch.turn_off","floorId":[],"areaId":["bedroom"],"deviceId":[],"entityId":["switch.bedroom_space_heater"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"switch","service":"turn_off","x":590,"y":460,"wires":[["6228b23d8171ce15"]]},
+{"id":"846c67623c973fcf","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Bedroom has exceeded 75 degrees.\",\"title\":\"Emergency! Bedroom\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":1010,"y":340,"wires":[["2d6da8a949552cb4"]]},
+{"id":"4a2cbafa05fb4fdc","type":"api-call-service","z":"a6e83cdb9f462de5","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Temperature in Bedroom is raising.\",\"title\":\"Warning: Bedroom\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":850,"y":340,"wires":[[]]},
+{"id":"68c86f7f336f195b","type":"comment","z":"a6e83cdb9f462de5","name":"Temp Monitoring/Emergency Shutoff","info":"","x":160,"y":340,"wires":[]},
+{"id":"5ff604f8735b704a","type":"rbe","z":"a6e83cdb9f462de5","name":"","func":"deadband","gap":"1","start":"","inout":"in","septopics":true,"property":"payload","topi":"topic","x":550,"y":380,"wires":[["af99ed424cc7eb01"]]},
+{"id":"6228b23d8171ce15","type":"api-current-state","z":"a6e83cdb9f462de5","name":"Heater On?","server":"18bb22fb.3ce36d","version":3,"outputs":2,"halt_if":"on","halt_if_type":"str","halt_if_compare":"is","entity_id":"switch.bedroom_space_heater","state_type":"str","blockInputOverrides":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"entity"}],"for":"0","forType":"num","forUnits":"minutes","override_topic":false,"state_location":"payload","override_payload":"msg","entity_location":"data","override_data":"msg","x":790,"y":460,"wires":[["5ca1869fe751c6f3"],[]]},
+{"id":"5ca1869fe751c6f3","type":"change","z":"a6e83cdb9f462de5","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"Heater Off","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":920,"y":400,"wires":[["846c67623c973fcf"]]},
+{"id":"af99ed424cc7eb01","type":"api-current-state","z":"a6e83cdb9f462de5","name":"Heater On?","server":"18bb22fb.3ce36d","version":3,"outputs":2,"halt_if":"on","halt_if_type":"str","halt_if_compare":"is","entity_id":"switch.bedroom_space_heater","state_type":"str","blockInputOverrides":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"entity"}],"for":"0","forType":"num","forUnits":"minutes","override_topic":false,"state_location":"payload","override_payload":"msg","entity_location":"data","override_data":"msg","x":710,"y":360,"wires":[["4a2cbafa05fb4fdc"],[]]},
+{"id":"18bb22fb.3ce36d","type":"server","name":"Home Assistant","addon":true,"rejectUnauthorizedCerts":true,"ha_boolean":"","connectionDelay":false,"cacheJson":true,"heartbeat":false,"heartbeatInterval":"","areaSelector":"friendlyName","deviceSelector":"friendlyName","entitySelector":"friendlyName","statusSeparator":"","enableGlobalContextStore":true},
+{"id":"035457e7c5672996","type":"tab","label":"Temp Control","disabled":false,"info":"","env":[]},
+{"id":"bf7e3a125b171ac1","type":"subflow:a6e83cdb9f462de5","z":"035457e7c5672996","name":"","x":600,"y":500,"wires":[]},
+{"id":"2601dc177af0a3d4","type":"server-state-changed","z":"035457e7c5672996","name":"Thermostat Status","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["sensor.thermostat_node_status"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"str","ifState":"alive","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"1","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":110,"y":260,"wires":[["ad8d22685a20629f"],["832ae9d6b6c94dd0"]]},
+{"id":"832ae9d6b6c94dd0","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat has Error.\",\"title\":\"Climate Control\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":300,"wires":[[]]},
+{"id":"ad8d22685a20629f","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat is Online.\",\"title\":\"Climate Control\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":220,"wires":[[]]},
+{"id":"cd5497207a97b7a7","type":"server-state-changed","z":"035457e7c5672996","d":true,"name":"Filter Life Expired","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["select.t6_pro_z_wave_programmable_thermostat_air_filter_1_reminder"],"substring":[],"regex":[]},"outputInitially":true,"stateType":"str","ifState":"0 days","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":100,"y":380,"wires":[["ebb1b9a241d019b7"],[]]},
+{"id":"ebb1b9a241d019b7","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"A/C Filter Life Expired.\",\"title\":\"Change Air Filter\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":380,"wires":[[]]},
+{"id":"9bbaba2859ba79be","type":"server-state-changed","z":"035457e7c5672996","name":"Battery Normal","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["sensor.hallway_thermostat_battery_level"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"num","ifState":"30","ifStateType":"num","ifStateOperator":"gte","outputOnlyOnStateChange":true,"for":"1","forType":"num","forUnits":"minutes","ignorePrevStateNull":true,"ignorePrevStateUnknown":true,"ignorePrevStateUnavailable":true,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":100,"y":680,"wires":[[],["d2c6931b63bf477a"]]},
+{"id":"d2c6931b63bf477a","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Replace Thermostat Batteries.\",\"title\":\"Thermostat Battery\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":680,"wires":[[]]},
+{"id":"45b30f9515fdebd8","type":"server-state-changed","z":"035457e7c5672996","d":true,"name":"Humidifier Pad Life Expired","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["select.t6_pro_z_wave_programmable_thermostat_humidification_pad_reminder"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"str","ifState":"12 months","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"1","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":130,"y":580,"wires":[["9f59dab5d4dee53d"],[]]},
+{"id":"9f59dab5d4dee53d","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Homvana Humidifier Pad Life Expired.\",\"title\":\"Humidifier Pad Life\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":580,"wires":[[]]},
+{"id":"8fce968a14ae5055","type":"server-state-changed","z":"035457e7c5672996","d":true,"name":"Filter Life Reset","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["select.t6_pro_z_wave_programmable_thermostat_air_filter_1_reminder"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"str","ifState":"30 days","ifStateType":"str","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":true,"ignoreCurrentStateUnavailable":true,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":100,"y":480,"wires":[["bcd084211630dcef"],[]]},
+{"id":"bcd084211630dcef","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.mobile_app_your_phone","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"A/C Filter Life Reset.\",\"title\":\"Air Filter Reset\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"mobile_app_your_phone","x":330,"y":480,"wires":[[]]},
+{"id":"938989aac1d80e48","type":"server-state-changed","z":"035457e7c5672996","name":"Bypass Enabled","server":"18bb22fb.3ce36d","version":6,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["input_boolean.thermostat_bypass"],"substring":[],"regex":[]},"outputInitially":false,"stateType":"habool","ifState":"true","ifStateType":"bool","ifStateOperator":"is","outputOnlyOnStateChange":true,"for":"0","forType":"num","forUnits":"minutes","ignorePrevStateNull":false,"ignorePrevStateUnknown":false,"ignorePrevStateUnavailable":false,"ignoreCurrentStateUnknown":false,"ignoreCurrentStateUnavailable":false,"outputProperties":[{"property":"payload","propertyType":"msg","value":"","valueType":"entityState"},{"property":"data","propertyType":"msg","value":"","valueType":"eventData"},{"property":"topic","propertyType":"msg","value":"","valueType":"triggerId"}],"x":600,"y":360,"wires":[["089f00a5dce69647"],["86fa8d4d8e6d2fb1"]]},
+{"id":"089f00a5dce69647","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat bypass enabled\",\"title\":\"Thermostat Bypass\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":810,"y":320,"wires":[[]]},
+{"id":"86fa8d4d8e6d2fb1","type":"api-call-service","z":"035457e7c5672996","name":"Notify","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat bypass disabled\",\"title\":\"Thermostat Bypass\"}","dataType":"json","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","x":810,"y":400,"wires":[[]]},
+{"id":"8ca345c49f9ef888","type":"api-call-service","z":"035457e7c5672996","name":"Set Thermostat","server":"18bb22fb.3ce36d","version":7,"debugenabled":true,"action":"climate.set_temperature","floorId":[],"areaId":[],"deviceId":[],"entityId":["climate.thermostat"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"climate","service":"set_temperature","output_location":"","output_location_type":"none","x":1060,"y":60,"wires":[[]]},
+{"id":"5fd3449c1236736b","type":"trigger-state","z":"035457e7c5672996","name":"Temp Changed","server":"18bb22fb.3ce36d","version":5,"inputs":0,"outputs":2,"exposeAsEntityConfig":"","entities":{"entity":["climate.thermostat"],"substring":[],"regex":[]},"debugEnabled":false,"constraints":[{"targetType":"this_entity","targetValue":"","propertyType":"property","propertyValue":"new_state.attributes.target_temp_low","comparatorType":"is_not","comparatorValueDatatype":"num","comparatorValue":""},{"targetType":"this_entity","targetValue":"","propertyType":"property","propertyValue":"new_state.attributes.target_temp_high","comparatorType":"is_not","comparatorValueDatatype":"str","comparatorValue":""}],"customOutputs":[],"outputInitially":false,"stateType":"str","enableInput":false,"exposeToHomeAssistant":false,"haConfig":[{"property":"name","value":""},{"property":"icon","value":""}],"x":100,"y":140,"wires":[["b8c4e207d40f2e4e"],[]]},
+{"id":"13cff0536923decc","type":"api-call-service","z":"035457e7c5672996","name":"Notify Safety Turn-off","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat turned off for safety reasons.\"}","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"notify","service":"notify","output_location":"","output_location_type":"none","x":940,"y":240,"wires":[["9b2521166bc490d6"]]},
+{"id":"9b2521166bc490d6","type":"api-call-service","z":"035457e7c5672996","name":"Turn Off Thermostat","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"climate.turn_off","floorId":[],"areaId":[],"deviceId":[],"entityId":["climate.thermostat"],"labelId":[],"data":"","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":false,"domain":"climate","service":"turn_off","output_location":"","output_location_type":"none","x":1180,"y":240,"wires":[[]]},
+{"id":"7af2b6675720a0a6","type":"api-call-service","z":"035457e7c5672996","name":"Notify Safety Turn-on","server":"18bb22fb.3ce36d","version":7,"debugenabled":false,"action":"notify.notify","floorId":[],"areaId":[],"deviceId":[],"entityId":[],"labelId":[],"data":"{\"message\":\"Thermostat turned on for safety reasons.\"}","dataType":"jsonata","mergeContext":"","mustacheAltTags":false,"outputProperties":[],"queue":"none","blockInputOverrides":true,"domain":"notify","service":"notify","output_location":"","output_location_type":"none","x":800,"y":140,"wires":[["8ca345c49f9ef888"]]},
+{"id":"149d357911bfa593","type":"comment","z":"035457e7c5672996","name":"Monitors for target temp changes","info":"","x":150,"y":40,"wires":[]},
+{"id":"ed02ecf4c701cc86","type":"comment","z":"035457e7c5672996","name":"Processes the data","info":"","x":470,"y":100,"wires":[]},
+{"id":"4ef2f896fbb3c296","type":"comment","z":"035457e7c5672996","name":"Forces heat at 58 or below, cool at 82 or above","info":"","x":1090,"y":140,"wires":[]},
+{"id":"7f2f1a6e58ad26f3","type":"comment","z":"035457e7c5672996","name":"Turns off Thermostat if cool setpoint is 60- or heat setpoint is 80+","info":"","x":1060,"y":200,"wires":[]},
+{"id":"516c2ff5cec34c13","type":"comment","z":"035457e7c5672996","name":"Changes Setpoints, Retains 5 degree spread","info":"","x":930,"y":20,"wires":[]},
+{"id":"dac9222a59771df5","type":"comment","z":"035457e7c5672996","name":"Monitors Online Status","info":"","x":120,"y":220,"wires":[]},
+{"id":"d42cd3e11fe11c08","type":"comment","z":"035457e7c5672996","name":"Monitors bypass switch state","info":"","x":620,"y":300,"wires":[]},
+{"id":"c83481b27eb5f042","type":"comment","z":"035457e7c5672996","name":"Monitors Air filter life","info":"","x":110,"y":340,"wires":[]},
+{"id":"600f3358b333e259","type":"comment","z":"035457e7c5672996","name":"Resets Air filter life","info":"","x":110,"y":440,"wires":[]},
+{"id":"f419796504562b64","type":"comment","z":"035457e7c5672996","name":"Monitors Humidifier Pad life","info":"","x":140,"y":540,"wires":[]},
+{"id":"60e8c79897d1d3e5","type":"comment","z":"035457e7c5672996","name":"Monitors battery life","info":"","x":110,"y":640,"wires":[]},
+{"id":"a67510807a922ca3","type":"comment","z":"035457e7c5672996","name":"Controls bedroom","info":"","x":630,"y":460,"wires":[]},
+{"id":"b8c4e207d40f2e4e","type":"function","z":"035457e7c5672996","name":"Adjust Temperature Difference","func":"// Temperatures are in °F\nconst SPREAD = 5;               // required gap between heat and cool setpoints\nconst LOW_TEMP = 58;            // room at or below this forces heating\nconst HIGH_TEMP = 82;           // room at or above this forces cooling\nconst SAFE_HEAT = { target_temp_low: 61, target_temp_high: 66 };\nconst SAFE_COOL = { target_temp_low: 74, target_temp_high: 79 };\nconst MIN_COOL_SETPOINT = 60;   // cool setpoint at or below this turns the thermostat off\nconst MAX_HEAT_SETPOINT = 80;   // heat setpoint at or above this turns the thermostat off\nconst MIN_SETPOINT = 63;        // lowest heat setpoint this flow will ever send\nconst MAX_SETPOINT = 78;        // highest cool setpoint this flow will ever send\nconst ECHO_WINDOW_MS = 30000;   // how long late events from our own change are ignored\nconst BYPASS_ENTITY = 'input_boolean.thermostat_bypass';\n\nconst event = msg.data && msg.data.event;\nconst previous = event && event.old_state && event.old_state.attributes;\nconst current = event && event.new_state && event.new_state.attributes;\nif (!previous || !current) {\n    return null;\n}\n\nconst currentTemp = current.current_temperature;\nconst targetHeat = current.target_temp_low;\nconst targetCool = current.target_temp_high;\nif (!Number.isFinite(currentTemp)) {\n    return null;\n}\n\n// Output 2 ignores the bypass switch. Skipped when the setpoints are already\n// applied, which stops repeat notifications while the room stays too hot/cold.\nconst forceSetpoints = (setpoints) => {\n    if (targetHeat === setpoints.target_temp_low && targetCool === setpoints.target_temp_high) {\n        return null;\n    }\n    msg.payload = { data: { ...setpoints } };\n    return [null, msg, null];\n};\n\nif (currentTemp <= LOW_TEMP) {\n    return forceSetpoints(SAFE_HEAT);\n}\nif (currentTemp >= HIGH_TEMP) {\n    return forceSetpoints(SAFE_COOL);\n}\n\n// Bypass switch: stops the extreme setpoint shutoff and the spread logic below.\n// The temperature safety above always runs. If the state can't be read, the\n// flow is treated as bypassed.\nconst ha = global.get('homeassistant');\nconst bypass = ha?.homeAssistant?.states?.[BYPASS_ENTITY];\nif (!bypass) {\n    node.warn('Cannot read ' + BYPASS_ENTITY + ' from the global context');\n    return null;\n}\nif (bypass.state !== 'off') {\n    return null;\n}\n\nif (!Number.isFinite(targetHeat) || !Number.isFinite(targetCool)) {\n    return null;\n}\n\n// Extreme setpoints: turn the thermostat off (unless it already is)\nif (targetCool <= MIN_COOL_SETPOINT || targetHeat >= MAX_HEAT_SETPOINT) {\n    if (event.new_state.state === 'off') {\n        return null;\n    }\n    return [null, null, { payload: {} }];\n}\n\nconst heatChanged = previous.target_temp_low !== targetHeat;\nconst coolChanged = previous.target_temp_high !== targetCool;\n\n// Only the current temperature (or another attribute) changed\nif (!heatChanged && !coolChanged) {\n    return null;\n}\n\n// Lagging events from our own last change report the setpoints from before or\n// after it. Acting on them would undo the change and can start a runaway loop.\n// A genuine new change (such as a +1 tap) has different values and gets through.\nconst last = flow.get('tempControlLast');\nif (last && Date.now() - last.time < ECHO_WINDOW_MS) {\n    const matches = (s) => s.low === targetHeat && s.high === targetCool;\n    if (matches(last.trigger) || matches(last.sent)) {\n        return null;\n    }\n}\n\n// The setpoint that was just moved wins; the other follows to keep the spread.\n// The result is clamped so the flow can never send a runaway value.\nconst wantedHeat = heatChanged ? targetHeat : targetCool - SPREAD;\nconst newHeat = Math.min(Math.max(wantedHeat, MIN_SETPOINT), MAX_SETPOINT - SPREAD);\nconst newCool = newHeat + SPREAD;\n\n// Already in sync, nothing to send\nif (newHeat === targetHeat && newCool === targetCool) {\n    return null;\n}\n\nflow.set('tempControlLast', {\n    time: Date.now(),\n    trigger: { low: targetHeat, high: targetCool },\n    sent: { low: newHeat, high: newCool }\n});\nmsg.payload = { data: { target_temp_low: newHeat, target_temp_high: newCool } };\nreturn [msg, null, null];\n","outputs":3,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":510,"y":140,"wires":[["8ca345c49f9ef888"],["7af2b6675720a0a6"],["13cff0536923decc"]]},
+{"id":"9fe28d17cc7b80fd","type":"global-config","env":[],"modules":{"node-red-contrib-home-assistant-websocket":"0.82.0"}}]
+```
+
+<BuyMeACoffeeButton />
