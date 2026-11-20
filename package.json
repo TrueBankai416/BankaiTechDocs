@@ -59,7 +59,7 @@
     "prettier": "^3.9.10",
     "process": "^0.11.10",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.73.0"
   },
   "browserslist": {
     "production": [
