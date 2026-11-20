@@ -37,7 +37,7 @@
     "discord.js": "^14.28.1",
     "disqus-react": "^1.1.7",
     "dotenv": "^18.0.9",
-    "posthog-docusaurus": "^2.0.5",
+    "posthog-docusaurus": "^2.0.7",
     "prism-react-renderer": "^2.4.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
