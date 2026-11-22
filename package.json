@@ -52,7 +52,7 @@
     "@rspack/cli": "^2.3.3",
     "@rspack/core": "^2.3.3",
     "cspell": "^10.4.0",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.13.0",
     "markdown-link-check": "^3.15.0",
